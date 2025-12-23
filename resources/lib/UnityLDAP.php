@@ -229,11 +229,16 @@ class UnityLDAP extends LDAPConn
         );
     }
 
-    public function getAllPIGroupOwnerUIDs(): array
-    {
-        return array_map(
-            fn($x) => UnityGroup::GID2OwnerUID($x["cn"][0]),
-            $this->pi_groupOU->getChildrenArrayStrict(["cn"]),
+    public function getPIGroupAttributesWithMemberUID(
+        string $uid,
+        array $attributes,
+        array $default_values = [],
+    ) {
+        return $this->pi_groupOU->getChildrenArrayStrict(
+            $attributes,
+            recursive: false,
+            filter: sprintf("(memberuid=%s)", ldap_escape($uid, "", LDAP_ESCAPE_FILTER)),
+            default_values: $default_values,
         );
     }
 

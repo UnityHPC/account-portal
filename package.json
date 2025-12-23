@@ -6,6 +6,10 @@
   "dependencies": {
     "ckeditor5": "^47.3.0",
     "copy-files-from-to": "^3.13.0",
+    "datatables.net-buttons-dt": "^3.2.6",
+    "datatables.net-columncontrol-dt": "^1.2.0",
+    "datatables.net-dt": "^2.3.6",
+    "datatables.net-responsive-dt": "^3.0.7",
     "jquery": "^3.7.1"
   },
   "copyFiles": [
@@ -20,6 +24,50 @@
     {
       "from": "node_modules/ckeditor5/dist/browser/ckeditor5.css",
       "to": "webroot/css/ckeditor5.css"
+    },
+    {
+      "from": "node_modules/datatables.net-responsive/js/dataTables.responsive.min.js",
+      "to": "webroot/js/dataTables.responsive.min.js"
+    },
+    {
+      "from": "node_modules/datatables.net-columncontrol/js/dataTables.columnControl.min.js",
+      "to": "webroot/js/dataTables.columnControl.min.js"
+    },
+    {
+      "from": "node_modules/datatables.net-buttons/js/buttons.print.min.js",
+      "to": "webroot/js/buttons.print.min.js"
+    },
+    {
+      "from": "node_modules/datatables.net-buttons/js/buttons.colVis.min.js",
+      "to": "webroot/js/buttons.colVis.min.js"
+    },
+    {
+      "from": "node_modules/datatables.net-buttons/js/dataTables.buttons.min.js",
+      "to": "webroot/js/dataTables.buttons.min.js"
+    },
+    {
+      "from": "node_modules/datatables.net-buttons/js/buttons.html5.min.js",
+      "to": "webroot/js/buttons.html5.min.js"
+    },
+    {
+      "from": "node_modules/datatables.net/js/dataTables.min.js",
+      "to": "webroot/js/dataTables.min.js"
+    },
+    {
+      "from": "node_modules/datatables.net-responsive-dt/css/responsive.dataTables.min.css",
+      "to": "webroot/css/responsive.dataTables.min.css"
+    },
+    {
+      "from": "node_modules/datatables.net-dt/css/dataTables.dataTables.min.css",
+      "to": "webroot/css/dataTables.dataTables.min.css"
+    },
+    {
+      "from": "node_modules/datatables.net-columncontrol-dt/css/columnControl.dataTables.min.css",
+      "to": "webroot/css/columnControl.dataTables.min.css"
+    },
+    {
+      "from": "node_modules/datatables.net-buttons-dt/css/buttons.dataTables.min.css",
+      "to": "webroot/css/buttons.dataTables.min.css"
     }
   ]
 }
