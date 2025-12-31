@@ -93,15 +93,18 @@ class UnityUser
         return $this->LDAP->userFlagGroups[$flag->value]->memberUIDExists($this->uid);
     }
 
+    /**
+     * @return bool true if changed, false if not changed
+     */
     public function setFlag(
         UserFlag $flag,
         bool $newValue,
         bool $doSendMail = true,
         bool $doSendMailAdmin = true,
-    ): void {
+    ): bool {
         $oldValue = $this->getFlag($flag);
         if ($oldValue == $newValue) {
-            return;
+            return false;
         }
         if ($newValue) {
             $this->LDAP->userFlagGroups[$flag->value]->addMemberUID($this->uid);
@@ -136,6 +139,7 @@ class UnityUser
                 ]);
             }
         }
+        return true;
     }
 
     /**
