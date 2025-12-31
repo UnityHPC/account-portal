@@ -57,6 +57,11 @@ if (isset($_SERVER["REMOTE_USER"])) {
     $_SESSION["SSO"] = $SSO;
 
     $OPERATOR = new UnityUser($SSO["user"], $LDAP, $SQL, $MAILER, $WEBHOOK);
+
+    if ($OPERATOR->getFlag(UserFlag::LOCKED)) {
+        UnityHTTPD::die("Your account is locked.", true);
+    }
+
     $_SESSION["is_admin"] = $OPERATOR->getFlag(UserFlag::ADMIN);
 
     $_SESSION["OPERATOR"] = $SSO["user"];
