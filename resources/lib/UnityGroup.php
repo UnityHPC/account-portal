@@ -190,7 +190,12 @@ class UnityGroup extends PosixGroup
         }
         // being in a group makes you qualified
         if (
-            $new_user->setFlag(UserFlag::QUALIFIED, true, doSendMail: true, doSendMailAdmin: false)
+            $new_user->setFlag(
+                UserFlag::QUALIFIED,
+                true,
+                doSendMail: $send_mail,
+                doSendMailAdmin: false,
+            )
         ) {
             UnityHTTPD::messageSuccess(
                 "Account Qualified",
@@ -254,7 +259,7 @@ class UnityGroup extends PosixGroup
                 $new_user->setFlag(
                     UserFlag::QUALIFIED,
                     false,
-                    doSendMail: true,
+                    doSendMail: $send_mail,
                     doSendMailAdmin: false,
                 )
             ) {
