@@ -45,18 +45,21 @@ cn: locked
 gidnumber: 502
 objectclass: posixGroup
 objectclass: top
+memberuid: user8_org1_test
 
 dn: cn=idlelocked,dc=unityhpc,dc=test
 cn: idlelocked
 gidnumber: 503
 objectclass: posixGroup
 objectclass: top
+memberuid: user6_org1_test
 
 dn: cn=ghost,dc=unityhpc,dc=test
 cn: ghost
 gidnumber: 504
 objectclass: posixGroup
 objectclass: top
+memberuid: user7_org1_test
 
 dn: cn=unityusers,dc=unityhpc,dc=test
 cn: unityusers
@@ -68,7 +71,6 @@ memberuid: user3_org1_test
 memberuid: user4_org1_test
 memberuid: user5_org2_test
 memberuid: user6_org1_test
-memberuid: user7_org1_test
 memberuid: user8_org1_test
 memberuid: user9_org3_test
 memberuid: user10_org1_test
@@ -13298,13 +13300,6 @@ memberuid: user1193_org5_test
 memberuid: user1121_org5_test
 memberuid: user855_org5_test
 memberuid: user76_org5_test
-objectclass: posixGroup
-objectclass: top
-
-dn: cn=pi_user7_org1_test,ou=pi_groups,dc=unityhpc,dc=test
-cn: pi_user7_org1_test
-gidnumber: 10124
-memberuid: user7_org1_test
 objectclass: posixGroup
 objectclass: top
 
