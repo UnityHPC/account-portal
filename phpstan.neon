@@ -33,6 +33,7 @@ parameters:
         - '#Negated boolean expression is always false\.#'
       paths:
         - test/functional/PiRemoveUserTest.php
+        - test/functional/LeaveGroupTest.php
         - test/phpunit-bootstrap.php
     - messages:
         - '#If condition is always false\.#'
