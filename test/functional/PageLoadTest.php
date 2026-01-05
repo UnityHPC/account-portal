@@ -61,6 +61,8 @@ class PageLoadTest extends UnityWebPortalTestCase
             ["Blank", "panel/new_account.php", "/panel\/account\.php/"],
             // non-PI can't access pi.php
             ["Blank", "panel/pi.php", "/You are not a PI./"],
+            // ghost account technically exists but new_account.php should not redirect
+            ["Ghost", "panel/new_account.php", "/Register New Account/"],
         ];
     }
 
