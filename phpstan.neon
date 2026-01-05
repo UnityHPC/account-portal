@@ -34,7 +34,6 @@ parameters:
       paths:
         - test/functional/PiRemoveUserTest.php
         - test/functional/LeaveGroupTest.php
-        - test/functional/IdleUnlockTest.php
         - test/phpunit-bootstrap.php
     - messages:
         - '#If condition is always false\.#'
