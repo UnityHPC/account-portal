@@ -212,7 +212,7 @@ class UnityWebPortalTestCase extends TestCase
         "user2004_org998_test" => ["user2004@org1.test", "foo", "bar", "user2001@org1.test"],
         "user2005_org1_test" => ["user2005@org1.test", "foo", "bar", "user2005@org1.test"],
     ];
-    private static array $NICKNAME2UID = [
+    public static array $NICKNAME2UID = [
         "Admin" => "user1_org1_test",
         "Blank" => "user2_org1_test",
         "EmptyPIGroupOwner" => "user5_org2_test",
