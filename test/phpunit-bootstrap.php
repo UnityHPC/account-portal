@@ -179,6 +179,9 @@ function ensurePIGroupDoesNotExist()
         $LDAP->getPIGroupEntry($gid)->delete();
         ensure(!$USER->getPIGroup()->exists());
     }
+    if (count($USER->getPIGroupGIDs()) === 0) {
+        $USER->setFlag(UserFlag::QUALIFIED, false);
+    }
 }
 
 function callPrivateMethod($obj, $name, ...$args)

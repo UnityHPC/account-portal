@@ -73,6 +73,7 @@ class PIBecomeApproveTest extends UnityWebPortalTestCase
         } finally {
             $this->switchUser("Blank", validate: false);
             ensurePIGroupDoesNotExist();
+            $this->assertFalse($USER->getFlag(UserFlag::QUALIFIED));
         }
     }
 }
