@@ -58,10 +58,6 @@ if (isset($_SERVER["REMOTE_USER"])) {
 
     $OPERATOR = new UnityUser($SSO["user"], $LDAP, $SQL, $MAILER, $WEBHOOK);
 
-    if ($OPERATOR->getFlag(UserFlag::LOCKED)) {
-        UnityHTTPD::die("Your account is locked.", true);
-    }
-
     $_SESSION["is_admin"] = $OPERATOR->getFlag(UserFlag::ADMIN);
 
     $_SESSION["OPERATOR"] = $SSO["user"];
@@ -77,6 +73,10 @@ if (isset($_SERVER["REMOTE_USER"])) {
     $_SESSION["is_pi"] = $USER->isPI();
 
     $SQL->addLog("user_login", $OPERATOR->uid);
+
+    if ($OPERATOR->getFlag(UserFlag::LOCKED)) {
+        UnityHTTPD::die("Your account is locked.");
+    }
 
     if ($OPERATOR->setFlag(UserFlag::IDLELOCKED, false)) {
         UnityHTTPD::messageSuccess(
