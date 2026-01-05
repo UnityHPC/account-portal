@@ -81,7 +81,12 @@ class UnityGroup extends PosixGroup
             $this->MAILER->sendMail($this->getOwner()->getMail(), "group_created");
         }
         // having your own group makes you qualified
-        $this->getOwner()->setFlag(UserFlag::QUALIFIED, true);
+        $this->getOwner()->setFlag(
+            UserFlag::QUALIFIED,
+            true,
+            doSendMail: $send_mail,
+            doSendMailAdmin: false,
+        );
     }
 
     /**
