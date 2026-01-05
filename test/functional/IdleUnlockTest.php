@@ -4,7 +4,7 @@ use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 
 class IdleUnlockTest extends UnityWebPortalTestCase
 {
-    public function testLeaveGroupDequalified()
+    public function testIdleUnlock()
     {
         global $USER, $LDAP;
         $this->switchUser("Admin");
