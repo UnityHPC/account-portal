@@ -5,7 +5,6 @@ use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UnityGroup;
 use PHPUnit\Framework\Attributes\DataProvider;
 use TRegx\PhpUnit\DataProviders\DataProvider as TRegxDataProvider;
-use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 
 class PIMemberApproveTest extends UnityWebPortalTestCase
 {
@@ -18,11 +17,6 @@ class PIMemberApproveTest extends UnityWebPortalTestCase
             "action" => "Approve",
             "uid" => $uid,
         ]);
-        $this->assertMessageExists(
-            UnityHTTPDMessageLevel::SUCCESS,
-            "/^Account Qualified$/",
-            "/$uid/",
-        );
     }
 
     private function approveUserByAdmin(string $uid, string $gid)
@@ -36,11 +30,6 @@ class PIMemberApproveTest extends UnityWebPortalTestCase
                 "pi" => $gid,
                 "uid" => $uid,
             ]);
-            $this->assertMessageExists(
-                UnityHTTPDMessageLevel::SUCCESS,
-                "/^Account Qualified$/",
-                "/$uid/",
-            );
         } finally {
             $this->switchBackUser();
         }

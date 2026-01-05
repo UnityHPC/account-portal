@@ -2,7 +2,6 @@
 use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnityGroup;
-use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 
 class LeaveGroupTest extends UnityWebPortalTestCase
 {
@@ -21,11 +20,6 @@ class LeaveGroupTest extends UnityWebPortalTestCase
                 "form_type" => "removePIForm",
                 "pi" => $gid,
             ]);
-            $this->assertMessageExists(
-                UnityHTTPDMessageLevel::SUCCESS,
-                "/^Account Dequalified$/",
-                "/^You/",
-            );
             $this->assertFalse($pi_group->memberUIDExists($USER->uid));
             $this->assertFalse($USER->getFlag(UserFlag::QUALIFIED));
         } finally {

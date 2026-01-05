@@ -194,19 +194,12 @@ class UnityGroup extends PosixGroup
             ]);
         }
         // being in a group makes you qualified
-        if (
-            $new_user->setFlag(
-                UserFlag::QUALIFIED,
-                true,
-                doSendMail: $send_mail,
-                doSendMailAdmin: false,
-            )
-        ) {
-            UnityHTTPD::messageSuccess(
-                "Account Qualified",
-                "User '$new_user->uid' should now have access to UnityHPC Platform services.",
-            );
-        }
+        $new_user->setFlag(
+            UserFlag::QUALIFIED,
+            true,
+            doSendMail: $send_mail,
+            doSendMailAdmin: false,
+        );
     }
 
     public function denyUser(UnityUser $new_user, bool $send_mail = true): void
@@ -260,22 +253,12 @@ class UnityGroup extends PosixGroup
         }
         // if user is no longer in any PI group, dequalify them
         if (count($this->LDAP->getPIGroupGIDsWithMemberUID($new_user->uid)) === 0) {
-            if (
-                $new_user->setFlag(
-                    UserFlag::QUALIFIED,
-                    false,
-                    doSendMail: $send_mail,
-                    doSendMailAdmin: false,
-                )
-            ) {
-                UnityHTTPD::messageSuccess(
-                    "Account Dequalified",
-                    sprintf(
-                        "%s should no longer have access to UnityHPC Platform services.",
-                        $_SESSION["OPERATOR"] === $new_user->uid ? "You" : "User '$new_user->uid'",
-                    ),
-                );
-            }
+            $new_user->setFlag(
+                UserFlag::QUALIFIED,
+                false,
+                doSendMail: $send_mail,
+                doSendMailAdmin: false,
+            );
         }
     }
 

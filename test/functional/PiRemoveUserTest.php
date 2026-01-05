@@ -2,7 +2,6 @@
 
 use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UserFlag;
-use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class PIRemoveUserTest extends UnityWebPortalTestCase
@@ -61,11 +60,6 @@ class PIRemoveUserTest extends UnityWebPortalTestCase
             $func($memberToDelete->uid, $piGroup->gid);
             $this->assertFalse($piGroup->memberUIDExists($memberToDelete->uid));
             $this->assertFalse($memberToDelete->getFlag(UserFlag::QUALIFIED));
-            $this->assertMessageExists(
-                UnityHTTPDMessageLevel::SUCCESS,
-                "/^Account Dequalified$/",
-                "/$memberToDelete->uid/",
-            );
         } finally {
             if (!$piGroup->memberUIDExists($memberToDelete->uid)) {
                 $piGroup->newUserRequest($memberToDelete);
