@@ -93,12 +93,12 @@ $(document).ready(() => {
     $('#user-table').DataTable({
         responsive: true,
         columns: [
-            {responsivePriority: 2}, // name
-            {responsivePriority: 1}, // uid
-            {responsivePriority: 2}, // org
-            {responsivePriority: 2}, // mail
-            {responsivePriority: 3}, // groups (ideally always hidden)
-            {responsivePriority: 1}, // actions
+            {data: "name", responsivePriority: 2},
+            {data: "uid", responsivePriority: 1},
+            {data: "org", responsivePriority: 2},
+            {data: "mail", responsivePriority: 2},
+            {data: "groups", responsivePriority: 3},
+            {data: "actions", responsivePriority: 1},
         ],
         layout: {topStart: {buttons: ['colvis']}}
     });

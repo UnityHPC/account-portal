@@ -145,12 +145,11 @@ echo "</table>";
         $('#users-table').DataTable({
             responsive: true,
             columns: [
-                {responsivePriority: 2}, // name
-                {responsivePriority: 1}, // username
-                {responsivePriority: 2}, // mail
-                {responsivePriority: 1}, // actions
+                {data: "name", responsivePriority: 2},
+                {data: "uid", responsivePriority: 1},
+                {data: "mail", responsivePriority: 2},
+                {data: "actions", responsivePriority: 1},
             ],
-            layout: {topStart: {buttons: ['colvis']}}
         });
     });
 </script>

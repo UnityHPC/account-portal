@@ -48,6 +48,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 require $LOC_HEADER;
+
+$CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 ?>
 
 <h1>PI Management</h1>
@@ -55,7 +57,7 @@ require $LOC_HEADER;
 
 <!-- <input type="text" id="tableSearch" placeholder="Search..."> -->
 
-<h2>Pending PI Requests</h2>
+<h2>PI Group Requests</h2>
 <table id="pi-request-table" class="stripe compact hover">
     <thead>
         <tr>
@@ -81,7 +83,6 @@ require $LOC_HEADER;
         echo "<td>$email</td>";
         echo "<td>" . $request['timestamp'] . "</td>";
         echo "<td>";
-        $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
         echo
             "<form action='' method='POST'>
         $CSRFTokenHiddenFormInput
@@ -99,47 +100,39 @@ require $LOC_HEADER;
     </tbody>
 </table>
 
-<h2>List of PIs</h2>
+<br>
+<h2>PI Groups</h2>
 
 <table id="pi-table" class="stripe compact hover">
     <thead>
         <tr>
             <th>Name</th>
-            <th>Unity ID</th>
+            <th>GID</th>
             <th>Mail</th>
-            <th>Members</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
     <?php
-    $pi_groups_attributes = $LDAP->getAllPIGroupsAttributes(["cn", "memberuid"]);
-    $pi_group_gid_to_member_uids = [];
-    $pi_group_gid_to_owner_uid = [];
-    foreach ($pi_groups_attributes as $group_attributes) {
-        $gid = $group_attributes["cn"][0];
-        $pi_group_gid_to_owner_uid[$gid] = UnityGroup::GID2OwnerUID($gid);
-        $pi_group_gid_to_member_uids[$gid] = $group_attributes["memberuid"];
-    }
-    $pi_group_owners_attributes = $LDAP->getUsersAttributes(
-        array_values($pi_group_gid_to_owner_uid),
+    $owner_uids = $LDAP->getAllPIGroupOwnerUIDs();
+    $owner_attributes = $LDAP->getUsersAttributes(
+        $owner_uids,
         ["uid", "gecos", "mail"],
         default_values: ["gecos" => ["(not found)"], "mail" => ["(not found)"]]
     );
-    foreach ($pi_group_gid_to_owner_uid as $gid => $uid) {
-        $owner_attributes = $pi_group_owners_attributes[$uid];
-        $gecos = $owner_attributes["gecos"][0];
-        $mail = $owner_attributes["mail"][0];
-        $members = $pi_group_gid_to_member_uids[$gid];
-        echo "<tr>";
-        echo "<td>$gecos</td>";
-        echo "<td>$uid</td>";
-        echo "<td>$mail</td>";
-        echo "<td><ul>";
-        foreach ($members as $member_uid) {
-            echo "<li>$member_uid</li>";
-        }
-        echo "</ul></td>";
-        echo "</tr>";
+    usort($owner_attributes, fn($a, $b) => strcmp($a["uid"][0], $b["uid"][0]));
+    foreach ($owner_attributes as $attributes) {
+        $gecos = $attributes["gecos"][0];
+        $gid = UnityGroup::OwnerUID2GID($attributes["uid"][0]);
+        $mail = $attributes["mail"][0];
+        echo "
+            <tr>
+                <td>$gecos</td>
+                <td>$gid</td>
+                <td>$mail</td>
+                <td />
+            </tr>
+        ";
     }
     ?>
     </tbody>
@@ -147,28 +140,59 @@ require $LOC_HEADER;
 
 <script>
     $(document).ready(() => {
-        $('#pi-request-table').DataTable({
+        let pi_request_datatable = $('#pi-request-table').DataTable({
             responsive: true,
             columns: [
-                {responsivePriority: 2}, // name
-                {responsivePriority: 1}, // uid
-                {responsivePriority: 2}, // mail
-                {responsivePriority: 2}, // requested on
-                {responsivePriority: 1}, // actions
+                {data: "name", responsivePriority: 2},
+                {data: "uid", responsivePriority: 1},
+                {data: "mail", responsivePriority: 2},
+                {data: "requested_on", responsivePriority: 2},
+                {data: "actions", responsivePriority: 1},
             ],
-            layout: {topStart: {buttons: ['colvis']}}
         });
-        $('#pi-table').DataTable({
-            responsive: true,
+        let pi_datatable = $('#pi-table').DataTable({
             columns: [
-                {responsivePriority: 1}, // name
-                {responsivePriority: 1}, // uid
-                {responsivePriority: 1}, // mail,
-                {responsivePriority: 2, visible: false}, // members
-            ],
-            layout: {topStart: {buttons: ['colvis']}}
+                {data: "name", className: 'details-control'},
+                {data: "gid"},
+                {data: "mail"},
+                {data: "actions"},
+            ]
+        });
+        // https://datatables.net/blog/2017/ajax-loaded-row-details
+        // https://datatables.net/forums/discussion/42045/nested-tables
+        $('#pi-table tbody').on('click', 'td.details-control', function() {
+            var tr = $(this).closest('tr');
+            var row = pi_datatable.row(tr);
+            if (row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+            }
+            else {
+                $.ajax({
+                    url: `/admin/ajax/get_group_members.php?gid=${row.data().gid}`,
+                    dataType: 'text',
+                    success: function(responseText) {
+                        responseElements = $(responseText).toArray();
+                        row.child(responseElements).show();
+                    },
+                    error: function(x) {
+                        row.child($(`<span>${x.responseText}</span>`)).show();
+                    },
+                });
+                tr.addClass('shown');
+            }
         });
     });
 </script>
-
+<style>
+.details-control::before {
+    content: "▶ ";
+}
+tr.shown td.details-control::before {
+    content: "▼ ";
+}
+th.details-control::before {
+    content: "";
+}
+</style>
 <?php require $LOC_FOOTER; ?>
