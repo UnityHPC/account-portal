@@ -59,4 +59,20 @@ class RegisterUserTest extends UnityWebPortalTestCase
             $USER->setFlag(UserFlag::GHOST, true);
         }
     }
+
+    public function testResurrectWithHauntedGroup()
+    {
+        global $USER;
+        $this->switchUser("GhostWithHauntedPIGroup");
+        $this->assertTrue($USER->getFlag(UserFlag::GHOST));
+        $this->assertFalse($USER->isPI());
+        try {
+            $this->register();
+            $this->assertMessageExists(UnityHTTPDMessageLevel::INFO, "/.*/", "/resurrected/");
+            $this->assertFalse($USER->getFlag(UserFlag::GHOST));
+            $this->assertFalse($USER->isPI());
+        } finally {
+            $USER->setFlag(UserFlag::GHOST, true);
+        }
+    }
 }
