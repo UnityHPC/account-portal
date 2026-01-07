@@ -170,7 +170,6 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
             else {
                 $.ajax({
                     url: `/admin/ajax/get_group_members.php?gid=${row.data().gid}`,
-                    dataType: 'text',
                     success: function(responseText) {
                         responseElements = $(responseText).toArray();
                         row.child(responseElements).show();
