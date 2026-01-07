@@ -238,22 +238,22 @@ if ($SQL->accDeletionRequestExists($USER->uid)) {
         $('#pi-table').DataTable({
             responsive: true,
             columns: [
-                {data: "name", responsivePriority: 1},
-                {data: "gid", responsivePriority: 2},
-                {data: "pi_mail", responsivePriority: 2},
-                {data: "members", responsivePriority: 3, visible: false},
-                {data: "actions", responsivePriority: 1},
+                {responsivePriority: 1}, // name
+                {responsivePriority: 2}, // gid
+                {responsivePriority: 2}, // pi_mail
+                {responsivePriority: 3, visible: false}, // members
+                {responsivePriority: 1}, // actions
             ],
             layout: {topStart: {buttons: ['colvis']}}
         });
         $('#pi-request-table').DataTable({
             responsive: true,
             columns: [
-                {data: "owner_name", responsivePriority: 1},
-                {data: "gid", responsivePriority: 2},
-                {data: "pi_mail", responsivePriority: 2},
-                {data: "requested_on", responsivePriority: 2},
-                {data: "actions", responsivePriority: 1},
+                {responsivePriority: 1}, // owner_name
+                {responsivePriority: 2}, // gid
+                {responsivePriority: 2}, // pi_mail
+                {responsivePriority: 2}, // requested_on
+                {responsivePriority: 1}, // actions
             ],
         });
     });

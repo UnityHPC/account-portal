@@ -143,19 +143,19 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
         let pi_request_datatable = $('#pi-request-table').DataTable({
             responsive: true,
             columns: [
-                {data: "name", responsivePriority: 2},
-                {data: "uid", responsivePriority: 1},
-                {data: "mail", responsivePriority: 2},
-                {data: "requested_on", responsivePriority: 2},
-                {data: "actions", responsivePriority: 1},
+                {responsivePriority: 2}, // name
+                {responsivePriority: 1}, // uid
+                {responsivePriority: 2}, // mail
+                {responsivePriority: 2}, // requested_on
+                {responsivePriority: 1}, // actions
             ],
         });
         let pi_datatable = $('#pi-table').DataTable({
             columns: [
-                {data: "name", className: 'details-control'},
-                {data: "gid"},
-                {data: "mail"},
-                {data: "actions"},
+                {className: 'details-control'}, // name
+                {}, // gid
+                {}, // mail
+                {}, // actions
             ]
         });
         // https://datatables.net/blog/2017/ajax-loaded-row-details
