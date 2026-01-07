@@ -25,6 +25,7 @@ Admin Features:
 - Cluster notices
   - Added to front page, mailed, and exposed via REST API
 - WYSIWYG HTML editor ([ckeditor5](https://github.com/ckeditor/ckeditor5)) for webpage contents, cluster notices
+- Responsive Tables ([datatables.net](https://datatables.net)) for filtering, sorting, pagination, etc.
 - Branding customization for multiple domains simultaneously
 - Custom UIDNumber / GIDNumber mappings for specific users
 - Login as another user
