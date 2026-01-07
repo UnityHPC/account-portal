@@ -4,6 +4,7 @@ namespace UnityWebPortal\lib;
 
 use PHPOpenLDAPer\LDAPEntry;
 use Exception;
+use RangeException;
 
 /**
  * Class that represents a single PI group in the UnityHPC Platform.
@@ -40,7 +41,7 @@ class UnityGroup extends PosixGroup
     public function requestGroup(?bool $send_mail_to_admins = null, bool $send_mail = true): void
     {
         $send_mail_to_admins ??= CONFIG["mail"]["send_pimesg_to_admins"];
-        if ($this->exists()) {
+        if ($this->exists() && !$this->getIsHaunted()) {
             return;
         }
         if ($this->SQL->accDeletionRequestExists($this->getOwner()->uid)) {
@@ -63,6 +64,15 @@ class UnityGroup extends PosixGroup
         }
     }
 
+    private function exorcism()
+    {
+        $this->setIsHaunted(false);
+        $owner_uid = $this->getOwner()->uid;
+        if (!$this->memberUIDExists($owner_uid)) {
+            $this->addMemberUID($owner_uid);
+        }
+    }
+
     /**
      * This method will create the group (this is what is executed when an admin approved the group)
      */
@@ -74,8 +84,7 @@ class UnityGroup extends PosixGroup
         if (!$this->entry->exists()) {
             $this->init();
         } elseif ($this->getIsHaunted()) {
-            // if haunted group is re-approved, group is no longer haunted
-            $this->setIsHaunted(false);
+            $this->exorcism();
         } else {
             throw new Exception("cannot approve group that already exists and is not haunted");
         }
@@ -409,13 +418,20 @@ class UnityGroup extends PosixGroup
         $value = $this->entry->getAttribute("isHaunted");
         if (count($value) === 0) {
             return false;
-        } else {
-            return $value[0];
+        }
+        switch ($value[0]) {
+            case "TRUE":
+                return true;
+            case "FALSE":
+                return false;
+            default:
+                $encoded = jsonEncode($value);
+                throw new \RuntimeException("unexpected value for isHaunted: '$encoded'");
         }
     }
 
     public function setIsHaunted(bool $new_value): void
     {
-        $this->entry->setAttribute("isHaunted", $new_value);
+        $this->entry->setAttribute("isHaunted", $new_value ? "TRUE" : "FALSE");
     }
 }

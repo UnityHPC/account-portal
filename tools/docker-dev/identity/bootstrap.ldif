@@ -11125,7 +11125,14 @@ objectclass: top
 dn: cn=pi_user9_org3_test,ou=pi_groups,dc=unityhpc,dc=test
 cn: pi_user9_org3_test
 gidnumber: 10094
-memberuid: user9_org3_test
+objectclass: unityClusterPIGroup
+objectclass: posixGroup
+objectclass: top
+isHaunted: TRUE
+
+dn: cn=pi_user10_org1_test,ou=pi_groups,dc=unityhpc,dc=test
+cn: pi_user10_org1_test
+gidnumber: 2257
 objectclass: unityClusterPIGroup
 objectclass: posixGroup
 objectclass: top

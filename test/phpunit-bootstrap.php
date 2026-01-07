@@ -207,6 +207,7 @@ class UnityWebPortalTestCase extends TestCase
         "user7_org1_test" => ["user7@org1.test", "foo", "bar", "user7@org1.test"],
         "user8_org1_test" => ["user8@org1.test", "foo", "bar", "user8@org1.test"],
         "user9_org3_test" => ["user9@org3.test", "foo", "bar", "user9@org3.test"],
+        "user10_org1_test" => ["user10@org1.test", "foo", "bar", "user10@org1.test"],
         "user2001_org998_test" => ["user2001@org998.test", "foo", "bar", "user2001@org998.test"],
         "user2002_org998_test" => ["user2002@org998.test", "foo", "bar", "user2002@org998.test"],
         "user2003_org998_test" => ["user2003@org1.test", "foo", "bar", "user2001@org1.test"],
@@ -221,6 +222,7 @@ class UnityWebPortalTestCase extends TestCase
         "Ghost" => "user7_org1_test",
         "GhostNotPI" => "user7_org1_test",
         "GhostPI" => "user9_org3_test",
+        "HadPIGroupInPastLife" => "user10_org1_test",
         "HasNoSshKeys" => "user3_org1_test",
         "HasOneSshKey" => "user5_org2_test",
         "IdleLocked" => "user6_org1_test",
@@ -280,6 +282,13 @@ class UnityWebPortalTestCase extends TestCase
             case "GhostNotPI":
                 $this->assertTrue($USER->getFlag(UserFlag::GHOST));
                 $this->assertFalse($USER->getPIGroup()->exists());
+                break;
+            case "HadPIGroupInPastLife":
+                $this->assertTrue($USER->exists());
+                $this->assertFalse($USER->getFlag(UserFlag::GHOST));
+                $this->assertFalse($USER->isPI());
+                $this->assertTrue($USER->getPIGroup()->exists());
+                $this->assertTrue($USER->getPIGroup()->getIsHaunted());
                 break;
             case "HasNoSshKeys":
                 $this->assertEqualsCanonicalizing([], $USER->getSSHKeys());
