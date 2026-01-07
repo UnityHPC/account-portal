@@ -10596,6 +10596,15 @@ memberuid: user494_org8_test
 objectclass: posixGroup
 objectclass: top
 
+dn: cn=pi_user7_org1_test,ou=pi_groups,dc=unityhpc,dc=test
+cn: pi_user7_org1_test
+gidnumber: 2257
+memberuid: pi_user7_org1_test
+objectclass: unityClusterPIGroup
+objectclass: posixGroup
+objectclass: top
+isHaunted: TRUE
+
 dn: cn=pi_user36_org2_test,ou=pi_groups,dc=unityhpc,dc=test
 cn: pi_user36_org2_test
 gidnumber: 10206
