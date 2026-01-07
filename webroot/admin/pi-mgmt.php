@@ -168,8 +168,9 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
                 tr.removeClass('shown');
             }
             else {
+                const gid = tr.children('td').eq(1).text().trim();
                 $.ajax({
-                    url: `/admin/ajax/get_group_members.php?gid=${row.data().gid}`,
+                    url: `/admin/ajax/get_group_members.php?gid=${encodeURIComponent(gid)}`,
                     success: function(responseText) {
                         const responseElements = $(responseText).toArray();
                         row.child(responseElements).show();
