@@ -60,7 +60,7 @@ class UnityUser
         $id = $this->LDAP->getNextUIDGIDNumber($this->uid);
         \ensure(!$ldapGroupEntry->exists());
         $ldapGroupEntry->create([
-            "objectclass" => UnityLDAP::POSIX_GROUP_CLASS,
+            "objectclass" => ["posixGroup", "top"],
             "gidnumber" => strval($id),
         ]);
         \ensure(!$this->entry->exists());
@@ -348,7 +348,7 @@ class UnityUser
      */
     public function isPI(): bool
     {
-        return $this->getPIGroup()->exists();
+        return $this->getPIGroup()->exists() && !$this->getPIGroup()->getIsHaunted();
     }
 
     public function getPIGroup(): UnityGroup

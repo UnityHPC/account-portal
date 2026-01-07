@@ -70,11 +70,16 @@ class UnityGroup extends PosixGroup
     {
         $uid = $this->getOwner()->uid;
         $request = $this->SQL->getRequest($uid, UnitySQL::REQUEST_BECOME_PI);
-        if ($this->exists()) {
-            return;
-        }
         \ensure($this->getOwner()->exists());
-        $this->init();
+        // if haunted group is re-approved, group is no longer haunted
+        if ($this->getIsHaunted()) {
+            $this->setIsHaunted(false);
+        } else {
+            if ($this->exists()) {
+                throw new Exception("cannot approve group that already exists and is not haunted");
+            }
+            $this->init();
+        }
         $this->SQL->removeRequest($this->getOwner()->uid, UnitySQL::REQUEST_BECOME_PI);
         $this->SQL->addLog("approved_group", $this->getOwner()->uid);
         if ($send_mail) {
@@ -343,7 +348,7 @@ class UnityGroup extends PosixGroup
         \ensure(!$this->entry->exists());
         $nextGID = $this->LDAP->getNextPIGIDNumber();
         $this->entry->create([
-            "objectclass" => UnityLDAP::POSIX_GROUP_CLASS,
+            "objectclass" => ["unityClusterPIGroup", "posixGroup", "top"],
             "gidnumber" => strval($nextGID),
             "memberuid" => [$owner->uid],
         ]);
@@ -398,5 +403,15 @@ class UnityGroup extends PosixGroup
             $attributes,
             $default_values,
         );
+    }
+
+    public function getIsHaunted()
+    {
+        return $this->entry->getAttribute("isHaunted");
+    }
+
+    public function setIsHaunted(bool $new_value)
+    {
+        return $this->entry->setAttribute("isHaunted", $new_value);
     }
 }

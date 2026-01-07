@@ -30,8 +30,6 @@ class UnityLDAP extends LDAPConn
         "ldapPublicKey",
     ];
 
-    public const array POSIX_GROUP_CLASS = ["posixGroup", "top"];
-
     private string $custom_mappings_path =
         __DIR__ . "/../../" . CONFIG["ldap"]["custom_user_mappings_dir"];
     private string $def_user_shell = CONFIG["ldap"]["def_user_shell"];
