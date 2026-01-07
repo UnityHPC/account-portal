@@ -56,27 +56,29 @@ class UnityUser
         string $org,
         bool $send_mail = true,
     ): void {
-        $ldapGroupEntry = $this->getGroupEntry();
-        $id = $this->LDAP->getNextUIDGIDNumber($this->uid);
-        \ensure(!$ldapGroupEntry->exists());
-        $ldapGroupEntry->create([
-            "objectclass" => ["posixGroup", "top"],
-            "gidnumber" => strval($id),
-        ]);
-        \ensure(!$this->entry->exists());
-        $this->entry->create([
-            "objectclass" => UnityLDAP::POSIX_ACCOUNT_CLASS,
-            "uid" => $this->uid,
-            "givenname" => $firstname,
-            "sn" => $lastname,
-            "gecos" => \transliterator_transliterate("Latin-ASCII", "$firstname $lastname"),
-            "mail" => $email,
-            "o" => $org,
-            "homedirectory" => self::HOME_DIR . $this->uid,
-            "loginshell" => $this->LDAP->getDefUserShell(),
-            "uidnumber" => strval($id),
-            "gidnumber" => strval($id),
-        ]);
+        if (!$this->getFlag(UserFlag::GHOST)) {
+            $ldapGroupEntry = $this->getGroupEntry();
+            \ensure(!$ldapGroupEntry->exists());
+            $id = $this->LDAP->getNextUIDGIDNumber($this->uid);
+            $ldapGroupEntry->create([
+                "objectclass" => ["posixGroup", "top"],
+                "gidnumber" => strval($id),
+            ]);
+            \ensure(!$this->entry->exists());
+            $this->entry->create([
+                "objectclass" => UnityLDAP::POSIX_ACCOUNT_CLASS,
+                "uid" => $this->uid,
+                "givenname" => $firstname,
+                "sn" => $lastname,
+                "gecos" => \transliterator_transliterate("Latin-ASCII", "$firstname $lastname"),
+                "mail" => $email,
+                "o" => $org,
+                "homedirectory" => self::HOME_DIR . $this->uid,
+                "loginshell" => $this->LDAP->getDefUserShell(),
+                "uidnumber" => strval($id),
+                "gidnumber" => strval($id),
+            ]);
+        }
         $org = $this->getOrgGroup();
         if (!$org->exists()) {
             $org->init();
