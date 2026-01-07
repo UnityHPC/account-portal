@@ -60,6 +60,7 @@ gidnumber: 504
 objectclass: posixGroup
 objectclass: top
 memberuid: user7_org1_test
+memberuid: user9_org3_test
 
 dn: cn=unityusers,dc=unityhpc,dc=test
 cn: unityusers
@@ -10596,15 +10597,6 @@ memberuid: user494_org8_test
 objectclass: posixGroup
 objectclass: top
 
-dn: cn=pi_user7_org1_test,ou=pi_groups,dc=unityhpc,dc=test
-cn: pi_user7_org1_test
-gidnumber: 2257
-memberuid: pi_user7_org1_test
-objectclass: unityClusterPIGroup
-objectclass: posixGroup
-objectclass: top
-isHaunted: TRUE
-
 dn: cn=pi_user36_org2_test,ou=pi_groups,dc=unityhpc,dc=test
 cn: pi_user36_org2_test
 gidnumber: 10206
@@ -11134,10 +11126,10 @@ dn: cn=pi_user9_org3_test,ou=pi_groups,dc=unityhpc,dc=test
 cn: pi_user9_org3_test
 gidnumber: 10094
 memberuid: user9_org3_test
-memberuid: user33_org3_test
 objectclass: unityClusterPIGroup
 objectclass: posixGroup
 objectclass: top
+isHaunted: TRUE
 
 dn: cn=pi_user242_org1_test,ou=pi_groups,dc=unityhpc,dc=test
 cn: pi_user242_org1_test
@@ -17720,8 +17712,6 @@ objectclass: ldapPublicKey
 givenname: Lori
 sn: Patterson
 gecos: Lori Patterson
-sshpublickey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZeqDmA6wuXsB5kC2T7HTjolXQFnV8/b+O3CZcoRDzqGjmpnBERvrzjhwaHofr+4knfvrWKqg3i5s74F369PXxIXCT0f6u5Vui6/fQCBq8HP6Z7SVAoVgoZFDUotPOlP4/2CoHq1ojYMkNzBLaIkjnKdckAs692WiUAhMsExreutjFx97nEt7DAlPVaOT5HAbBhvp/EWRKdihPDatdrKJ0ji/+/sTRYdhOyNgpMkS1IEmgYUBhBLl6fwwFgwMrnYvMlWLPNNVJ/D3oXmr4dZXpYOflwSHJ/J5w0d/PFCBJgMIOJ7v76R/9siZ5VvG/Z7V/S29YCXTlPhPhPBM5K++d
-sshpublickey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCeRQtdc/3NRffyhi7LkGj9KFylzKyJNwkv1NQw7koUtB9kJ7EerHnkPIX3R6BENcqhy24sFFq7ktX8e47HqS/DbVqLgjkExM6il3s/0xWmjKD+E+wB1hxPNMazmX18/2rzkCJlNS3c9xkVM9elr9hL5RCncwaFI4HS7lwQ9ciJpaE3lGW+llA2H9F0Is2lDMVftQh/NvFg1uomfe9tJPu8cfxTQ3yg3b8MeYXLRedilhpCWCTK1theTWcsYj6S2IEXiiYRqfwSh+FHK22EytZjxVED0bWqDPRXl23oaIRfsq26uvzUT9fZz1Fh3M67SlHMRKiUqkdqanetDjf5gAih
 uid: user9_org3_test
 uidnumber: 1306
 

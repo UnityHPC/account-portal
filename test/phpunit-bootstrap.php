@@ -206,6 +206,7 @@ class UnityWebPortalTestCase extends TestCase
         "user6_org1_test" => ["user6@org1.test", "foo", "bar", "user6@org1.test"],
         "user7_org1_test" => ["user7@org1.test", "foo", "bar", "user7@org1.test"],
         "user8_org1_test" => ["user8@org1.test", "foo", "bar", "user8@org1.test"],
+        "user9_org3_test" => ["user9@org3.test", "foo", "bar", "user9@org3.test"],
         "user2001_org998_test" => ["user2001@org998.test", "foo", "bar", "user2001@org998.test"],
         "user2002_org998_test" => ["user2002@org998.test", "foo", "bar", "user2002@org998.test"],
         "user2003_org998_test" => ["user2003@org1.test", "foo", "bar", "user2001@org1.test"],
@@ -218,6 +219,8 @@ class UnityWebPortalTestCase extends TestCase
         "EmptyPIGroupOwner" => "user5_org2_test",
         "CustomMapped555" => "user2002_org998_test",
         "Ghost" => "user7_org1_test",
+        "GhostWithoutHauntedPIGroup" => "user7_org1_test",
+        "GhostWithHauntedPIGroup" => "user9_org3_test",
         "HasNoSshKeys" => "user3_org1_test",
         "HasOneSshKey" => "user5_org2_test",
         "IdleLocked" => "user6_org1_test",
@@ -268,6 +271,15 @@ class UnityWebPortalTestCase extends TestCase
                 break;
             case "Ghost":
                 $this->assertTrue($USER->getFlag(UserFlag::GHOST));
+                break;
+            case "GhostWithHauntedPIGroup":
+                $this->assertTrue($USER->getFlag(UserFlag::GHOST));
+                $this->assertTrue($USER->getPIGroup()->exists());
+                $this->assertTrue($USER->getPIGroup()->getIsHaunted());
+                break;
+            case "GhostWithoutHauntedPIGroup":
+                $this->assertTrue($USER->getFlag(UserFlag::GHOST));
+                $this->assertFalse($USER->getPIGroup()->exists());
                 break;
             case "HasNoSshKeys":
                 $this->assertEqualsCanonicalizing([], $USER->getSSHKeys());
