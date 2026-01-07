@@ -405,13 +405,13 @@ class UnityGroup extends PosixGroup
         );
     }
 
-    public function getIsHaunted()
+    public function getIsHaunted(): bool
     {
-        return $this->entry->getAttribute("isHaunted");
+        return $this->entry->getAttribute("isHaunted")[0];
     }
 
-    public function setIsHaunted(bool $new_value)
+    public function setIsHaunted(bool $new_value): void
     {
-        return $this->entry->setAttribute("isHaunted", $new_value);
+        $this->entry->setAttribute("isHaunted", $new_value);
     }
 }
