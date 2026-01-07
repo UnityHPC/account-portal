@@ -407,7 +407,12 @@ class UnityGroup extends PosixGroup
 
     public function getIsHaunted(): bool
     {
-        return $this->entry->getAttribute("isHaunted")[0];
+        $value = $this->entry->getAttribute("isHaunted");
+        if (count($value) === 0) {
+            return false;
+        } else {
+            return $value[0];
+        }
     }
 
     public function setIsHaunted(bool $new_value): void
