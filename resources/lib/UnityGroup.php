@@ -72,12 +72,13 @@ class UnityGroup extends PosixGroup
         $request = $this->SQL->getRequest($uid, UnitySQL::REQUEST_BECOME_PI);
         \ensure($this->getOwner()->exists());
         // if haunted group is re-approved, group is no longer haunted
-        if ($this->getIsHaunted()) {
-            $this->setIsHaunted(false);
-        } else {
-            if ($this->exists()) {
+        if ($this->entry->exists()) {
+            if ($this->getIsHaunted()) {
+                $this->setIsHaunted(false);
+            } else {
                 throw new Exception("cannot approve group that already exists and is not haunted");
             }
+        } else {
             $this->init();
         }
         $this->SQL->removeRequest($this->getOwner()->uid, UnitySQL::REQUEST_BECOME_PI);
