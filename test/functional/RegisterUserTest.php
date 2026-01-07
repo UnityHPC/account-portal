@@ -49,7 +49,7 @@ class RegisterUserTest extends UnityWebPortalTestCase
     public function testResurrectNoHauntedGroup()
     {
         global $USER;
-        $this->switchUser("GhostWithoutHauntedPIGroup");
+        $this->switchUser("GhostNotPI");
         $this->assertTrue($USER->getFlag(UserFlag::GHOST));
         try {
             $this->register();
@@ -63,7 +63,7 @@ class RegisterUserTest extends UnityWebPortalTestCase
     public function testResurrectWithHauntedGroup()
     {
         global $USER;
-        $this->switchUser("GhostWithHauntedPIGroup");
+        $this->switchUser("GhostPI");
         $this->assertTrue($USER->getFlag(UserFlag::GHOST));
         $this->assertFalse($USER->isPI());
         try {
