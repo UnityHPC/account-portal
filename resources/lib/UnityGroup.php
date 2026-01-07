@@ -4,7 +4,6 @@ namespace UnityWebPortal\lib;
 
 use PHPOpenLDAPer\LDAPEntry;
 use Exception;
-use RangeException;
 
 /**
  * Class that represents a single PI group in the UnityHPC Platform.
