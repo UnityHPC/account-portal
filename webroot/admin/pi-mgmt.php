@@ -48,6 +48,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 require $LOC_HEADER;
+
+$CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 ?>
 
 <h1>PI Management</h1>
@@ -55,16 +57,18 @@ require $LOC_HEADER;
 
 <!-- <input type="text" id="tableSearch" placeholder="Search..."> -->
 
-<h2>Pending PI Requests</h2>
-<table class="searchable">
-    <tr>
-        <th>Name</th>
-        <th>Unity ID</th>
-        <th>Mail</th>
-        <th>Requested On</th>
-        <th>Actions</th>
-    </tr>
-
+<h2>PI Group Requests</h2>
+<table id="pi-request-table" class="stripe compact hover">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>UID</th>
+            <th>Mail</th>
+            <th>Requested On</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
     <?php
     $requests = $SQL->getRequests(UnitySQL::REQUEST_BECOME_PI);
 
@@ -76,10 +80,9 @@ require $LOC_HEADER;
         echo "<tr>";
         echo "<td>$name</td>";
         echo "<td>$uid</td>";
-        echo "<td><a href='mailto:$email'>$email</a></td>";
-        echo "<td>" . date("jS F, Y", strtotime($request['timestamp'])) . "</td>";
+        echo "<td>$email</td>";
+        echo "<td>" . $request['timestamp'] . "</td>";
         echo "<td>";
-        $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
         echo
             "<form action='' method='POST'>
         $CSRFTokenHiddenFormInput
@@ -94,26 +97,22 @@ require $LOC_HEADER;
         echo "</tr>";
     }
     ?>
-
+    </tbody>
 </table>
 
-<h2>List of PIs</h2>
+<br>
+<h2>PI Groups</h2>
 
-<table class="searchable longTable sortable filterable">
-    <tr>
-        <input
-            type="text"
-            style="margin-right:5px;"
-            placeholder="Filter by..."
-            id="common-filter"
-            class="filterSearch"
-        >
-        <th id="name"><span class="filter">⫧ </span>Name</th>
-        <th id="unityID"><span class="filter">⫧ </span>Unity ID</th>
-        <th id="mail"><span class="filter">⫧ </span>Mail</th>
-        <th>Actions</th>
-    </tr>
-
+<table id="pi-table" class="stripe compact hover">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>GID</th>
+            <th>Mail</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
     <?php
     $owner_uids = $LDAP->getAllPIGroupOwnerUIDs();
     $owner_attributes = $LDAP->getUsersAttributes(
@@ -123,34 +122,77 @@ require $LOC_HEADER;
     );
     usort($owner_attributes, fn($a, $b) => strcmp($a["uid"][0], $b["uid"][0]));
     foreach ($owner_attributes as $attributes) {
+        $gecos = $attributes["gecos"][0];
+        $gid = UnityGroup::OwnerUID2GID($attributes["uid"][0]);
         $mail = $attributes["mail"][0];
-        echo "<tr class='expandable'>";
-        echo "<td><button class='btnExpand'>&#9654;</button>" . $attributes["gecos"][0] . "</td>";
-        echo "<td>" . UnityGroup::OwnerUID2GID($attributes["uid"][0]) . "</td>";
-        echo "<td><a href='mailto:$mail'>$mail</a></td>";
-        echo "</tr>";
+        echo "
+            <tr>
+                <td>$gecos</td>
+                <td>$gid</td>
+                <td>$mail</td>
+                <td></td>
+            </tr>
+        ";
     }
     ?>
+    </tbody>
 </table>
 
 <script>
-    $("table tr.tr-pichild").hide(); // Hide the children first (and then the women)
-
-    $("table tr").click(function () {
-        if (!$(this).hasClass("tr-pichild")) {
-            var current = $(this).next();
-            while (current.hasClass("tr-pichild")) {
-                if (current.is(":visible")) {
-                    current.hide();
-                } else {
-                    current.show();
-                }
-                current = current.next();
+    $(document).ready(() => {
+        let pi_request_datatable = $('#pi-request-table').DataTable({
+            responsive: true,
+            columns: [
+                {responsivePriority: 2}, // name
+                {responsivePriority: 1}, // uid
+                {responsivePriority: 2}, // mail
+                {responsivePriority: 2, searchable: false}, // requested_on
+                {responsivePriority: 1, searchable: false}, // actions
+            ],
+        });
+        let pi_datatable = $('#pi-table').DataTable({
+            columns: [
+                {className: 'details-control'}, // name
+                {}, // gid
+                {}, // mail
+                {searchable: false}, // actions
+            ]
+        });
+        // https://datatables.net/blog/2017/ajax-loaded-row-details
+        // https://datatables.net/forums/discussion/42045/nested-tables
+        $('#pi-table tbody').on('click', 'td.details-control', function() {
+            var tr = $(this).closest('tr');
+            var row = pi_datatable.row(tr);
+            if (row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
             }
-        }
+            else {
+                const gid = tr.children('td').eq(1).text().trim();
+                $.ajax({
+                    url: `/admin/ajax/get_group_members.php?gid=${encodeURIComponent(gid)}`,
+                    success: function(responseText) {
+                        const responseElements = $(responseText).toArray();
+                        row.child(responseElements).show();
+                    },
+                    error: function(x) {
+                        row.child($(`<span>${x.responseText}</span>`)).show();
+                    },
+                });
+                tr.addClass('shown');
+            }
+        });
     });
-
-    var ajax_url = "<?php echo getURL("admin/ajax/get_group_members.php"); ?>?gid=";
 </script>
-
+<style>
+.details-control::before {
+    content: "▶ ";
+}
+tr.shown td.details-control::before {
+    content: "▼ ";
+}
+th.details-control::before {
+    content: "";
+}
+</style>
 <?php require $LOC_FOOTER; ?>

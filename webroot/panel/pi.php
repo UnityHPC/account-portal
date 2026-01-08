@@ -61,7 +61,7 @@ foreach ($requests as [$user, $timestamp]) {
     echo "<tr>";
     echo "<td>$name</td>";
     echo "<td>$uid</td>";
-    echo "<td><a href='mailto:$email'>$email</a></td>";
+    echo "<td>$email</td>";
     echo "<td>$date</td>";
     echo "<td>";
     $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
@@ -96,7 +96,18 @@ if (count($assocs) === 1) {
     ";
 }
 
-echo "<table>";
+echo "
+    <table id='users-table' class='stripe compact hover'>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Mail</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+";
 
 foreach ($assocs as $assoc) {
     if ($assoc->uid == $USER->uid) {
@@ -104,6 +115,9 @@ foreach ($assocs as $assoc) {
     }
 
     echo "<tr>";
+    echo "<td>" . $assoc->getFirstname() . " " . $assoc->getLastname() . "</td>";
+    echo "<td>" . $assoc->uid . "</td>";
+    echo "<td>" . $assoc->getMail() . "</td>";
     echo "<td>";
     $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
     echo
@@ -120,13 +134,24 @@ foreach ($assocs as $assoc) {
     >
     </form>";
     echo "</td>";
-    echo "<td>" . $assoc->getFirstname() . " " . $assoc->getLastname() . "</td>";
-    echo "<td>" . $assoc->uid . "</td>";
-    echo "<td><a href='mailto:" . $assoc->getMail() . "'>" . $assoc->getMail() . "</a></td>";
     echo "</tr>";
 }
-
+echo "</tbody>";
 echo "</table>";
 ?>
+
+<script>
+    $(document).ready(() => {
+        $('#users-table').DataTable({
+            responsive: true,
+            columns: [
+                {responsivePriority: 2}, // name
+                {responsivePriority: 1}, // uid
+                {responsivePriority: 2}, // mail
+                {responsivePriority: 1, searchable: false}, // actions
+            ],
+        });
+    });
+</script>
 
 <?php require $LOC_FOOTER; ?>

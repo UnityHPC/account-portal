@@ -1,5 +1,7 @@
 <?php
 
+/* pi-mgmt.php uses ajax to get this output and then uses it to insert new rows to the PI table */
+
 require_once __DIR__ . "/../../../resources/autoload.php";
 
 use UnityWebPortal\lib\UnityGroup;
@@ -15,22 +17,17 @@ $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
 $members = $group->getGroupMembersAttributes(["gecos", "mail"]);
 $requests = $group->getRequests();
 
-$i = 0;
 $count = count($members) + count($requests);
 foreach ($members as $uid => $attributes) {
     if ($uid == $group->getOwner()->uid) {
         continue;
     }
-    if ($i >= $count - 1) {
-        echo "<tr class='expanded $i last'>";
-    } else {
-        echo "<tr class='expanded $i'>";
-    }
+    echo "<tr style='background: var(--light_panel_background);'>";
     $fullname = $attributes["gecos"][0];
     $mail = $attributes["mail"][0];
     echo "<td>$fullname</td>";
     echo "<td>$uid</td>";
-    echo "<td><a href='mailto:$mail'>$mail</a></td>";
+    echo "<td>$mail</td>";
     echo "<td>";
     $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
     echo "
@@ -50,20 +47,15 @@ foreach ($members as $uid => $attributes) {
     ";
     echo "</td>";
     echo "</tr>";
-    $i++;
 }
 
-foreach ($requests as $i => [$user, $timestamp]) {
-    if ($i >= $count - 1) {
-        echo "<tr class='expanded $i last'>";
-    } else {
-        echo "<tr class='expanded $i'>";
-    }
+foreach ($requests as [$user, $timestamp]) {
+    echo "<tr style='background: var(--light_panel_background);'>";
     $name = $user->getFullName();
     $email = $user->getMail();
     echo "<td>$name</td>";
     echo "<td>$user->uid</td>";
-    echo "<td><a href='mailto:$email'>$email</a></td>";
+    echo "<td>$email</td>";
     echo "<td>";
     $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
     echo
@@ -77,5 +69,4 @@ foreach ($requests as $i => [$user, $timestamp]) {
     <input type='submit' name='action' value='Deny'></form>";
     echo "</td>";
     echo "</tr>";
-    $i++;
 }

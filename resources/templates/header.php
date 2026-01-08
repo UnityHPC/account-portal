@@ -37,7 +37,12 @@ if (isset($SSO)) {
 
 <head>
   <?php
-    foreach (["jquery.min", "global-early", "ckeditor5.umd"] as $x) {
+    $scripts = [
+      "jquery.min", "global-early", "ckeditor5.umd", "dataTables.min", "dataTables.responsive.min",
+      "dataTables.buttons.min", "dataTables.columnControl.min", "buttons.print.min",
+      "buttons.colVis.min", "buttons.html5.min",
+    ];
+    foreach ($scripts as $x) {
         $url = getURL("js/$x.js?cache_bust_increment_me=" . CONFIG["upstream"]["version"]);
         echo "<script src='$url'></script>";
     }
@@ -54,7 +59,11 @@ if (isset($SSO)) {
   </style>
 
   <?php
-    foreach (["global", "navbar", "modal", "tables", "filters", "messages", "ckeditor5"] as $x) {
+    $stylesheets = [
+      "global", "navbar", "modal", "messages", "ckeditor5", "responsive.dataTables.min",
+      "dataTables.dataTables.min", "columnControl.dataTables.min", "buttons.dataTables.min",
+    ];
+    foreach ($stylesheets as $x) {
         $url = getURL("css/$x.css?cache_bust_increment_me=" . CONFIG["upstream"]["version"]);
         echo "<link rel='stylesheet' type='text/css' href='$url' />";
     }

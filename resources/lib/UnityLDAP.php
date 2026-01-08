@@ -237,6 +237,19 @@ class UnityLDAP extends LDAPConn
         );
     }
 
+    public function getPIGroupAttributesWithMemberUID(
+        string $uid,
+        array $attributes,
+        array $default_values = [],
+    ) {
+        return $this->pi_groupOU->getChildrenArrayStrict(
+            $attributes,
+            recursive: false,
+            filter: sprintf("(memberuid=%s)", ldap_escape($uid, "", LDAP_ESCAPE_FILTER)),
+            default_values: $default_values,
+        );
+    }
+
     /**
      * Returns an associative array where keys are UIDs and values are arrays of PI GIDs
      */

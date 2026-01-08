@@ -26,25 +26,21 @@ require $LOC_HEADER;
 <h1>User Management</h1>
 <hr>
 
-<!-- <input type="text" id="tableSearch" placeholder="Search..."> -->
-
-<table class="searchable longTable sortable filterable">
-    <tr>
-        <input
-            type="text"
-            style="margin-right:5px;"
-            placeholder="Filter by..."
-            id="common-filter"
-            class="filterSearch"
-        >
-        <th id="name"><span class="filter">⫧ </span>Name</th>
-        <th id="uid"><span class="filter">⫧ </span>UID</th>
-        <th id="org"><span class="filter">⫧ </span>Org</th>
-        <th id="mail"><span class="filter">⫧ </span>Mail</th>
-        <th id="groups"><span class="filter">⫧ </span>Groups</th>
-        <th>Actions</th>
-    </tr>
-
+<table
+    id="user-table"
+    class="stripe compact hover"
+>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>UID</th>
+            <th>Org</th>
+            <th>Mail</th>
+            <th>Groups</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
     <?php
     $UID2PIGIDs = $LDAP->getUID2PIGIDs();
     $user_attributes = $LDAP->getAllNativeUsersAttributes(
@@ -67,19 +63,15 @@ require $LOC_HEADER;
         echo "<td>" . $attributes["gecos"][0] . "</td>";
         echo "<td>" . $uid . "</td>";
         echo "<td>" . $attributes["o"][0] . "</td>";
-        echo "
-            <td>
-                <a href='mailto:" . $attributes["mail"][0] . "'>" . $attributes["mail"][0] . "</a>
-            </td>
-        ";
+        echo "<td>" . $attributes["mail"][0] . "</td>";
         echo "<td>";
+        echo "<ul style='padding-left: 2ch; margin: 0;'>";
         if (count($UID2PIGIDs[$uid] ?? []) > 0) {
-            echo "<table style='margin: 0 0 0 0;'>";
             foreach ($UID2PIGIDs[$uid] as $gid) {
-                echo "<tr><td>$gid</td></tr>";
+                echo "<li>$gid</li>";
             }
-            echo "</table>";
         }
+        echo "</ul>";
         echo "</td>";
         echo "<td>";
         echo "<form class='viewAsUserForm' action='' method='POST'
@@ -93,6 +85,23 @@ require $LOC_HEADER;
         echo "</tr>";
     }
     ?>
+    </tbody>
 </table>
 
+<script>
+$(document).ready(() => {
+    $('#user-table').DataTable({
+        responsive: true,
+        columns: [
+            {responsivePriority: 2}, // name
+            {responsivePriority: 1}, // uid
+            {responsivePriority: 2}, // org
+            {responsivePriority: 2}, // mail
+            {responsivePriority: 3, searchable: false}, // groups
+            {responsivePriority: 1, searchable: false}, // actions
+        ],
+        layout: {topStart: {buttons: ['colvis']}}
+    });
+});
+</script>
 <?php require $LOC_FOOTER; ?>

@@ -74,7 +74,18 @@ require $LOC_HEADER;
 <hr>
 
 <?php
-$PIGroupGIDs = $USER->getPIGroupGIDs();
+$PIGroupGIDs = [];
+$PIGroupAttributes = $LDAP->getPIGroupAttributesWithMemberUID(
+    $USER->uid,
+    ["cn", "memberuid"],
+    default_values: ["memberuid" => []]
+);
+$PIGroupMembers = [];
+foreach ($PIGroupAttributes as $attributes) {
+    $gid = $attributes["cn"][0];
+    $PIGroupMembers[$gid] = $attributes["memberuid"];
+    array_push($PIGroupGIDs, $gid);
+}
 
 $requests = $SQL->getRequestsByUser($USER->uid);
 
@@ -87,8 +98,20 @@ foreach ($requests as $request) {
 }
 
 if (count($req_filtered) > 0) {
-    echo "<h2>Pending Requests</h2>";
-    echo "<table>";
+    echo "
+        <h2>Pending Requests</h2>
+        <table id='pi-request-table' class='stripe compact hover'>
+            <thead>
+                <tr>
+                    <th>Group Owner Name</th>
+                    <th>Group ID</th>
+                    <th>Group Owner Mail</th>
+                    <th>Requested On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+    ";
     foreach ($req_filtered as $request) {
         $requested_account = new UnityGroup(
             $request["request_for"],
@@ -103,7 +126,7 @@ if (count($req_filtered) > 0) {
         echo "<tr class='pending_request'>";
         echo "<td>$full_name</td>";
         echo "<td>" . $requested_account->gid . "</td>";
-        echo "<td><a href='mailto:$mail'>$mail</a></td>";
+        echo "<td>$mail</td>";
         echo "<td>" . date("jS F, Y", strtotime($request['timestamp'])) . "</td>";
         echo "<td>";
         $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
@@ -116,6 +139,7 @@ if (count($req_filtered) > 0) {
         echo "</td>";
         echo "</tr>";
     }
+    echo "</tbody>";
     echo "</table>";
 
     if (count($PIGroupGIDs) > 0) {
@@ -141,8 +165,19 @@ if (count($PIGroupGIDs) == 0) {
     or request your own PI account on the <a href='$url'>account settings</a> page";
 }
 
-echo "<table>";
-
+echo "
+    <table id='pi-table' class='stripe compact hover'>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>GID</th>
+                <th>PI Mail</th>
+                <th>Members</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+";
 foreach ($PIGroupGIDs as $gid) {
     $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
     $owner = $group->getOwner();
@@ -151,24 +186,29 @@ foreach ($PIGroupGIDs as $gid) {
         continue;
     }
 
-    echo "<tr class='expandable'>";
-    echo "<td><button class='btnExpand'>&#9654;</button>$full_name</td>";
-    echo "<td>" . $group->gid . "</td>";
-    echo "<td><a href='mailto:" . $owner->getMail() . "'>" . $owner->getMail() . "</a></td>";
+    echo "<tr>";
+    echo "<td>$full_name</td>";
+    echo "<td>$gid</td>";
+    echo "<td>" . $owner->getMail() . "</td>";
+    echo "<td><ul>";
+    foreach ($PIGroupMembers[$gid] as $memberuid) {
+        echo "<li>$memberuid</li>";
+    }
+    echo "</ul></td>";
     $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
     echo
         "<td>
     <form action='' method='POST'
-    onsubmit='return confirm(\"Are you sure you want to leave the PI group " . $group->gid . "?\")'>
+    onsubmit='return confirm(\"Are you sure you want to leave the PI group $gid?\")'>
     $CSRFTokenHiddenFormInput
     <input type='hidden' name='form_type' value='removePIForm'>
-    <input type='hidden' name='pi' value='" . $group->gid . "'>
+    <input type='hidden' name='pi' value='$gid'>
     <input type='submit' value='Leave Group'>
     </form>
     </td>";
     echo "</tr>";
 }
-
+echo "</tbody>";
 echo "</table>";
 ?>
 
@@ -191,17 +231,32 @@ if ($SQL->accDeletionRequestExists($USER->uid)) {
     $("button.btnAddPI").click(function () {
         openModal("Add New PI", "<?php echo getURL("panel/modal/new_pi.php"); ?>");
     });
-
-    // tables.js uses ajax_url to populate expandable tables
-    var ajax_url = "<?php echo getURL("panel/ajax/get_group_members.php"); ?>?gid=";
 </script>
 
-<style>
-    @media only screen and (max-width: 1000px) {
-        table td:nth-child(2) {
-            display: none;
-        }
-    }
-</style>
+<script>
+    $(document).ready(() => {
+        $('#pi-table').DataTable({
+            responsive: true,
+            columns: [
+                {responsivePriority: 1}, // name
+                {responsivePriority: 2}, // gid
+                {responsivePriority: 2}, // pi_mail
+                {responsivePriority: 3, visible: false, searchable: false}, // members
+                {responsivePriority: 1, searchable: false}, // actions
+            ],
+            layout: {topStart: {buttons: ['colvis']}}
+        });
+        $('#pi-request-table').DataTable({
+            responsive: true,
+            columns: [
+                {responsivePriority: 1}, // owner_name
+                {responsivePriority: 2}, // gid
+                {responsivePriority: 2}, // pi_mail
+                {responsivePriority: 2, searchable: false}, // requested_on
+                {responsivePriority: 1, searchable: false}, // actions
+            ],
+        });
+    });
+</script>
 
 <?php require $LOC_FOOTER; ?>
