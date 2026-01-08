@@ -28,7 +28,7 @@ require $LOC_HEADER;
 
 <!-- <input type="text" id="tableSearch" placeholder="Search..."> -->
 
-<table class="searchable longTable sortable filterable">
+<table class="searchable longTable sortable filterable column-toggle" id="user-table">
     <tr>
         <input
             type="text"
@@ -39,10 +39,16 @@ require $LOC_HEADER;
         >
         <th id="name"><span class="filter">⫧ </span>Name</th>
         <th id="uid"><span class="filter">⫧ </span>UID</th>
-        <th id="org"><span class="filter">⫧ </span>Org</th>
+        <th id="org" class="hidden-by-default"><span class="filter">⫧ </span>Org</th>
         <th id="mail"><span class="filter">⫧ </span>Mail</th>
         <th id="groups"><span class="filter">⫧ </span>Groups</th>
         <th>Actions</th>
+        <?php
+        foreach (UserFlag::cases() as $flag) {
+            $val = $flag->value;
+            echo "<th id='$val' class='hidden-by-default'><span class='filter'>⫧ </span>$val</th>";
+        }
+        ?>
     </tr>
 
     <?php
@@ -56,6 +62,10 @@ require $LOC_HEADER;
         ]
     );
     $csrf_token = htmlspecialchars(CSRFToken::generate());
+    $users_with_flags = [];
+    foreach (UserFlag::cases() as $flag) {
+        $users_with_flags[$flag->value] = $LDAP->userFlagGroups[$flag->value]->getMemberUIDs();
+    }
     usort($user_attributes, fn ($a, $b) => strcmp($a["uid"][0], $b["uid"][0]));
     foreach ($user_attributes as $attributes) {
         $uid = $attributes["uid"][0];
@@ -73,8 +83,8 @@ require $LOC_HEADER;
             </td>
         ";
         echo "<td>";
-        if (count($UID2PIGIDs[$uid] ?? []) > 0) {
-            echo "<table style='margin: 0 0 0 0;'>";
+        if (array_key_exists($uid, $UID2PIGIDs) && count($UID2PIGIDs[$uid] ?? []) > 0) {
+            echo "<table>";
             foreach ($UID2PIGIDs[$uid] as $gid) {
                 echo "<tr><td>$gid</td></tr>";
             }
@@ -90,6 +100,13 @@ require $LOC_HEADER;
         <input type='submit' name='action' value='Access'>
         </form>";
         echo "</td>";
+        foreach (UserFlag::cases() as $flag) {
+            echo "<td>";
+            if (in_array($uid, $users_with_flags[$flag->value])) {
+                echo $flag->value;
+            }
+            echo "</td>";
+        }
         echo "</tr>";
     }
     ?>
