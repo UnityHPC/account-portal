@@ -241,8 +241,8 @@ if ($SQL->accDeletionRequestExists($USER->uid)) {
                 {responsivePriority: 1}, // name
                 {responsivePriority: 2}, // gid
                 {responsivePriority: 2}, // pi_mail
-                {responsivePriority: 3, visible: false}, // members
-                {responsivePriority: 1}, // actions
+                {responsivePriority: 3, visible: false, searchable: false}, // members
+                {responsivePriority: 1, searchable: false}, // actions
             ],
             layout: {topStart: {buttons: ['colvis']}}
         });
@@ -252,8 +252,8 @@ if ($SQL->accDeletionRequestExists($USER->uid)) {
                 {responsivePriority: 1}, // owner_name
                 {responsivePriority: 2}, // gid
                 {responsivePriority: 2}, // pi_mail
-                {responsivePriority: 2}, // requested_on
-                {responsivePriority: 1}, // actions
+                {responsivePriority: 2, searchable: false}, // requested_on
+                {responsivePriority: 1, searchable: false}, // actions
             ],
         });
     });

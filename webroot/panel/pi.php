@@ -148,7 +148,7 @@ echo "</table>";
                 {responsivePriority: 2}, // name
                 {responsivePriority: 1}, // uid
                 {responsivePriority: 2}, // mail
-                {responsivePriority: 1}, // actions
+                {responsivePriority: 1, searchable: false}, // actions
             ],
         });
     });
