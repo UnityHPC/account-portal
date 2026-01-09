@@ -128,7 +128,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
     usort($owner_attributes, fn($a, $b) => strcmp($a["uid"][0], $b["uid"][0]));
     foreach ($owner_attributes as $attributes) {
         $mail = $attributes["mail"][0];
-        $gid = UnityGroup::ownerUID2GID($attributes["uid"][0]);
+        $gid = UnityGroup::OwnerUID2GID($attributes["uid"][0]);
         echo "<tr class='expandable'>";
         echo "<td><button class='btnExpand'>&#9654;</button>" . $attributes["gecos"][0] . "</td>";
         echo "<td>$gid</td>";
