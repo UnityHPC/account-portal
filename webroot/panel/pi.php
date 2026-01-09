@@ -129,14 +129,20 @@ foreach ($assocs as $assoc) {
     echo "</tr>";
 }
 
-echo "</table>";
+echo "
+    </table>
+    <h2>Danger Zone</h2>
+    <form
+        action=''
+        method='POST'
+        onsubmit='return confirm(\"Are you sure you want to disband your PI group?\")'
+    >
+        $CSRFTokenHiddenFormInput
+        <input type='hidden' name='form_type' value='disband'>
+        <input type='submit' value='Disband PI Account'>
+    </form>
+";
 
 ?>
-
-<h2>Danger Zone</h2>
-<form action='' method='POST' onsubmit='return confirm("Are you sure you want to disband your PI group?")'>
-<input type='hidden' name='form_type' value='disband'>
-<input type='submit' value='Disband PI Account'>
-</form>
 
 <?php require $LOC_FOOTER; ?>
