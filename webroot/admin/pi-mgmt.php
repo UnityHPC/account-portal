@@ -128,7 +128,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
     usort($owner_attributes, fn($a, $b) => strcmp($a["uid"][0], $b["uid"][0]));
     foreach ($owner_attributes as $attributes) {
         $mail = $attributes["mail"][0];
-        $owner_uid = $attributes["uid"][0];
+        $gid = UnityGroup::ownerUID2GID($attributes["uid"][0]);
         echo "<tr class='expandable'>";
         echo "<td><button class='btnExpand'>&#9654;</button>" . $attributes["gecos"][0] . "</td>";
         echo "<td>" . UnityGroup::OwnerUID2GID($attributes["uid"][0]) . "</td>";
@@ -139,12 +139,13 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
                 action=''
                 method='POST'
                 onsubmit='
-                    return confirm(\"Are you sure you want to remove $owner_uid?\")
+                    return confirm(\"Are you sure you want to disband group $gid?\")
                 '
             >
+                $CSRFTokenHiddenFormInput
                 <input type='hidden' name='form_type' value='disband'>
-                <input type='hidden' name='pi' value='$owner_uid'>
-                <input type='submit' value='Remove'>
+                <input type='hidden' name='pi' value='$gid'>
+                <input type='submit' value='Disband Group'>
             </form>
         ";
         echo "</td>";
