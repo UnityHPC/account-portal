@@ -63,6 +63,14 @@ class UnityGroup extends PosixGroup
         }
     }
 
+    public function disband()
+    {
+        $this->setIsDefunct(true);
+        if (count($this->getMemberUIDs()) > 0) {
+            $this->entry->setAttribute("memberuid", []);
+        }
+    }
+
     private function reinstate()
     {
         $this->setIsDefunct(false);
