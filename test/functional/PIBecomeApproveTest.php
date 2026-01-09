@@ -80,7 +80,7 @@ class PIBecomeApproveTest extends UnityWebPortalTestCase
     public function testReinstateDefunctGroup()
     {
         global $USER, $SSO, $LDAP, $SQL, $MAILER, $WEBHOOK;
-        $this->switchUser("PreviousOwnerOfDefunctPIGroup");
+        $this->switchUser("ResurrectedOwnerOfDefunctPIGroup");
         $this->assertFalse($USER->isPI());
         $user = $USER;
         $pi_group = $USER->getPIGroup();

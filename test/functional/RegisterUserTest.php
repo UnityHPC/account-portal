@@ -63,7 +63,7 @@ class RegisterUserTest extends UnityWebPortalTestCase
     public function testResurrectWithHauntedGroup()
     {
         global $USER;
-        $this->switchUser("GhostPI");
+        $this->switchUser("GhostOwnerOfDefunctPIGroup");
         $this->assertTrue($USER->getFlag(UserFlag::GHOST));
         $this->assertFalse($USER->isPI());
         try {
