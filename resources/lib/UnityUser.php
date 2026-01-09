@@ -57,8 +57,8 @@ class UnityUser
         bool $send_mail = true,
     ): void {
         $ldapGroupEntry = $this->getGroupEntry();
-        \ensure(!$ldapGroupEntry->exists());
         $id = $this->LDAP->getNextUIDGIDNumber($this->uid);
+        \ensure(!$ldapGroupEntry->exists());
         $ldapGroupEntry->create([
             "objectclass" => ["posixGroup", "top"],
             "gidnumber" => strval($id),
