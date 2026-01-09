@@ -76,14 +76,18 @@ class UnityGroup extends PosixGroup
         if (count($memberuids) > 0) {
             $this->entry->setAttribute("memberuid", []);
         }
+        // TODO optimmize
         // if user is no longer in any PI group, dequalify them
-        if (count($this->getOwner()->getPIGroupGIDs()) === 0) {
-            $this->getOwner()->setFlag(
-                UserFlag::QUALIFIED,
-                false,
-                doSendMail: $send_mail,
-                doSendMailAdmin: false,
-            );
+        foreach ($memberuids as $uid) {
+            $user = new UnityUser($uid, $this->LDAP, $this->SQL, $this->MAILER, $this->WEBHOOK);
+            if (count($user->getPIGroupGIDs()) === 0) {
+                $user->setFlag(
+                    UserFlag::QUALIFIED,
+                    false,
+                    doSendMail: $send_mail,
+                    doSendMailAdmin: false,
+                );
+            }
         }
     }
 

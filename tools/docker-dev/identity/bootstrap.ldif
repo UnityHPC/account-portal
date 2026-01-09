@@ -11926,7 +11926,6 @@ memberuid: user716_org2_test
 memberuid: user584_org2_test
 memberuid: user788_org2_test
 memberuid: user170_org2_test
-memberuid: user5_org2_test
 objectclass: unityClusterPIGroup
 objectclass: posixGroup
 objectclass: top
@@ -12071,7 +12070,6 @@ memberuid: user264_org1_test
 memberuid: user10_org1_test
 memberuid: user6_org1_test
 memberuid: user8_org1_test
-memberuid: user5_org2_test
 memberuid: user698_org1_test
 memberuid: user1065_org1_test
 memberuid: user491_org4_test
