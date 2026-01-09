@@ -73,6 +73,30 @@ class PIBecomeApproveTest extends UnityWebPortalTestCase
         } finally {
             $this->switchUser("Blank", validate: false);
             ensurePIGroupDoesNotExist();
+            $this->assertFalse($USER->getFlag(UserFlag::QUALIFIED));
+        }
+    }
+
+    public function testReinstateDefunctGroup()
+    {
+        global $USER, $SSO, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        $this->switchUser("ResurrectedOwnerOfDefunctPIGroup");
+        $this->assertFalse($USER->isPI());
+        $user = $USER;
+        $pi_group = $USER->getPIGroup();
+        $approve_uid = $USER->uid;
+        try {
+            $this->requestGroupCreation();
+            $this->assertRequestedPIGroup(true);
+            $this->switchUser("Admin");
+            $this->approveGroup($approve_uid);
+            $this->assertTrue($user->isPI());
+        } finally {
+            if ($pi_group->memberUIDExists($approve_uid)) {
+                $pi_group->removeMemberUID($approve_uid);
+                $pi_group->setIsDefunct(true);
+                assert(!$user->isPI());
+            }
         }
     }
 }

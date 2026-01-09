@@ -57,6 +57,7 @@ if (isset($_SERVER["REMOTE_USER"])) {
     $_SESSION["SSO"] = $SSO;
 
     $OPERATOR = new UnityUser($SSO["user"], $LDAP, $SQL, $MAILER, $WEBHOOK);
+
     $_SESSION["is_admin"] = $OPERATOR->getFlag(UserFlag::ADMIN);
 
     $_SESSION["OPERATOR"] = $SSO["user"];
@@ -72,6 +73,18 @@ if (isset($_SERVER["REMOTE_USER"])) {
     $_SESSION["is_pi"] = $USER->isPI();
 
     $SQL->addLog("user_login", $OPERATOR->uid);
+
+    if ($USER->getFlag(UserFlag::LOCKED)) {
+        UnityHTTPD::forbidden("locked", "Your account is locked.");
+    }
+
+    if ($OPERATOR == $USER && $USER->getFlag(UserFlag::IDLELOCKED)) {
+        $USER->setFlag(UserFlag::IDLELOCKED, false);
+        UnityHTTPD::messageSuccess(
+            "Account Unlocked",
+            "Your account was previously locked due to inactivity.",
+        );
+    }
 }
 
 $LOC_HEADER = __DIR__ . "/templates/header.php";

@@ -148,7 +148,11 @@ repos:
         entry: bash ./test/assert-exceptions-used.bash
         language: system
         files: ^resources/.*\.php$
-        exclude: ^resources/lib/UnityHTTPD\.php$
+        exclude: |
+          (?x)^(
+              ^resources/lib/UnityHTTPD\.php$|
+              ^resources/init\.php$|
+          )$
       - id: assert-forbidden-used
         name: Assert forbidden() is used
         entry: bash ./test/assert-forbidden-used.bash

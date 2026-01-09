@@ -21,6 +21,7 @@ class PIMemberApproveTest extends UnityWebPortalTestCase
 
     private function approveUserByAdmin(string $uid, string $gid)
     {
+        global $USER;
         $this->switchUser("Admin");
         try {
             http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [

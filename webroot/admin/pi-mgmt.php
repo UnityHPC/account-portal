@@ -44,6 +44,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $parent = new UnityGroup($_POST["pi"], $LDAP, $SQL, $MAILER, $WEBHOOK);
             $parent->removeUser($form_user);
             break;
+        case "disband":
+            $group = new UnityGroup(UnityHTTPD::getPostData("pi"), $LDAP, $SQL, $MAILER, $WEBHOOK);
+            $group->disband();
+            break;
     }
 }
 
@@ -115,7 +119,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
     </tr>
 
     <?php
-    $owner_uids = $LDAP->getAllPIGroupOwnerUIDs();
+    $owner_uids = $LDAP->getAllNonDefunctPIGroupOwnerUIDs();
     $owner_attributes = $LDAP->getUsersAttributes(
         $owner_uids,
         ["uid", "gecos", "mail"],
@@ -124,10 +128,27 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
     usort($owner_attributes, fn($a, $b) => strcmp($a["uid"][0], $b["uid"][0]));
     foreach ($owner_attributes as $attributes) {
         $mail = $attributes["mail"][0];
+        $gid = UnityGroup::OwnerUID2GID($attributes["uid"][0]);
         echo "<tr class='expandable'>";
         echo "<td><button class='btnExpand'>&#9654;</button>" . $attributes["gecos"][0] . "</td>";
-        echo "<td>" . UnityGroup::OwnerUID2GID($attributes["uid"][0]) . "</td>";
+        echo "<td>$gid</td>";
         echo "<td><a href='mailto:$mail'>$mail</a></td>";
+        echo "<td>";
+        echo "
+            <form
+                action=''
+                method='POST'
+                onsubmit='
+                    return confirm(\"Are you sure you want to disband group $gid?\")
+                '
+            >
+                $CSRFTokenHiddenFormInput
+                <input type='hidden' name='form_type' value='disband'>
+                <input type='hidden' name='pi' value='$gid'>
+                <input type='submit' value='Disband Group'>
+            </form>
+        ";
+        echo "</td>";
         echo "</tr>";
     }
     ?>

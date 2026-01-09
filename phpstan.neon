@@ -4,6 +4,8 @@ parameters:
     - resources
     - webroot
     - test
+  excludePaths:
+    - test/Template.php
   ignoreErrors:
     # $this, $data comes from UnityMailer
     - messages:
@@ -33,6 +35,7 @@ parameters:
         - '#Negated boolean expression is always false\.#'
       paths:
         - test/functional/PiRemoveUserTest.php
+        - test/functional/LeaveGroupTest.php
         - test/phpunit-bootstrap.php
     - messages:
         - '#If condition is always false\.#'

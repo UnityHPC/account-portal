@@ -1,7 +1,8 @@
 <?php
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use UnityWebPortal\lib\UnityOrg;
+use UnityWebPortal\lib\UnityHTTPDMessageLevel;
+use UnityWebPortal\lib\UserFlag;
 
 class RegisterUserTest extends UnityWebPortalTestCase
 {
@@ -42,6 +43,36 @@ class RegisterUserTest extends UnityWebPortalTestCase
         } finally {
             ensureOrgGroupDoesNotExist();
             ensureUserDoesNotExist();
+        }
+    }
+
+    public function testResurrectNoHauntedGroup()
+    {
+        global $USER;
+        $this->switchUser("GhostNotPI");
+        $this->assertTrue($USER->getFlag(UserFlag::GHOST));
+        try {
+            $this->register();
+            $this->assertMessageExists(UnityHTTPDMessageLevel::INFO, "/.*/", "/resurrected/");
+            $this->assertFalse($USER->getFlag(UserFlag::GHOST));
+        } finally {
+            $USER->setFlag(UserFlag::GHOST, true);
+        }
+    }
+
+    public function testResurrectWithHauntedGroup()
+    {
+        global $USER;
+        $this->switchUser("GhostOwnerOfDefunctPIGroup");
+        $this->assertTrue($USER->getFlag(UserFlag::GHOST));
+        $this->assertFalse($USER->isPI());
+        try {
+            $this->register();
+            $this->assertMessageExists(UnityHTTPDMessageLevel::INFO, "/.*/", "/resurrected/");
+            $this->assertFalse($USER->getFlag(UserFlag::GHOST));
+            $this->assertFalse($USER->isPI());
+        } finally {
+            $USER->setFlag(UserFlag::GHOST, true);
         }
     }
 }

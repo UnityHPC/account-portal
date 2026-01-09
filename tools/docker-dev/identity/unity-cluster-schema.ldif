@@ -1,0 +1,12 @@
+dn: cn=unityCluster,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: unityCluster
+olcAttributeTypes: ( 1.1.1 NAME 'isDefunct'
+    DESC 'if defunct, systems should pretend this group does not exist'
+    EQUALITY booleanMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+    )
+olcObjectClasses: ( 1.1.2 NAME 'unityClusterPIGroup' SUP top AUXILIARY
+    DESC 'Unity Cluster PI Group'
+    MAY ( isDefunct )
+    )

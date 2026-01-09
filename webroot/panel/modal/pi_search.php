@@ -10,7 +10,7 @@ if (empty($search_query)) {
     UnityHTTPD::die();
 }
 
-$assocs = $LDAP->getAllPIGroups($SQL, $MAILER, $WEBHOOK);
+$assocs = $LDAP->getAllNonDefunctPIGroups($SQL, $MAILER, $WEBHOOK);
 
 $MAX_COUNT = 10;  // Max results of PI search
 

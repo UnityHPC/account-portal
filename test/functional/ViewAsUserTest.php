@@ -8,8 +8,7 @@ class ViewAsUserTest extends UnityWebPortalTestCase
     public function _testViewAsUser(string $beforeNickname, string $afterNickname)
     {
         global $USER;
-        $this->switchUser($afterNickname);
-        $afterUid = $USER->uid;
+        $afterUid = self::$NICKNAME2UID[$afterNickname];
         $this->switchUser($beforeNickname);
         // $this->assertTrue($USER->getFlag(UserFlag::ADMIN));
         $beforeUid = $USER->uid;
@@ -64,5 +63,15 @@ class ViewAsUserTest extends UnityWebPortalTestCase
             "uid" => $adminUid,
         ]);
         $this->assertArrayNotHasKey("viewUser", $_SESSION);
+    }
+
+    public function testViewAsIdleLockedUserStillIdleLocked()
+    {
+        global $LDAP;
+        $idleLockedUID = self::$NICKNAME2UID["IdleLocked"];
+        $this->switchUser("Admin");
+        $this->assertContains($idleLockedUID, $LDAP->userFlagGroups["idlelocked"]->getMemberUIDs());
+        $this->_testViewAsUser("Admin", "IdleLocked");
+        $this->assertContains($idleLockedUID, $LDAP->userFlagGroups["idlelocked"]->getMemberUIDs());
     }
 }
