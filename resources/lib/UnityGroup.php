@@ -436,17 +436,31 @@ class UnityGroup extends PosixGroup
     public function getIsDefunct(): bool
     {
         $value = $this->entry->getAttribute("isDefunct");
-        if (count($value) === 0) {
-            return false;
-        }
-        switch ($value[0]) {
-            case "TRUE":
-                return true;
-            case "FALSE":
+        switch (count($value)) {
+            case 0:
                 return false;
+            case 1:
+                switch ($value[0]) {
+                    case "TRUE":
+                        return true;
+                    case "FALSE":
+                        return false;
+                    default:
+                        throw new \RuntimeException(
+                            sprintf(
+                                "unexpected value for isDefunct: '%s'. expected 'TRUE' or 'FALSE'.",
+                                $value[0],
+                            ),
+                        );
+                }
             default:
-                $encoded = jsonEncode($value);
-                throw new \RuntimeException("unexpected value for isDefunct: '$encoded'");
+                throw new \RuntimeException(
+                    sprintf(
+                        "expected value of length 0 or 1, found value %s of length %s",
+                        jsonEncode($value),
+                        count($value),
+                    ),
+                );
         }
     }
 
