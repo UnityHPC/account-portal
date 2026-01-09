@@ -13526,7 +13526,6 @@ dn: cn=pi_user11_org1_test,ou=pi_groups,dc=unityhpc,dc=test
 cn: pi_user11_org1_test
 gidnumber: 10031
 memberuid: user11_org1_test
-memberuid: user1_org1_test
 memberuid: user156_org6_test
 memberuid: user222_org6_test
 memberuid: user1126_org12_test

@@ -1,4 +1,5 @@
 <?php
+use UnityWebPortal\lib\UserFlag;
 
 class PiDisbandTest extends UnityWebPortalTestCase
 {
@@ -10,6 +11,7 @@ class PiDisbandTest extends UnityWebPortalTestCase
         $memberuids_before = $pi_group->getMemberUIDs();
         $this->assertFalse($pi_group->getIsDefunct());
         $this->assertNotEmpty($pi_group->getMemberUIDs());
+        $this->assertTrue($pi_group->getOwner()->getFlag(UserFlag::QUALIFIED));
         try {
             $this->switchUser("Admin");
             http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
@@ -18,10 +20,12 @@ class PiDisbandTest extends UnityWebPortalTestCase
             ]);
             $this->assertTrue($pi_group->getIsDefunct());
             $this->assertEmpty($pi_group->getMemberUIDs());
+            $this->assertFalse($pi_group->getOwner()->getFlag(UserFlag::QUALIFIED));
         } finally {
             $entry = $LDAP->getPIGroupEntry($pi_group->gid);
             $entry->setAttribute("memberuid", $memberuids_before);
             $entry->setAttribute("isDefunct", "FALSE");
+            $pi_group->getOwner()->setFlag(UserFlag::QUALIFIED, true);
         }
     }
 
@@ -33,14 +37,17 @@ class PiDisbandTest extends UnityWebPortalTestCase
         $memberuids_before = $pi_group->getMemberUIDs();
         $this->assertFalse($pi_group->getIsDefunct());
         $this->assertNotEmpty($pi_group->getMemberUIDs());
+        $this->assertTrue($pi_group->getOwner()->getFlag(UserFlag::QUALIFIED));
         try {
             http_post(__DIR__ . "/../../webroot/panel/pi.php", ["form_type" => "disband"]);
             $this->assertTrue($pi_group->getIsDefunct());
             $this->assertEmpty($pi_group->getMemberUIDs());
+            $this->assertFalse($pi_group->getOwner()->getFlag(UserFlag::QUALIFIED));
         } finally {
             $entry = $LDAP->getPIGroupEntry($pi_group->gid);
             $entry->setAttribute("memberuid", $memberuids_before);
             $entry->setAttribute("isDefunct", "FALSE");
+            $pi_group->getOwner()->setFlag(UserFlag::QUALIFIED, true);
         }
     }
 }

@@ -76,6 +76,15 @@ class UnityGroup extends PosixGroup
         if (count($memberuids) > 0) {
             $this->entry->setAttribute("memberuid", []);
         }
+        // if user is no longer in any PI group, dequalify them
+        if (count($this->getOwner()->getPIGroupGIDs()) === 0) {
+            $this->getOwner()->setFlag(
+                UserFlag::QUALIFIED,
+                false,
+                doSendMail: $send_mail,
+                doSendMailAdmin: false,
+            );
+        }
     }
 
     private function reinstate(bool $send_mail = true)
@@ -91,6 +100,7 @@ class UnityGroup extends PosixGroup
         if (!$this->memberUIDExists($owner_uid)) {
             $this->addMemberUID($owner_uid);
         }
+        $this->getOwner()->setFlag(UserFlag::QUALIFIED, true);
     }
 
     /**
