@@ -119,7 +119,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
     </tr>
 
     <?php
-    $owner_uids = $LDAP->getAllPIGroupOwnerUIDs();
+    $owner_uids = $LDAP->getAllNonDefunctPIGroupOwnerUIDs();
     $owner_attributes = $LDAP->getUsersAttributes(
         $owner_uids,
         ["uid", "gecos", "mail"],

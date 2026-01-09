@@ -215,6 +215,18 @@ class UnityLDAP extends LDAPConn
         );
     }
 
+    public function getAllNonDefunctPIGroupsAttributes(
+        array $attributes,
+        array $default_values = [],
+    ): array {
+        return $this->pi_groupOU->getChildrenArrayStrict(
+            $attributes,
+            false, // non-recursive
+            "(|(!(isDefunct=*))(isDefunct=FALSE))", // unset or false
+            $default_values,
+        );
+    }
+
     public function getPIGroupGIDsWithMemberUID(string $uid): array
     {
         return array_map(
@@ -227,11 +239,11 @@ class UnityLDAP extends LDAPConn
         );
     }
 
-    public function getAllPIGroupOwnerUIDs(): array
+    public function getAllNonDefunctPIGroupOwnerUIDs(): array
     {
         return array_map(
             fn($x) => UnityGroup::GID2OwnerUID($x["cn"][0]),
-            $this->pi_groupOU->getChildrenArrayStrict(["cn"]),
+            $this->getAllNonDefunctPIGroupsAttributes(["cn"]),
         );
     }
 
