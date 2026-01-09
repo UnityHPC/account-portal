@@ -328,28 +328,35 @@ class UnityLDAP extends LDAPConn
     }
 
     /**
-     * returns an array with each UID as an array key
+     * constructs a filter where $filter_key attribute must be one of $filter_values
+     * and objectClass must be equal to $filter_object_class
+     * returns an array with each filter value as an array key
      * @throws \UnityWebPortal\lib\exceptions\EntryNotFoundException
      */
-    public function getUsersAttributes(
-        array $uids,
+    private function getEntriesAttributes(
+        array $filter_values,
+        string $filter_key,
+        string $filter_object_class,
         array $attributes,
         array $default_values = [],
     ): array {
-        if (count($uids) === 0) {
+        if (count($filter_values) === 0) {
             return [];
         }
         $attributes = array_map("strtolower", $attributes);
-        if (in_array("uid", $attributes)) {
-            $asked_for_uid_attribute = true;
+        if (in_array($filter_key, $attributes)) {
+            $filter_key_attribute_was_requested = true;
         } else {
-            $asked_for_uid_attribute = false;
+            $filter_key_attribute_was_requested = false;
             array_push($attributes, "uid");
         }
-        $uids_escaped = array_map(fn($x) => ldap_escape($x, "", LDAP_ESCAPE_FILTER), $uids);
+        $filter_values_escaped = array_map(
+            fn($x) => ldap_escape($x, "", LDAP_ESCAPE_FILTER),
+            $filter_values,
+        );
         $filter =
-            "(&(objectClass=posixAccount)(|" .
-            implode("", array_map(fn($x) => "(uid=$x)", $uids_escaped)) .
+            "(&(objectClass=$filter_object_class)(|" .
+            implode("", array_map(fn($x) => "($filter_key=$x)", $filter_values_escaped)) .
             "))";
         $entries = $this->baseOU->getChildrenArrayStrict(
             $attributes,
@@ -359,17 +366,31 @@ class UnityLDAP extends LDAPConn
         );
         $output = [];
         foreach ($entries as $entry) {
-            $uid = $entry["uid"][0];
-            if (!$asked_for_uid_attribute) {
-                unset($entry["uid"]);
+            $filter_value = $entry[$filter_key][0];
+            if (!$filter_key_attribute_was_requested) {
+                unset($entry[$filter_key]);
             }
-            $output[$uid] = $entry;
+            $output[$filter_value] = $entry;
         }
-        $uids_not_found = array_diff($uids, array_keys($output));
+        $uids_not_found = array_diff($filter_values, array_keys($output));
         if (count($uids_not_found) > 0) {
             throw new EntryNotFoundException(jsonEncode($uids_not_found));
         }
         ksort($output);
         return $output;
+    }
+
+    public function getUsersAttributes(
+        array $uids,
+        array $attributes,
+        array $default_values = [],
+    ): array {
+        return $this->getEntriesAttributes(
+            $uids,
+            "uid",
+            "posixAccount",
+            $attributes,
+            $default_values,
+        );
     }
 }
