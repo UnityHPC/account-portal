@@ -285,7 +285,7 @@ class UnityGroup extends PosixGroup
             ]);
         }
         // if user is no longer in any PI group, dequalify them
-        if (count($this->LDAP->getPIGroupGIDsWithMemberUID($new_user->uid)) === 0) {
+        if (count($new_user->getPIGroupGIDs()) === 0) {
             $new_user->setFlag(
                 UserFlag::QUALIFIED,
                 false,
