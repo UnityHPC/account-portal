@@ -63,16 +63,29 @@ class UnityGroup extends PosixGroup
         }
     }
 
-    public function disband()
+    public function disband(bool $send_mail = true): void
     {
+        $this->SQL->addLog("disband_pi_group", $this->gid);
+        $memberuids = $this->getMemberUIDs();
+        if ($send_mail) {
+            $member_attributes = $this->LDAP->getUsersAttributes($memberuids, ["mail"]);
+            $member_mails = array_map(fn($x) => $x["mail"][0], $member_attributes);
+            $this->MAILER->sendMail($member_mails, "group_disband", ["group_name" => $this->gid]);
+        }
         $this->setIsDefunct(true);
-        if (count($this->getMemberUIDs()) > 0) {
+        if (count($memberuids) > 0) {
             $this->entry->setAttribute("memberuid", []);
         }
     }
 
-    private function reinstate()
+    private function reinstate(bool $send_mail = true)
     {
+        $this->SQL->addLog("reinstate_pi_group", $this->gid);
+        if ($send_mail) {
+            $this->MAILER->sendMail($this->getOwner()->getMail(), "group_reinstate", [
+                "group_name" => $this->gid,
+            ]);
+        }
         $this->setIsDefunct(false);
         $owner_uid = $this->getOwner()->uid;
         if (!$this->memberUIDExists($owner_uid)) {
