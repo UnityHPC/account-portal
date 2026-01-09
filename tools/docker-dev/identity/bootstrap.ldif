@@ -13536,6 +13536,7 @@ memberuid: user804_org12_test
 objectclass: unityClusterPIGroup
 objectclass: posixGroup
 objectclass: top
+isDefunct: FALSE
 
 dn: cn=pi_user1128_org1_test,ou=pi_groups,dc=unityhpc,dc=test
 cn: pi_user1128_org1_test
