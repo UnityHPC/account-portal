@@ -43,15 +43,14 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
     {
         global $USER, $SQL;
         $this->switchUser("Blank");
-        $this->assertNumberPiBecomeRequests(0);
         try {
             $USER->requestAccountDeletion();
+            $this->expectException(Exception::class);
             http_post(__DIR__ . "/../../webroot/panel/account.php", [
                 "form_type" => "pi_request",
                 "tos" => "agree",
                 "account_policy" => "agree",
             ]);
-            $this->assertNumberPiBecomeRequests(0);
         } finally {
             if ($SQL->requestExists($USER, UnitySQL::REQUEST_BECOME_PI)) {
                 $SQL->removeRequest($USER->uid, UnitySQL::REQUEST_BECOME_PI);
