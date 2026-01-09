@@ -56,6 +56,7 @@ class UnityUser
         string $org,
         bool $send_mail = true,
     ): void {
+        // if this user is a ghost then they already have LDAP entries
         if (!$this->getFlag(UserFlag::GHOST)) {
             $ldapGroupEntry = $this->getGroupEntry();
             \ensure(!$ldapGroupEntry->exists());
