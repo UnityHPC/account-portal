@@ -33,6 +33,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $group->removeUser($form_user);
 
             break;
+        case "disband":
+            $group->disband();
+            UnityHTTPD::redirect("panel/account.php");
+            break; /** @phpstan-ignore deadCode.unreachable */
     }
 }
 
@@ -126,6 +130,13 @@ foreach ($assocs as $assoc) {
 }
 
 echo "</table>";
+
 ?>
+
+<h2>Danger Zone</h2>
+<form action='' method='POST' onsubmit='return confirm("Are you sure you want to disband your PI group?")'>
+<input type='hidden' name='form_type' value='disband'>
+<input type='submit' value='Disband PI Account'>
+</form>
 
 <?php require $LOC_FOOTER; ?>
