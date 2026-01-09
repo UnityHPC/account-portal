@@ -142,7 +142,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
                     return confirm(\"Are you sure you want to remove $owner_uid?\")
                 '
             >
-                <input type='hidden' name='form_name' value='disband'>
+                <input type='hidden' name='form_type' value='disband'>
                 <input type='hidden' name='pi' value='$owner_uid'>
                 <input type='submit' value='Remove'>
             </form>
