@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             break;
         case "disband":
             $group->disband();
-            UnityHTTPD::redirect("panel/account.php");
+            UnityHTTPD::redirect(getURL("panel/account.php"));
             break; /** @phpstan-ignore deadCode.unreachable */
     }
 }
