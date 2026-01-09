@@ -131,6 +131,7 @@ foreach ($assocs as $assoc) {
 
 echo "
     </table>
+    <hr>
     <h2>Danger Zone</h2>
     <form
         action=''
