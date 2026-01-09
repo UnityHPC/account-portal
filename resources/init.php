@@ -74,11 +74,11 @@ if (isset($_SERVER["REMOTE_USER"])) {
 
     $SQL->addLog("user_login", $OPERATOR->uid);
 
-    if ($OPERATOR->getFlag(UserFlag::LOCKED)) {
+    if ($USER->getFlag(UserFlag::LOCKED)) {
         UnityHTTPD::forbidden("locked", "Your account is locked.");
     }
 
-    if ($OPERATOR->setFlag(UserFlag::IDLELOCKED, false)) {
+    if ($OPERATOR == $USER && $USER->setFlag(UserFlag::IDLELOCKED, false)) {
         UnityHTTPD::messageSuccess(
             "Account Unlocked",
             "Your account was previously locked due to inactivity.",
