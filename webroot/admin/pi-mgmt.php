@@ -44,6 +44,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $parent = new UnityGroup($_POST["pi"], $LDAP, $SQL, $MAILER, $WEBHOOK);
             $parent->removeUser($form_user);
             break;
+        case "disband":
+            $group = new UnityGroup(UnityHTTPD::getPostData("pi"), $LDAP, $SQL, $MAILER, $WEBHOOK);
+            $group->disband();
+            break;
     }
 }
 
@@ -124,10 +128,26 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
     usort($owner_attributes, fn($a, $b) => strcmp($a["uid"][0], $b["uid"][0]));
     foreach ($owner_attributes as $attributes) {
         $mail = $attributes["mail"][0];
+        $owner_uid = $attributes["uid"][0];
         echo "<tr class='expandable'>";
         echo "<td><button class='btnExpand'>&#9654;</button>" . $attributes["gecos"][0] . "</td>";
         echo "<td>" . UnityGroup::OwnerUID2GID($attributes["uid"][0]) . "</td>";
         echo "<td><a href='mailto:$mail'>$mail</a></td>";
+        echo "<td>";
+        echo "
+            <form
+                action=''
+                method='POST'
+                onsubmit='
+                    return confirm(\"Are you sure you want to remove $owner_uid?\")
+                '
+            >
+                <input type='hidden' name='form_name' value='disband'>
+                <input type='hidden' name='pi' value='$owner_uid'>
+                <input type='submit' value='Remove'>
+            </form>
+        ";
+        echo "</td>";
         echo "</tr>";
     }
     ?>
