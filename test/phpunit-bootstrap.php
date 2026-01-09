@@ -222,7 +222,7 @@ class UnityWebPortalTestCase extends TestCase
         "Ghost" => "user7_org1_test",
         "GhostNotPI" => "user7_org1_test",
         "GhostPI" => "user9_org3_test",
-        "HadPIGroupInPastLife" => "user10_org1_test",
+        "PreviousOwnerOfDefunctPIGroup" => "user10_org1_test",
         "HasNoSshKeys" => "user3_org1_test",
         "HasOneSshKey" => "user5_org2_test",
         "IdleLocked" => "user6_org1_test",
@@ -283,7 +283,7 @@ class UnityWebPortalTestCase extends TestCase
                 $this->assertTrue($USER->getFlag(UserFlag::GHOST));
                 $this->assertFalse($USER->getPIGroup()->exists());
                 break;
-            case "HadPIGroupInPastLife":
+            case "PreviousOwnerOfDefunctPIGroup":
                 $this->assertTrue($USER->exists());
                 $this->assertFalse($USER->getFlag(UserFlag::GHOST));
                 $this->assertFalse($USER->isPI());
