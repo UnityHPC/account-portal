@@ -23,6 +23,9 @@ class UnityLDAP extends LDAPConn
 {
     private const string RDN = "cn"; // The defauls RDN for LDAP entries is set to "common name"
 
+    // isDefunct unset or set to "FALSE"
+    private static string $NON_DEFUNCT_FILTER = "(|(!(isDefunct=*))(isDefunct=FALSE))";
+
     public const array POSIX_ACCOUNT_CLASS = [
         "inetorgperson",
         "posixAccount",
@@ -180,25 +183,21 @@ class UnityLDAP extends LDAPConn
         );
     }
 
-    public function getAllPIGroups(
+    public function getAllNonDefunctPIGroups(
         UnitySQL $UnitySQL,
         UnityMailer $UnityMailer,
         UnityWebhook $UnityWebhook,
     ) {
         $out = [];
-
-        $pi_groups = $this->pi_groupOU->getChildren(true);
-
-        foreach ($pi_groups as $pi_group) {
+        $pi_groups_attributes = $this->pi_groupOU->getChildrenArrayStrict(
+            attributes: ["cn"],
+            recursive: false,
+            filter: self::$NON_DEFUNCT_FILTER,
+        );
+        foreach ($pi_groups_attributes as $attributes) {
             array_push(
                 $out,
-                new UnityGroup(
-                    $pi_group->getAttribute("cn")[0],
-                    $this,
-                    $UnitySQL,
-                    $UnityMailer,
-                    $UnityWebhook,
-                ),
+                new UnityGroup($attributes["cn"][0], $this, $UnitySQL, $UnityMailer, $UnityWebhook),
             );
         }
 
@@ -222,19 +221,23 @@ class UnityLDAP extends LDAPConn
         return $this->pi_groupOU->getChildrenArrayStrict(
             $attributes,
             false, // non-recursive
-            "(|(!(isDefunct=*))(isDefunct=FALSE))", // unset or false
+            self::$NON_DEFUNCT_FILTER,
             $default_values,
         );
     }
 
-    public function getPIGroupGIDsWithMemberUID(string $uid): array
+    public function getNonDefunctPIGroupGIDsWithMemberUID(string $uid): array
     {
         return array_map(
             fn($x) => $x["cn"][0],
             $this->pi_groupOU->getChildrenArrayStrict(
                 ["cn"],
                 false,
-                "(memberuid=" . ldap_escape($uid, "", LDAP_ESCAPE_FILTER) . ")",
+                sprintf(
+                    "(&(memberuid=%s)%s)",
+                    ldap_escape($uid, "", LDAP_ESCAPE_FILTER),
+                    self::$NON_DEFUNCT_FILTER,
+                ),
             ),
         );
     }
@@ -254,7 +257,7 @@ class UnityLDAP extends LDAPConn
     {
         $uid2pigids = [];
         // for each PI group, append that GID to the member list for each of its member UIDs
-        $pi_groups_attributes = $this->getAllPIGroupsAttributes(
+        $pi_groups_attributes = $this->getAllNonDefunctPIGroupsAttributes(
             ["cn", "memberuid"],
             default_values: ["memberuid" => []],
         );

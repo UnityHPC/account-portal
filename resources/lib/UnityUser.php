@@ -381,7 +381,7 @@ class UnityUser
      */
     public function getPIGroupGIDs(): array
     {
-        return $this->LDAP->getPIGroupGIDsWithMemberUID($this->uid);
+        return $this->LDAP->getNonDefunctPIGroupGIDsWithMemberUID($this->uid);
     }
 
     /**
