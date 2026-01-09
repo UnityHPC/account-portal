@@ -75,7 +75,7 @@ if (isset($_SERVER["REMOTE_USER"])) {
     $SQL->addLog("user_login", $OPERATOR->uid);
 
     if ($OPERATOR->getFlag(UserFlag::LOCKED)) {
-        UnityHTTPD::die("Your account is locked.");
+        UnityHTTPD::forbidden("locked", "Your account is locked.");
     }
 
     if ($OPERATOR->setFlag(UserFlag::IDLELOCKED, false)) {
