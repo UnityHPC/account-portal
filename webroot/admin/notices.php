@@ -11,18 +11,24 @@ if (!$USER->getFlag(UserFlag::ADMIN)) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     UnityHTTPD::validatePostCSRFToken();
-    switch ($_POST["form_type"]) {
+    switch (UnityHTTPD::getPostData("form_type")) {
         case "newNotice":
-            $SQL->addNotice($_POST["title"], $_POST["date"], $_POST["content"]);
-
+            $SQL->addNotice(
+                UnityHTTPD::getPostData("title"),
+                UnityHTTPD::getPostData("date"),
+                UnityHTTPD::getPostData("content"),
+            );
             break;
         case "editNotice":
-            $SQL->editNotice($_POST["id"], $_POST["title"], $_POST["date"], $_POST["content"]);
-
+            $SQL->editNotice(
+                UnityHTTPD::getPostData("id"),
+                UnityHTTPD::getPostData("title"),
+                UnityHTTPD::getPostData("date"),
+                UnityHTTPD::getPostData("content")
+            );
             break;
         case "delNotice":
-            $SQL->deleteNotice($_POST["id"]);
-
+            $SQL->deleteNotice(UnityHTTPD::getPostData("id"));
             break;
     }
 }

@@ -27,10 +27,10 @@ $getPIGroupFromPost = function () {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     UnityHTTPD::validatePostCSRFToken();
     if (isset($_POST["form_type"])) {
-        switch ($_POST["form_type"]) {
+        switch (UnityHTTPD::getPostData("form_type")) {
             case "addPIform":
                 $pi_account = $getPIGroupFromPost();
-                if ($_POST["tos"] != "agree") {
+                if (UnityHTTPD::getPostData("tos") != "agree") {
                     UnityHTTPD::badRequest("user did not agree to terms of service");
                 }
                 if ($pi_account->exists()) {

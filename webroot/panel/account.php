@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "loginshell":
-            $USER->setLoginShell($_POST["shellSelect"]);
+            $USER->setLoginShell(UnityHTTPD::getPostData("shellSelect"));
             break;
         case "pi_request":
             if ($USER->isPI()) {
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             if ($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI)) {
                 UnityHTTPD::badRequest("already requested to be PI");
             }
-            if ($_POST["tos"] != "agree") {
+            if (UnityHTTPD::getPostData("tos") != "agree") {
                 UnityHTTPD::badRequest("user did not agree to terms of service");
             }
             $USER->getPIGroup()->requestGroup();

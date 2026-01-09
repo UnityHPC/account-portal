@@ -8,7 +8,7 @@ use UnityWebPortal\lib\UnityHTTPD;
 $private = EC::createKey('Ed25519');
 $public = $private->getPublicKey();
 $public_str = $public->toString('OpenSSH');
-if (UnityHTTPD::getQueryParameter("type", false) == "ppk") {
+if (UnityHTTPD::getOptionalQueryParameter("type") == "ppk") {
     $private_str = $private->toString('PuTTY');
 } else {
     $private_str = $private->toString('OpenSSH');

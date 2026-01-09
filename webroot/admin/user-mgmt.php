@@ -12,9 +12,9 @@ if (!$USER->getFlag(UserFlag::ADMIN)) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     UnityHTTPD::validatePostCSRFToken();
-    switch ($_POST["form_type"]) {
+    switch (UnityHTTPD::getPostData("form_type")) {
         case "viewAsUser":
-            $_SESSION["viewUser"] = $_POST["uid"];
+            $_SESSION["viewUser"] = UnityHTTPD::getPostData("uid");
             UnityHTTPD::redirect(getURL("panel/account.php"));
             break; /** @phpstan-ignore deadCode.unreachable */
     }

@@ -226,6 +226,7 @@ class UnityHTTPD
         return false;
     }
 
+    /* if key is not found, dies */
     public static function getPostData(string $key): string
     {
         if (!array_key_exists($key, $_POST)) {
@@ -234,17 +235,23 @@ class UnityHTTPD
         return $_POST[$key];
     }
 
-    /* returns null if not found and not $die_if_not_found */
-    public static function getQueryParameter(string $key, bool $die_if_not_found = true): ?string
+    public static function getOptionalPostData(string $key): ?string
+    {
+        return @$_POST[$key];
+    }
+
+    /* if key is not found, dies */
+    public static function getQueryParameter(string $key): string
     {
         if (!array_key_exists($key, $_GET)) {
-            if ($die_if_not_found) {
-                self::badRequest("\$_GET has no array key '$key'");
-            } else {
-                return null;
-            }
+            self::badRequest("\$_GET has no array key '$key'");
         }
         return $_GET[$key];
+    }
+
+    public static function getOptionalQueryParameter(string $key): ?string
+    {
+        return @$_GET[$key];
     }
 
     public static function getUploadedFileContents(

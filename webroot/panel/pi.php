@@ -18,12 +18,12 @@ $getUserFromPost = function () {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     UnityHTTPD::validatePostCSRFToken();
-    switch ($_POST["form_type"]) {
+    switch (UnityHTTPD::getPostData("form_type")) {
         case "userReq":
             $form_user = $getUserFromPost();
-            if ($_POST["action"] == "Approve") {
+            if (UnityHTTPD::getPostData("action") == "Approve") {
                 $group->approveUser($form_user);
-            } elseif ($_POST["action"] == "Deny") {
+            } elseif (UnityHTTPD::getPostData("action") == "Deny") {
                 $group->denyUser($form_user);
             }
             break;
