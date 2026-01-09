@@ -4,6 +4,8 @@ parameters:
     - resources
     - webroot
     - test
+  excludePaths:
+    - test/Template.php
   ignoreErrors:
     # $this, $data comes from UnityMailer
     - messages:
