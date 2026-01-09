@@ -204,16 +204,6 @@ class UnityLDAP extends LDAPConn
         return $out;
     }
 
-    public function getAllPIGroupsAttributes(array $attributes, array $default_values = []): array
-    {
-        return $this->pi_groupOU->getChildrenArrayStrict(
-            $attributes,
-            false, // non-recursive
-            "objectClass=posixGroup",
-            $default_values,
-        );
-    }
-
     public function getAllNonDefunctPIGroupsAttributes(
         array $attributes,
         array $default_values = [],
