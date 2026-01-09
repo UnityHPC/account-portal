@@ -123,6 +123,14 @@ rm "$prod" && ln -s "$old" "$prod"
 
 ### Version-specific update instructions:
 
+### 1.6 -> 1.7
+
+- a new LDAP schema needs to be added:
+  ```shell
+  scp tools/docker-dev/identity/unity-cluster-schema.ldif your-ldap-server:/root/unity-cluster-schema.ldif
+  ssh your-ldap-server ldapadd /root/unity-cluster-schema.ldif
+  ```
+
 ### 1.5 -> 1.6
 
 - the `[site]getting_started_url` option should be defined
