@@ -267,16 +267,7 @@ class UnityLDAP extends LDAPConn
         $org_groups = $this->org_groupOU->getChildren(true);
 
         foreach ($org_groups as $org_group) {
-            array_push(
-                $out,
-                new UnityOrg(
-                    $org_group->getAttribute("cn")[0],
-                    $this,
-                    $UnitySQL,
-                    $UnityMailer,
-                    $UnityWebhook,
-                ),
-            );
+            array_push($out, new UnityOrg($org_group->getAttribute("cn")[0], $this));
         }
 
         return $out;

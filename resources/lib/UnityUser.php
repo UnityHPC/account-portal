@@ -360,13 +360,7 @@ class UnityUser
 
     public function getOrgGroup(): UnityOrg
     {
-        return new UnityOrg(
-            $this->getOrg(),
-            $this->LDAP,
-            $this->SQL,
-            $this->MAILER,
-            $this->WEBHOOK,
-        );
+        return new UnityOrg($this->getOrg(), $this->LDAP);
     }
 
     /**
