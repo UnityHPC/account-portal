@@ -94,7 +94,7 @@ class PIBecomeApproveTest extends UnityWebPortalTestCase
         } finally {
             if ($pi_group->memberUIDExists($approve_uid)) {
                 $pi_group->removeMemberUID($approve_uid);
-                $pi_group->setIsHaunted(true);
+                $pi_group->setIsDefunct(true);
                 assert(!$user->isPI());
             }
         }

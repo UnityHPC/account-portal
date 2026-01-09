@@ -11128,7 +11128,7 @@ gidnumber: 10094
 objectclass: unityClusterPIGroup
 objectclass: posixGroup
 objectclass: top
-isHaunted: TRUE
+isDefunct: TRUE
 
 dn: cn=pi_user10_org1_test,ou=pi_groups,dc=unityhpc,dc=test
 cn: pi_user10_org1_test
@@ -11136,7 +11136,7 @@ gidnumber: 2257
 objectclass: unityClusterPIGroup
 objectclass: posixGroup
 objectclass: top
-isHaunted: TRUE
+isDefunct: TRUE
 
 dn: cn=pi_user242_org1_test,ou=pi_groups,dc=unityhpc,dc=test
 cn: pi_user242_org1_test

@@ -277,7 +277,7 @@ class UnityWebPortalTestCase extends TestCase
             case "GhostPI":
                 $this->assertTrue($USER->getFlag(UserFlag::GHOST));
                 $this->assertTrue($USER->getPIGroup()->exists());
-                $this->assertTrue($USER->getPIGroup()->getIsHaunted());
+                $this->assertTrue($USER->getPIGroup()->getIsDefunct());
                 break;
             case "GhostNotPI":
                 $this->assertTrue($USER->getFlag(UserFlag::GHOST));
@@ -288,7 +288,7 @@ class UnityWebPortalTestCase extends TestCase
                 $this->assertFalse($USER->getFlag(UserFlag::GHOST));
                 $this->assertFalse($USER->isPI());
                 $this->assertTrue($USER->getPIGroup()->exists());
-                $this->assertTrue($USER->getPIGroup()->getIsHaunted());
+                $this->assertTrue($USER->getPIGroup()->getIsDefunct());
                 break;
             case "HasNoSshKeys":
                 $this->assertEqualsCanonicalizing([], $USER->getSSHKeys());

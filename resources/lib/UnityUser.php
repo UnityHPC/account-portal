@@ -350,7 +350,7 @@ class UnityUser
      */
     public function isPI(): bool
     {
-        return $this->getPIGroup()->exists() && !$this->getPIGroup()->getIsHaunted();
+        return $this->getPIGroup()->exists() && !$this->getPIGroup()->getIsDefunct();
     }
 
     public function getPIGroup(): UnityGroup
