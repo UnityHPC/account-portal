@@ -4,6 +4,12 @@ namespace UnityWebPortal\lib;
 
 use PDO;
 
+enum UnityUserExpirationWarningType: string
+{
+    case IDLELOCK = "idlelock";
+    case DISABLE = "disable";
+}
+
 /**
  * @phpstan-type account_deletion_request array{timestamp: string, uid: string}
  * @phpstan-type user_last_login array{operator: string, last_login: string}
@@ -14,6 +20,7 @@ class UnitySQL
     private const string TABLE_REQS = "requests";
     private const string TABLE_AUDIT_LOG = "audit_log";
     private const string TABLE_ACCOUNT_DELETION_REQUESTS = "account_deletion_requests";
+    public const string TABLE_USER_EXPIRY = "user_expiry";
     // FIXME this string should be changed to something more intuitive, requires production change
     public const string REQUEST_BECOME_PI = "admin";
 
@@ -194,4 +201,48 @@ class UnitySQL
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+    /**
+     * @return array<string, array{idlelock: int[], disable: int[]}>
+     * returns an array where each key is a UID and each value is another array
+     * where each key is a warning type and each value is a sorted list of
+     * day numbers when a warning was sent
+     *
+     * day numbers count up from the last day that the user logged in,
+     * so on day 5 the user has been idle for 5 days
+     * for example, a user might get idlelock warnings on day numbers 180, 200, 219
+     * before actually getting idlelocked on day 220
+     * in this case, the output would be:
+     * ['username_here' => ['idlelock' => [180, 200, 219], 'disable' => []], ...]
+     */
+    public function getAllUsersExpirationWarningDaysSent(): array
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM " . self::TABLE_USER_EXPIRY);
+        $stmt->execute();
+        $output = [];
+        foreach ($stmt->fetchAll() as $data) {
+            $uid = $data["uid"];
+            $idlelock_warning_days_sent = array_map(
+                "digits2int",
+                explode(",", $data["idlelock_warning_days_sent"]),
+            );
+            $disable_warning_days_sent = array_map(
+                "digits2int",
+                explode(",", $data["disable_warning_days_sent"]),
+            );
+            sort($idlelock_warning_days_sent);
+            sort($disable_warning_days_sent);
+            $output[$uid] = [
+                "idlelock" => $idlelock_warning_days_sent,
+                "disable" => $disable_warning_days_sent,
+            ];
+        }
+        return $output;
+    }
+
+    public function recordUserExpirationWarningDaySent(
+        string $uid,
+        UnityUserExpirationWarningType $warning_type,
+        int $day,
+    ): void {}
 }
