@@ -94,8 +94,8 @@ CREATE TABLE `requests` (
 
 CREATE TABLE `user_expiry` (
   `uid` varchar(128) NOT NULL,
-  `idlelock_warning_days_sent` varchar(768) NOT NULL COMMENT 'sorted list of day numbers joined by commas',
-  `disable_warning_days_sent` varchar(768) NOT NULL COMMENT 'sorted list of day numbers joined by commas'
+  `idlelock_warning_days_sent` varchar(768) NOT NULL COMMENT 'JSON encoded sorted list of day numbers',
+  `disable_warning_days_sent` varchar(768) NOT NULL COMMENT 'JSON encoded sorted list of day numbers'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
