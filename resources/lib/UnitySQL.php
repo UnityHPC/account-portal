@@ -20,6 +20,7 @@ class UnitySQL
     private const string TABLE_REQS = "requests";
     private const string TABLE_AUDIT_LOG = "audit_log";
     private const string TABLE_ACCOUNT_DELETION_REQUESTS = "account_deletion_requests";
+    private const string TABLE_USER_LAST_LOGINS = "user_last_logins";
     public const string TABLE_USER_EXPIRY = "user_expiry";
     // FIXME this string should be changed to something more intuitive, requires production change
     public const string REQUEST_BECOME_PI = "admin";
@@ -288,5 +289,12 @@ class UnitySQL
         );
         $stmt->bindParam(":uid", $uid);
         $stmt->execute();
+    }
+
+    public function getAllUserLastLogins(): array
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM " . self::TABLE_USER_LAST_LOGINS);
+        $stmt->execute();
+        return $stmt->fetchAll();
     }
 }
