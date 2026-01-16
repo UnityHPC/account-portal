@@ -203,28 +203,6 @@ class UnitySQL
     }
 
     /**
-     * example input: ['uid' => 'foobar', 'idlelock' => '1,2,3', 'disable' => '4,5,6']
-     * example output: ['foobar', ['idlelock' => [1,2,3], 'disable' => [4,5,6]]]
-     */
-    private function formatExpirationWarningDaysSent(array $record): array
-    {
-        $idlelock_warning_days_sent = array_map(
-            "digits2int",
-            explode(",", $record["idlelock_warning_days_sent"]),
-        );
-        $disable_warning_days_sent = array_map(
-            "digits2int",
-            explode(",", $record["disable_warning_days_sent"]),
-        );
-        sort($idlelock_warning_days_sent);
-        sort($disable_warning_days_sent);
-        return [
-            $record["uid"],
-            ["idlelock" => $idlelock_warning_days_sent, "disable" => $disable_warning_days_sent],
-        ];
-    }
-
-    /**
      * returns an array where each key is a UID and each value is another array
      * where each key is a warning type and each value is a sorted list of
      * day numbers when a warning was sent
@@ -243,8 +221,10 @@ class UnitySQL
         $records = $stmt->fetchAll();
         $output = [];
         foreach ($records as $record) {
-            [$key, $val] = $this->formatExpirationWarningDaysSent($record);
-            $output[$key] = $val;
+            $uid = $record["uid"];
+            $idlelock = jsonDecode($record["idlelock_warning_days_sent"]);
+            $disable = jsonDecode($record["disable_warning_days_sent"]);
+            $output[$uid] = ["idlelock" => $idlelock, "disable" => $disable];
         }
         return $output;
     }
@@ -264,8 +244,11 @@ class UnitySQL
             case 0:
                 return ["idlelock" => [], "disable" => []];
             case 1:
-                [$_, $output] = $this->formatExpirationWarningDaysSent($records[0]);
-                return $output;
+                $record = $records[0];
+                $uid = $record["uid"];
+                $idlelock = jsonDecode($record["idlelock_warning_days_sent"]);
+                $disable = jsonDecode($record["disable_warning_days_sent"]);
+                return ["idlelock" => $idlelock, "disable" => $disable];
             default:
                 throw new RecordNotUniqueException("uid='$uid'");
         }
@@ -280,7 +263,7 @@ class UnitySQL
         $days_sent = $warning_type_to_days_sent[$warning_type->value];
         array_push($days_sent, $day);
         sort($days_sent);
-        $days_sent_str = implode(",", array_map("digits2int", $days_sent));
+        $days_sent_str = jsonEncode($days_sent);
         $stmt = $this->conn->prepare(
             sprintf(
                 "UPDATE %s SET %s=:days WHERE uid=:uid",
@@ -297,7 +280,7 @@ class UnitySQL
     {
         $stmt = $this->conn->prepare(
             sprintf(
-                "UPDATE %s SET %s='' %s='' WHERE uid=:uid",
+                "UPDATE %s SET %s='[]' %s='[]' WHERE uid=:uid",
                 self::TABLE_USER_EXPIRY,
                 "idlelock_warning_days_sent",
                 "disable_warning_days_sent",
