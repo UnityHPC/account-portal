@@ -96,19 +96,15 @@ foreach ($LDAP->getAllPIGroupsAttributes(["cn", "memberuid"], ["memberuid" => []
 }
 $pi_group_owners = array_map(UnityGroup::GID2OwnerUID(...), array_keys($pi_group_members));
 
-$action_log = [];
 function sendMail(string $type, array|string $recipients, string $template, ?array $data = null)
 {
-    global $MAILER, $args, $action_log;
+    global $MAILER, $args;
     if ($args["verbose"]) {
-        array_push(
-            $action_log,
-            sprintf(
-                "sending %s email to %s with data %s",
-                $type,
-                jsonEncode($recipients),
-                jsonEncode($data),
-            ),
+        printf(
+            "sending %s email to %s with data %s",
+            $type,
+            jsonEncode($recipients),
+            jsonEncode($data),
         );
     }
     if (!$args["dry-run"]) {
@@ -118,8 +114,8 @@ function sendMail(string $type, array|string $recipients, string $template, ?arr
 
 function idleLockUser($uid)
 {
-    global $args, $action_log, $LDAP, $SQL, $MAILER, $WEBHOOK;
-    array_push($action_log, "idle-locking user '$uid'");
+    global $args, $LDAP, $SQL, $MAILER, $WEBHOOK;
+    echo "idle-locking user '$uid'";
     if (!$args["dry-run"]) {
         $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
         $user->setFlag(UserFlag::IDLELOCKED, true);
@@ -128,8 +124,8 @@ function idleLockUser($uid)
 
 function disableUser($uid)
 {
-    global $args, $action_log, $LDAP, $SQL, $MAILER, $WEBHOOK;
-    array_push($action_log, "disabling user '$uid'");
+    global $args, $LDAP, $SQL, $MAILER, $WEBHOOK;
+    echo "disabling user '$uid'";
     if (!$args["dry-run"]) {
         $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
         $user->disable();
@@ -203,8 +199,7 @@ foreach ($uid_to_idle_days as $uid => $day) {
     }
 }
 
-echo jsonEncode($action_log, JSON_PRETTY_PRINT) . "\n";
 if ($args["dry-run"]) {
-    echo "dry run, nothing doing.\n";
+    echo "[DRY RUN]\n";
 }
 
