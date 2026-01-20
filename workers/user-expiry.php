@@ -161,7 +161,7 @@ foreach ($uid_to_idle_days as $uid => $day) {
             "warning_number" => $warning_number,
             "is_final_warning" => $is_final_warning,
         ];
-        if (count($pi_group_member_uids) === 0) {
+        if (!array_key_exists($pi_group_gid, $pi_group_member_uids)) {
             $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
             sendMail(
                 "disable",
@@ -178,17 +178,19 @@ foreach ($uid_to_idle_days as $uid => $day) {
                 "user_expiry_disable_warning_pi.php",
                 $mail_template_data,
             );
-            $members = [];
-            foreach ($pi_group_member_uids as $uid) {
-                array_push($members, new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK));
+            if (count($pi_group_member_uids) > 0) {
+                $members = [];
+                foreach ($pi_group_member_uids as $uid) {
+                    array_push($members, new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK));
+                }
+                $member_mails = array_map(fn($x) => $x->getMail(), $members);
+                sendMail(
+                    "disable (to PI group members)",
+                    $member_mails,
+                    "user_expiry_disable_warning_member.php",
+                    $mail_template_data,
+                );
             }
-            $member_mails = array_map(fn($x) => $x->getMail(), $members);
-            sendMail(
-                "disable (to PI group members)",
-                $member_mails,
-                "user_expiry_disable_warning_member.php",
-                $mail_template_data,
-            );
         }
     }
     if ($day === $idlelock_day) {
