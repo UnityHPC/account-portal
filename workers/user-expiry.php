@@ -116,6 +116,26 @@ function sendMail(string $type, array|string $recipients, string $template, ?arr
     }
 }
 
+function idleLockUser($uid)
+{
+    global $args, $action_log, $LDAP, $SQL, $MAILER, $WEBHOOK;
+    array_push($action_log, "idle-locking user '$uid'");
+    if (!$args["dry-run"]) {
+        $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+        $user->setFlag(UserFlag::IDLELOCKED, true);
+    }
+}
+
+function disableUser($uid)
+{
+    global $args, $action_log, $LDAP, $SQL, $MAILER, $WEBHOOK;
+    array_push($action_log, "disabling user '$uid'");
+    if (!$args["dry-run"]) {
+        $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+        $user->disable();
+    }
+}
+
 $uids_to_send_idlelock_warning = [];
 $uids_to_send_disable_warning = [];
 $uids_to_idlelock = [];
@@ -185,18 +205,10 @@ foreach ($uids_to_send_disable_warning as $uid) {
     $MAILER->sendMail($pi_user->getMail(), "group_user_request_owner", []);
 }
 foreach ($uids_to_idlelock as $uid) {
-    array_push($action_log, "idlelock user '$uid'");
-    if (!$args["dry-run"]) {
-        $user = new UnityUser($uid, $LDAP, $SLQ, $MAILER, $WEBHOOK);
-        $user->setFlag(UserFlag::IDLELOCKED, true);
-    }
+    idleLockUser($uid);
 }
 foreach ($uids_to_disable as $uid) {
-    array_push($action_log, "disable user '$uid'");
-    if (!$args["dry-run"]) {
-        $user = new UnityUser($uid, $LDAP, $SLQ, $MAILER, $WEBHOOK);
-        $user->disable();
-    }
+    disableUser($uid);
 }
 
 echo jsonEncode($action_log, JSON_PRETTY_PRINT) . "\n";
