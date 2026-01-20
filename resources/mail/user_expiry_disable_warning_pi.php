@@ -22,5 +22,5 @@ Upon expiration, your files and your PI group's files will be permanently delete
 you will lose access to UnityHPC Platform services,
 and your group members also may lose access unless they are a member of some other group.
 If you don't wish for this to happen,
-reset the inactivity timer by simply logging in to the Unity account portal.
+reset the inactivity timer by simply logging in to the <?php echo getHyperlink("Unity account portal") ?>.
 </p>
