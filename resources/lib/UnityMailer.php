@@ -76,8 +76,11 @@ class UnityMailer extends PHPMailer
         }
     }
 
-    /** @param string|string[] $recipients */
-    public function sendMail(string|array $recipients, string $template, mixed $data = null): bool
+    /**
+     * @param string|string[] $recipients
+     * @param ?mixed[] $data
+     */
+    public function sendMail(string|array $recipients, string $template, ?array $data = null): bool
     {
         $this->setFrom($this->MSG_SENDER_EMAIL, $this->MSG_SENDER_NAME);
         $this->addReplyTo($this->MSG_SUPPORT_EMAIL, $this->MSG_SUPPORT_NAME);
