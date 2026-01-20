@@ -165,7 +165,15 @@ foreach ($uid_to_idle_days as $uid => $day) {
             "warning_number" => $warning_number,
             "is_final_warning" => $is_final_warning,
         ];
-        if (count($pi_group_member_uids) > 0) {
+        if (count($pi_group_member_uids) === 0) {
+            $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+            sendMail(
+                "disable",
+                $user->getMail(),
+                "user_expiry_disable_warning_non_pi.php",
+                $mail_template_data,
+            );
+        } else {
             $mail_template_data["pi_group_gid"] = $pi_group_gid;
             $owner = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
             sendMail(
@@ -183,14 +191,6 @@ foreach ($uid_to_idle_days as $uid => $day) {
                 "disable (to PI group members)",
                 $member_mails,
                 "user_expiry_disable_warning_member.php",
-                $mail_template_data,
-            );
-        } else {
-            $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
-            sendMail(
-                "disable",
-                $user->getMail(),
-                "user_expiry_disable_warning_non_pi.php",
                 $mail_template_data,
             );
         }
