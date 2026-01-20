@@ -21,5 +21,5 @@ if ($is_final_warning) {
 Upon expiration, this group's files will be permanently deleted,
 and you will lose access to UnityHPC Platform services unless you are a member of any other PI group.
 If you don't wish for this to happen,
-remind your PI to reset the inactivity timer by simply logging in to the Unity account portal.
+remind your PI to reset the inactivity timer by simply logging in to the <?php echo getHyperlink("Unity account portal") ?>.
 </p>

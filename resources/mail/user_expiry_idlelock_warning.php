@@ -17,5 +17,5 @@ if ($is_final_warning) {
 }
 ?>
 <p>
-Upon expiration, you will lose access to UnityHPC Platform services until you reset the inactivity timer by logging in to the Unity account portal.
+Upon expiration, you will lose access to UnityHPC Platform services until you reset the inactivity timer by logging in to the <?php echo getHyperlink("Unity account portal") ?>.
 </p>
