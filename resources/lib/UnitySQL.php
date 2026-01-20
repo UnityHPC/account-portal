@@ -4,7 +4,7 @@ namespace UnityWebPortal\lib;
 
 use PDO;
 
-enum UnityUserExpirationWarningType: string
+enum UserExpiryWarningType: string
 {
     case IDLELOCK = "idlelock";
     case DISABLE = "disable";
@@ -257,7 +257,7 @@ class UnitySQL
 
     public function recordUserExpirationWarningDaySent(
         string $uid,
-        UnityUserExpirationWarningType $warning_type,
+        UserExpiryWarningType $warning_type,
         int $day,
     ): void {
         $warning_type_to_days_sent = $this->getUserExpirationWarningDaysSent($uid);

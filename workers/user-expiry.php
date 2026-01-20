@@ -2,7 +2,7 @@
 <?php
 include __DIR__ . "/init.php";
 use Garden\Cli\Cli;
-use UnityWebPortal\lib\UnityUserExpirationWarningType;
+use UnityWebPortal\lib\UserExpiryWarningType;
 use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UnityGroup;
 use UnityWebPortal\lib\UserFlag;
@@ -112,6 +112,17 @@ function sendMail(string $type, array|string $recipients, string $template, ?arr
     }
 }
 
+function recordUserExpirationWarningDaySent(
+    string $uid,
+    UserExpiryWarningType $warning_type,
+    int $day,
+) {
+    global $args, $SQL;
+    if (!$args["dry-run"]) {
+        $SQL->recordUserExpirationWarningDaySent($uid, $warning_type, $day);
+    }
+}
+
 function idleLockUser($uid)
 {
     global $args, $LDAP, $SQL, $MAILER, $WEBHOOK;
@@ -146,6 +157,7 @@ foreach ($uid_to_idle_days as $uid => $day) {
             "warning_number" => $warning_number,
             "is_final_warning" => $is_final_warning,
         ]);
+        recordUserExpirationWarningDaySent($uid, UserExpiryWarningType::IDLELOCK, $idle_days);
     }
     if (in_array($day, $disable_warning_days)) {
         $idle_days = $uid_to_idle_days[$uid];
@@ -169,6 +181,7 @@ foreach ($uid_to_idle_days as $uid => $day) {
                 "user_expiry_disable_warning_non_pi.php",
                 $mail_template_data,
             );
+            recordUserExpirationWarningDaySent($uid, UserExpiryWarningType::DISABLE, $idle_days);
         } else {
             $mail_template_data["pi_group_gid"] = $pi_group_gid;
             $owner = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
@@ -178,6 +191,7 @@ foreach ($uid_to_idle_days as $uid => $day) {
                 "user_expiry_disable_warning_pi.php",
                 $mail_template_data,
             );
+            recordUserExpirationWarningDaySent($uid, UserExpiryWarningType::DISABLE, $idle_days);
             if (count($pi_group_member_uids) > 0) {
                 $members = [];
                 foreach ($pi_group_member_uids as $uid) {
