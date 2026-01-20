@@ -58,10 +58,10 @@ if (!doesArrayHaveOnlyIntegerValues($disable_warning_days)) {
     _die('$CONFIG["user_expiry"]["disable_warning_days"] must be a list of integers!', 1);
 }
 if (!isArrayMonotonicallyIncreasing($idlelock_warning_days)) {
-    _die('$CONFIG["user_expiry"]["idlelock_warning_days"] is not monotonically increasing!', 1);
+    _die('$CONFIG["user_expiry"]["idlelock_warning_days"] must be monotonically increasing!', 1);
 }
 if (!isArrayMonotonicallyIncreasing($disable_warning_days)) {
-    _die('$CONFIG["user_expiry"]["disable_warning_days"] is not monotonically increasing!', 1);
+    _die('$CONFIG["user_expiry"]["disable_warning_days"] must be monotonically increasing!', 1);
 }
 
 $last_disable_warning_day = $disable_warning_days[array_key_last($disable_warning_days)];
