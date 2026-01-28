@@ -214,6 +214,7 @@ class UnitySQL
      * before actually getting idlelocked on day 220
      * in this case, the output would be:
      * ['username_here' => ['idlelock' => [180, 200, 219], 'disable' => []], ...]
+     * @return array<string, int[]>
      */
     public function getAllUsersExpirationWarningDaysSent(): array
     {
@@ -223,8 +224,8 @@ class UnitySQL
         $output = [];
         foreach ($records as $record) {
             $uid = $record["uid"];
-            $idlelock = jsonDecode($record["idlelock_warning_days_sent"]);
-            $disable = jsonDecode($record["disable_warning_days_sent"]);
+            $idlelock = _json_decode($record["idlelock_warning_days_sent"]);
+            $disable = _json_decode($record["disable_warning_days_sent"]);
             $output[$uid] = ["idlelock" => $idlelock, "disable" => $disable];
         }
         return $output;
@@ -232,6 +233,7 @@ class UnitySQL
 
     /**
      * example output: ['idlelock' => [1,2,3], 'disable' => [4,5,6]]
+     * @return array<string, int[]>
      */
     public function getUserExpirationWarningDaysSent(string $uid): array
     {
@@ -247,8 +249,8 @@ class UnitySQL
             case 1:
                 $record = $records[0];
                 $uid = $record["uid"];
-                $idlelock = jsonDecode($record["idlelock_warning_days_sent"]);
-                $disable = jsonDecode($record["disable_warning_days_sent"]);
+                $idlelock = _json_decode($record["idlelock_warning_days_sent"]);
+                $disable = _json_decode($record["disable_warning_days_sent"]);
                 return ["idlelock" => $idlelock, "disable" => $disable];
             default:
                 throw new \Exception("multiple records found with uid='$uid'");
@@ -264,7 +266,7 @@ class UnitySQL
         $days_sent = $warning_type_to_days_sent[$warning_type->value];
         array_push($days_sent, $day);
         sort($days_sent);
-        $days_sent_str = jsonEncode($days_sent);
+        $days_sent_str = _json_encode($days_sent);
         $stmt = $this->conn->prepare(
             sprintf(
                 "UPDATE %s SET %s=:days WHERE uid=:uid",
@@ -291,6 +293,7 @@ class UnitySQL
         $stmt->execute();
     }
 
+    /** @return string[] */
     public function getAllUserLastLogins(): array
     {
         $stmt = $this->conn->prepare("SELECT * FROM " . self::TABLE_USER_LAST_LOGINS);
