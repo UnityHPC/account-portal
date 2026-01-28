@@ -91,7 +91,10 @@ foreach ($SQL->getAllUsersExpirationWarningDaysSent() as $record) {
 }
 
 $pi_group_members = [];
-foreach ($LDAP->getAllPIGroupsAttributes(["cn", "memberuid"], ["memberuid" => []]) as $attributes) {
+foreach (
+    $LDAP->getAllNonDisabledPIGroupsAttributes(["cn", "memberuid"], ["memberuid" => []])
+    as $attributes
+) {
     $pi_group_members[$attributes["cn"][0]] = $attributes["memberuid"];
 }
 $pi_group_owners = array_map(UnityGroup::GID2OwnerUID(...), array_keys($pi_group_members));
