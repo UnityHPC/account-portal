@@ -199,7 +199,7 @@ foreach ($uid_to_idle_days as $uid => $day) {
             );
             if (count($pi_group_member_uids) > 0) {
                 $members = [];
-                foreach ($pi_group_member_uids[$pi_group_gid] as $member_uid) {
+                foreach ($pi_group_member_uids as $member_uid) {
                     $member = new UnityUser($member_uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
                     if ($member != $owner) {
                         array_push($members, $member);
