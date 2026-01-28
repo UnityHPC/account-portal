@@ -103,8 +103,8 @@ function sendMail(string $type, array|string $recipients, string $template, ?arr
         printf(
             "sending %s email to %s with data %s",
             $type,
-            jsonEncode($recipients),
-            jsonEncode($data),
+            _json_encode($recipients),
+            _json_encode($data),
         );
     }
     if (!$args["dry-run"]) {
