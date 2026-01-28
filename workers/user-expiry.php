@@ -184,18 +184,26 @@ foreach ($uid_to_idle_days as $uid => $day) {
             recordUserExpirationWarningDaySent($uid, UserExpiryWarningType::DISABLE, $idle_days);
         } else {
             $mail_template_data["pi_group_gid"] = $pi_group_gid;
-            $owner = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+            $owner_uid = $uid;
+            $owner = new UnityUser($owner_uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
             sendMail(
                 "disable",
                 $owner->getMail(),
                 "user_expiry_disable_warning_pi",
                 $mail_template_data,
             );
-            recordUserExpirationWarningDaySent($uid, UserExpiryWarningType::DISABLE, $idle_days);
+            recordUserExpirationWarningDaySent(
+                $owner_uid,
+                UserExpiryWarningType::DISABLE,
+                $idle_days,
+            );
             if (count($pi_group_member_uids) > 0) {
                 $members = [];
-                foreach ($pi_group_member_uids as $uid) {
-                    array_push($members, new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK));
+                foreach ($pi_group_member_uids[$pi_group_gid] as $member_uid) {
+                    $member = new UnityUser($member_uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+                    if ($member != $owner) {
+                        array_push($members, $member);
+                    }
                 }
                 $member_mails = array_map(fn($x) => $x->getMail(), $members);
                 sendMail(
