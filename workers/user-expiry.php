@@ -151,7 +151,7 @@ foreach ($uid_to_idle_days as $uid => $day) {
         $warning_number = count($warnings_sent) + 1;
         $is_final_warning = $warning_number === $final_idlelock_warning_day;
         $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
-        sendMail("idlelock", $user->getMail(), "user_expiry_idlelock_warning.php", [
+        sendMail("idlelock", $user->getMail(), "user_expiry_idlelock_warning", [
             "idle_days" => $idle_days,
             "expiration_date" => $expiration_date,
             "warning_number" => $warning_number,
@@ -178,7 +178,7 @@ foreach ($uid_to_idle_days as $uid => $day) {
             sendMail(
                 "disable",
                 $user->getMail(),
-                "user_expiry_disable_warning_non_pi.php",
+                "user_expiry_disable_warning_non_pi",
                 $mail_template_data,
             );
             recordUserExpirationWarningDaySent($uid, UserExpiryWarningType::DISABLE, $idle_days);
@@ -188,7 +188,7 @@ foreach ($uid_to_idle_days as $uid => $day) {
             sendMail(
                 "disable",
                 $owner->getMail(),
-                "user_expiry_disable_warning_pi.php",
+                "user_expiry_disable_warning_pi",
                 $mail_template_data,
             );
             recordUserExpirationWarningDaySent($uid, UserExpiryWarningType::DISABLE, $idle_days);
@@ -201,7 +201,7 @@ foreach ($uid_to_idle_days as $uid => $day) {
                 sendMail(
                     "disable (to PI group members)",
                     $member_mails,
-                    "user_expiry_disable_warning_member.php",
+                    "user_expiry_disable_warning_member",
                     $mail_template_data,
                 );
             }
