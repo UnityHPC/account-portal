@@ -58,7 +58,11 @@ class PageLoadTest extends UnityWebPortalTestCase
             ["Blank", "panel/new_account.php", "/panel\/account\.php/", true],
             // non-PI can't access pi.php
             ["Blank", "panel/pi.php", "/You are not a PI./", true],
-            // disabled account technically exists but new_account.php should not redirect
+            // nonexistent, disabled users should be redirected to new_account.php
+            // and new_account.php should not redirect anywhere else
+            ["NonExistent", "panel/account.php", "/panel\/new_account\.php/", true],
+            ["Disabled", "panel/account.php", "/panel\/new_account\.php/", true],
+            ["NonExistent", "panel/new_account.php", "/Register New Account/", true],
             ["Disabled", "panel/new_account.php", "/Register New Account/", true],
         ];
     }

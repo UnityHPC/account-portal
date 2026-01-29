@@ -11,7 +11,7 @@ if ($USER->exists() && (!$USER->getFlag(UserFlag::DISABLED))) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     UnityHTTPD::validatePostCSRFToken();
     if ($USER->getFlag(UserFlag::DISABLED)) {
-        $USER->setFlag(UserFlag::DISABLED, false);
+        $USER->reEnable();
         UnityHTTPD::messageInfo(
             "Welcome Back!",
             "Your previously disabled account has been re-enabled."

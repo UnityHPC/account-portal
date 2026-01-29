@@ -79,7 +79,7 @@ if (isset($_SERVER["REMOTE_USER"])) {
         $USER = $OPERATOR;
     }
 
-    $_SESSION["user_exists"] = $USER->exists();
+    $_SESSION["user_exists"] = $USER->exists() && !$USER->getFlag(UserFlag::DISABLED);
     $_SESSION["is_pi"] = $USER->isPI();
 
     $SQL->addLog("user_login", $OPERATOR->uid);
