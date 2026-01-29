@@ -4,14 +4,10 @@ require_once __DIR__ . "/../../resources/autoload.php";
 
 use UnityWebPortal\lib\UnityHTTPD;
 use UnityWebPortal\lib\UserFlag;
-use UnityWebPortal\lib\UnityUser;
 
 if (!$USER->getFlag(UserFlag::ADMIN)) {
     UnityHTTPD::forbidden("not an admin", "You are not an admin.");
 }
-
-$locked_users = $LDAP->userFlagGroups["locked"]->getMemberUIDs();
-$disabled_users = $LDAP->userFlagGroups["disabled"]->getMemberUIDs();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     UnityHTTPD::validatePostCSRFToken();
@@ -19,39 +15,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         case "viewAsUser":
             $_SESSION["viewUser"] = $_POST["uid"];
             UnityHTTPD::redirect(getURL("panel/account.php"));
-            break; /** @phpstan-ignore deadCode.unreachable */
-        case "lockUser":
-            $uid = UnityHTTPD::getPostData("uid");
-            $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
-            if (in_array($uid, $locked_users)) {
-                UnityHTTPD::messageError("Cannot lock user, already locked", $uid);
-                UnityHTTPD::redirect();
-            }
-            $user->setFlag(UserFlag::LOCKED, true);
-            UnityHTTPD::messageSuccess("User Locked", $uid);
-            UnityHTTPD::redirect();
-            break; /** @phpstan-ignore deadCode.unreachable */
-        case "unlockUser":
-            $uid = UnityHTTPD::getPostData("uid");
-            $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
-            if (!in_array($uid, $locked_users)) {
-                UnityHTTPD::messageError("Cannot unlock user, not locked", $uid);
-                UnityHTTPD::redirect();
-            }
-            $user->setFlag(UserFlag::LOCKED, false);
-            UnityHTTPD::messageSuccess("User Unlocked", $uid);
-            UnityHTTPD::redirect();
-            break; /** @phpstan-ignore deadCode.unreachable */
-        case "disableUser":
-            $uid = UnityHTTPD::getPostData("uid");
-            $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
-            if (in_array($uid, $disabled_users)) {
-                UnityHTTPD::messageError("Cannot disable user, already disabled", $uid);
-                UnityHTTPD::redirect();
-            }
-            $user->disable();
-            UnityHTTPD::messageSuccess("User Disabled", $uid);
-            UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
     }
 }
@@ -121,41 +84,13 @@ $flags_to_display = array_filter(UserFlag::cases(), fn($x) => $x !== UserFlag::D
         echo "</ul>";
         echo "</td>";
         echo "<td>";
-        if (in_array($uid, $locked_users)) {
-            [$action, $action_lowercase, $form_type] = ["Unlock", "unlock", "unlockUser"];
-        } else {
-            [$action, $action_lowercase, $form_type] = ["Lock", "lock", "lockUser"];
-        }
-        echo "
-            <div style='display: flex; gap: 5px;'>
-                <form action='' method='POST'>
-                    $CSRFTokenHiddenFormInput
-                    <input type='hidden' name='form_type' value='viewAsUser'>
-                    <input type='hidden' name='uid' value='$uid'>
-                    <input type='submit' name='action' value='Access'>
-                </form>
-                <form
-                    action=''
-                    method='POST'
-                    onsubmit='return confirm(\"Are you sure you want to $action_lowercase user $uid?\");'
-                >
-                    $CSRFTokenHiddenFormInput
-                    <input type='hidden' name='form_type' value='$form_type'>
-                    <input type='hidden' name='uid' value='$uid'>
-                    <input type='submit' name='action' value='$action'>
-                </form>
-                <form
-                    action=''
-                    method='POST'
-                    onsubmit='return confirm(\"🚨 Are you sure you want to DISABLE user $uid? 🚨\");'
-                >
-                    $CSRFTokenHiddenFormInput
-                    <input type='hidden' name='form_type' value='disableUser'>
-                    <input type='hidden' name='uid' value='$uid'>
-                    <input type='submit' name='action' value='Disable' class='danger'>
-                </form>
-            </div>
-        ";
+        echo "<form class='viewAsUserForm' action='' method='POST'
+        onsubmit='return confirm(\"Are you sure you want to switch to the user $uid?\");'>
+        $CSRFTokenHiddenFormInput
+        <input type='hidden' name='form_type' value='viewAsUser'>
+        <input type='hidden' name='uid' value='$uid'>
+        <input type='submit' name='action' value='Access'>
+        </form>";
         echo "</td>";
         foreach ($flags_to_display as $flag) {
             echo sprintf(
