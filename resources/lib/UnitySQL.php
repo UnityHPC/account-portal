@@ -267,16 +267,14 @@ class UnitySQL
         sort($warning_type_to_days_sent[$warning_type->value]);
         $idlelock_days_sent_str = _json_encode($warning_type_to_days_sent["idlelock"]);
         $disable_days_sent_str = _json_encode($warning_type_to_days_sent["disable"]);
-        $stmt = $this->conn->prepare(
-            sprintf(
-                "INSERT INTO %s (uid, %s, %s) VALUES (:uid, :idlelock_days, :disable_days) ON DUPLICATE KEY UPDATE %s=:idlelock_days, %s=:disable_days",
-                self::TABLE_USER_EXPIRY,
-                "idlelock_warning_days_sent",
-                "disable_warning_days_sent",
-                "idlelock_warning_days_sent",
-                "disable_warning_days_sent",
-            ),
-        );
+        $table = self::TABLE_USER_EXPIRY;
+        $stmt = $this->conn->prepare("
+            INSERT INTO $table
+            (uid, idlelock_warning_days_sent, disable_warning_days_sent)
+            VALUES(:uid, :idlelock_days, :disable_days)
+            ON DUPLICATE KEY UPDATE
+            idlelock_warning_days_sent=:idlelock_days, disable_warning_days_sent=:disable_days
+        ");
         $stmt->bindParam(":uid", $uid);
         $stmt->bindParam(":idlelock_days", $idlelock_days_sent_str);
         $stmt->bindParam(":disable_days", $disable_days_sent_str);
@@ -285,16 +283,14 @@ class UnitySQL
 
     public function resetUserExpirationWarningDaysSent(string $uid): void
     {
-        $stmt = $this->conn->prepare(
-            sprintf(
-                "INSERT INTO %s (uid, %s, %s) VALUES (:uid, '[]', '[]') ON DUPLICATE KEY UPDATE %s='[]', %s='[]'",
-                self::TABLE_USER_EXPIRY,
-                "idlelock_warning_days_sent",
-                "disable_warning_days_sent",
-                "idlelock_warning_days_sent",
-                "disable_warning_days_sent",
-            ),
-        );
+        $table = self::TABLE_USER_EXPIRY;
+        $stmt = $this->conn->prepare("
+            INSERT INTO $table
+            (uid, idlelock_warning_days_sent, disable_warning_days_sent)
+            VALUES (:uid, '[]', '[]')
+            ON DUPLICATE KEY UPDATE
+            idlelock_warning_days_sent='[]', disable_warning_days_sent='[]'
+        ");
         $stmt->bindParam(":uid", $uid);
         $stmt->execute();
     }
