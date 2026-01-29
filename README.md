@@ -149,6 +149,14 @@ rm "$prod" && ln -s "$old" "$prod"
 - the `[ldap]group_ou` option has been renamed to `[ldap]usergroup_ou`
 - the `[ldap]user_flag_groups[ghost]` group has been renamed to `[ldap]user_flag_groups[disabled]`
 - 3 new colors `danger` `danger_hover` `danger_disabled` should be added to the branding config
+- the SQL trigger for `audit_log` to update `user_last_logins` should be removed:
+  ```sql
+  drop trigger update_last_logins;
+  ```
+- all `user_login` records should be purged from `audit_log`:
+  ```sql
+  delete from audit_log where action_type='user_login';
+  ```
 
 ### 1.5 -> 1.6
 

@@ -14,6 +14,7 @@ class UnitySQL
     private const string TABLE_REQS = "requests";
     private const string TABLE_AUDIT_LOG = "audit_log";
     private const string TABLE_ACCOUNT_DELETION_REQUESTS = "account_deletion_requests";
+    private const string TABLE_USER_LAST_LOGINS = "user_last_logins";
     // FIXME this string should be changed to something more intuitive, requires production change
     public const string REQUEST_BECOME_PI = "admin";
 
@@ -193,5 +194,17 @@ class UnitySQL
         $stmt = $this->conn->prepare("SELECT * FROM " . self::TABLE_ACCOUNT_DELETION_REQUESTS);
         $stmt->execute();
         return $stmt->fetchAll();
+    }
+
+    public function updateUserLastLogin(string $uid): void
+    {
+        $stmt = $this->conn->prepare(
+            sprintf(
+                "UPDATE %s SET last_login=CURRENT_TIMESTAMP WHERE uid=:uid",
+                self::TABLE_USER_LAST_LOGINS,
+            ),
+        );
+        $stmt->bindParam(":uid", $uid);
+        $stmt->execute();
     }
 }
