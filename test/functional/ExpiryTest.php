@@ -17,6 +17,27 @@ class ExpiryTest extends UnityWebPortalTestCase
         ];
     }
 
+    private function assertOnlyOneWarningEmailSent(
+        string $output,
+        string $type,
+        string $mail,
+        int $day,
+        int $warning_number,
+        bool $is_final,
+    ) {
+        $this->assertMatchesRegularExpression(
+            sprintf(
+                "/^sending %s email to \"%s\" with data \{\"idle_days\":%s,\"expiration_date\":\"[\d\/]+\",\"warning_number\":%s,\"is_final_warning\":%s\}$/",
+                $type,
+                $mail,
+                $day,
+                $warning_number,
+                $is_final ? "true" : "false",
+            ),
+            $output,
+        );
+    }
+
     #[DataProvider("provider")]
     public function testExpiry(string $uid, string $mail)
     {
@@ -46,17 +67,25 @@ class ExpiryTest extends UnityWebPortalTestCase
             callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 2);
             [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
             $output = trim(implode("\n", $output_lines));
-            $this->assertMatchesRegularExpression(
-                "/^sending idlelock email to \"$mail\" with data \{\"idle_days\":2,\"expiration_date\":\"[\d\/]+\",\"warning_number\":1,\"is_final_warning\":false\}$/",
+            $this->assertOnlyOneWarningEmailSent(
                 $output,
+                "idlelock",
+                $mail,
+                day: 2,
+                warning_number: 1,
+                is_final: false,
             );
             // 3 ///////////////////////////////////////////////////////////////////////////////////
             callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 3);
             [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
             $output = trim(implode("\n", $output_lines));
-            $this->assertMatchesRegularExpression(
-                "/^sending idlelock email to \"$mail\" with data \{\"idle_days\":3,\"expiration_date\":\"[\d\/]+\",\"warning_number\":2,\"is_final_warning\":true\}$/",
+            $this->assertOnlyOneWarningEmailSent(
                 $output,
+                "idlelock",
+                $mail,
+                day: 3,
+                warning_number: 2,
+                is_final: true,
             );
             // 4 ///////////////////////////////////////////////////////////////////////////////////
             callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 4);
@@ -71,17 +100,25 @@ class ExpiryTest extends UnityWebPortalTestCase
             callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 6);
             [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
             $output = trim(implode("\n", $output_lines));
-            $this->assertMatchesRegularExpression(
-                "/^sending disable email to \"$mail\" with data \{\"idle_days\":6,\"expiration_date\":\"[\d\/]+\",\"warning_number\":1,\"is_final_warning\":false\}$/",
+            $this->assertOnlyOneWarningEmailSent(
                 $output,
+                "disable",
+                $mail,
+                day: 6,
+                warning_number: 1,
+                is_final: false,
             );
             // 7 ///////////////////////////////////////////////////////////////////////////////////
             callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 7);
             [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
             $output = trim(implode("\n", $output_lines));
-            $this->assertMatchesRegularExpression(
-                "/^sending disable email to \"$mail\" with data \{\"idle_days\":7,\"expiration_date\":\"[\d\/]+\",\"warning_number\":2,\"is_final_warning\":true\}$/",
+            $this->assertOnlyOneWarningEmailSent(
                 $output,
+                "disable",
+                $mail,
+                day: 7,
+                warning_number: 2,
+                is_final: true,
             );
             // 8 ///////////////////////////////////////////////////////////////////////////////////
             callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 8);
