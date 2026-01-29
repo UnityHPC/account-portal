@@ -300,4 +300,19 @@ class UnitySQL
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+    /* for testing purposes */
+    private function setUserLastLoginDaysAgo(string $uid, int $days): void
+    {
+        $datetime = date("Y-m-d H:i:s", time() - $days * 24 * 60 * 60);
+        $stmt = $this->conn->prepare(
+            sprintf(
+                "UPDATE %s SET last_login=:datetime WHERE operator=:uid",
+                self::TABLE_USER_LAST_LOGINS,
+            ),
+        );
+        $stmt->bindParam(":uid", $uid);
+        $stmt->bindParam(":datetime", $datetime);
+        $stmt->execute();
+    }
 }
