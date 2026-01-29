@@ -200,7 +200,7 @@ class UnitySQL
     {
         $stmt = $this->conn->prepare(
             sprintf(
-                "UPDATE %s SET last_login=CURRENT_TIMESTAMP WHERE uid=:uid",
+                "UPDATE %s SET last_login=CURRENT_TIMESTAMP WHERE operator=:uid",
                 self::TABLE_USER_LAST_LOGINS,
             ),
         );
