@@ -73,7 +73,7 @@ if ($idlelock_day <= $final_idlelock_warning_day) {
 
 $uid_to_last_login = [];
 foreach ($SQL->getAllUserLastLogins() as $record) {
-    $uid_to_last_login[$record["uid"]] = strtotime($record["last_login"]);
+    $uid_to_last_login[$record["operator"]] = strtotime($record["last_login"]);
 }
 
 $uid_to_idle_days = [];
@@ -84,7 +84,7 @@ foreach ($uid_to_last_login as $uid => $last_login) {
 
 $uid_to_warnings_sent = [];
 foreach ($SQL->getAllUsersExpirationWarningDaysSent() as $record) {
-    $uids_to_warnings_sent[$record["uid"]] = [
+    $uids_to_warnings_sent[$record["operator"]] = [
         "idlelock" => $record["idlelock"],
         "disable" => $record["disable"],
     ];
