@@ -214,7 +214,7 @@ class UnitySQL
      * before actually getting idlelocked on day 220
      * in this case, the output would be:
      * ['username_here' => ['idlelock' => [180, 200, 219], 'disable' => []], ...]
-     * @return array<string, int[]>
+     * @return array<string, array<string, int[]>>
      */
     public function getAllUsersExpirationWarningDaysSent(): array
     {
