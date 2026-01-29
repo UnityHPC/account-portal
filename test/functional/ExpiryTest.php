@@ -25,17 +25,10 @@ class ExpiryTest extends UnityWebPortalTestCase
         int $warning_number,
         bool $is_final,
     ) {
-        $this->assertMatchesRegularExpression(
-            sprintf(
-                "/^sending %s email to \"%s\" with data \{\"idle_days\":%s,\"expiration_date\":\"[\d\/]+\",\"warning_number\":%s,\"is_final_warning\":%s\}$/",
-                $type,
-                $mail,
-                $day,
-                $warning_number,
-                $is_final ? "true" : "false",
-            ),
-            $output,
-        );
+        $fmt =
+            "/^sending %s email to \"%s\" with data \{\"idle_days\":%s,\"expiration_date\":\"[\d\/]+\",\"warning_number\":%s,\"is_final_warning\":%s\}$/";
+        $regex = sprintf($fmt, $type, $mail, $day, $warning_number, $is_final ? "true" : "false");
+        $this->assertMatchesRegularExpression($regex, $output);
     }
 
     #[DataProvider("provider")]
