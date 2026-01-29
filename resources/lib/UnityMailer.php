@@ -77,46 +77,41 @@ class UnityMailer extends PHPMailer
     }
 
     /** @param string|string[] $recipients */
-    public function sendMail(
-        string|array $recipients,
-        ?string $template = null,
-        mixed $data = null,
-    ): bool {
-        if (isset($template)) {
-            $this->setFrom($this->MSG_SENDER_EMAIL, $this->MSG_SENDER_NAME);
-            $this->addReplyTo($this->MSG_SUPPORT_EMAIL, $this->MSG_SUPPORT_NAME);
+    public function sendMail(string|array $recipients, string $template, mixed $data = null): bool
+    {
+        $this->setFrom($this->MSG_SENDER_EMAIL, $this->MSG_SENDER_NAME);
+        $this->addReplyTo($this->MSG_SUPPORT_EMAIL, $this->MSG_SUPPORT_NAME);
 
-            $template_filename = $template . ".php";
-            if (file_exists($this->override_dir . "/" . $template_filename)) {
-                $template_path = $this->override_dir . "/" . $template_filename;
-            } else {
-                $template_path = $this->content_dir . "/" . $template_filename;
-            }
+        $template_filename = $template . ".php";
+        if (file_exists($this->override_dir . "/" . $template_filename)) {
+            $template_path = $this->override_dir . "/" . $template_filename;
+        } else {
+            $template_path = $this->content_dir . "/" . $template_filename;
+        }
 
-            if (file_exists($this->override_dir . "/footer.php")) {
-                $footer_template_path = $this->override_dir . "/footer.php";
-            } else {
-                $footer_template_path = $this->content_dir . "/footer.php";
-            }
+        if (file_exists($this->override_dir . "/footer.php")) {
+            $footer_template_path = $this->override_dir . "/footer.php";
+        } else {
+            $footer_template_path = $this->content_dir . "/footer.php";
+        }
 
-            ob_start();
-            include $template_path;
-            include $footer_template_path;
-            $mes_html = _ob_get_clean();
-            $this->msgHTML($mes_html);
+        ob_start();
+        include $template_path;
+        include $footer_template_path;
+        $mes_html = _ob_get_clean();
+        $this->msgHTML($mes_html);
 
-            if ($recipients == "admin") {
-                $this->addBCC($this->MSG_ADMIN_EMAIL, $this->MSG_ADMIN_NAME);
-            } elseif ($recipients == "pi_approve") {
-                $this->addBCC($this->MSG_PI_APPROVAL_EMAIL, $this->MSG_PI_APPROVAL_NAME);
-            } else {
-                if (is_array($recipients)) {
-                    foreach ($recipients as $addr) {
-                        $this->addBCC($addr);
-                    }
-                } else {
-                    $this->addAddress($recipients);
+        if ($recipients == "admin") {
+            $this->addBCC($this->MSG_ADMIN_EMAIL, $this->MSG_ADMIN_NAME);
+        } elseif ($recipients == "pi_approve") {
+            $this->addBCC($this->MSG_PI_APPROVAL_EMAIL, $this->MSG_PI_APPROVAL_NAME);
+        } else {
+            if (is_array($recipients)) {
+                foreach ($recipients as $addr) {
+                    $this->addBCC($addr);
                 }
+            } else {
+                $this->addAddress($recipients);
             }
         }
 
