@@ -145,7 +145,13 @@ function executeWorker(
     ?string $stdinFilePath = null,
 ): array {
     global $LDAP;
-    $command = sprintf("%s %s/../workers/%s %s 2>&1", PHP_BINARY, __DIR__, $basename, $args);
+    $command = sprintf(
+        "HTTP_HOST=phpunit %s %s/../workers/%s %s 2>&1",
+        PHP_BINARY,
+        __DIR__,
+        $basename,
+        $args,
+    );
     if ($stdinFilePath !== null) {
         $command .= " <$stdinFilePath";
     }
@@ -270,7 +276,7 @@ class UnityWebPortalTestCase extends TestCase
     private ?string $current_user_nickname = null;
     private array $nickname_to_latest_session_id = [];
     // FIXME these names are wrong
-    private static array $UID2ATTRIBUTES = [
+    public static array $UID2ATTRIBUTES = [
         "user1_org1_test" => ["user1@org1.test", "foo", "bar", "user1@org1.test"],
         "user2_org1_test" => ["user2@org1.test", "foo", "bar", "user2@org1.test"],
         "user3_org1_test" => ["user3@org1.test", "foo", "bar", "user3@org1.test"],
