@@ -426,4 +426,29 @@ class UnityUser
             doSendMailAdmin: false,
         );
     }
+
+    public function disable(bool $send_mail = true, bool $send_mail_admin = true): void
+    {
+        foreach ($this->LDAP->getNonDisabledPIGroupGIDsWithMemberUID($this->uid) as $gid) {
+            $group = new UnityGroup($gid, $this->LDAP, $this->SQL, $this->MAILER, $this->WEBHOOK);
+            $group->removeMemberUID($this->uid);
+        }
+        $this->entry->removeAttribute("sshPublicKey");
+        $this->setFlag(
+            UserFlag::DISABLED,
+            true,
+            doSendMail: $send_mail,
+            doSendMailAdmin: $send_mail_admin,
+        );
+    }
+
+    public function reEnable(bool $send_mail = true, bool $send_mail_admin = true): void
+    {
+        $this->setFlag(
+            UserFlag::DISABLED,
+            false,
+            doSendMail: $send_mail,
+            doSendMailAdmin: $send_mail_admin,
+        );
+    }
 }
