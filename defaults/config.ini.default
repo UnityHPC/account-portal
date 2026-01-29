@@ -122,14 +122,3 @@ url = "https://hooks.slack.com/services/T04BB3N3M26/B050A55CBNX/IGm1YA0VhjczAfs5
 [page]  ; which sql objects to use for the content on these pages
 home = "home"
 support = "support"
-
-[expiry]
-idlelock_warning_days[] = 180
-idlelock_warning_days[] = 200
-idlelock_warning_days[] = 219
-idlelock_day = 220
-
-disable_warning_days[] = 360
-disable_warning_days[] = 380
-disable_warning_days[] = 399
-disable_day = 400
