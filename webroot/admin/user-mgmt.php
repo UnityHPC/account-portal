@@ -52,6 +52,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 UnityHTTPD::messageError("Cannot disable user, already disabled", $uid);
                 UnityHTTPD::redirect();
             }
+            if ($user->isPI()) {
+                UnityHTTPD::messageError("Cannot disable user, user is PI", $uid);
+                UnityHTTPD::redirect();
+            }
             $user->disable();
             UnityHTTPD::messageSuccess("User Disabled", $uid);
             UnityHTTPD::redirect();
