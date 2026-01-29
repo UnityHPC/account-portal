@@ -148,6 +148,7 @@ rm "$prod" && ln -s "$old" "$prod"
   ```
 - the `[ldap]group_ou` option has been renamed to `[ldap]usergroup_ou`
 - the `[ldap]user_flag_groups[ghost]` group has been renamed to `[ldap]user_flag_groups[disabled]`
+- 3 new colors `danger` `danger_hover` `danger_disabled` should be added to the branding config
 
 ### 1.5 -> 1.6
 

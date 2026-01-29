@@ -143,13 +143,13 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
                         action=''
                         method='POST'
                         onsubmit='return confirm(
-                            \"Are you sure you want to remove all members and disable group $gid?\"
+                            \"🚨 Are you sure you want to REMOVE ALL MEMBERS and DISABLE group $gid? 🚨\"
                         )'
                     >
                         $CSRFTokenHiddenFormInput
                         <input type='hidden' name='form_type' value='disable'>
                         <input type='hidden' name='pi' value='$gid'>
-                        <input type='submit' value='Disable Group'>
+                        <input class='danger' type='submit' value='Disable'>
                     </form>
                 </td>
             </tr>

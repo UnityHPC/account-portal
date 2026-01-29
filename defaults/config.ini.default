@@ -74,6 +74,9 @@ accent_2 = "#9c2020"  ; On hover color for element using accent color
 accent_3 = "#a92323"  ; Active element color for element using accent color
 accent_disabled = "#e48181"  ; Disabled element color for element using accent color
 accent_foreground = "#ffffff"  ; Text color when accent color is background
+danger = "#2e1b74" ; accent color for dangerous things
+danger_hover = "#472e9f" ; on-hover accent color for dangerous things
+danger_disabled = "#7b729f" ; disabled accent color for dangerous things
 
 [footer]  ; Footer logos (add new lines for each)
 logos[] = "testLongFooter.png"
@@ -119,3 +122,14 @@ url = "https://hooks.slack.com/services/T04BB3N3M26/B050A55CBNX/IGm1YA0VhjczAfs5
 [page]  ; which sql objects to use for the content on these pages
 home = "home"
 support = "support"
+
+[expiry]
+idlelock_warning_days[] = 180
+idlelock_warning_days[] = 200
+idlelock_warning_days[] = 219
+idlelock_day = 220
+
+disable_warning_days[] = 360
+disable_warning_days[] = 380
+disable_warning_days[] = 399
+disable_day = 400

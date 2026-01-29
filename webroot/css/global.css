@@ -171,6 +171,21 @@ button:disabled {
   cursor: default;
 }
 
+input[type="submit"].danger,
+button.danger {
+  background: var(--danger);
+}
+
+input[type="submit"].danger:hover,
+button.danger:hover {
+  background: var(--danger_hover);
+}
+
+input[type="submit"].danger:disabled,
+button.danger:disabled {
+  background: var(--danger_disabled);
+}
+
 input[type="checkbox"],
 input[type="radio"] {
   display: inline-block;
