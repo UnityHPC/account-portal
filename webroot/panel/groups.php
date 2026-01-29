@@ -218,8 +218,16 @@ echo "</table>";
 
 <?php
 if ($SQL->accDeletionRequestExists($USER->uid)) {
-    echo "<button type='button' class='plusBtn btnAddPI' disabled><span>&#43;</span></button>";
-    echo "<label>You cannot join a PI while you have requested account deletion.</label>";
+    echo "
+        <button
+            type='button'
+            class='plusBtn btnAddPI'
+            title='You cannot join a PI while you have requested account deletion.'
+            disabled
+        >
+            <span>&#43;</span>
+        </button>
+    ";
 } else {
     echo "<button type='button' class='plusBtn btnAddPI'><span>&#43;</span></button>";
 }

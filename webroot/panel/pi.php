@@ -206,13 +206,23 @@ echo "
 ";
 if (!$user_is_owner) {
     echo "
-        <input type='submit' value='Disable PI Group' class='danger' disabled>
-        <p>Only the group owner can disable the group.</p>
+        <input
+            type='submit'
+            value='Disable PI Group'
+            class='danger'
+            title='Only the group owner can disable the group.'
+            disabled
+        >
     ";
 } elseif (count($assocs) > 1) {
     echo "
-        <input type='submit' value='Disable PI Group' class='danger' disabled>
-        <p>You must first remove all members before you can disable.</p>
+        <input
+            type='submit'
+            value='Disable PI Group'
+            class='danger'
+            title='You must first remove all members before you can disable.'
+            disabled
+        >
     ";
 } else {
     echo "

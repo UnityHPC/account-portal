@@ -209,11 +209,13 @@ if (!$isPI) {
     ";
     echo $CSRFTokenHiddenFormInput;
     if ($SQL->accDeletionRequestExists($USER->uid)) {
-        echo "<input type='submit' value='Request PI Account' disabled />";
         echo "
-            <label style='margin-left: 10px'>
-                You cannot request PI Account while you have requested account deletion.
-            </label>
+            <input
+                type='submit'
+                value='Request PI Account'
+                title='You cannot request PI Account while you have requested account deletion.'
+                disabled
+            />
         ";
     } else {
         if ($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI)) {
@@ -296,38 +298,46 @@ echo "
 ";
 
 if ($hasGroups) {
-    echo "<p>You cannot request to delete your account while you are in a PI group.</p>";
+    $request_account_deletion_disabled = "disabled";
+    $request_account_deletion_title = "You cannot request to delete your account while you are in a PI group.";
 } else {
-    if ($SQL->accDeletionRequestExists($USER->uid)) {
-        echo "
-            <p>Your request has been submitted and is currently pending.</p>
-            <form
-                action=''
-                method='POST'
-                onsubmit='
-                    return confirm(
-                        \"Are you sure you want to cancel your request for account deletion?\"
-                    )
-                '
-            >
-                $CSRFTokenHiddenFormInput
-                <input type='hidden' name='form_type' value='cancel_account_deletion_request' />
-                <input type='submit' value='Cancel Account Deletion Request' />
-            </form>
-        ";
-    } else {
-        echo "
-            <form
-                action=''
-                method='POST'
-                onsubmit='return confirm(\"Are you sure you want to request an account deletion?\")'
-            >
-                $CSRFTokenHiddenFormInput
-                <input type='hidden' name='form_type' value='account_deletion_request' />
-                <input type='submit' value='Request Account Deletion' />
-            </form>
-        ";
-    }
+    $request_account_deletion_disabled = "";
+    $request_account_deletion_title = "";
+}
+if ($SQL->accDeletionRequestExists($USER->uid)) {
+    echo "
+        <p>Your request has been submitted and is currently pending.</p>
+        <form
+            action=''
+            method='POST'
+            onsubmit='
+                return confirm(
+                    \"Are you sure you want to cancel your request for account deletion?\"
+                )
+            '
+        >
+            $CSRFTokenHiddenFormInput
+            <input type='hidden' name='form_type' value='cancel_account_deletion_request' />
+            <input type='submit' value='Cancel Account Deletion Request' />
+        </form>
+    ";
+} else {
+    echo "
+        <form
+            action=''
+            method='POST'
+            onsubmit='return confirm(\"Are you sure you want to request an account deletion?\")'
+        >
+            $CSRFTokenHiddenFormInput
+            <input type='hidden' name='form_type' value='account_deletion_request' />
+            <input
+                type='submit'
+                value='Request Account Deletion'
+                title='$request_account_deletion_title'
+                $request_account_deletion_disabled
+            />
+        </form>
+    ";
 }
 
 ?>
@@ -348,9 +358,9 @@ if ($hasGroups) {
 
     function enableOrDisableSubmitLoginShell() {
         if ($("#loginSelector").val() == ldapLoginShell) {
-            $("#submitLoginShell").prop("disabled", true);
+            $("#submitLoginShell").prop("disabled", true).prop("title", "Login shell is unchanged");
         } else {
-            $("#submitLoginShell").prop("disabled", false);
+            $("#submitLoginShell").prop("disabled", false).prop("title", "");
         }
     }
     $("#loginSelector").change(enableOrDisableSubmitLoginShell);
