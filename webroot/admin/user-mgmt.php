@@ -120,8 +120,10 @@ $flags_to_display = array_filter(UserFlag::cases(), fn($x) => $x !== UserFlag::D
         echo "</td>";
         echo "<td>";
         if (in_array($uid, $users_with_flags[UserFlag::LOCKED->value])) {
+            $access_button_disabled = "disabled";
             [$action, $action_lowercase, $form_type] = ["Unlock", "unlock", "unlockUser"];
         } else {
+            $access_button_disabled = "";
             [$action, $action_lowercase, $form_type] = ["Lock", "lock", "lockUser"];
         }
         echo "
@@ -130,7 +132,7 @@ $flags_to_display = array_filter(UserFlag::cases(), fn($x) => $x !== UserFlag::D
                     $CSRFTokenHiddenFormInput
                     <input type='hidden' name='form_type' value='viewAsUser'>
                     <input type='hidden' name='uid' value='$uid'>
-                    <input type='submit' name='action' value='Access'>
+                    <input type='submit' name='action' value='Access' $access_button_disabled>
                 </form>
                 <form
                     action=''
