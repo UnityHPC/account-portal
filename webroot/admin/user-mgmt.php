@@ -10,6 +10,7 @@ if (!$USER->getFlag(UserFlag::ADMIN)) {
     UnityHTTPD::forbidden("not an admin", "You are not an admin.");
 }
 
+$pi_uids = $LDAP->getAllNonDisabledPIGroupOwnerUIDs();
 $users_with_flags = [];
 foreach (UserFlag::cases() as $flag) {
     $users_with_flags[$flag->value] = $LDAP->userFlagGroups[$flag->value]->getMemberUIDs();
@@ -126,6 +127,13 @@ $flags_to_display = array_filter(UserFlag::cases(), fn($x) => $x !== UserFlag::D
             $access_button_disabled = "";
             [$action, $action_lowercase, $form_type] = ["Lock", "lock", "lockUser"];
         }
+        if (in_array($uid, $pi_uids)) {
+            $disable_button_disabled = "disabled";
+            $disable_button_title = "PI group owners cannot be disabled.";
+        } else {
+            $disable_button_disabled = "";
+            $disable_button_title = "";
+        }
         echo "
             <div style='display: flex; gap: 5px;'>
                 <form action='' method='POST'>
@@ -152,7 +160,14 @@ $flags_to_display = array_filter(UserFlag::cases(), fn($x) => $x !== UserFlag::D
                     $CSRFTokenHiddenFormInput
                     <input type='hidden' name='form_type' value='disableUser'>
                     <input type='hidden' name='uid' value='$uid'>
-                    <input type='submit' name='action' value='Disable' class='danger'>
+                    <input
+                        type='submit'
+                        name='action'
+                        value='Disable'
+                        class='danger'
+                        title='$disable_button_title'
+                        $disable_button_disabled
+                    >
                 </form>
             </div>
         ";
