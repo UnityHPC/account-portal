@@ -27,10 +27,13 @@ class UnityConfig
     {
         $file_loc = $loc . "/config/config.ini";
         if (file_exists($file_loc)) {
-            $CONFIG_override = _parse_ini_file($file_loc, true, INI_SCANNER_TYPED);
-            return array_replace_recursive($CONFIG, $CONFIG_override);
-        } else {
-            return $CONFIG;
+            $override = _parse_ini_file($file_loc, true, INI_SCANNER_TYPED);
+            foreach ($override as $key1 => $val1) {
+                foreach ($val1 as $key2 => $val2) {
+                    $CONFIG[$key1][$key2] = $val2;
+                }
+            }
         }
+        return $CONFIG;
     }
 }
