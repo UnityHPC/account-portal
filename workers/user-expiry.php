@@ -16,10 +16,10 @@ $cli->description(
     ->opt("verbose", "Print which emails are sent.", false, "boolean");
 $args = $cli->parse($argv, true);
 
-$idlelock_warning_days = CONFIG["user_expiry"]["idlelock_warning_days"];
-$idlelock_day = CONFIG["user_expiry"]["idlelock_day"];
-$disable_warning_days = CONFIG["user_expiry"]["idlelock_warning_days"];
-$disable_day = CONFIG["user_expiry"]["disable_day"];
+$idlelock_warning_days = CONFIG["expiry"]["idlelock_warning_days"];
+$idlelock_day = CONFIG["expiry"]["idlelock_day"];
+$disable_warning_days = CONFIG["expiry"]["idlelock_warning_days"];
+$disable_day = CONFIG["expiry"]["disable_day"];
 $now = time();
 
 function doesArrayHaveOnlyIntegerValues(array $x): bool
@@ -50,16 +50,16 @@ function isArrayMonotonicallyIncreasing(array $x): bool
 }
 
 if (!doesArrayHaveOnlyIntegerValues($idlelock_warning_days)) {
-    _die('$CONFIG["user_expiry"]["idlelock_warning_days"] must be a list of integers!', 1);
+    _die('$CONFIG["expiry"]["idlelock_warning_days"] must be a list of integers!', 1);
 }
 if (!doesArrayHaveOnlyIntegerValues($disable_warning_days)) {
-    _die('$CONFIG["user_expiry"]["disable_warning_days"] must be a list of integers!', 1);
+    _die('$CONFIG["expiry"]["disable_warning_days"] must be a list of integers!', 1);
 }
 if (!isArrayMonotonicallyIncreasing($idlelock_warning_days)) {
-    _die('$CONFIG["user_expiry"]["idlelock_warning_days"] must be monotonically increasing!', 1);
+    _die('$CONFIG["expiry"]["idlelock_warning_days"] must be monotonically increasing!', 1);
 }
 if (!isArrayMonotonicallyIncreasing($disable_warning_days)) {
-    _die('$CONFIG["user_expiry"]["disable_warning_days"] must be monotonically increasing!', 1);
+    _die('$CONFIG["expiry"]["disable_warning_days"] must be monotonically increasing!', 1);
 }
 
 $final_disable_warning_day = $disable_warning_days[array_key_last($disable_warning_days)];
