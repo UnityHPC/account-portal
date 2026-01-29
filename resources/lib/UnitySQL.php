@@ -283,7 +283,7 @@ class UnitySQL
     {
         $stmt = $this->conn->prepare(
             sprintf(
-                "UPDATE %s SET %s='[]' %s='[]' WHERE uid=:uid",
+                "UPDATE %s SET %s='[]', %s='[]' WHERE uid=:uid",
                 self::TABLE_USER_EXPIRY,
                 "idlelock_warning_days_sent",
                 "disable_warning_days_sent",
