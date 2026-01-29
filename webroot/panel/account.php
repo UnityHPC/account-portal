@@ -305,40 +305,25 @@ if ($hasGroups) {
     $request_account_deletion_title = "";
 }
 if ($SQL->accDeletionRequestExists($USER->uid)) {
-    echo "
-        <p>Your request has been submitted and is currently pending.</p>
-        <form
-            action=''
-            method='POST'
-            onsubmit='
-                return confirm(
-                    \"Are you sure you want to cancel your request for account deletion?\"
-                )
-            '
-        >
-            $CSRFTokenHiddenFormInput
-            <input type='hidden' name='form_type' value='cancel_account_deletion_request' />
-            <input type='submit' value='Cancel Account Deletion Request' />
-        </form>
-    ";
-} else {
-    echo "
-        <form
-            action=''
-            method='POST'
-            onsubmit='return confirm(\"Are you sure you want to request an account deletion?\")'
-        >
-            $CSRFTokenHiddenFormInput
-            <input type='hidden' name='form_type' value='account_deletion_request' />
-            <input
-                type='submit'
-                value='Request Account Deletion'
-                title='$request_account_deletion_title'
-                $request_account_deletion_disabled
-            />
-        </form>
-    ";
+    $request_account_deletion_disabled = "disabled";
+    $request_account_deletion_title = "Your request has been submitted and is currently pending.";
 }
+echo "
+    <form
+        action=''
+        method='POST'
+        onsubmit='return confirm(\"Are you sure you want to request an account deletion?\")'
+    >
+        $CSRFTokenHiddenFormInput
+        <input type='hidden' name='form_type' value='account_deletion_request' />
+        <input
+            type='submit'
+            value='Request Account Deletion'
+            title='$request_account_deletion_title'
+            $request_account_deletion_disabled
+        />
+    </form>
+";
 
 ?>
 
