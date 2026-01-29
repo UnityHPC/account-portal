@@ -56,34 +56,16 @@ if (!array_key_exists("csrf_tokens", $_SESSION)) {
     $_SESSION["csrf_tokens"] = [];
 }
 
-// $_SERVER["REMOTE_USER"] is only defined for pages where httpd requies authentication
-// the home page does not require authentication,
-// so if the user goes to a secure page and then back to home, they've effectively logged out
-// it would be bad UX to show the user that they are effectively logging in and out,
-// so we use session cache to remember if they have logged in recently and then pretend
-// they're logged in even if they aren't
 if (isset($_SERVER["REMOTE_USER"])) {
-    // Check if SSO is enabled on this page
     $SSO = UnitySSO::getSSO();
-    $_SESSION["SSO"] = $SSO;
-
-    $OPERATOR = new UnityUser($SSO["user"], $LDAP, $SQL, $MAILER, $WEBHOOK);
-    $_SESSION["is_admin"] = $OPERATOR->getFlag(UserFlag::ADMIN);
-
     $_SESSION["OPERATOR"] = $SSO["user"];
     $_SESSION["OPERATOR_IP"] = $_SERVER["REMOTE_ADDR"];
-
-    if (isset($_SESSION["viewUser"]) && $_SESSION["is_admin"]) {
+    if (isset($_SESSION["viewUser"])) {
         $USER = new UnityUser($_SESSION["viewUser"], $LDAP, $SQL, $MAILER, $WEBHOOK);
     } else {
-        $USER = $OPERATOR;
+        $USER = new UnityUser($SSO["user"], $LDAP, $SQL, $MAILER, $WEBHOOK);
     }
-
-    $_SESSION["user_exists"] = $USER->exists();
-    $_SESSION["is_pi"] = $USER->isPI();
-
-    $SQL->addLog("user_login", $OPERATOR->uid);
-
+    $SQL->addLog("user_login", $SSO["user"]);
     $USER->updateIsQualified(); // in case manual changes have been made to PI groups
 
     if ($USER->getFlag(UserFlag::LOCKED)) {
@@ -97,4 +79,14 @@ if (isset($_SERVER["REMOTE_USER"])) {
             "Your account was previously locked due to inactivity.",
         );
     }
+
+    // $_SERVER["REMOTE_USER"] is only defined for pages where httpd requies authentication
+    // the home page does not require authentication,
+    // so if the user goes to a secure page and then back to home, they've effectively logged out
+    // it would be bad UX to show the user that they are effectively logging in and out,
+    // so we use session cache to remember if they have logged in recently and then pretend
+    // they're logged in even if they aren't
+    $_SESSION["navbar_show_logged_in_user_pages"] = true;
+    $_SESSION["navbar_show_admin_pages"] = $USER->getFlag(UserFlag::ADMIN);
+    $_SESSION["navbar_show_pi_pages"] = $USER->isPI();
 }

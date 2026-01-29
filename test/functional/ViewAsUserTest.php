@@ -24,7 +24,6 @@ class ViewAsUserTest extends UnityWebPortalTestCase
         http_get(__DIR__ . "/../../resources/init.php");
         // now we should be new user
         $this->assertEquals($afterUid, $USER->uid);
-        // $this->assertTrue($_SESSION["user_exists"]);
         http_post(__DIR__ . "/../../webroot/panel/account.php", [
             "form_type" => "clearView",
         ]);
