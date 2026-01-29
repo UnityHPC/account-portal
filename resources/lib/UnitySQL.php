@@ -263,19 +263,23 @@ class UnitySQL
         int $day,
     ): void {
         $warning_type_to_days_sent = $this->getUserExpirationWarningDaysSent($uid);
-        $days_sent = $warning_type_to_days_sent[$warning_type->value];
-        array_push($days_sent, $day);
-        sort($days_sent);
-        $days_sent_str = _json_encode($days_sent);
+        array_push($warning_type_to_days_sent[$warning_type->value], $day);
+        sort($warning_type_to_days_sent[$warning_type->value]);
+        $idlelock_days_sent_str = _json_encode($warning_type_to_days_sent["idlelock"]);
+        $disable_days_sent_str = _json_encode($warning_type_to_days_sent["disable"]);
         $stmt = $this->conn->prepare(
             sprintf(
-                "UPDATE %s SET %s=:days WHERE uid=:uid",
+                "INSERT INTO %s (uid, %s, %s) VALUES (:uid, :idlelock_days, :disable_days) ON DUPLICATE KEY UPDATE %s=:idlelock_days, %s=:disable_days",
                 self::TABLE_USER_EXPIRY,
-                $warning_type->value . "_warning_days_sent", // column name
+                "idlelock_warning_days_sent",
+                "disable_warning_days_sent",
+                "idlelock_warning_days_sent",
+                "disable_warning_days_sent",
             ),
         );
         $stmt->bindParam(":uid", $uid);
-        $stmt->bindParam(":days", $days_sent_str);
+        $stmt->bindParam(":idlelock_days", $idlelock_days_sent_str);
+        $stmt->bindParam(":disable_days", $disable_days_sent_str);
         $stmt->execute();
     }
 
@@ -283,8 +287,10 @@ class UnitySQL
     {
         $stmt = $this->conn->prepare(
             sprintf(
-                "UPDATE %s SET %s='[]', %s='[]' WHERE uid=:uid",
+                "INSERT INTO %s (uid, %s, %s) VALUES (:uid, '[]', '[]') ON DUPLICATE KEY UPDATE %s='[]', %s='[]'",
                 self::TABLE_USER_EXPIRY,
+                "idlelock_warning_days_sent",
+                "disable_warning_days_sent",
                 "idlelock_warning_days_sent",
                 "disable_warning_days_sent",
             ),
