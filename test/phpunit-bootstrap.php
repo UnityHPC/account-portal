@@ -36,6 +36,7 @@ use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnitySQL;
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use PHPUnit\Framework\TestCase;
+use UnityWebPortal\lib\UnityLDAP;
 
 $_SERVER["HTTP_HOST"] = "phpunit"; // used for config override
 require_once __DIR__ . "/../resources/config.php";
@@ -133,7 +134,7 @@ function http_get(string $phpfile, array $get_data = [], bool $ignore_die = fals
 }
 
 /**
- * runs a worker script
+ * runs a worker script, then resets the $LDAP global to pick up changes
  * @throws RuntimeException
  * @return array [return code, output lines]
  */
@@ -143,6 +144,7 @@ function executeWorker(
     bool $doThrowIfNonzero = true,
     ?string $stdinFilePath = null,
 ): array {
+    global $LDAP;
     $command = sprintf("%s %s/../workers/%s %s 2>&1", PHP_BINARY, __DIR__, $basename, $args);
     if ($stdinFilePath !== null) {
         $command .= " <$stdinFilePath";
@@ -160,6 +162,10 @@ function executeWorker(
             ),
         );
     }
+    unset($LDAP);
+    unset($GLOBALS["ldapconn"]);
+    $LDAP = new UnityLDAP();
+    $GLOBALS["ldapconn"] = $LDAP;
     return [$rc, $output];
 }
 

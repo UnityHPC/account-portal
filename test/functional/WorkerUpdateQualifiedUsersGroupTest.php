@@ -23,8 +23,6 @@ class WorkerUpdateQualifiedUsersGroupTest extends UnityWebPortalTestCase
             $output_str = implode("\n", $output_lines);
             $output = _json_decode($output_str, associative: true);
             $this->assertEquals($expectedOutput, $output);
-            // refresh LDAP to pick up changes from subprocess
-            unset($GLOBALS["ldapconn"]);
             $this->switchUser("Blank", validate: false);
             $user = $USER;
             $this->assertTrue($user->getFlag(UserFlag::QUALIFIED));
@@ -52,8 +50,6 @@ class WorkerUpdateQualifiedUsersGroupTest extends UnityWebPortalTestCase
             $output_str = implode("\n", $output_lines);
             $output = _json_decode($output_str, associative: true);
             $this->assertEquals($expectedOutput, $output);
-            // refresh LDAP to pick up changes from subprocess
-            unset($GLOBALS["ldapconn"]);
             $this->switchUser("Blank", validate: false);
             $this->assertFalse($USER->getFlag(UserFlag::QUALIFIED));
         } finally {
@@ -79,8 +75,6 @@ class WorkerUpdateQualifiedUsersGroupTest extends UnityWebPortalTestCase
             $output_str = implode("\n", $output_lines);
             $output = _json_decode($output_str, associative: true);
             $this->assertEquals($expectedOutput, $output);
-            // refresh LDAP to pick up changes from subprocess
-            unset($GLOBALS["ldapconn"]);
             $this->switchUser("Blank");
             $this->assertTrue(
                 $LDAP->userFlagGroups["qualified"]->memberUIDExists("non_native_user1"),
