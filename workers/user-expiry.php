@@ -101,6 +101,9 @@ foreach (
 }
 $pi_group_owners = array_map(UnityGroup::GID2OwnerUID(...), array_keys($pi_group_members));
 
+$initially_idlelocked_users = $LDAP->userFlagGroups["idlelocked"]->getMemberUIDs();
+$initially_disabled_users = $LDAP->userFlagGroups["disabled"]->getMemberUIDs();
+
 function sendMail(string $type, array|string $recipients, string $template, ?array $data = null)
 {
     global $MAILER, $args;
@@ -202,6 +205,12 @@ foreach ($uid_to_idle_days as $uid => $day) {
     }
     if ($day === $disable_day) {
         disableUser($uid);
+    }
+    if (!in_array($uid, $initially_idlelocked_users) && $day > $idlelock_day) {
+        echo "WARNING: user '$uid' should have already been idlelocked, but isn't!\n";
+    }
+    if (!in_array($uid, $initially_disabled_users) && $day > $disable_day) {
+        echo "WARNING: user '$uid' should have already been disabled, but isn't!\n";
     }
 }
 

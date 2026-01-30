@@ -129,4 +129,38 @@ class ExpiryTest extends UnityWebPortalTestCase
             callPrivateMethod($user, "setSSHKeys", $ssh_keys_before);
         }
     }
+
+    public function testWarningUserPassedOver()
+    {
+        global $USER, $SQL;
+        $this->switchUser("Blank");
+        $last_login_before = callPrivateMethod($SQL, "getUserLastLogin", $USER->uid);
+        try {
+            // set last login to one day after epoch
+            callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, 1 * 24 * 60 * 60);
+
+            $this->assertEquals(CONFIG["expiry"]["idlelock_day"], 4);
+            $output = $this->runExpiryWorker(idle_days: 5);
+            $this->assertEquals(
+                "WARNING: user '$USER->uid' should have already been idlelocked, but isn't!",
+                $output,
+            );
+
+            $this->assertEquals(CONFIG["expiry"]["disable_day"], 8);
+            $output = $this->runExpiryWorker(idle_days: 9);
+            $this->assertEquals(
+                implode("\n", [
+                    "WARNING: user '$USER->uid' should have already been idlelocked, but isn't!",
+                    "WARNING: user '$USER->uid' should have already been disabled, but isn't!",
+                ]),
+                $output,
+            );
+        } finally {
+            if ($last_login_before === null) {
+                callPrivateMethod($SQL, "removeUserLastLogin", $USER->uid);
+            } else {
+                callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, $last_login_before);
+            }
+        }
+    }
 }
