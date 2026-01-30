@@ -192,10 +192,25 @@ class ExpiryTest extends UnityWebPortalTestCase
             $this->assertEquals(7, $final_disable_warning_day);
             $output = $this->runExpiryWorker(idle_days: 7);
             $this->assertEquals(
-                implode("\n", [
-                    'sending user_expiry_disable_warning_pi email to "user5@org2.test" with data {"idle_days":7,"expiration_date":"1970/01/10","is_final_warning":true,"pi_group_gid":"pi_user5_org2_test"}',
-                    'sending user_expiry_disable_warning_member email to ["user2@org1.test"] with data {"idle_days":7,"expiration_date":"1970/01/10","is_final_warning":true,"pi_group_gid":"pi_user5_org2_test"}',
-                ]),
+                sprintf(
+                    "sending %s email to %s with data %s\nsending %s email to %s with data %s",
+                    "user_expiry_disable_warning_pi",
+                    '"' . $owner->getMail() . '"',
+                    _json_encode([
+                        "idle_days" => 7,
+                        "expiration_date" => "1970/01/10",
+                        "is_final_warning" => true,
+                        "pi_group_gid" => $owner->getPIGroup()->gid,
+                    ]),
+                    "user_expiry_disable_warning_member",
+                    '["' . $USER->getMail() . '"]',
+                    _json_encode([
+                        "idle_days" => 7,
+                        "expiration_date" => "1970/01/10",
+                        "is_final_warning" => true,
+                        "pi_group_gid" => $owner->getPIGroup()->gid,
+                    ]),
+                ),
                 $output,
             );
         } finally {
