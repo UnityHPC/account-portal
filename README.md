@@ -26,6 +26,7 @@ Admin Features:
 - Custom UIDNumber / GIDNumber mappings for specific users
 - Login as another user
 - Mailing
+- User expiration
 
 ## Installation/Deployment
 
@@ -149,6 +150,12 @@ rm "$prod" && ln -s "$old" "$prod"
 - the `[ldap]group_ou` option has been renamed to `[ldap]usergroup_ou`
 - the `[ldap]user_flag_groups[ghost]` group has been renamed to `[ldap]user_flag_groups[disabled]`
 - 3 new colors `danger` `danger_hover` `danger_disabled` should be added to the branding config
+- a new config section has been added `[expiry]` which needs 4 options set:
+  - `idlelock_warning_days`: list of day numbers when a user will get an email warning that their account will be idlelocked
+  - `idlelock_warning_day`: day number when a user will be idlelocked
+  - `disable_warning_days`: list of day numbers when a user will get an email warning that their account will be disabled
+  - `disable_warning_day`: day number when a user will be disabled
+  - a "day number" starts counting from the last day that a user logged in, so on day 5, the user last logged in 5 days ago
 
 ### 1.5 -> 1.6
 

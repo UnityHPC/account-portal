@@ -64,3 +64,8 @@ parameters:
         - '#Variable \$(LDAP|SQL|MAILER|WEBHOOK|GITHUB|SSO|OPERATOR|USER|LOC_HEADER|LOC_FOOTER) might not be defined.#'
       paths:
         - '*'
+    # this method is called using callPrivateMethod()
+    - messages:
+        - '#Method UnityWebPortal\\lib\\UnitySQL::setUserLastLoginDaysAgo\(\) is unused.#'
+      paths:
+        - 'resources/lib/UnitySQL.php'
