@@ -38,6 +38,7 @@
 1. Install modern implementation of grep (not macOS builtin grep): `brew install grep`
 1. Install `npm`
 1. Install nodeJS tools: `npm install`
+1. If using vscode, Copy the recommended config: `cp ./.vscode/settings-recommended.jsonc ./.vscode/settings.json`
 
 ### Environment Usage
 

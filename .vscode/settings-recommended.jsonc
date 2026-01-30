@@ -1,0 +1,10 @@
+{
+  // https://github.com/prettier/plugin-php/issues/2430
+  "files.insertFinalNewline": false,
+  "files.trimFinalNewlines": false,
+  // NPM prettier has prettier-plugin-php installed
+  "prettier.prettierPath": "./node_modules/prettier",
+  "[php]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+}
