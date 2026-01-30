@@ -29,6 +29,16 @@ class ExpiryTest extends UnityWebPortalTestCase
         $this->assertMatchesRegularExpression($regex, $output);
     }
 
+    private function runExpiryWorker(int $idle_days, int $seconds_offset = 0): string
+    {
+        $days_since_epoch = $idle_days + 1; // last login was 1 day after epoch
+        [$_, $output_lines] = executeWorker(
+            "user-expiry.php",
+            "--verbose --timestamp=" . $days_since_epoch * 24 * 60 * 60 + $seconds_offset,
+        );
+        return trim(implode("\n", $output_lines));
+    }
+
     #[DataProvider("provider")]
     public function testExpiry(string $uid, string $mail)
     {
@@ -36,6 +46,8 @@ class ExpiryTest extends UnityWebPortalTestCase
         $this->switchUser("Admin");
         $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
         $ssh_keys_before = $user->getSSHKeys();
+        $user_last_logins = $SQL->getAllUserLastLogins();
+        $last_login_before = $user_last_logins[$uid] ?? null;
         $this->assertFalse($user->getFlag(UserFlag::IDLELOCKED));
         $this->assertFalse($user->getFlag(UserFlag::DISABLED));
         if ($user->getPIGroup()->exists()) {
@@ -47,18 +59,16 @@ class ExpiryTest extends UnityWebPortalTestCase
         $this->assertEquals(CONFIG["expiry"]["disable_warning_days"], [6, 7]);
         $this->assertEquals(CONFIG["expiry"]["disable_day"], 8);
         try {
-            [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
-            $output = trim(implode("\n", $output_lines));
+            // set last login to one day after epoch
+            callPrivateMethod($SQL, "setUserLastLogin", $uid, 1);
+            // one second before day 1 /////////////////////////////////////////////////////////////
+            $output = $this->runExpiryWorker(idle_days: 1, seconds_offset: -1);
             $this->assertEquals("", $output);
             // 1 ///////////////////////////////////////////////////////////////////////////////////
-            callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 1);
-            [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
-            $output = trim(implode("\n", $output_lines));
+            $output = $this->runExpiryWorker(idle_days: 1);
             $this->assertEquals("", $output);
             // 2 ///////////////////////////////////////////////////////////////////////////////////
-            callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 2);
-            [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
-            $output = trim(implode("\n", $output_lines));
+            $output = $this->runExpiryWorker(idle_days: 2);
             $this->assertOnlyOneWarningEmailSent(
                 $output,
                 "idlelock",
@@ -67,9 +77,7 @@ class ExpiryTest extends UnityWebPortalTestCase
                 is_final: false,
             );
             // 3 ///////////////////////////////////////////////////////////////////////////////////
-            callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 3);
-            [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
-            $output = trim(implode("\n", $output_lines));
+            $output = $this->runExpiryWorker(idle_days: 3);
             $this->assertOnlyOneWarningEmailSent(
                 $output,
                 "idlelock",
@@ -78,20 +86,14 @@ class ExpiryTest extends UnityWebPortalTestCase
                 is_final: true,
             );
             // 4 ///////////////////////////////////////////////////////////////////////////////////
-            callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 4);
-            [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
-            $output = trim(implode("\n", $output_lines));
+            $output = $this->runExpiryWorker(idle_days: 4);
             $this->assertEquals("idle-locking user '$uid'", $output);
             $this->assertTrue($user->getFlag(UserFlag::IDLELOCKED));
             // 5 ///////////////////////////////////////////////////////////////////////////////////
-            callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 5);
-            [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
-            $output = trim(implode("\n", $output_lines));
+            $output = $this->runExpiryWorker(idle_days: 5);
             $this->assertEquals("", $output);
             // 6 ///////////////////////////////////////////////////////////////////////////////////
-            callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 6);
-            [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
-            $output = trim(implode("\n", $output_lines));
+            $output = $this->runExpiryWorker(idle_days: 6);
             $this->assertOnlyOneWarningEmailSent(
                 $output,
                 "disable",
@@ -100,23 +102,17 @@ class ExpiryTest extends UnityWebPortalTestCase
                 is_final: false,
             );
             // 7 ///////////////////////////////////////////////////////////////////////////////////
-            callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 7);
-            [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
-            $output = trim(implode("\n", $output_lines));
+            $output = $this->runExpiryWorker(idle_days: 7);
             $this->assertOnlyOneWarningEmailSent($output, "disable", $mail, day: 7, is_final: true);
             // 8 ///////////////////////////////////////////////////////////////////////////////////
-            callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 8);
-            [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
-            $output = trim(implode("\n", $output_lines));
+            $output = $this->runExpiryWorker(idle_days: 8);
             $this->assertEquals("disabling user '$uid'", $output);
             $this->assertTrue($user->getFlag(UserFlag::DISABLED));
             if ($user->getPIGroup()->exists()) {
                 $this->assertTrue($user->getPIGroup()->getIsDisabled());
             }
             // 9 ///////////////////////////////////////////////////////////////////////////////////
-            callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 9);
-            [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
-            $output = trim(implode("\n", $output_lines));
+            $output = $this->runExpiryWorker(idle_days: 9);
             $this->assertEquals("", $output);
         } finally {
             $user->setFlag(UserFlag::IDLELOCKED, false);
@@ -126,7 +122,11 @@ class ExpiryTest extends UnityWebPortalTestCase
             if ($user->getPIGroup()->exists() && $user->getPIGroup()->getIsDisabled()) {
                 callPrivateMethod($user->getPIGroup(), "reenable");
             }
-            callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 0);
+            if ($last_login_before === null) {
+                callPrivateMethod($SQL, "removeUserLastLogin", $uid);
+            } else {
+                callPrivateMethod($SQL, "setUserLastLogin", $uid, $last_login_before);
+            }
             callPrivateMethod($user, "setSSHKeys", $ssh_keys_before);
         }
     }

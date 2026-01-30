@@ -13,14 +13,20 @@ $cli->description(
         "To prevent a user from being expired, remove them from the `user_last_logins` SQL table.",
 )
     ->opt("dry-run", "Print actions without actually doing anything.", false, "boolean")
-    ->opt("verbose", "Print which emails are sent.", false, "boolean");
+    ->opt("verbose", "Print which emails are sent.", false, "boolean")
+    ->opt("timestamp", "Use this unix timestmap instead of right now", false, "int");
 $args = $cli->parse($argv, true);
 
 $idlelock_warning_days = CONFIG["expiry"]["idlelock_warning_days"];
 $idlelock_day = CONFIG["expiry"]["idlelock_day"];
 $disable_warning_days = CONFIG["expiry"]["disable_warning_days"];
 $disable_day = CONFIG["expiry"]["disable_day"];
-$now = time();
+
+if (isset($args["timestamp"])) {
+    $now = $args["timestamp"];
+} else {
+    $now = time();
+}
 
 function doesArrayHaveOnlyIntegerValues(array $x): bool
 {
