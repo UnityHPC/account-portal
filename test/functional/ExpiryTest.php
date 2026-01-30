@@ -36,8 +36,12 @@ class ExpiryTest extends UnityWebPortalTestCase
         global $LDAP, $SQL, $MAILER, $WEBHOOK;
         $this->switchUser("Admin");
         $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+        $ssh_keys_before = $user->getSSHKeys();
         $this->assertFalse($user->getFlag(UserFlag::IDLELOCKED));
         $this->assertFalse($user->getFlag(UserFlag::DISABLED));
+        if ($user->getPIGroup()->exists()) {
+            $this->assertFalse($user->getPIGroup()->getIsDisabled());
+        }
         // see deployment/overrides/phpunit/config/config.ini
         $this->assertEquals(CONFIG["expiry"]["idlelock_warning_days"], [2, 3]);
         $this->assertEquals(CONFIG["expiry"]["idlelock_day"], 4);
@@ -108,7 +112,11 @@ class ExpiryTest extends UnityWebPortalTestCase
             if ($user->getFlag(UserFlag::DISABLED)) {
                 $user->reEnable();
             }
+            if ($user->getPIGroup()->exists() && $user->getPIGroup()->getIsDisabled()) {
+                callPrivateMethod($user->getPIGroup(), "reenable");
+            }
             callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 0);
+            callPrivateMethod($user, "setSSHKeys", $ssh_keys_before);
         }
     }
 }
