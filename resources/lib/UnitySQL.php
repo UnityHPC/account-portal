@@ -198,12 +198,14 @@ class UnitySQL
 
     public function updateUserLastLogin(string $uid): void
     {
-        $stmt = $this->conn->prepare(
-            sprintf(
-                "UPDATE %s SET last_login=CURRENT_TIMESTAMP WHERE operator=:uid",
-                self::TABLE_USER_LAST_LOGINS,
-            ),
-        );
+        $table = self::TABLE_USER_LAST_LOGINS;
+        $stmt = $this->conn->prepare("
+            INSERT INTO $table
+            (operator, last_login)
+            VALUES(:uid, CURRENT_TIMESTAMP)
+            ON DUPLICATE KEY UPDATE
+            last_login=CURRENT_TIMESTAMP
+        ");
         $stmt->bindParam(":uid", $uid);
         $stmt->execute();
     }
