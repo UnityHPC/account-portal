@@ -81,6 +81,7 @@ class ExpiryTest extends UnityWebPortalTestCase
             callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 4);
             [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
             $output = trim(implode("\n", $output_lines));
+            $this->assertEquals("idle-locking user '$uid'", $output);
             $this->assertTrue($user->getFlag(UserFlag::IDLELOCKED));
             // 5 ///////////////////////////////////////////////////////////////////////////////////
             callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 5);
@@ -107,6 +108,7 @@ class ExpiryTest extends UnityWebPortalTestCase
             callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 8);
             [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
             $output = trim(implode("\n", $output_lines));
+            $this->assertEquals("disabling user '$uid'", $output);
             $this->assertTrue($user->getFlag(UserFlag::DISABLED));
             if ($user->getPIGroup()->exists()) {
                 $this->assertTrue($user->getPIGroup()->getIsDisabled());
