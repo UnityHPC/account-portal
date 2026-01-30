@@ -9,7 +9,8 @@ use UnityWebPortal\lib\UserFlag;
 $cli = new Cli();
 $cli->description(
     "Send a warning email, idlelock, or disable users, depending on their last login date. " .
-        "It is important that this script runs exactly once per day.",
+        "It is important that this script runs exactly once per day." .
+        "To prevent a user from being expired, remove them from the `user_last_logins` SQL table.",
 )
     ->opt("dry-run", "Print actions without actually doing anything.", false, "boolean")
     ->opt("verbose", "Print which emails are sent.", false, "boolean");
@@ -130,6 +131,7 @@ function disableUser($uid)
 }
 
 foreach ($uid_to_idle_days as $uid => $day) {
+    $last_login = $uid_to_last_login[$uid];
     if (in_array($day, $idlelock_warning_days)) {
         $idle_days = $uid_to_idle_days[$uid];
         $expiration_date = date("Y/m/d", $last_login + $idlelock_day * 24 * 60 * 60);
