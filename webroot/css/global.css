@@ -97,12 +97,6 @@ p {
   margin: 0;
 }
 
-.vertical-align {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
 button.plusBtn span {
   font-size: 24pt;
   font-family: monospace;
