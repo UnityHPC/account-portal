@@ -31,7 +31,7 @@ class ExpiryTest extends UnityWebPortalTestCase
 
     private function runExpiryWorker(int $idle_days, int $seconds_offset = 0): string
     {
-        $days_since_epoch = $idle_days + 1; // last login was 1 day after epoch
+        $days_since_epoch = $idle_days + 1; // assume last login was 1 day after epoch
         [$_, $output_lines] = executeWorker(
             "user-expiry.php",
             "--verbose --timestamp=" . $days_since_epoch * 24 * 60 * 60 + $seconds_offset,
