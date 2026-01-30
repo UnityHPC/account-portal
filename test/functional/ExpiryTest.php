@@ -8,13 +8,12 @@ class ExpiryTest extends UnityWebPortalTestCase
 {
     public static function provider()
     {
-        return [
-            [self::$NICKNAME2UID["Blank"], self::$UID2ATTRIBUTES[self::$NICKNAME2UID["Blank"]][3]],
-            [
-                self::$NICKNAME2UID["EmptyPIGroupOwner"],
-                self::$UID2ATTRIBUTES[self::$NICKNAME2UID["EmptyPIGroupOwner"]][3],
-            ],
-        ];
+        $output = [];
+        foreach (["Blank", "EmptyPIGroupOwner"] as $nickname) {
+            $uid = self::$NICKNAME2UID[$nickname];
+            array_push($output, [$uid, self::$UID2ATTRIBUTES[$uid][3]]);
+        }
+        return $output;
     }
 
     private function assertOnlyOneWarningEmailSent(
@@ -82,6 +81,7 @@ class ExpiryTest extends UnityWebPortalTestCase
             callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 4);
             [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
             $output = trim(implode("\n", $output_lines));
+            $this->assertTrue($user->getFlag(UserFlag::IDLELOCKED));
             // 5 ///////////////////////////////////////////////////////////////////////////////////
             callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 5);
             [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
@@ -107,6 +107,10 @@ class ExpiryTest extends UnityWebPortalTestCase
             callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 8);
             [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
             $output = trim(implode("\n", $output_lines));
+            $this->assertTrue($user->getFlag(UserFlag::DISABLED));
+            if ($user->getPIGroup()->exists()) {
+                $this->assertTrue($user->getPIGroup()->getIsDisabled());
+            }
         } finally {
             $user->setFlag(UserFlag::IDLELOCKED, false);
             if ($user->getFlag(UserFlag::DISABLED)) {
