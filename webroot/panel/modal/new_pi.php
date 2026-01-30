@@ -45,7 +45,12 @@ $_SESSION["pi_group_gid_to_owner_gecos_and_mail"] = $pi_group_gid_to_owner_gecos
             Terms of Service
         </a>.
     </label>
-    <input type="submit" value="Send Request" disabled>
+    <input
+        type="submit"
+        value="Send Request"
+        title="Please enter a GID, owner name, or owner email"
+        disabled
+    >
 </form>
 
 <script>
@@ -62,23 +67,21 @@ $_SESSION["pi_group_gid_to_owner_gecos_and_mail"] = $pi_group_gid_to_owner_gecos
                     const results = JSON.parse(data);
                     if (results.length === 0) {
                         wrapper.html("<span>No Results</span>").show();
-                        submit.prop("disabled", true);
+                        submit.prop("disabled", true).prop("title", "no groups found");
                     } else if (results.includes(query)) {
                         // search query exactly matches a PI group GID
                         wrapper.html("").hide();
-                        submit.prop("disabled", false);
+                        submit.prop("disabled", false).prop("title", "");
                     } else {
                         const html = results.map(gid => `<span>${gid}</span>`).join('');
                         wrapper.html(html).show();
-                        submit.prop("disabled", true);
+                        submit.prop("disabled", true).prop("title", "no group found with this GID");
                     }
                 },
                 error: function(result) {
-                    const error_msg_div = $("<div></div>");
-                    error_msg_div.html(result.responseText);
-                    submit.after(error_msg_div);
+                    submit.after($("<div></div>").html(result.responseText));
                     wrapper.html("").hide();
-                    submit.prop("disabled", true);
+                    submit.prop("disabled", true).prop("title", "something went wrong");
                 }
             });
         };
