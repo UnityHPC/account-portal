@@ -113,6 +113,11 @@ class ExpiryTest extends UnityWebPortalTestCase
             if ($user->getPIGroup()->exists()) {
                 $this->assertTrue($user->getPIGroup()->getIsDisabled());
             }
+            // 9 ///////////////////////////////////////////////////////////////////////////////////
+            callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 9);
+            [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
+            $output = trim(implode("\n", $output_lines));
+            $this->assertEquals("", $output);
         } finally {
             $user->setFlag(UserFlag::IDLELOCKED, false);
             if ($user->getFlag(UserFlag::DISABLED)) {
