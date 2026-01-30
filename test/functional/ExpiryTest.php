@@ -215,9 +215,9 @@ class ExpiryTest extends UnityWebPortalTestCase
             );
         } finally {
             if ($last_login_before === null) {
-                callPrivateMethod($SQL, "removeUserLastLogin", $USER->uid);
+                callPrivateMethod($SQL, "removeUserLastLogin", $owner->uid);
             } else {
-                callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, $last_login_before);
+                callPrivateMethod($SQL, "setUserLastLogin", $owner->uid, $last_login_before);
             }
             if ($pi_group->memberUIDExists($USER->uid)) {
                 $pi_group->removeMemberUID($USER->uid);
