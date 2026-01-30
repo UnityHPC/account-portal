@@ -36,7 +36,6 @@ use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnitySQL;
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use PHPUnit\Framework\TestCase;
-use UnityWebPortal\lib\UnityLDAP;
 
 $_SERVER["HTTP_HOST"] = "phpunit"; // used for config override
 require_once __DIR__ . "/../resources/config.php";
@@ -168,10 +167,10 @@ function executeWorker(
             ),
         );
     }
-    unset($LDAP);
-    unset($GLOBALS["ldapconn"]);
-    $LDAP = new UnityLDAP();
-    $GLOBALS["ldapconn"] = $LDAP;
+    $entries = accessPrivateVariable($LDAP, "entries");
+    foreach ($entries as $entry) {
+        callPrivateMethod($entry, "pullObject");
+    }
     return [$rc, $output];
 }
 
@@ -268,6 +267,14 @@ function callPrivateMethod($obj, $name, ...$args)
     $class = new \ReflectionClass($obj);
     $method = $class->getMethod($name);
     return $method->invokeArgs($obj, $args);
+}
+
+function accessPrivateVariable($obj, string $name)
+{
+    $class = new \ReflectionClass($obj);
+    $property = $class->getProperty($name);
+    $property->setAccessible(true);
+    return $property->getValue($obj);
 }
 
 class UnityWebPortalTestCase extends TestCase
