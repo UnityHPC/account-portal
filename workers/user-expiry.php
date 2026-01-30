@@ -69,6 +69,9 @@ if ($disable_day <= $final_disable_warning_day) {
 if ($idlelock_day <= $final_idlelock_warning_day) {
     _die("idlelock day must be greater than the last idlelock warning day", 1);
 }
+if ($disable_day <= $idlelock_day) {
+    _die("disable day day must be greater than idlelock day", 1);
+}
 
 $uid_to_last_login = [];
 foreach ($SQL->getAllUserLastLogins() as $record) {
