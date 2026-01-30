@@ -196,7 +196,7 @@ class UnitySQL
         return $stmt->fetchAll();
     }
 
-    /** @return string[] */
+    /** @return user_last_login[] */
     public function getAllUserLastLogins(): array
     {
         $stmt = $this->conn->prepare("SELECT * FROM " . self::TABLE_USER_LAST_LOGINS);
