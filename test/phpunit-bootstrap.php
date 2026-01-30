@@ -133,7 +133,7 @@ function http_get(string $phpfile, array $get_data = [], bool $ignore_die = fals
 }
 
 /**
- * runs a worker script, then resets the $LDAP global to pick up changes
+ * runs a worker script, then refreshes all LDAP entries to pick up changes
  * @throws RuntimeException
  * @return array [return code, output lines]
  */
