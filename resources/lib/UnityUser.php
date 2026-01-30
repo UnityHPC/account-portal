@@ -63,7 +63,7 @@ class UnityUser
         ]);
         \ensure(!$this->entry->exists());
         $this->entry->create([
-            "objectclass" => UnityLDAP::POSIX_ACCOUNT_CLASS,
+            "objectclass" => ["inetorgperson", "posixAccount", "top", "ldapPublicKey"],
             "uid" => $this->uid,
             "givenname" => $firstname,
             "sn" => $lastname,
@@ -91,6 +91,7 @@ class UnityUser
         return $this->LDAP->userFlagGroups[$flag->value]->memberUIDExists($this->uid);
     }
 
+    /** if you want to set the "disabled" flag, you should probably use disable() or reEnable() */
     public function setFlag(
         UserFlag $flag,
         bool $newValue,

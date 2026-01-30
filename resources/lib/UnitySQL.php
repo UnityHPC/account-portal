@@ -4,6 +4,12 @@ namespace UnityWebPortal\lib;
 
 use PDO;
 
+enum UserExpiryWarningType: string
+{
+    case IDLELOCK = "idlelock";
+    case DISABLE = "disable";
+}
+
 /**
  * @phpstan-type account_deletion_request array{timestamp: string, uid: string}
  * @phpstan-type user_last_login array{operator: string, last_login: string}
@@ -14,6 +20,8 @@ class UnitySQL
     private const string TABLE_REQS = "requests";
     private const string TABLE_AUDIT_LOG = "audit_log";
     private const string TABLE_ACCOUNT_DELETION_REQUESTS = "account_deletion_requests";
+    private const string TABLE_USER_LAST_LOGINS = "user_last_logins";
+    private const string TABLE_USER_EXPIRY = "user_expiry";
     // FIXME this string should be changed to something more intuitive, requires production change
     public const string REQUEST_BECOME_PI = "admin";
 
@@ -193,5 +201,120 @@ class UnitySQL
         $stmt = $this->conn->prepare("SELECT * FROM " . self::TABLE_ACCOUNT_DELETION_REQUESTS);
         $stmt->execute();
         return $stmt->fetchAll();
+    }
+
+    /**
+     * returns an array where each key is a UID and each value is another array
+     * where each key is a warning type and each value is a sorted list of
+     * day numbers when a warning was sent
+     *
+     * day numbers count up from the last day that the user logged in,
+     * so on day 5 the user has been idle for 5 days
+     * for example, a user might get idlelock warnings on day numbers 180, 200, 219
+     * before actually getting idlelocked on day 220
+     * in this case, the output would be:
+     * ['username_here' => ['idlelock' => [180, 200, 219], 'disable' => []], ...]
+     * @return array<string, array<string, int[]>>
+     */
+    public function getAllUsersExpirationWarningDaysSent(): array
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM " . self::TABLE_USER_EXPIRY);
+        $stmt->execute();
+        $records = $stmt->fetchAll();
+        $output = [];
+        foreach ($records as $record) {
+            $uid = $record["uid"];
+            $idlelock = _json_decode($record["idlelock_warning_days_sent"]);
+            $disable = _json_decode($record["disable_warning_days_sent"]);
+            $output[$uid] = ["idlelock" => $idlelock, "disable" => $disable];
+        }
+        return $output;
+    }
+
+    /**
+     * example output: ['idlelock' => [1,2,3], 'disable' => [4,5,6]]
+     * @return array<string, int[]>
+     */
+    public function getUserExpirationWarningDaysSent(string $uid): array
+    {
+        $stmt = $this->conn->prepare(
+            sprintf("SELECT * FROM %s WHERE uid=:uid", self::TABLE_USER_EXPIRY),
+        );
+        $stmt->bindParam(":uid", $uid);
+        $stmt->execute();
+        $records = $stmt->fetchAll();
+        switch (count($records)) {
+            case 0:
+                return ["idlelock" => [], "disable" => []];
+            case 1:
+                $record = $records[0];
+                $uid = $record["uid"];
+                $idlelock = _json_decode($record["idlelock_warning_days_sent"]);
+                $disable = _json_decode($record["disable_warning_days_sent"]);
+                return ["idlelock" => $idlelock, "disable" => $disable];
+            default:
+                throw new \Exception("multiple records found with uid='$uid'");
+        }
+    }
+
+    public function recordUserExpirationWarningDaySent(
+        string $uid,
+        UserExpiryWarningType $warning_type,
+        int $day,
+    ): void {
+        $warning_type_to_days_sent = $this->getUserExpirationWarningDaysSent($uid);
+        array_push($warning_type_to_days_sent[$warning_type->value], $day);
+        sort($warning_type_to_days_sent[$warning_type->value]);
+        $idlelock_days_sent_str = _json_encode($warning_type_to_days_sent["idlelock"]);
+        $disable_days_sent_str = _json_encode($warning_type_to_days_sent["disable"]);
+        $table = self::TABLE_USER_EXPIRY;
+        $stmt = $this->conn->prepare("
+            INSERT INTO $table
+            (uid, idlelock_warning_days_sent, disable_warning_days_sent)
+            VALUES(:uid, :idlelock_days, :disable_days)
+            ON DUPLICATE KEY UPDATE
+            idlelock_warning_days_sent=:idlelock_days, disable_warning_days_sent=:disable_days
+        ");
+        $stmt->bindParam(":uid", $uid);
+        $stmt->bindParam(":idlelock_days", $idlelock_days_sent_str);
+        $stmt->bindParam(":disable_days", $disable_days_sent_str);
+        $stmt->execute();
+    }
+
+    public function resetUserExpirationWarningDaysSent(string $uid): void
+    {
+        $table = self::TABLE_USER_EXPIRY;
+        $stmt = $this->conn->prepare("
+            INSERT INTO $table
+            (uid, idlelock_warning_days_sent, disable_warning_days_sent)
+            VALUES (:uid, '[]', '[]')
+            ON DUPLICATE KEY UPDATE
+            idlelock_warning_days_sent='[]', disable_warning_days_sent='[]'
+        ");
+        $stmt->bindParam(":uid", $uid);
+        $stmt->execute();
+    }
+
+    /** @return string[] */
+    public function getAllUserLastLogins(): array
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM " . self::TABLE_USER_LAST_LOGINS);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    /* for testing purposes */
+    private function setUserLastLoginDaysAgo(string $uid, int $days): void
+    {
+        $datetime = date("Y-m-d H:i:s", time() - $days * 24 * 60 * 60);
+        $stmt = $this->conn->prepare(
+            sprintf(
+                "UPDATE %s SET last_login=:datetime WHERE operator=:uid",
+                self::TABLE_USER_LAST_LOGINS,
+            ),
+        );
+        $stmt->bindParam(":uid", $uid);
+        $stmt->bindParam(":datetime", $datetime);
+        $stmt->execute();
     }
 }
