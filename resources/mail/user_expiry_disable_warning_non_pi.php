@@ -9,7 +9,7 @@ $is_final_warning = $data["is_final_warning"];
 $hyperlink = getHyperlink("account portal");
 
 echo "
-    Your account is set to be disabled on $expiration_date because you have been idle for too long.
+    Your account is scheduled to be disabled on $expiration_date because you have been idle for too long.
     Upon expiration, you will lose access to UnityHPC Platform services.
     If you don't wish for this to happen,
     reset the inactivity timer by simply logging in to the $hyperlink.
