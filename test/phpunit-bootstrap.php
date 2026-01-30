@@ -282,7 +282,7 @@ class UnityWebPortalTestCase extends TestCase
     private ?string $current_user_nickname = null;
     private array $nickname_to_latest_session_id = [];
     // FIXME these names are wrong
-    public static array $UID2ATTRIBUTES = [
+    protected static array $UID2ATTRIBUTES = [
         "user1_org1_test" => ["user1@org1.test", "foo", "bar", "user1@org1.test"],
         "user2_org1_test" => ["user2@org1.test", "foo", "bar", "user2@org1.test"],
         "user3_org1_test" => ["user3@org1.test", "foo", "bar", "user3@org1.test"],
@@ -307,7 +307,7 @@ class UnityWebPortalTestCase extends TestCase
             "user1+cs123_org1_test@org1.test",
         ],
     ];
-    public static array $NICKNAME2UID = [
+    protected static array $NICKNAME2UID = [
         "Admin" => "user1_org1_test",
         "Blank" => "user2_org1_test",
         "EmptyPIGroupOwner" => "user5_org2_test",
