@@ -59,7 +59,7 @@ class ExpiryTest extends UnityWebPortalTestCase
         $this->assertEquals(CONFIG["expiry"]["disable_day"], 8);
         try {
             // set last login to one day after epoch
-            callPrivateMethod($SQL, "setUserLastLogin", $uid, 1);
+            callPrivateMethod($SQL, "setUserLastLogin", $uid, 1 * 24 * 60 * 60);
             // one second before day 1 /////////////////////////////////////////////////////////////
             $output = $this->runExpiryWorker(idle_days: 1, seconds_offset: -1);
             $this->assertEquals("", $output);
