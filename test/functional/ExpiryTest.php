@@ -46,8 +46,7 @@ class ExpiryTest extends UnityWebPortalTestCase
         $this->switchUser("Admin");
         $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
         $ssh_keys_before = $user->getSSHKeys();
-        $user_last_logins = $SQL->getAllUserLastLogins();
-        $last_login_before = $user_last_logins[$uid] ?? null;
+        $last_login_before = callPrivateMethod($SQL, "getUserLastLogin", $uid);
         $this->assertFalse($user->getFlag(UserFlag::IDLELOCKED));
         $this->assertFalse($user->getFlag(UserFlag::DISABLED));
         if ($user->getPIGroup()->exists()) {

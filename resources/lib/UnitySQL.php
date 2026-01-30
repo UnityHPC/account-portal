@@ -223,4 +223,22 @@ class UnitySQL
         $stmt->bindParam(":uid", $uid);
         $stmt->execute();
     }
+
+    /* for testing purposes */
+    private function getUserLastLogin(string $uid): ?int
+    {
+        $table = self::TABLE_USER_LAST_LOGINS;
+        $stmt = $this->conn->prepare("SELECT * FROM $table WHERE operator=:uid");
+        $stmt->bindParam(":uid", $uid);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        if (count($result) == 0) {
+            return null;
+        }
+        if (count($result) > 1) {
+            throw new \Exception("multiple records found with operator '$uid'");
+        }
+        $timestamp_str = $result[0]["last_login"];
+        return strtotime($timestamp_str);
+    }
 }
