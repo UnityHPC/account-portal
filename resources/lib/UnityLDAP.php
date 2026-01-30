@@ -24,6 +24,13 @@ class UnityLDAP extends LDAPConn
 {
     private const string RDN = "cn"; // The defauls RDN for LDAP entries is set to "common name"
 
+    public const array POSIX_ACCOUNT_CLASS = [
+        "inetorgperson",
+        "posixAccount",
+        "top",
+        "ldapPublicKey",
+    ];
+
     // isDisabled unset or set to "FALSE"
     private static string $NON_DISABLED_FILTER = "(|(!(isDisabled=*))(isDisabled=FALSE))";
 
