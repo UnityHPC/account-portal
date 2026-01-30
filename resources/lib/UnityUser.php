@@ -63,7 +63,7 @@ class UnityUser
         ]);
         \ensure(!$this->entry->exists());
         $this->entry->create([
-            "objectclass" => ["inetorgperson", "posixAccount", "top", "ldapPublicKey"],
+            "objectclass" => UnityLDAP::POSIX_ACCOUNT_CLASS,
             "uid" => $this->uid,
             "givenname" => $firstname,
             "sn" => $lastname,
