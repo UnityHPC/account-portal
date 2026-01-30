@@ -14,7 +14,7 @@ $cli->description(
 )
     ->opt("dry-run", "Print actions without actually doing anything.", false, "boolean")
     ->opt("verbose", "Print which emails are sent.", false, "boolean")
-    ->opt("timestamp", "Use this unix timestmap instead of right now", false, "int");
+    ->opt("timestamp", "Use this unix timestamp instead of right now", false, "int");
 $args = $cli->parse($argv, true);
 
 $idlelock_warning_days = CONFIG["expiry"]["idlelock_warning_days"];
