@@ -209,7 +209,12 @@ class UnitySQL
     {
         $datetime = date("Y-m-d H:i:s", $timestamp);
         $table = self::TABLE_USER_LAST_LOGINS;
-        $stmt = $this->conn->prepare("UPDATE $table SET last_login=:datetime WHERE operator=:uid");
+        $stmt = $this->conn->prepare("
+            INSERT INTO $table
+            VALUES (:uid, :datetime)
+            ON DUPLICATE KEY
+            UPDATE last_login=:datetime;
+        ");
         $stmt->bindParam(":uid", $uid);
         $stmt->bindParam(":datetime", $datetime);
         $stmt->execute();
