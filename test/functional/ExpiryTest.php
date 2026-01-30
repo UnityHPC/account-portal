@@ -9,23 +9,23 @@ class ExpiryTest extends UnityWebPortalTestCase
     public static function provider()
     {
         $output = [];
-        foreach (["Blank", "EmptyPIGroupOwner"] as $nickname) {
+        foreach ([["Blank", false], ["EmptyPIGroupOwner", true]] as [$nickname, $is_pi]) {
             $uid = self::$NICKNAME2UID[$nickname];
-            array_push($output, [$uid, self::$UID2ATTRIBUTES[$uid][3]]);
+            array_push($output, [$uid, self::$UID2ATTRIBUTES[$uid][3], $is_pi]);
         }
         return $output;
     }
 
     private function assertOnlyOneWarningEmailSent(
         string $output,
-        string $type,
+        string $template,
         string $mail,
         int $day,
         bool $is_final,
     ) {
         $fmt =
             '/^sending %s email to "%s" with data \{"idle_days":%s,"expiration_date":"[\d\/]+","is_final_warning":%s(,"pi_group_gid":"[^"]+")?\}$/';
-        $regex = sprintf($fmt, $type, $mail, $day, $is_final ? "true" : "false");
+        $regex = sprintf($fmt, $template, $mail, $day, $is_final ? "true" : "false");
         $this->assertMatchesRegularExpression($regex, $output);
     }
 
@@ -40,7 +40,7 @@ class ExpiryTest extends UnityWebPortalTestCase
     }
 
     #[DataProvider("provider")]
-    public function testExpiry(string $uid, string $mail)
+    public function testExpiry(string $uid, string $mail, bool $is_pi)
     {
         global $LDAP, $SQL, $MAILER, $WEBHOOK;
         $this->switchUser("Admin");
@@ -49,7 +49,7 @@ class ExpiryTest extends UnityWebPortalTestCase
         $last_login_before = callPrivateMethod($SQL, "getUserLastLogin", $uid);
         $this->assertFalse($user->getFlag(UserFlag::IDLELOCKED));
         $this->assertFalse($user->getFlag(UserFlag::DISABLED));
-        if ($user->getPIGroup()->exists()) {
+        if ($is_pi) {
             $this->assertFalse($user->getPIGroup()->getIsDisabled());
         }
         // see deployment/overrides/phpunit/config/config.ini
@@ -70,7 +70,7 @@ class ExpiryTest extends UnityWebPortalTestCase
             $output = $this->runExpiryWorker(idle_days: 2);
             $this->assertOnlyOneWarningEmailSent(
                 $output,
-                "idlelock",
+                "user_expiry_idlelock_warning",
                 $mail,
                 day: 2,
                 is_final: false,
@@ -79,7 +79,7 @@ class ExpiryTest extends UnityWebPortalTestCase
             $output = $this->runExpiryWorker(idle_days: 3);
             $this->assertOnlyOneWarningEmailSent(
                 $output,
-                "idlelock",
+                "user_expiry_idlelock_warning",
                 $mail,
                 day: 3,
                 is_final: true,
@@ -95,14 +95,20 @@ class ExpiryTest extends UnityWebPortalTestCase
             $output = $this->runExpiryWorker(idle_days: 6);
             $this->assertOnlyOneWarningEmailSent(
                 $output,
-                "disable",
+                $is_pi ? "user_expiry_disable_warning_pi" : "user_expiry_disable_warning_non_pi",
                 $mail,
                 day: 6,
                 is_final: false,
             );
             // 7 ///////////////////////////////////////////////////////////////////////////////////
             $output = $this->runExpiryWorker(idle_days: 7);
-            $this->assertOnlyOneWarningEmailSent($output, "disable", $mail, day: 7, is_final: true);
+            $this->assertOnlyOneWarningEmailSent(
+                $output,
+                $is_pi ? "user_expiry_disable_warning_pi" : "user_expiry_disable_warning_non_pi",
+                $mail,
+                day: 7,
+                is_final: true,
+            );
             // 8 ///////////////////////////////////////////////////////////////////////////////////
             $output = $this->runExpiryWorker(idle_days: 8);
             $this->assertEquals("disabling user '$uid'", $output);
@@ -118,7 +124,7 @@ class ExpiryTest extends UnityWebPortalTestCase
             if ($user->getFlag(UserFlag::DISABLED)) {
                 $user->reEnable();
             }
-            if ($user->getPIGroup()->exists() && $user->getPIGroup()->getIsDisabled()) {
+            if ($is_pi && $user->getPIGroup()->getIsDisabled()) {
                 callPrivateMethod($user->getPIGroup(), "reenable");
             }
             if ($last_login_before === null) {
