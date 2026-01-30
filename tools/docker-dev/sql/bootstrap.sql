@@ -89,18 +89,6 @@ CREATE TABLE `requests` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user_expiry`
---
-
-CREATE TABLE `user_expiry` (
-  `uid` varchar(128) NOT NULL,
-  `idlelock_warning_days_sent` varchar(768) NOT NULL COMMENT 'JSON encoded sorted list of day numbers',
-  `disable_warning_days_sent` varchar(768) NOT NULL COMMENT 'JSON encoded sorted list of day numbers'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Indexes for dumped tables
 --
 
@@ -121,12 +109,6 @@ ALTER TABLE `audit_log`
 --
 ALTER TABLE `requests`
   ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `user_expiry`
---
-ALTER TABLE `user_expiry`
-  ADD PRIMARY KEY (`uid`);
 
 --
 -- AUTO_INCREMENT for dumped tables
