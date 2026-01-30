@@ -145,14 +145,13 @@ function executeWorker(
 ): array {
     global $LDAP;
     $command = sprintf(
-        "HTTP_HOST=phpunit '%s' '%s/../workers/%s' %s 2>&1",
-        PHP_BINARY,
-        __DIR__,
-        $basename,
+        "HTTP_HOST=phpunit %s %s %s 2>&1",
+        escapeshellarg(PHP_BINARY),
+        escapeshellarg(__DIR__ . "/../workers/" . $basename),
         $args,
     );
     if ($stdinFilePath !== null) {
-        $command .= " <'$stdinFilePath'";
+        $command .= " <" . escapeshellarg($stdinFilePath);
     }
     $output = [];
     $rc = null;
