@@ -169,4 +169,45 @@ class ExpiryTest extends UnityWebPortalTestCase
             }
         }
     }
+
+    public function testGroupMembersNotified()
+    {
+        global $USER, $SQL;
+        $this->switchUser("EmptyPIGroupOwner");
+        $last_login_before = callPrivateMethod($SQL, "getUserLastLogin", $USER->uid);
+        $owner = $USER;
+        $owner->setFlag(UserFlag::IDLELOCKED, true);
+        $pi_group = $USER->getPIGroup();
+        $this->switchUser("Blank");
+        $pi_group->newUserRequest($USER, false);
+        $pi_group->approveUser($USER, false);
+        $this->assertEqualsCanonicalizing([$owner->uid, $USER->uid], $pi_group->getMemberUIDs());
+        try {
+            // set last login to one day after epoch
+            callPrivateMethod($SQL, "setUserLastLogin", $owner->uid, 1 * 24 * 60 * 60);
+            $final_disable_warning_day =
+                CONFIG["expiry"]["disable_warning_days"][
+                    array_key_last(CONFIG["expiry"]["disable_warning_days"])
+                ];
+            $this->assertEquals(7, $final_disable_warning_day);
+            $output = $this->runExpiryWorker(idle_days: 7);
+            $this->assertEquals(
+                implode("\n", [
+                    'sending user_expiry_disable_warning_pi email to "user5@org2.test" with data {"idle_days":7,"expiration_date":"1970/01/10","is_final_warning":true,"pi_group_gid":"pi_user5_org2_test"}',
+                    'sending user_expiry_disable_warning_member email to ["user2@org1.test"] with data {"idle_days":7,"expiration_date":"1970/01/10","is_final_warning":true,"pi_group_gid":"pi_user5_org2_test"}',
+                ]),
+                $output,
+            );
+        } finally {
+            if ($last_login_before === null) {
+                callPrivateMethod($SQL, "removeUserLastLogin", $USER->uid);
+            } else {
+                callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, $last_login_before);
+            }
+            if ($pi_group->memberUIDExists($USER->uid)) {
+                $pi_group->removeMemberUID($USER->uid);
+            }
+            $owner->setFlag(UserFlag::IDLELOCKED, false);
+        }
+    }
 }
