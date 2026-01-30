@@ -55,7 +55,7 @@ class UnityLDAP extends LDAPConn
         $this->userFlagGroups = [];
         foreach (UserFlag::cases() as $flag) {
             $dn = CONFIG["ldap"]["user_flag_groups"][$flag->value];
-            $this->userFlagGroups[$flag->value] = new PosixGroup(new LDAPEntry($this->conn, $dn));
+            $this->userFlagGroups[$flag->value] = new PosixGroup($this->getEntry($dn));
         }
     }
 
