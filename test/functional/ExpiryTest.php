@@ -22,12 +22,11 @@ class ExpiryTest extends UnityWebPortalTestCase
         string $type,
         string $mail,
         int $day,
-        int $warning_number,
         bool $is_final,
     ) {
         $fmt =
-            "/^sending %s email to \"%s\" with data \{\"idle_days\":%s,\"expiration_date\":\"[\d\/]+\",\"warning_number\":%s,\"is_final_warning\":%s\}$/";
-        $regex = sprintf($fmt, $type, $mail, $day, $warning_number, $is_final ? "true" : "false");
+            "/^sending %s email to \"%s\" with data \{\"idle_days\":%s,\"expiration_date\":\"[\d\/]+\",\"is_final_warning\":%s\}$/";
+        $regex = sprintf($fmt, $type, $mail, $day, $is_final ? "true" : "false");
         $this->assertMatchesRegularExpression($regex, $output);
     }
 
@@ -39,9 +38,6 @@ class ExpiryTest extends UnityWebPortalTestCase
         $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
         $this->assertFalse($user->getFlag(UserFlag::IDLELOCKED));
         $this->assertFalse($user->getFlag(UserFlag::DISABLED));
-        $warnings_sent = $SQL->getUserExpirationWarningDaysSent($uid);
-        $this->assertEmpty($warnings_sent["idlelock"]);
-        $this->assertEmpty($warnings_sent["disable"]);
         // see deployment/overrides/phpunit/config/config.ini
         $this->assertEquals(CONFIG["expiry"]["idlelock_warning_days"], [2, 3]);
         $this->assertEquals(CONFIG["expiry"]["idlelock_day"], 4);
@@ -65,7 +61,6 @@ class ExpiryTest extends UnityWebPortalTestCase
                 "idlelock",
                 $mail,
                 day: 2,
-                warning_number: 1,
                 is_final: false,
             );
             // 3 ///////////////////////////////////////////////////////////////////////////////////
@@ -77,7 +72,6 @@ class ExpiryTest extends UnityWebPortalTestCase
                 "idlelock",
                 $mail,
                 day: 3,
-                warning_number: 2,
                 is_final: true,
             );
             // 4 ///////////////////////////////////////////////////////////////////////////////////
@@ -98,27 +92,18 @@ class ExpiryTest extends UnityWebPortalTestCase
                 "disable",
                 $mail,
                 day: 6,
-                warning_number: 1,
                 is_final: false,
             );
             // 7 ///////////////////////////////////////////////////////////////////////////////////
             callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 7);
             [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
             $output = trim(implode("\n", $output_lines));
-            $this->assertOnlyOneWarningEmailSent(
-                $output,
-                "disable",
-                $mail,
-                day: 7,
-                warning_number: 2,
-                is_final: true,
-            );
+            $this->assertOnlyOneWarningEmailSent($output, "disable", $mail, day: 7, is_final: true);
             // 8 ///////////////////////////////////////////////////////////////////////////////////
             callPrivateMethod($SQL, "setUserLastLoginDaysAgo", $uid, 8);
             [$_, $output_lines] = executeWorker("user-expiry.php", "--verbose");
             $output = trim(implode("\n", $output_lines));
         } finally {
-            $SQL->resetUserExpirationWarningDaysSent($uid);
             $user->setFlag(UserFlag::IDLELOCKED, false);
             if ($user->getFlag(UserFlag::DISABLED)) {
                 $user->reEnable();

@@ -2,7 +2,6 @@
 <?php
 include __DIR__ . "/init.php";
 use Garden\Cli\Cli;
-use UnityWebPortal\lib\UserExpiryWarningType;
 use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UnityGroup;
 use UnityWebPortal\lib\UserFlag;
@@ -82,8 +81,6 @@ foreach ($uid_to_last_login as $uid => $last_login) {
     $uid_to_idle_days[$uid] = round($seconds_since_last_login / (60 * 60 * 24));
 }
 
-$uid_to_warnings_sent = $SQL->getAllUsersExpirationWarningDaysSent();
-
 $pi_group_members = [];
 foreach (
     $LDAP->getAllNonDisabledPIGroupsAttributes(["cn", "memberuid"], ["memberuid" => []])
@@ -106,17 +103,6 @@ function sendMail(string $type, array|string $recipients, string $template, ?arr
     }
     if (!$args["dry-run"]) {
         $MAILER->sendMail($recipients, $template, $data);
-    }
-}
-
-function recordUserExpirationWarningDaySent(
-    string $uid,
-    UserExpiryWarningType $warning_type,
-    int $day,
-) {
-    global $args, $SQL;
-    if (!$args["dry-run"]) {
-        $SQL->recordUserExpirationWarningDaySent($uid, $warning_type, $day);
     }
 }
 
@@ -144,30 +130,23 @@ foreach ($uid_to_idle_days as $uid => $day) {
     if (in_array($day, $idlelock_warning_days)) {
         $idle_days = $uid_to_idle_days[$uid];
         $expiration_date = date("Y/m/d", $last_login + $idlelock_day * 24 * 60 * 60);
-        $warnings_sent = $uid_to_warnings_sent[$uid]["idlelock"] ?? [];
-        $warning_number = count($warnings_sent) + 1;
-        $is_final_warning = $warning_number === $final_idlelock_warning_day;
+        $is_final_warning = $day === $final_idlelock_warning_day;
         $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
         sendMail("idlelock", $user->getMail(), "user_expiry_idlelock_warning", [
             "idle_days" => $idle_days,
             "expiration_date" => $expiration_date,
-            "warning_number" => $warning_number,
             "is_final_warning" => $is_final_warning,
         ]);
-        recordUserExpirationWarningDaySent($uid, UserExpiryWarningType::IDLELOCK, $idle_days);
     }
     if (in_array($day, $disable_warning_days)) {
         $idle_days = $uid_to_idle_days[$uid];
         $expiration_date = date("Y/m/d", $last_login + $disable_day * 24 * 60 * 60);
-        $warnings_sent = $uid_to_warnings_sent[$uid]["disable"] ?? [];
-        $warning_number = count($warnings_sent) + 1;
-        $is_final_warning = $warning_number === $final_disable_warning_day;
+        $is_final_warning = $day === $final_disable_warning_day;
         $pi_group_gid = UnityGroup::ownerUID2GID($uid);
         $pi_group_member_uids = $pi_group_members[$pi_group_gid] ?? [];
         $mail_template_data = [
             "idle_days" => $idle_days,
             "expiration_date" => $expiration_date,
-            "warning_number" => $warning_number,
             "is_final_warning" => $is_final_warning,
         ];
         if (!in_array($uid, $pi_group_owners)) {
@@ -178,7 +157,6 @@ foreach ($uid_to_idle_days as $uid => $day) {
                 "user_expiry_disable_warning_non_pi",
                 $mail_template_data,
             );
-            recordUserExpirationWarningDaySent($uid, UserExpiryWarningType::DISABLE, $idle_days);
         } else {
             $mail_template_data["pi_group_gid"] = $pi_group_gid;
             $owner_uid = $uid;
@@ -188,11 +166,6 @@ foreach ($uid_to_idle_days as $uid => $day) {
                 $owner->getMail(),
                 "user_expiry_disable_warning_pi",
                 $mail_template_data,
-            );
-            recordUserExpirationWarningDaySent(
-                $owner_uid,
-                UserExpiryWarningType::DISABLE,
-                $idle_days,
             );
             if (count($pi_group_member_uids) > 1) {
                 $members = [];
