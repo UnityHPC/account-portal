@@ -26,6 +26,7 @@ require_once __DIR__ . "/../resources/lib/exceptions/EnsureException.php";
 require_once __DIR__ . "/../resources/lib/exceptions/EncodingUnknownException.php";
 require_once __DIR__ . "/../resources/lib/exceptions/EncodingConversionException.php";
 require_once __DIR__ . "/../resources/lib/exceptions/UnityHTTPDMessageNotFoundException.php";
+require_once __DIR__ . "/../resources/lib/exceptions/InvalidConfigurationException.php";
 
 use UnityWebPortal\lib\CSRFToken;
 use UnityWebPortal\lib\exceptions\ArrayKeyException;
