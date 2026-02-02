@@ -70,7 +70,7 @@ function sendMail(array|string $recipients, string $template, ?array $data = nul
     }
 }
 
-function sendUserExpiryNoticeToOwner(string $template, UnityUser $user)
+function sendUserExpiryNoticeToPIGroupOwners(string $template, UnityUser $user)
 {
     global $LDAP, $SQL, $MAILER, $WEBHOOK;
     foreach ($LDAP->getNonDisabledPIGroupGIDsWithMemberUID($user->uid) as $gid) {
@@ -91,7 +91,7 @@ function idleLockUser($uid)
     echo "idle-locking user '$uid'\n";
     if (!$args["dry-run"]) {
         $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
-        sendUserExpiryNoticeToOwner("group_user_idlelocked_owner", $user);
+        sendUserExpiryNoticeToPIGroupOwners("group_user_idlelocked_owner", $user);
         $user->setFlag(UserFlag::IDLELOCKED, true);
     }
 }
@@ -102,7 +102,7 @@ function disableUser($uid)
     echo "disabling user '$uid'\n";
     if (!$args["dry-run"]) {
         $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
-        sendUserExpiryNoticeToOwner("group_user_disabled_owner", $user);
+        sendUserExpiryNoticeToPIGroupOwners("group_user_disabled_owner", $user);
         $user->disable(send_mail_pi_group_owner: false);
     }
 }
