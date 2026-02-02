@@ -107,7 +107,7 @@ function disableUser($uid)
     }
 }
 
-function idleLockWarnUser(string $uid, int $last_login, int $day)
+function idleLockWarnUser(string $uid, int $day)
 {
     global $uid_to_idle_days,
         $uid_to_last_login,
@@ -129,7 +129,7 @@ function idleLockWarnUser(string $uid, int $last_login, int $day)
     ]);
 }
 
-function disableWarnUser(string $uid, int $last_login, int $day)
+function disableWarnUser(string $uid, int $day)
 {
     global $uid_to_idle_days,
         $uid_to_last_login,
@@ -175,10 +175,10 @@ function disableWarnUser(string $uid, int $last_login, int $day)
 
 foreach ($uid_to_idle_days as $uid => $day) {
     if (in_array($day, $idlelock_warning_days)) {
-        idleLockWarnUser($uid, $last_login, $day);
+        idleLockWarnUser($uid, $day);
     }
     if (in_array($day, $disable_warning_days)) {
-        disableWarnUser($uid, $last_login, $day);
+        disableWarnUser($uid, $day);
     }
     if ($day === $idlelock_day) {
         idleLockUser($uid);
