@@ -77,7 +77,9 @@ function _json_encode(mixed $value, int $flags = 0, int $depth = 512): string
 {
     $flags |= JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES;
     $output = json_encode($value, $flags, $depth);
-    assert($output !== false);
+    if ($output === false) {
+        throw new Exception("json_encode returned false!");
+    }
     return $output;
 }
 
