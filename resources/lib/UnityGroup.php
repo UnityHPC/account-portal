@@ -476,8 +476,8 @@ class UnityGroup extends PosixGroup
 
     public function addMemberUID(string $uid): void
     {
-        $this->SQL->addLog("added_user", _json_encode(["user" => $uid, "group" => $this->gid]));
         parent::addMemberUID($uid);
+        $this->SQL->addLog("added_user", _json_encode(["user" => $uid, "group" => $this->gid]));
     }
 
     public function removeMemberUID(string $uid): void
@@ -485,8 +485,8 @@ class UnityGroup extends PosixGroup
         if ($this->managerUIDExists($uid)) {
             $this->removeManagerUID($uid);
         }
-        $this->SQL->addLog("removed_user", _json_encode(["user" => $uid, "group" => $this->gid]));
         parent::removeMemberUID($uid);
+        $this->SQL->addLog("removed_user", _json_encode(["user" => $uid, "group" => $this->gid]));
     }
 
     public function addPlusAddressToMail(string $mail): string
