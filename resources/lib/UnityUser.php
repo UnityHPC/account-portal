@@ -428,15 +428,18 @@ class UnityUser
         );
     }
 
-    public function disable(bool $send_mail = true, bool $send_mail_admin = true): void
-    {
+    public function disable(
+        bool $send_mail = true,
+        bool $send_mail_pi_group_owner = true,
+        bool $send_mail_admin = true,
+    ): void {
         $pi_group = $this->getPIGroup();
         if ($pi_group->exists() && !$pi_group->getIsDisabled()) {
             $pi_group->disable($send_mail);
         }
         foreach ($this->LDAP->getNonDisabledPIGroupGIDsWithMemberUID($this->uid) as $gid) {
             $group = new UnityGroup($gid, $this->LDAP, $this->SQL, $this->MAILER, $this->WEBHOOK);
-            $group->removeMemberUID($this->uid);
+            $group->removeUser($this, $send_mail_pi_group_owner);
         }
         $this->entry->removeAttribute("sshPublicKey");
         $this->setFlag(

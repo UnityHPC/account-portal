@@ -126,6 +126,21 @@ function idleLockUser($uid)
     echo "idle-locking user '$uid'";
     if (!$args["dry-run"]) {
         $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+        foreach ($LDAP->getNonDisabledPIGroupGIDsWithMemberUID($uid) as $gid) {
+            $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+            sendMail(
+                $group->getOwnerMailAndPlusAddressedManagerMails(),
+                "group_user_idlelocked_owner",
+                [
+                    "group" => $gid,
+                    "user" => $uid,
+                    "org" => $user->getOrg(),
+                    "name" => $user->getFullname(),
+                    "email" => $user->getMail(),
+                ],
+            );
+        }
+
         $user->setFlag(UserFlag::IDLELOCKED, true);
     }
 }
@@ -136,7 +151,21 @@ function disableUser($uid)
     echo "disabling user '$uid'";
     if (!$args["dry-run"]) {
         $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
-        $user->disable();
+        foreach ($LDAP->getNonDisabledPIGroupGIDsWithMemberUID($uid) as $gid) {
+            $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+            sendMail(
+                $group->getOwnerMailAndPlusAddressedManagerMails(),
+                "group_user_disabled_owner",
+                [
+                    "group" => $gid,
+                    "user" => $uid,
+                    "org" => $user->getOrg(),
+                    "name" => $user->getFullname(),
+                    "email" => $user->getMail(),
+                ],
+            );
+        }
+        $user->disable(send_mail_pi_group_owner: false);
     }
 }
 
