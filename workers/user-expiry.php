@@ -123,7 +123,7 @@ function sendMail(array|string $recipients, string $template, ?array $data = nul
 function idleLockUser($uid)
 {
     global $args, $LDAP, $SQL, $MAILER, $WEBHOOK;
-    echo "idle-locking user '$uid'";
+    echo "idle-locking user '$uid'\n";
     if (!$args["dry-run"]) {
         $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
         foreach ($LDAP->getNonDisabledPIGroupGIDsWithMemberUID($uid) as $gid) {
@@ -148,7 +148,7 @@ function idleLockUser($uid)
 function disableUser($uid)
 {
     global $args, $LDAP, $SQL, $MAILER, $WEBHOOK;
-    echo "disabling user '$uid'";
+    echo "disabling user '$uid'\n";
     if (!$args["dry-run"]) {
         $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
         foreach ($LDAP->getNonDisabledPIGroupGIDsWithMemberUID($uid) as $gid) {

@@ -176,13 +176,16 @@ class ExpiryTest extends UnityWebPortalTestCase
         $this->switchUser("EmptyPIGroupOwner");
         $last_login_before = callPrivateMethod($SQL, "getUserLastLogin", $USER->uid);
         $owner = $USER;
-        $owner->setFlag(UserFlag::IDLELOCKED, true);
         $pi_group = $USER->getPIGroup();
         $this->switchUser("Blank");
-        $pi_group->newUserRequest($USER, false);
-        $pi_group->approveUser($USER, false);
-        $this->assertEqualsCanonicalizing([$owner->uid, $USER->uid], $pi_group->getMemberUIDs());
         try {
+            $owner->setFlag(UserFlag::IDLELOCKED, true);
+            $pi_group->newUserRequest($USER, false);
+            $pi_group->approveUser($USER, false);
+            $this->assertEqualsCanonicalizing(
+                [$owner->uid, $USER->uid],
+                $pi_group->getMemberUIDs(),
+            );
             // set last login to one day after epoch
             callPrivateMethod($SQL, "setUserLastLogin", $owner->uid, 1 * 24 * 60 * 60);
             $final_disable_warning_day =
@@ -223,6 +226,82 @@ class ExpiryTest extends UnityWebPortalTestCase
                 $pi_group->removeMemberUID($USER->uid);
             }
             $owner->setFlag(UserFlag::IDLELOCKED, false);
+        }
+    }
+
+    public function testGroupOwnerManagersNotified()
+    {
+        global $USER, $SQL;
+        $this->switchUser("CourseGroupOwner");
+        $owner = $USER;
+        $pi_group = $USER->getPIGroup();
+        $manager_uids = $pi_group->getManagerUIDs();
+        $this->assertEquals(1, count($manager_uids));
+        $manager_uid = $manager_uids[0];
+        $this->switchUser("Blank");
+        $last_login_before = callPrivateMethod($SQL, "getUserLastLogin", $USER->uid);
+        try {
+            $pi_group->newUserRequest($USER, false);
+            $pi_group->approveUser($USER, false);
+            $this->assertEqualsCanonicalizing(
+                [$owner->uid, $manager_uid, $USER->uid],
+                $pi_group->getMemberUIDs(),
+            );
+            // set last login to one day after epoch
+            callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, 1 * 24 * 60 * 60);
+            // idlelock ////////////////////////////////////////////////////////////////////////////
+            $idlelock_day = CONFIG["expiry"]["idlelock_day"];
+            $this->assertEquals(4, $idlelock_day);
+            $output = $this->runExpiryWorker(idle_days: 4);
+            $this->assertEquals(
+                sprintf(
+                    "idle-locking user '%s'\nsending %s email to %s with data %s",
+                    $USER->uid,
+                    "group_user_idlelocked_owner",
+                    '["' . $owner->getMail() . '"]',
+                    _json_encode([
+                        "group" => $pi_group->gid,
+                        "user" => $USER->uid,
+                        "org" => $USER->getOrg(),
+                        "name" => $USER->getFullname(),
+                        "email" => $USER->getMail(),
+                    ]),
+                ),
+                $output,
+            );
+            // disable /////////////////////////////////////////////////////////////////////////////
+            $disable_day = CONFIG["expiry"]["disable_day"];
+            $this->assertEquals(8, $disable_day);
+            $output = $this->runExpiryWorker(idle_days: 8);
+            $this->assertEquals(
+                sprintf(
+                    "disabling user '%s'\nsending %s email to %s with data %s",
+                    $USER->uid,
+                    "group_user_disabled_owner",
+                    '["' . $owner->getMail() . '"]',
+                    _json_encode([
+                        "group" => $pi_group->gid,
+                        "user" => $USER->uid,
+                        "org" => $USER->getOrg(),
+                        "name" => $USER->getFullname(),
+                        "email" => $USER->getMail(),
+                    ]),
+                ),
+                $output,
+            );
+        } finally {
+            if ($last_login_before === null) {
+                callPrivateMethod($SQL, "removeUserLastLogin", $USER->uid);
+            } else {
+                callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, $last_login_before);
+            }
+            if ($pi_group->memberUIDExists($USER->uid)) {
+                $pi_group->removeMemberUID($USER->uid);
+            }
+            $USER->setFlag(UserFlag::IDLELOCKED, false);
+            if ($USER->getFlag(UserFlag::DISABLED)) {
+                $USER->reEnable();
+            }
         }
     }
 }
