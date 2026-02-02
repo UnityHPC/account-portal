@@ -231,18 +231,21 @@ class ExpiryTest extends UnityWebPortalTestCase
 
     public function testGroupOwnerManagersNotified()
     {
-        global $USER, $SQL;
-        $this->switchUser("CourseGroupOwner");
+        global $USER, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        $this->switchUser("EmptyPIGroupOwner");
         $owner = $USER;
         $pi_group = $USER->getPIGroup();
-        $manager_uids = $pi_group->getManagerUIDs();
-        $this->assertEquals(1, count($manager_uids));
-        $manager_uid = $manager_uids[0];
+        $this->assertEmpty($pi_group->getManagerUIDs());
+        $manager_uid = self::$NICKNAME2UID["Admin"];
+        $manager = new UnityUser($manager_uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
         $this->switchUser("Blank");
         $last_login_before = callPrivateMethod($SQL, "getUserLastLogin", $USER->uid);
         try {
             $pi_group->newUserRequest($USER, false);
             $pi_group->approveUser($USER, false);
+            $pi_group->newUserRequest($manager, false);
+            $pi_group->approveUser($manager, false);
+            $pi_group->addManagerUID($manager_uid);
             $this->assertEqualsCanonicalizing(
                 [$owner->uid, $manager_uid, $USER->uid],
                 $pi_group->getMemberUIDs(),
@@ -258,7 +261,10 @@ class ExpiryTest extends UnityWebPortalTestCase
                     "idle-locking user '%s'\nsending %s email to %s with data %s",
                     $USER->uid,
                     "group_user_idlelocked_owner",
-                    '["' . $owner->getMail() . '"]',
+                    _json_encode([
+                        $pi_group->addPlusAddressToMail($manager->getMail()),
+                        $owner->getMail(),
+                    ]),
                     _json_encode([
                         "group" => $pi_group->gid,
                         "user" => $USER->uid,
@@ -278,7 +284,10 @@ class ExpiryTest extends UnityWebPortalTestCase
                     "disabling user '%s'\nsending %s email to %s with data %s",
                     $USER->uid,
                     "group_user_disabled_owner",
-                    '["' . $owner->getMail() . '"]',
+                    _json_encode([
+                        $pi_group->addPlusAddressToMail($manager->getMail()),
+                        $owner->getMail(),
+                    ]),
                     _json_encode([
                         "group" => $pi_group->gid,
                         "user" => $USER->uid,
@@ -297,6 +306,9 @@ class ExpiryTest extends UnityWebPortalTestCase
             }
             if ($pi_group->memberUIDExists($USER->uid)) {
                 $pi_group->removeMemberUID($USER->uid);
+            }
+            if ($pi_group->memberUIDExists($manager_uid)) {
+                $pi_group->removeMemberUID($manager_uid);
             }
             $USER->setFlag(UserFlag::IDLELOCKED, false);
             if ($USER->getFlag(UserFlag::DISABLED)) {
