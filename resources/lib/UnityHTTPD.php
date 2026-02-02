@@ -5,6 +5,7 @@ namespace UnityWebPortal\lib;
 use UnityWebPortal\lib\exceptions\NoDieException;
 use UnityWebPortal\lib\exceptions\ArrayKeyException;
 use UnityWebPortal\lib\exceptions\UnityHTTPDMessageNotFoundException;
+use UnityWebPortal\lib\exceptions\JsonException;
 use RuntimeException;
 
 enum UnityHTTPDMessageLevel: string
@@ -122,7 +123,7 @@ class UnityHTTPD
             try {
                 \_json_encode($data);
                 $output["data"] = $data;
-            } catch (\JsonException $e) {
+            } catch (JsonException $e) {
                 $output["data"] = "data could not be JSON encoded: " . $e->getMessage();
             }
         }
