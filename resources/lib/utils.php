@@ -85,6 +85,7 @@ function _json_encode(mixed $value, int $flags = 0, int $depth = 512): string
 
 /**
  * @param int<1,max> $depth
+ * @throws \JsonException
  */
 function _json_decode(string $x, ?bool $associative = null, int $depth = 512, int $flags = 0): mixed
 {
