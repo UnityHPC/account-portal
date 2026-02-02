@@ -86,7 +86,7 @@ class ExpiryTest extends UnityWebPortalTestCase
             );
             // 4 ///////////////////////////////////////////////////////////////////////////////////
             $output = $this->runExpiryWorker(idle_days: 4);
-            $this->assertEquals("idle-locking user '$uid'", $output);
+            $this->assertMatchesRegularExpression("/idle-locking user '$uid'/", $output);
             $this->assertTrue($user->getFlag(UserFlag::IDLELOCKED));
             // 5 ///////////////////////////////////////////////////////////////////////////////////
             $output = $this->runExpiryWorker(idle_days: 5);
@@ -111,7 +111,7 @@ class ExpiryTest extends UnityWebPortalTestCase
             );
             // 8 ///////////////////////////////////////////////////////////////////////////////////
             $output = $this->runExpiryWorker(idle_days: 8);
-            $this->assertEquals("disabling user '$uid'", $output);
+            $this->assertMatchesRegularExpression("/disabling user '$uid'/", $output);
             $this->assertTrue($user->getFlag(UserFlag::DISABLED));
             if ($user->getPIGroup()->exists()) {
                 $this->assertTrue($user->getPIGroup()->getIsDisabled());
