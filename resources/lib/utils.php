@@ -6,6 +6,7 @@ use UnityWebPortal\lib\exceptions\EncodingConversionException;
 use phpseclib3\Crypt\PublicKeyLoader;
 use phpseclib3\Exception\NoKeyLoadedException;
 use UnityWebPortal\lib\exceptions\CurlException;
+use UnityWebPortal\lib\exceptions\JsonException;
 
 /**
  * like assert() but not subject to zend.assertions config
@@ -71,27 +72,27 @@ function testValidSSHKey(string $key): array
 
 /**
  * @param int<1,max> $depth
- * @throws Exception
+ * @throws JsonException
  */
 function _json_encode(mixed $value, int $flags = 0, int $depth = 512): string
 {
     $flags |= JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES;
     $output = json_encode($value, $flags, $depth);
     if ($output === false) {
-        throw new Exception("json_encode returned false!");
+        throw new JsonException(json_last_error_msg());
     }
     return $output;
 }
 
 /**
  * @param int<1,max> $depth
- * @throws Exception
+ * @throws JsonException
  */
 function _json_decode(string $x, ?bool $associative = null, int $depth = 512, int $flags = 0): mixed
 {
     $output = json_decode($x, $associative, $depth, $flags);
     if ($output === null) {
-        throw new Exception("json_decode returned null");
+        throw new JsonException(json_last_error_msg());
     }
     return $output;
 }
