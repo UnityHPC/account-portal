@@ -134,6 +134,7 @@ function disableWarnUser(string $uid, int $day)
     global $uid_to_idle_days,
         $uid_to_last_login,
         $pi_group_owners,
+        $pi_group_members,
         $disable_day,
         $final_disable_warning_day,
         $LDAP,
