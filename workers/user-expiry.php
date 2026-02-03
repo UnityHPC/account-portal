@@ -85,43 +85,33 @@ function sendUserExpiryNoticeToPIGroupOwners(string $template, UnityUser $user)
     }
 }
 
-function idleLockUser($uid)
+function idleLockUser(UnityUser $user)
 {
-    global $args, $LDAP, $SQL, $MAILER, $WEBHOOK;
-    echo "idle-locking user '$uid'\n";
+    global $args;
+    echo "idle-locking user '$user->uid'\n";
     if (!$args["dry-run"]) {
-        $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
         sendUserExpiryNoticeToPIGroupOwners("group_user_idlelocked_owner", $user);
         $user->setFlag(UserFlag::IDLELOCKED, true);
     }
 }
 
-function disableUser($uid)
+function disableUser(UnityUser $user)
 {
-    global $args, $LDAP, $SQL, $MAILER, $WEBHOOK;
-    echo "disabling user '$uid'\n";
+    global $args;
+    echo "disabling user '$user->uid'\n";
     if (!$args["dry-run"]) {
-        $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
         sendUserExpiryNoticeToPIGroupOwners("group_user_disabled_owner", $user);
         $user->disable(send_mail_pi_group_owner: false);
     }
 }
 
-function idleLockWarnUser(string $uid, int $day)
+function idleLockWarnUser(UnityUser $user, int $day)
 {
-    global $uid_to_idle_days,
-        $uid_to_last_login,
-        $idlelock_day,
-        $final_idlelock_warning_day,
-        $LDAP,
-        $SQL,
-        $MAILER,
-        $WEBHOOK;
-    $last_login = $uid_to_last_login[$uid];
-    $idle_days = $uid_to_idle_days[$uid];
+    global $uid_to_idle_days, $uid_to_last_login, $idlelock_day, $final_idlelock_warning_day;
+    $last_login = $uid_to_last_login[$user->uid];
+    $idle_days = $uid_to_idle_days[$user->uid];
     $expiration_date = date("Y/m/d", $last_login + $idlelock_day * 24 * 60 * 60);
     $is_final_warning = $day === $final_idlelock_warning_day;
-    $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
     sendMail($user->getMail(), "user_expiry_idlelock_warning", [
         "idle_days" => $idle_days,
         "expiration_date" => $expiration_date,
@@ -129,7 +119,7 @@ function idleLockWarnUser(string $uid, int $day)
     ]);
 }
 
-function disableWarnUser(string $uid, int $day)
+function disableWarnUser(UnityUser $user, int $day)
 {
     global $uid_to_idle_days,
         $uid_to_last_login,
@@ -141,24 +131,22 @@ function disableWarnUser(string $uid, int $day)
         $SQL,
         $MAILER,
         $WEBHOOK;
-    $last_login = $uid_to_last_login[$uid];
-    $idle_days = $uid_to_idle_days[$uid];
+    $last_login = $uid_to_last_login[$user->uid];
+    $idle_days = $uid_to_idle_days[$user->uid];
     $expiration_date = date("Y/m/d", $last_login + $disable_day * 24 * 60 * 60);
     $is_final_warning = $day === $final_disable_warning_day;
-    $pi_group_gid = UnityGroup::ownerUID2GID($uid);
+    $pi_group_gid = UnityGroup::ownerUID2GID($user->uid);
     $pi_group_member_uids = $pi_group_members[$pi_group_gid] ?? [];
     $mail_template_data = [
         "idle_days" => $idle_days,
         "expiration_date" => $expiration_date,
         "is_final_warning" => $is_final_warning,
     ];
-    if (!in_array($uid, $pi_group_owners)) {
-        $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+    if (!in_array($user->uid, $pi_group_owners)) {
         sendMail($user->getMail(), "user_expiry_disable_warning_non_pi", $mail_template_data);
     } else {
         $mail_template_data["pi_group_gid"] = $pi_group_gid;
-        $owner_uid = $uid;
-        $owner = new UnityUser($owner_uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+        $owner = $user;
         sendMail($owner->getMail(), "user_expiry_disable_warning_pi", $mail_template_data);
         if (count($pi_group_member_uids) > 1) {
             $members = [];
@@ -175,17 +163,21 @@ function disableWarnUser(string $uid, int $day)
 }
 
 foreach ($uid_to_idle_days as $uid => $day) {
+    $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+    if (!$user->exists()) {
+        continue;
+    }
     if (in_array($day, $idlelock_warning_days)) {
-        idleLockWarnUser($uid, $day);
+        idleLockWarnUser($user, $day);
     }
     if (in_array($day, $disable_warning_days)) {
-        disableWarnUser($uid, $day);
+        disableWarnUser($user, $day);
     }
     if ($day === $idlelock_day) {
-        idleLockUser($uid);
+        idleLockUser($user);
     }
     if ($day === $disable_day) {
-        disableUser($uid);
+        disableUser($user);
     }
     if (!in_array($uid, $initially_idlelocked_users) && $day > $idlelock_day) {
         echo "WARNING: user '$uid' should have already been idlelocked, but isn't!\n";
