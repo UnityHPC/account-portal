@@ -14,6 +14,7 @@ class UnitySQL
     private const string TABLE_REQS = "requests";
     private const string TABLE_AUDIT_LOG = "audit_log";
     private const string TABLE_ACCOUNT_DELETION_REQUESTS = "account_deletion_requests";
+    private const string TABLE_USER_LAST_LOGINS = "user_last_logins";
     // FIXME this string should be changed to something more intuitive, requires production change
     public const string REQUEST_BECOME_PI = "admin";
 
@@ -193,5 +194,56 @@ class UnitySQL
         $stmt = $this->conn->prepare("SELECT * FROM " . self::TABLE_ACCOUNT_DELETION_REQUESTS);
         $stmt->execute();
         return $stmt->fetchAll();
+    }
+
+    /** @return user_last_login[] */
+    public function getAllUserLastLogins(): array
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM " . self::TABLE_USER_LAST_LOGINS);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    /* for testing purposes */
+    private function setUserLastLogin(string $uid, int $timestamp): void
+    {
+        $datetime = date("Y-m-d H:i:s", $timestamp);
+        $table = self::TABLE_USER_LAST_LOGINS;
+        $stmt = $this->conn->prepare("
+            INSERT INTO $table
+            VALUES (:uid, :datetime)
+            ON DUPLICATE KEY
+            UPDATE last_login=:datetime;
+        ");
+        $stmt->bindParam(":uid", $uid);
+        $stmt->bindParam(":datetime", $datetime);
+        $stmt->execute();
+    }
+
+    /* for testing purposes */
+    private function removeUserLastLogin(string $uid): void
+    {
+        $table = self::TABLE_USER_LAST_LOGINS;
+        $stmt = $this->conn->prepare("DELETE FROM $table WHERE operator=:uid");
+        $stmt->bindParam(":uid", $uid);
+        $stmt->execute();
+    }
+
+    /* for testing purposes */
+    private function getUserLastLogin(string $uid): ?int
+    {
+        $table = self::TABLE_USER_LAST_LOGINS;
+        $stmt = $this->conn->prepare("SELECT * FROM $table WHERE operator=:uid");
+        $stmt->bindParam(":uid", $uid);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        if (count($result) == 0) {
+            return null;
+        }
+        if (count($result) > 1) {
+            throw new \Exception("multiple records found with operator '$uid'");
+        }
+        $timestamp_str = $result[0]["last_login"];
+        return strtotime($timestamp_str);
     }
 }

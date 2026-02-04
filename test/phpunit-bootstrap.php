@@ -26,6 +26,7 @@ require_once __DIR__ . "/../resources/lib/exceptions/EnsureException.php";
 require_once __DIR__ . "/../resources/lib/exceptions/EncodingUnknownException.php";
 require_once __DIR__ . "/../resources/lib/exceptions/EncodingConversionException.php";
 require_once __DIR__ . "/../resources/lib/exceptions/UnityHTTPDMessageNotFoundException.php";
+require_once __DIR__ . "/../resources/lib/exceptions/InvalidConfigurationException.php";
 
 use UnityWebPortal\lib\CSRFToken;
 use UnityWebPortal\lib\exceptions\ArrayKeyException;
@@ -133,7 +134,7 @@ function http_get(string $phpfile, array $get_data = [], bool $ignore_die = fals
 }
 
 /**
- * runs a worker script
+ * runs a worker script, then refreshes all LDAP entries to pick up changes
  * @throws RuntimeException
  * @return array [return code, output lines]
  */
@@ -143,9 +144,15 @@ function executeWorker(
     bool $doThrowIfNonzero = true,
     ?string $stdinFilePath = null,
 ): array {
-    $command = sprintf("%s %s/../workers/%s %s 2>&1", PHP_BINARY, __DIR__, $basename, $args);
+    global $LDAP;
+    $command = sprintf(
+        "HTTP_HOST=phpunit %s %s %s 2>&1",
+        escapeshellarg(PHP_BINARY),
+        escapeshellarg(__DIR__ . "/../workers/" . $basename),
+        $args,
+    );
     if ($stdinFilePath !== null) {
-        $command .= " <$stdinFilePath";
+        $command .= " <" . escapeshellarg($stdinFilePath);
     }
     $output = [];
     $rc = null;
@@ -159,6 +166,10 @@ function executeWorker(
                 _json_encode($output),
             ),
         );
+    }
+    $entries = accessPrivateVariable($LDAP, "entries");
+    foreach ($entries as $entry) {
+        callPrivateMethod($entry, "pullObject");
     }
     return [$rc, $output];
 }
@@ -258,13 +269,21 @@ function callPrivateMethod($obj, $name, ...$args)
     return $method->invokeArgs($obj, $args);
 }
 
+function accessPrivateVariable($obj, string $name)
+{
+    $class = new \ReflectionClass($obj);
+    $property = $class->getProperty($name);
+    $property->setAccessible(true);
+    return $property->getValue($obj);
+}
+
 class UnityWebPortalTestCase extends TestCase
 {
     private ?string $last_user_nickname = null;
     private ?string $current_user_nickname = null;
     private array $nickname_to_latest_session_id = [];
     // FIXME these names are wrong
-    private static array $UID2ATTRIBUTES = [
+    protected static array $UID2ATTRIBUTES = [
         "user1_org1_test" => ["user1@org1.test", "foo", "bar", "user1@org1.test"],
         "user2_org1_test" => ["user2@org1.test", "foo", "bar", "user2@org1.test"],
         "user3_org1_test" => ["user3@org1.test", "foo", "bar", "user3@org1.test"],
@@ -289,7 +308,7 @@ class UnityWebPortalTestCase extends TestCase
             "user1+cs123_org1_test@org1.test",
         ],
     ];
-    public static array $NICKNAME2UID = [
+    protected static array $NICKNAME2UID = [
         "Admin" => "user1_org1_test",
         "Blank" => "user2_org1_test",
         "EmptyPIGroupOwner" => "user5_org2_test",

@@ -501,7 +501,7 @@ class UnityGroup extends PosixGroup
     }
 
     /** @return string[] */
-    private function getOwnerMailAndPlusAddressedManagerMails(): array
+    public function getOwnerMailAndPlusAddressedManagerMails(): array
     {
         $mails = [$this->getOwner()->getMail()];
         foreach ($this->getManagerUIDs() as $manager_uid) {
