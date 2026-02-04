@@ -32,7 +32,7 @@ class PageLoadTest extends UnityWebPortalTestCase
         return TRegxDataProvider::list(...self::findPHPFiles(__DIR__ . "/../../webroot/admin"));
     }
 
-    public static function providerNonexistentUser()
+    public static function phpFilesWithNormalHeaderRedirects()
     {
         $dir = __DIR__ . "/../../webroot/panel";
         $excludePages = array_map(fn($x) => "$dir/$x.php", [
@@ -88,12 +88,20 @@ class PageLoadTest extends UnityWebPortalTestCase
         $this->assertMatchesRegularExpression("/You are not an admin\./", $output);
     }
 
-    #[DataProvider("providerNonexistentUser")]
+    #[DataProvider("phpFilesWithNormalHeaderRedirects")]
     public function testLoadPageNonexistentUser($path)
     {
         $this->switchUser("NonExistent");
         $output = http_get($path, ignore_die: true);
         $this->assertMatchesRegularExpression("/panel\/new_account\.php/", $output);
+    }
+
+    #[DataProvider("phpFilesWithNormalHeaderRedirects")]
+    public function testLoadPageDisabled($path)
+    {
+        $this->switchUser("Disabled");
+        $output = http_get($path, ignore_die: true);
+        $this->assertMatchesRegularExpression("/panel\/disabled_account\.php/", $output);
     }
 
     public function testLoadPageLockedUser()
