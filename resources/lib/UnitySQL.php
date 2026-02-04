@@ -196,6 +196,20 @@ class UnitySQL
         return $stmt->fetchAll();
     }
 
+    public function updateUserLastLogin(string $uid): void
+    {
+        $table = self::TABLE_USER_LAST_LOGINS;
+        $stmt = $this->conn->prepare("
+            INSERT INTO $table
+            (operator, last_login)
+            VALUES(:uid, CURRENT_TIMESTAMP)
+            ON DUPLICATE KEY UPDATE
+            last_login=CURRENT_TIMESTAMP
+        ");
+        $stmt->bindParam(":uid", $uid);
+        $stmt->execute();
+    }
+
     /** @return user_last_login[] */
     public function getAllUserLastLogins(): array
     {
