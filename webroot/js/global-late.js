@@ -11,21 +11,7 @@
   }
 
   $("button.hamburger").on("click", function () {
-    var mainNav = $("nav.mainNav");
-    if (mainNav.is(":visible")) {
-      mainNav.fadeOut(100);
-    } else {
-      mainNav.fadeIn(100);
-    }
-  });
-
-  $(window).click(function (e) {
-    if (
-      !$(e.target).parent().hasClass("hamburger") &&
-      $("button.hamburger").is(":visible")
-    ) {
-      $("nav.mainNav").fadeOut(100);
-    }
+    $("nav.mainNav").toggle();
   });
 
   // Functions to set nav links as active. Sub links can activate parents by naming files with same prefix, for example: documentation.php and documentation_view.php activate the same link
