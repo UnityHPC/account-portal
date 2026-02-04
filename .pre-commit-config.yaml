@@ -56,23 +56,6 @@ repos:
         files: \.php$
         pass_filenames: false
 
-  - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.6.2
-    hooks:
-      - id: prettier
-        # exclude impure PHP files
-        exclude: |
-          (?x)^(
-              composer\.json|
-              composer\.lock|
-              node_modules/.*|
-              resources/lib/phpopenldaper/.*|
-              vendor/.*|
-              resources/templates/.*|
-              webroot/.*|
-              resources/mail/.*|
-          )$
-
   # linters (work required) ########################################################################
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -90,6 +73,20 @@ repos:
 
   - repo: local
     hooks:
+      - id: prettier
+        name: prettier
+        entry: ./node_modules/.bin/prettier
+        language: system
+        args: [-w]
+        files: |
+          (?x)(
+              \.php
+              \.html
+              \.js
+              \.css
+              \.json
+          )$
+        # exclude is done with .prettierignore
       - id: phpcs-pure
         name: PHP Code Sniffer (pure PHP files)
         entry: ./vendor/bin/phpcs
