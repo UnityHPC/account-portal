@@ -6,7 +6,7 @@ use UnityWebPortal\lib\UnityHTTPD;
 use UnityWebPortal\lib\UserFlag;
 
 if (!$USER->getFlag(UserFlag::DISABLED)) {
-    UnityHTTPD::badRequest("user is not disabled", "");
+    UnityHTTPD::redirect(getURL("panel/account.php"));
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     UnityHTTPD::validatePostCSRFToken();
