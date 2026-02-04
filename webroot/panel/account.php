@@ -231,11 +231,13 @@ if (!$isPI) {
                <input type='hidden' name='form_type' value='cancel_pi_request'/>
             ";
         } else {
-            $button_msg =
-                $USER->getPIGroup()->exists() && $USER->getPIGroup()->getIsDisabled()
-                    ? "Request to Re-Enable Old PI Group"
-                    : "Request a PI Group";
-            $onclick = "return confirm(\"Are you sure you want to request a PI account?\")";
+            if ($USER->getPIGroup()->exists() && $USER->getPIGroup()->getIsDisabled()) {
+                $button_msg = "Request to Re-Enable PI Group";
+                $onclick = "return confirm(\"Are you sure you want to re-enable your old PI group?\")";
+            } else {
+                $button_msg = "Request PI Group";
+                $onclick = "return confirm(\"Are you sure you want to request a PI group?\")";
+            }
             $tos_url = CONFIG["site"]["terms_of_service_url"];
             $account_policy_url = CONFIG["site"]["account_policy_url"];
             echo "
