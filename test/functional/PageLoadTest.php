@@ -38,6 +38,7 @@ class PageLoadTest extends UnityWebPortalTestCase
         $excludePages = array_map(fn($x) => "$dir/$x.php", [
             "pi", // requires user to be a PI
             "new_account", // this is the one page that does not redirect to new_account
+            "disabled_account", // requires user to be disabled
         ]);
         $panelPages = self::findPHPFiles($dir);
         $output = array_diff($panelPages, $excludePages);
