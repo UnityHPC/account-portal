@@ -71,7 +71,6 @@ light_panel_background = "#e6e6e6"  ; Background color for panels on the page
 accent = "#881c1c"  ; Primary accent color
 accent_1 = "#941e1e"  ; a little brighter
 accent_2 = "#9c2020"  ; On hover color for element using accent color
-accent_3 = "#a92323"  ; Active element color for element using accent color
 accent_disabled = "#e48181"  ; Disabled element color for element using accent color
 accent_foreground = "#ffffff"  ; Text color when accent color is background
 danger = "#2e1b74" ; accent color for dangerous things
