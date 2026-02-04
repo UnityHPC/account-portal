@@ -171,14 +171,14 @@ $isPI = $USER->isPI();
 
 if ($isPI) {
     echo "
-        <p>You are curently a <strong>principal investigator</strong> on the UnityHPC Platform.</p>
+        <p>You are currently a <strong>principal investigator</strong> on the UnityHPC Platform.</p>
     ";
 } else {
     if ($USER->getPIGroup()->exists() && $USER->getPIGroup()->getIsDisabled()) {
         echo "<p>You are no longer a PI because your PI group is disabled.</p>";
     }
     if ($USER->getFlag(UserFlag::QUALIFIED)) {
-        echo "<p>You are curently a <strong>qualified user</strong> on the UnityHPC Platform.</p>";
+        echo "<p>You are currently a <strong>qualified user</strong> on the UnityHPC Platform.</p>";
     } else {
         $tos_url = CONFIG["site"]["terms_of_service_url"];
         $form_url = getURL("panel/groups.php");
