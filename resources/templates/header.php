@@ -1,14 +1,12 @@
 <?php
 
 use UnityWebPortal\lib\UnityHTTPD;
+use UnityWebPortal\lib\UserFlag;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // another page should have already validated and we can't validate the same token twice
     // UnityHTTPD::validatePostCSRFToken();
-    if (
-        ($_SESSION["is_admin"] ?? false) == true
-        && ($_POST["form_type"] ?? null) == "clearView"
-    ) {
+    if (($_SESSION["is_admin"] ?? false) == true && ($_POST["form_type"] ?? null) == "clearView") {
         unset($_SESSION["viewUser"]);
         UnityHTTPD::redirect(getURL("admin/user-mgmt.php"));
     }
@@ -22,14 +20,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 if (isset($SSO)) {
+    if (!$USER->exists() && !str_ends_with($_SERVER["PHP_SELF"], "/panel/new_account.php")) {
+        UnityHTTPD::redirect("new_account.php");
+    }
     if (
-        !$_SESSION["user_exists"]
-        && !str_ends_with($_SERVER['PHP_SELF'], "/panel/new_account.php")
+        $USER->getFlag(UserFlag::DISABLED) &&
+        !str_ends_with($_SERVER["PHP_SELF"], "/panel/disabled_account.php")
     ) {
-        UnityHTTPD::redirect(getURL("panel/new_account.php"));
+        UnityHTTPD::redirect("disabled_account.php");
     }
 }
-
 ?>
 
 <!DOCTYPE html>
