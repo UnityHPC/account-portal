@@ -60,7 +60,7 @@ class RegisterUserTest extends UnityWebPortalTestCase
         $this->assertTrue($USER->getFlag(UserFlag::DISABLED));
         try {
             $this->reEnable();
-            $this->assertMessageExists(UnityHTTPDMessageLevel::INFO, "/.*/", "/re-enabled/");
+            $this->assertMessageExists(UnityHTTPDMessageLevel::SUCCESS, "/Re-Enabled/", "/.*/");
             $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
         } finally {
             $USER->setFlag(UserFlag::DISABLED, true);
@@ -75,7 +75,7 @@ class RegisterUserTest extends UnityWebPortalTestCase
         $this->assertFalse($USER->isPI());
         try {
             $this->reEnable();
-            $this->assertMessageExists(UnityHTTPDMessageLevel::INFO, "/.*/", "/re-enabled/");
+            $this->assertMessageExists(UnityHTTPDMessageLevel::SUCCESS, "/Re-Enabled/", "/.*/");
             $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
             $this->assertFalse($USER->isPI());
         } finally {
