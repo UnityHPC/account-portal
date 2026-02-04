@@ -10,7 +10,7 @@ if ($USER->exists()) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     UnityHTTPD::validatePostCSRFToken();
     $USER->init($SSO["firstname"], $SSO["lastname"], $SSO["mail"], $SSO["org"]);
-    UnityHTTPD::redirect("panel/account.php");
+    UnityHTTPD::redirect(getURL("panel/account.php"));
 }
 require getTemplatePath("header.php");
 $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
