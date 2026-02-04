@@ -54,16 +54,20 @@ class PageLoadTest extends UnityWebPortalTestCase
             ["Blank", "panel/account.php", "/Account Settings/"],
             ["Blank", "panel/groups.php", "/My Principal Investigators/"],
             ["EmptyPIGroupOwner", "panel/pi.php", "/My Users/"],
-            // new_account.php should redirect to account.php if account already exists
-            ["Blank", "panel/new_account.php", "/panel\/account\.php/", true],
             // non-PI can't access pi.php
             ["Blank", "panel/pi.php", "/You are not a PI./", true],
-            // nonexistent, disabled users should be redirected to new_account.php
-            // and new_account.php should not redirect anywhere else
+            // nonexistent users should be redirected from anywhere to new_account.php
+            // existent users should be redirected from new_account.php to account.php
+            // nonexistent users should not be redirected from new_account.php
             ["NonExistent", "panel/account.php", "/panel\/new_account\.php/", true],
-            ["Disabled", "panel/account.php", "/panel\/new_account\.php/", true],
+            ["Blank", "panel/new_account.php", "/panel\/account\.php/", true],
             ["NonExistent", "panel/new_account.php", "/Register New Account/", true],
-            ["Disabled", "panel/new_account.php", "/Register New Account/", true],
+            // disabled users should be redirected from anywhere to disabled_account.php
+            // non-disabled users should be redirected from disabled_account.php to account.php
+            // disabled users should not be redirected from new_account.php
+            ["Disabled", "panel/account.php", "/panel\/disabled_account\.php/", true],
+            ["Blank", "panel/disabled_account.php", "/panel\/account\.php/", true],
+            ["Disabled", "panel/disabled_account.php", "/Disabled Account/", true],
         ];
     }
 
