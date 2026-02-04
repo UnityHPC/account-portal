@@ -5,7 +5,7 @@ require_once __DIR__ . "/../../resources/autoload.php";
 use UnityWebPortal\lib\UnityHTTPD;
 
 if ($USER->exists()) {
-    UnityHTTPD::badRequest("user exists", "");
+    UnityHTTPD::redirect(getURL("panel/account.php"));
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     UnityHTTPD::validatePostCSRFToken();
