@@ -10,7 +10,7 @@ $cli = new Cli();
 $cli->description(
     "Send a warning email, idlelock, or disable users, depending on their last login date. " .
         "It is important that this script runs exactly once per day." .
-        "To prevent a user from being expired, remove them from the `user_last_logins` SQL table.",
+        "To prevent a user from being expired, add them to the 'immortal' user flag group.",
 )
     ->opt("dry-run", "Print actions without actually doing anything.", false, "boolean")
     ->opt("verbose", "Print which emails are sent.", false, "boolean")
@@ -53,6 +53,7 @@ $pi_group_owners = array_map(UnityGroup::GID2OwnerUID(...), array_keys($pi_group
 
 $initially_idlelocked_users = $LDAP->userFlagGroups["idlelocked"]->getMemberUIDs();
 $initially_disabled_users = $LDAP->userFlagGroups["disabled"]->getMemberUIDs();
+$immortal_users = $LDAP->userFlagGroups["immortal"]->getMemberUIDs();
 
 function sendMail(array|string $recipients, string $template, ?array $data = null)
 {
@@ -163,6 +164,9 @@ function disableWarnUser(UnityUser $user, int $day)
 }
 
 foreach ($uid_to_idle_days as $uid => $day) {
+    if (in_array($uid, $immortal_users)) {
+        continue;
+    }
     $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
     if (!$user->exists()) {
         continue;

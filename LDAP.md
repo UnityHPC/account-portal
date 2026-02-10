@@ -33,6 +33,8 @@ Terminology:
   - a user who has been inactive for so long that they lose access to your services
   - as soon as they log in to this account portal, this flag is removed
   - your other services should block this group for authorization
+- **immortal user**:
+  - a user who is not automatically idlelocked or disabled
 - **disabled user**:
   - a user that we pretend does not exist
   - TODO user can disable their account in the GUI

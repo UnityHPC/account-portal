@@ -287,6 +287,7 @@ class UnityWebPortalTestCase extends TestCase
         "user10_org1_test" => ["user10@org1.test", "foo", "bar", "user10@org1.test"],
         "user11_org1_test" => ["user11@org1.test", "foo", "bar", "user11@org1.test"],
         "user12_org1_test" => ["user12@org1.test", "foo", "bar", "user12@org1.test"],
+        "user13_org1_test" => ["user13@org1.test", "foo", "bar", "user13@org1.test"],
         "user2001_org998_test" => ["user2001@org998.test", "foo", "bar", "user2001@org998.test"],
         "user2002_org998_test" => ["user2002@org998.test", "foo", "bar", "user2002@org998.test"],
         "user2003_org998_test" => ["user2003@org1.test", "foo", "bar", "user2001@org1.test"],
@@ -318,6 +319,7 @@ class UnityWebPortalTestCase extends TestCase
         "NonExistent" => "user2001_org998_test",
         "Normal" => "user4_org1_test",
         "NormalPI" => "user11_org1_test",
+        "ImmortalNotPI" => "user13_org1_test",
     ];
 
     private function validateUser(string $nickname)
@@ -394,6 +396,10 @@ class UnityWebPortalTestCase extends TestCase
                 // this cannot be validated automatically because the user is already idle
                 // unlocked before this code runs
                 // $this->assertTrue($USER->getFlag(UserFlag::IDLELOCKED));
+                break;
+            case "ImmortalNotPI":
+                $this->assertTrue($USER->getFlag(UserFlag::IMMORTAL));
+                $this->assertFalse($USER->getPIGroup()->exists());
                 break;
             case "Locked":
                 $this->assertTrue($USER->getFlag(UserFlag::LOCKED));
