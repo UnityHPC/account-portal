@@ -204,8 +204,7 @@ class UnitySQL
         return $stmt->fetchAll();
     }
 
-    /* for testing purposes */
-    private function setUserLastLogin(string $uid, int $timestamp): void
+    public function setUserLastLogin(string $uid, int $timestamp): void
     {
         $datetime = date("Y-m-d H:i:s", $timestamp);
         $table = self::TABLE_USER_LAST_LOGINS;
