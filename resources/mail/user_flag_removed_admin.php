@@ -1,4 +1,7 @@
-<?php use UnityWebPortal\lib\UserFlag; ?>
+<?php
+use UnityWebPortal\lib\UserFlag;
+use UnityWebPortal\lib\UnityHTTPD;
+?>
 <?php switch ($data["flag"]):
 case UserFlag::QUALIFIED: ?>
 <?php $this->Subject = "User Disqualified"; ?>
@@ -28,13 +31,9 @@ case UserFlag::QUALIFIED: ?>
 <?php break; ?>
 
 <?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
-<?php case UserFlag::ADMIN: ?>
-<?php $this->Subject = "User Demoted"; ?>
-<p>Hello,</p>
-<p>User "<?php echo $data["user"] ?>" has been demoted from admin. </p>
-<?php break; ?>
-
-<?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
 <?php default: ?>
-<?php throw new \Exception("unknown flag: " . $data["flag"]); ?>
+<?php
+UnityHTTPD::errorLog("email cancelled", sprintf("user flag '%s' has no template", $data["flag"]));
+$this->cancelled = true;
+?>
 <?php endswitch; ?>
