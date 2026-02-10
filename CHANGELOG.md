@@ -42,6 +42,7 @@ For details on the changes in each release, see [the Releases page](https://gith
   ```sql
   drop trigger update_last_logins;
   ```
+- `[api]keys` can now be specified in the config file
 
 ### 1.5 -> 1.6
 

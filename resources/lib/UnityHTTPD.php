@@ -420,4 +420,16 @@ class UnityHTTPD
         $token = htmlspecialchars(CSRFToken::generate());
         return "<input type='hidden' name='csrf_token' value='$token'>";
     }
+
+    public static function validateAPIKey(): void
+    {
+        $authorization = $_SERVER["HTTP_AUTHORIZATION"] ?? "";
+        if (!str_starts_with($authorization, "Bearer ")) {
+            self::badRequest("HTTP_AUTHORIZATION is not Bearer", "invalid HTTP_AUTHORIZATION");
+        }
+        $key = substr($authorization, strlen("Bearer "));
+        if (!in_array($key, CONFIG["api"]["keys"])) {
+            self::forbidden("API key not found in config", "forbidden");
+        }
+    }
 }
