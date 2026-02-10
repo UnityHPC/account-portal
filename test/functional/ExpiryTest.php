@@ -113,7 +113,7 @@ class ExpiryTest extends UnityWebPortalTestCase
             $output = $this->runExpiryWorker(idle_days: 8);
             $this->assertMatchesRegularExpression("/disabling user '$uid'/", $output);
             $this->assertTrue($user->getFlag(UserFlag::DISABLED));
-            if ($user->getPIGroup()->exists()) {
+            if ($is_pi) {
                 $this->assertTrue($user->getPIGroup()->getIsDisabled());
             }
             // 9 ///////////////////////////////////////////////////////////////////////////////////
@@ -133,6 +133,42 @@ class ExpiryTest extends UnityWebPortalTestCase
                 callPrivateMethod($SQL, "setUserLastLogin", $uid, $last_login_before);
             }
             callPrivateMethod($user, "setSSHKeys", $ssh_keys_before);
+        }
+    }
+
+    public function testExpiryIgnoresImmortal()
+    {
+        global $USER, $SQL;
+        $this->switchUser("ImmortalNotPI");
+        $ssh_keys_before = $USER->getSSHKeys();
+        $last_login_before = callPrivateMethod($SQL, "getUserLastLogin", $USER->uid);
+        $this->assertFalse($USER->getFlag(UserFlag::IDLELOCKED));
+        $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
+        // see deployment/overrides/phpunit/config/config.ini
+        $this->assertEquals(CONFIG["expiry"]["idlelock_warning_days"], [2, 3]);
+        $this->assertEquals(CONFIG["expiry"]["idlelock_day"], 4);
+        $this->assertEquals(CONFIG["expiry"]["disable_warning_days"], [6, 7]);
+        $this->assertEquals(CONFIG["expiry"]["disable_day"], 8);
+        try {
+            // set last login to one day after epoch
+            callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, 1 * 24 * 60 * 60);
+            foreach (range(1, 9) as $day) {
+                $output = $this->runExpiryWorker(idle_days: $day);
+                $this->assertEquals("", $output);
+            }
+            $this->assertFalse($USER->getFlag(UserFlag::IDLELOCKED));
+            $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
+        } finally {
+            $USER->setFlag(UserFlag::IDLELOCKED, false);
+            if ($USER->getFlag(UserFlag::DISABLED)) {
+                $USER->reEnable();
+            }
+            if ($last_login_before === null) {
+                callPrivateMethod($SQL, "removeUserLastLogin", $USER->uid);
+            } else {
+                callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, $last_login_before);
+            }
+            callPrivateMethod($USER, "setSSHKeys", $ssh_keys_before);
         }
     }
 

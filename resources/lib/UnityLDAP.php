@@ -12,6 +12,7 @@ enum UserFlag: string
     case ADMIN = "admin";
     case DISABLED = "disabled";
     case IDLELOCKED = "idlelocked";
+    case IMMORTAL = "immortal";
     case LOCKED = "locked";
     case QUALIFIED = "qualified";
 }
