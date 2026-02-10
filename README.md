@@ -156,6 +156,7 @@ rm "$prod" && ln -s "$old" "$prod"
   - `disable_warning_days`: list of day numbers when a user will get an email warning that their account will be disabled
   - `disable_day`: day number when a user will be disabled
   - a "day number" starts counting from the last day that a user logged in, so on day 5, the user last logged in 5 days ago
+- `[api]keys` can now be specified in the config file
 
 ### 1.5 -> 1.6
 
