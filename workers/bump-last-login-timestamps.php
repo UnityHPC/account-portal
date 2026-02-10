@@ -6,8 +6,8 @@ use Garden\Cli\Cli;
 
 $cli = new Cli();
 $cli->description("clamp all last login dates to a minimum timestamp")
-    ->opt("dry-run", "Print changes without actually changing anything.", false, "boolean")
-    ->opt("date", "YYYY/MM/DD", true);
+    ->arg("date", "YYYY/MM/DD", true)
+    ->opt("dry-run", "Print changes without actually changing anything.", false, "boolean");
 $args = $cli->parse($argv, true);
 
 $threshold = strtotime($args["date"]);
