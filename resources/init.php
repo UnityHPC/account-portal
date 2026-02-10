@@ -15,9 +15,6 @@ use UnityWebPortal\lib\UnityWebhook;
 use UnityWebPortal\lib\UnityGithub;
 use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnityHTTPD;
-use UnityWebPortal\lib\UnityConfig;
-
-UnityConfig::validateConfig(CONFIG);
 
 if (CONFIG["site"]["enable_exception_handler"]) {
     set_exception_handler(["UnityWebPortal\lib\UnityHTTPD", "exceptionHandler"]);

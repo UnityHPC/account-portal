@@ -31,6 +31,7 @@ repos:
               vendor/.*|
               resources/templates/.*|
               resources/mail/.*|
+              resources/config\.php|
               webroot/.*|
           )$
       - id: phpcbf-impure
@@ -102,6 +103,7 @@ repos:
               vendor/.*|
               resources/templates/.*|
               resources/mail/.*|
+              resources/config\.php|
               webroot/.*|
           )$
       - id: phpcs-impure
