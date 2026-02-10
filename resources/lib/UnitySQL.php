@@ -188,7 +188,6 @@ class UnitySQL
         $stmt->execute();
     }
 
-    /* for testing purposes */
     public function getUserLastLogin(string $uid): ?int
     {
         $table = self::TABLE_USER_LAST_LOGINS;
