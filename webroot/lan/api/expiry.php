@@ -9,8 +9,8 @@ $last_login = $SQL->getUserLastLogin($uid);
 if ($last_login === null) {
     UnityHTTPD::badRequest("no last login timestamp known for user '$uid'");
 }
-$idlelock_day = $last_login + CONFIG["expiry"]["idlelock_day"] * 60 * 60 * 24;
-$disable_day = $last_login + CONFIG["expiry"]["disable_day"] * 60 * 60 * 24;
-$idlelock_day_str = date("Y/m/d", $idlelock_day);
-$disable_day_str = date("Y/m/d", $disable_day);
-echo _json_encode(["uid" => $uid, "idlelock_day" => $idlelock_day_str, "disable_day" => $disable_day_str]);
+$idlelock_timestamp = $last_login + CONFIG["expiry"]["idlelock_day"] * 60 * 60 * 24;
+$disable_timestamp = $last_login + CONFIG["expiry"]["disable_day"] * 60 * 60 * 24;
+$idlelock_date = date("Y/m/d", $idlelock_timestamp);
+$disable_date = date("Y/m/d", $disable_timestamp);
+echo _json_encode(["uid" => $uid, "idlelock_day" => $idlelock_date, "disable_day" => $disable_date]);
