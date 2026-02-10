@@ -14,7 +14,7 @@ $threshold = strtotime($args->getArg("date"));
 
 foreach ($SQL->getAllUserLastLogins() as $last_login) {
     $uid = $last_login["operator"];
-    $timestamp = $last_login["last_login"];
+    $timestamp = strtotime($last_login["last_login"]);
     if ($timestamp < $threshold) {
         echo "bumping last login date of user '$uid'\n";
         if (!$args["dry-run"]) {

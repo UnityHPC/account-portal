@@ -16,7 +16,7 @@ $threshold = strtotime($args["date"]);
 $changed = false;
 foreach ($SQL->getAllUserLastLogins() as $last_login) {
     $uid = $last_login["operator"];
-    $timestamp = $last_login["last_login"];
+    $timestamp = strtotime($last_login["last_login"]);
     if ($timestamp < $threshold) {
         echo "idlelocking user '$uid'\n";
         $changed = true;
