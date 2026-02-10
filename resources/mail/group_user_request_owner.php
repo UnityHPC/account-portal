@@ -21,4 +21,4 @@ The details of the user are below:
 </p>
 
 <p>You can approve or deny this user on the
-    <?php echo getHyperlink("my users", "panel/pi.php?gid=${data['group']}"); ?> page</p>
+    <?php echo getHyperlink("my users", "panel/pi.php?gid=$data[group]"); ?> page</p>
