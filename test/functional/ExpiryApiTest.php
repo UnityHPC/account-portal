@@ -4,22 +4,22 @@ class ExpiryApiTest extends UnityWebPortalTestCase
 {
     public function testExpiryAPI()
     {
-        global $USER;
+        global $USER, $SQL;
 
         $this->switchUser("Normal");
-        $expected_idlelock_timestamp = time() + CONFIG["expiry"]["idlelock_day"] * 24 * 60 * 60;
-        $expected_disable_timestamp = time() + CONFIG["expiry"]["disable_day"] * 24 * 60 * 60;
-        $expected_idlelock_day = date("Y/m/d", $expected_idlelock_timestamp);
-        $expected_disable_day = date("Y/m/d", $expected_disable_timestamp);
+        // set last login to one day after epoch
+        callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, 1 * 24 * 60 * 60);
+        $this->assertEquals(CONFIG["expiry"]["idlelock_day"], 4);
+        $this->assertEquals(CONFIG["expiry"]["disable_day"], 8);
         $output_str = http_get(__DIR__ . "/../../webroot/lan/api/expiry.php", [
             "uid" => $USER->uid,
         ]);
         $output_data = _json_decode($output_str, associative: true);
-        $this->assertEqualsCanonicalizing(
+        $this->assertEquals(
             [
                 "uid" => $USER->uid,
-                "idlelock_day" => $expected_idlelock_day,
-                "disable_day" => $expected_disable_day,
+                "idlelock_day" => "1970/01/05",
+                "disable_day" => "1970/01/09",
             ],
             $output_data,
         );
