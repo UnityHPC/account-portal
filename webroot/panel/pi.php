@@ -12,7 +12,7 @@ if (($gid = $_GET["gid"] ?? null) !== null) {
     if (!$group->exists()) {
         UnityHTTPD::badRequest("no such group: '$gid'", "This group does not exist.");
     }
-    if (!in_array($USER->uid, $group->getManagerUIDs())) {
+    if (!in_array($USER->uid, $group->getManagerUIDs()) && $USER->uid != $group->getOwner()->uid) {
         UnityHTTPD::forbidden("not a manager of group '$gid'", "You cannot manage this group.");
     }
 } else {
