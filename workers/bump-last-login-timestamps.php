@@ -10,7 +10,7 @@ $cli->description("clamp all last login dates to a minimum timestamp")
     ->opt("dry-run", "Print changes without actually changing anything.", false, "boolean");
 $args = $cli->parse($argv, true);
 
-$threshold = strtotime($args["date"]);
+$threshold = strtotime($args->getArg("date"));
 
 foreach ($SQL->getAllUserLastLogins() as $last_login) {
     $uid = $last_login["operator"];
