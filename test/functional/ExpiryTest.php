@@ -113,6 +113,7 @@ class ExpiryTest extends UnityWebPortalTestCase
             $output = $this->runExpiryWorker(idle_days: 8);
             $this->assertMatchesRegularExpression("/disabling user '$uid'/", $output);
             $this->assertTrue($user->getFlag(UserFlag::DISABLED));
+            $this->assertEmpty($user->getSSHKeys());
             if ($is_pi) {
                 $this->assertTrue($user->getPIGroup()->getIsDisabled());
             }
@@ -158,6 +159,7 @@ class ExpiryTest extends UnityWebPortalTestCase
             }
             $this->assertFalse($USER->getFlag(UserFlag::IDLELOCKED));
             $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
+            $this->assertEqualsCanonicalizing($ssh_keys_before, $USER->getSSHKeys());
         } finally {
             $USER->setFlag(UserFlag::IDLELOCKED, false);
             if ($USER->getFlag(UserFlag::DISABLED)) {
