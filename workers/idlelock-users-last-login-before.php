@@ -11,12 +11,16 @@ $cli->description("idlelock all users with a last login timestamp before a given
 $args = $cli->parse($argv, true);
 
 $idlelocked_users = $LDAP->userFlagGroups["idlelocked"]->getMemberUIDs();
+$immortal_users = $LDAP->userFlagGroups["immortal"]->getMemberUIDs();
 $threshold = strtotime($args["date"]);
 
 $changed = false;
 foreach ($SQL->getAllUserLastLogins() as $last_login) {
     $uid = $last_login["operator"];
     $timestamp = strtotime($last_login["last_login"]);
+    if (in_array($uid, $immortal_users)) {
+        continue;
+    }
     if ($timestamp < $threshold) {
         echo "idlelocking user '$uid'\n";
         $changed = true;
