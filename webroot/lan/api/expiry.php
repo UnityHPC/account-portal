@@ -14,5 +14,5 @@ $disable_timestamp = $last_login + CONFIG["expiry"]["disable_day"] * 60 * 60 * 2
 $idlelock_date = date("Y/m/d", $idlelock_timestamp);
 $disable_date = date("Y/m/d", $disable_timestamp);
 echo _json_encode(
-    ["uid" => $uid, "idlelock_date" => $idlelock_timestamp, "disable_date" => $disable_timestamp]
+    ["uid" => $uid, "idlelock_date" => $idlelock_date, "disable_date" => $disable_date]
 );
