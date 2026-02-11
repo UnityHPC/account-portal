@@ -151,7 +151,12 @@ class UnityLDAP extends LDAPConn
             }
         }
         $output_map = [];
-        foreach ($output as [$uid, $uidNumber_str]) {
+        foreach ($output as $i => $row) {
+            $num_columns = count($row);
+            if ($num_columns !== 2) {
+                throw new \Exception("row number $i has $num_columns columns, expected 2 columns");
+            }
+            [$uid, $uidNumber_str] = $row;
             if ($uidNumber_str === null) {
                 throw new RuntimeException("uidNumber_str is null");
             }
