@@ -262,6 +262,14 @@ function _fopen(
     return $output;
 }
 
+function _fclose(mixed $handle): void
+{
+    $output = fclose($handle);
+    if ($output === false) {
+        throw new \Exception("fclose returned false!");
+    }
+}
+
 /** @throws Exception */
 function _ob_get_clean(): string
 {

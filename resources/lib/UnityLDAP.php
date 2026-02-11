@@ -136,8 +136,12 @@ class UnityLDAP extends LDAPConn
             }
             if ($fileinfo->getExtension() == "csv") {
                 $handle = _fopen($fileinfo->getPathname(), "r");
-                while (($row = fgetcsv($handle, null, ",")) !== false) {
-                    array_push($output, $row);
+                try {
+                    while (($row = fgetcsv($handle, null, ",")) !== false) {
+                        array_push($output, $row);
+                    }
+                } finally {
+                    _fclose($handle);
                 }
             } else {
                 UnityHTTPD::errorLog(

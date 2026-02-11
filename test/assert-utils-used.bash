@@ -16,6 +16,7 @@ declare -A utils=(
     ["preg_match"]="_preg_match"
     ["parse_ini_file"]="_parse_ini_file"
     ["fopen"]="_fopen"
+    ["fclose"]="_fclose"
     ["ob_get_clean"]="_ob_get_clean"
 )
 
