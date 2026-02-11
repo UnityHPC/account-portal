@@ -281,3 +281,12 @@ function _curl_exec(CurlHandle $handle): string
     }
     return $output;
 }
+
+/** @param mixed[] $x */
+function _array_last(array $x): mixed
+{
+    if (count($x) === 0) {
+        throw new Exception("cannot get the last element of an empty array");
+    }
+    return $x[array_key_last($x)];
+}
