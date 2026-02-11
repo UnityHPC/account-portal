@@ -289,7 +289,12 @@ echo "
             $CSRFTokenHiddenFormInput
             <input type='hidden' name='form_type' value='disable'>
 ";
-if ($hasGroups) {
+if ($isPI) {
+    echo "
+        <input type='submit' value='Disable Account' class='danger' disabled>
+        <p>You must first disable your PI group before you can disable your account.</p>
+    ";
+} elseif ($hasGroups) {
     echo "
         <input type='submit' value='Disable Account' class='danger' disabled>
         <p>You cannot disable your account while you are in a PI group.</p>
