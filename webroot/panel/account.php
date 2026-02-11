@@ -114,11 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 UnityHTTPD::redirect();
             }
             if ($USER->getFlag(UserFlag::DISABLED)) {
-                UnityHTTPD::messageError(
-                    "Cannot Disable",
-                    "You have already requested this"
-                );
-                UnityHTTPD::redirect();
+                UnityHTTPD::badRequest("user is already disabled", "");
             }
             $USER->disable();
             UnityHTTPD::messageSuccess("Account Disabled", "");
