@@ -378,39 +378,6 @@ class UnityUser
     }
 
     /**
-     * Sends an email to admins about account deletion request
-     * and also adds it to a table in the database
-     */
-    public function requestAccountDeletion(): void
-    {
-        $this->SQL->deleteRequestsByUser($this->uid);
-        $this->SQL->addAccountDeletionRequest($this->uid);
-        $this->MAILER->sendMail("admin", "account_deletion_request_admin", [
-            "user" => $this->uid,
-            "name" => $this->getFullname(),
-            "email" => $this->getMail(),
-        ]);
-    }
-
-    public function cancelRequestAccountDeletion(): void
-    {
-        $this->SQL->deleteAccountDeletionRequest($this->uid);
-        $this->MAILER->sendMail("admin", "account_deletion_request_cancelled_admin", [
-            "user" => $this->uid,
-            "name" => $this->getFullname(),
-            "email" => $this->getMail(),
-        ]);
-    }
-
-    /**
-     * Checks if the user has requested account deletion
-     */
-    public function hasRequestedAccountDeletion(): bool
-    {
-        return $this->SQL->accDeletionRequestExists($this->uid);
-    }
-
-    /**
      * Checks whether a user is in a group or not
      */
     public function isInGroup(string $uid, UnityGroup $group): bool

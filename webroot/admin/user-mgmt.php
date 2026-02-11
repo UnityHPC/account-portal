@@ -65,11 +65,7 @@ $flags_to_display = array_filter(UserFlag::cases(), fn($x) => $x !== UserFlag::D
         if (in_array($uid, $users_with_flags[UserFlag::DISABLED->value])) {
             continue;
         }
-        if ($SQL->accDeletionRequestExists($uid)) {
-            echo "<tr style='color:#555555; font-style: italic'>";
-        } else {
-            echo "<tr>";
-        }
+        echo "<tr>";
         echo "<td>" . $attributes["gecos"][0] . "</td>";
         echo "<td>" . $uid . "</td>";
         echo "<td>" . $attributes["o"][0] . "</td>";

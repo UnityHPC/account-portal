@@ -105,35 +105,23 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             UnityHTTPD::messageSuccess("PI Request Cancelled", "");
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
-        case "account_deletion_request":
+        case "disable":
             if ($hasGroups) {
                 UnityHTTPD::messageError(
-                    "Cannot Request Account Deletion",
+                    "Cannot Disable",
                     "You are a PI or you are a member of at least one PI group"
                 );
                 UnityHTTPD::redirect();
             }
-            if ($SQL->accDeletionRequestExists($USER->uid)) {
+            if ($USER->getFlag(UserFlag::DISABLED)) {
                 UnityHTTPD::messageError(
-                    "Cannot Request Account Deletion",
+                    "Cannot Disable",
                     "You have already requested this"
                 );
                 UnityHTTPD::redirect();
             }
-            $USER->requestAccountDeletion();
-            UnityHTTPD::messageSuccess("Account Deletion Requested", "");
-            UnityHTTPD::redirect();
-            break; /** @phpstan-ignore deadCode.unreachable */
-        case "cancel_account_deletion_request":
-            if (!$SQL->accDeletionRequestExists($USER->uid)) {
-                UnityHTTPD::messageError(
-                    "Cannot Cancel Account Deletion Request",
-                    "No account deletion request found"
-                );
-                UnityHTTPD::redirect();
-            }
-            $USER->cancelRequestAccountDeletion();
-            UnityHTTPD::messageSuccess("Account Deletion Request Cancelled", "");
+            $USER->disable();
+            UnityHTTPD::messageSuccess("Account Disabled", "");
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
     }
@@ -208,43 +196,34 @@ if (!$isPI) {
         >
     ";
     echo $CSRFTokenHiddenFormInput;
-    if ($SQL->accDeletionRequestExists($USER->uid)) {
-        echo "<input type='submit' value='Request PI Account' disabled />";
+    if ($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI)) {
+        $onclick = "return confirm(\"Are you sure you want to cancel this request?\")";
+        echo "<input type='submit' value='Cancel PI Account Request' onclick='$onclick'/>";
         echo "
             <label style='margin-left: 10px'>
-                You cannot request PI Account while you have requested account deletion.
+                Your request has been submitted and is currently pending
             </label>
+            <input type='hidden' name='form_type' value='cancel_pi_request'/>
         ";
     } else {
-        if ($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI)) {
-            $onclick = "return confirm(\"Are you sure you want to cancel this request?\")";
-            echo "<input type='submit' value='Cancel PI Account Request' onclick='$onclick'/>";
-            echo "
-                <label style='margin-left: 10px'>
-                    Your request has been submitted and is currently pending
-                </label>
-               <input type='hidden' name='form_type' value='cancel_pi_request'/>
-            ";
-        } else {
-            $onclick = "return confirm(\"Are you sure you want to request a PI account?\")";
-            $tos_url = CONFIG["site"]["terms_of_service_url"];
-            $account_policy_url = CONFIG["site"]["account_policy_url"];
-            echo "
-                <label>
-                    <input type='checkbox' name='confirm_pi' value='agree' required>
-                    I have read the PI
-                    <a target='_blank' href='$account_policy_url'> account policy</a> guidelines.
-                </label>
-                <br>
-                <label><input type='checkbox' name='tos' value='agree' required>
-                    I have read and accept the
-                    <a target='_blank' href='$tos_url'>Terms of Service</a>.
-                </label>
-                <br>
-                <input type='hidden' name='form_type' value='pi_request'/>
-                <input type='submit' value='Request a PI Group' onclick='$onclick'/>
-            ";
-        }
+        $onclick = "return confirm(\"Are you sure you want to request a PI account?\")";
+        $tos_url = CONFIG["site"]["terms_of_service_url"];
+        $account_policy_url = CONFIG["site"]["account_policy_url"];
+        echo "
+            <label>
+                <input type='checkbox' name='confirm_pi' value='agree' required>
+                I have read the PI
+                <a target='_blank' href='$account_policy_url'> account policy</a> guidelines.
+            </label>
+            <br>
+            <label><input type='checkbox' name='tos' value='agree' required>
+                I have read and accept the
+                <a target='_blank' href='$tos_url'>Terms of Service</a>.
+            </label>
+            <br>
+            <input type='hidden' name='form_type' value='pi_request'/>
+            <input type='submit' value='Request a PI Group' onclick='$onclick'/>
+        ";
     }
     echo "</form>";
 }
@@ -298,36 +277,17 @@ echo "
 if ($hasGroups) {
     echo "<p>You cannot request to delete your account while you are in a PI group.</p>";
 } else {
-    if ($SQL->accDeletionRequestExists($USER->uid)) {
-        echo "
-            <p>Your request has been submitted and is currently pending.</p>
-            <form
-                action=''
-                method='POST'
-                onsubmit='
-                    return confirm(
-                        \"Are you sure you want to cancel your request for account deletion?\"
-                    )
-                '
-            >
-                $CSRFTokenHiddenFormInput
-                <input type='hidden' name='form_type' value='cancel_account_deletion_request' />
-                <input type='submit' value='Cancel Account Deletion Request' />
-            </form>
-        ";
-    } else {
-        echo "
-            <form
-                action=''
-                method='POST'
-                onsubmit='return confirm(\"Are you sure you want to request an account deletion?\")'
-            >
-                $CSRFTokenHiddenFormInput
-                <input type='hidden' name='form_type' value='account_deletion_request' />
-                <input type='submit' value='Request Account Deletion' />
-            </form>
-        ";
-    }
+    echo "
+        <form
+            action=''
+            method='POST'
+            onsubmit='return confirm(\"Are you sure you want to disable your account?\")'
+        >
+            $CSRFTokenHiddenFormInput
+            <input type='hidden' name='form_type' value='disable' />
+            <input type='submit' value='Disable Account' />
+        </form>
+    ";
 }
 
 ?>

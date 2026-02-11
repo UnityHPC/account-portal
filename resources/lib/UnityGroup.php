@@ -43,9 +43,6 @@ class UnityGroup extends PosixGroup
         if ($this->exists() && !$this->getIsDisabled()) {
             return;
         }
-        if ($this->SQL->accDeletionRequestExists($this->getOwner()->uid)) {
-            return;
-        }
         $context = [
             "user" => $this->getOwner()->uid,
             "org" => $this->getOwner()->getOrg(),
@@ -288,9 +285,6 @@ class UnityGroup extends PosixGroup
         if ($this->requestExists($new_user)) {
             UnityHTTPD::errorLog("warning", "user '$new_user' already requested group membership");
             return;
-        }
-        if ($this->SQL->accDeletionRequestExists($new_user->uid)) {
-            throw new Exception("user '$new_user' requested account deletion");
         }
         $this->addRequest($new_user->uid);
         if ($send_mail) {

@@ -14,7 +14,7 @@ class WorkerRemoveUsersFromGroupTest extends UnityWebPortalTestCase
         $this->assertEqualsCanonicalizing([$pi->uid], $pi_group->getMemberUIDs());
         $this->assertEqualsCanonicalizing([$pi->uid], $pi_group->getMemberUIDs());
         $this->assertEqualsCanonicalizing([], $pi_group->getRequests());
-        $uids = getSomeUIDsOfQualifiedUsersNotRequestedAccountDeletion();
+        $uids = getSomeUIDsOfQualifiedUsers();
         $uids_to_remove = array_slice($uids, 0, 3);
         $expected_new_uids = array_diff(array_merge([$pi->uid], $uids), $uids_to_remove);
         $remove_uids_file = writeLinesToTmpFile($uids_to_remove);
