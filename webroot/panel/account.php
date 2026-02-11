@@ -265,31 +265,53 @@ echo "
 foreach (CONFIG["loginshell"]["shell"] as $shell) {
     echo "<option>$shell</option>";
 }
+
 echo "
       </select>
       <br>
       <input id='submitLoginShell' type='submit' value='Set Login Shell' />
     </form>
     <hr>
-    <h2>Account Deletion</h2>
-";
-
-if ($hasGroups) {
-    echo "<p>You cannot request to delete your account while you are in a PI group.</p>";
-} else {
-    echo "
+    <h2>Danger Zone</h2>
+    <div style='display: flex; flex-direction: row; align-items: center;'>
+        <p>
+            <strong>Disable Account</strong>
+            <br>
+            You will lose access to UnityHPC Platform services
+            and your home directory will be permanently deleted.
+            Your account can later be re-enabled.
+        </p>
         <form
             action=''
             method='POST'
-            onsubmit='return confirm(\"Are you sure you want to disable your account?\")'
+            onsubmit='return confirm(\"🚨 Are you sure you want to DISABLE your account? 🚨\")'
         >
             $CSRFTokenHiddenFormInput
-            <input type='hidden' name='form_type' value='disable' />
-            <input type='submit' value='Disable Account' />
-        </form>
+            <input type='hidden' name='form_type' value='disable'>
+";
+if ($hasGroups) {
+    echo "
+        <input type='submit' value='Disable Account' class='danger' disabled>
+        <p>You cannot disable your account while you are in a PI group.</p>
+    ";
+} else {
+    echo "
+        <input type='submit' value='Disable Account' class='danger'>
     ";
 }
-
+echo "</form></div>";
+// $support = CONFIG["mail"]["support"];
+// echo "
+//         </form>
+//     </div>
+//     <p>
+//         <strong>Request Account Deletion</strong>
+//         <br>
+//         If you wish for all non-essential personal information to be redacted,
+//         send us an email at <a href='mailto:$support'>$support</a>.
+//         This cannot be undone.
+//     </p>
+// ";
 ?>
 
 <script>
