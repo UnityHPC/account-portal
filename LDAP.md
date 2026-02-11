@@ -1,39 +1,54 @@
 Terminology:
-- **UID**: in Unix, this would be "username", but we use LDAP terminology
+
+- **UID**:
+  - in Unix, this would be "username", but we use LDAP terminology
   - by default our UIDs are based on [the EPPN attribute](https://spaces.at.internet2.edu/spaces/federation/pages/181634464/user-attr-eppn)
-- **GID**: in Unix, this would be "group name", but we use LDAP terminology
+- **GID**:
+  - in Unix, this would be "group name", but we use LDAP terminology
   - every user gets their own group with a group name equal to their username
     - see [User Private Groups](https://wiki.debian.org/UserPrivateGroups)
-- **UID number**: in Unix, this would be "UID", but we use LDAP terminology
+- **UID number**:
+  - in Unix, this would be "UID", but we use LDAP terminology
   - all users created by the account portal have equal UID numbers and GID numbers
   - see `custom_user_mappings`
-- **GID number**: in Unix, this would be "GID", but we use LDAP terminology
+- **GID number**:
+  - in Unix, this would be "GID", but we use LDAP terminology
   - all users created by the account portal have equal UID numbers and GID numbers
   - see `custom_user_mappings`
-- **qualified user**: a user who is currently a PI or a member of at least one PI group
+- **qualified user**:
+  - a user who is currently a PI or a member of at least one PI group
   - your other services should require this group for authorization
-- **unqualified user**: inverse of qualified
-- **native user**: a user whose entries exist in the OUs given in `config.ini`
-- **non-native user**: inverse of native
+- **unqualified user**:
+  - inverse of qualified
+- **native user**:
+  - a user whose entries exist in the OUs given in `config.ini`
+- **non-native user**:
+  - inverse of native
   - users created for administrative purposes should not be mixed with native users in the LDAP OUs given in `config.ini` or else this account portal may get confused
-- **locked user**: a user who has been manually denied access to your services by an admin
+- **locked user**:
+  - a user who has been manually denied access to your services by an admin
   - this account portal gives HTTP 403 permission denied for these users on any page where httpd has authentication
   - your other services should block this group for authorization
-- **idlelocked user**: a user who has been inactive for so long that they lose access to your services
+- **idlelocked user**:
+  - a user who has been inactive for so long that they lose access to your services
   - as soon as they log in to this account portal, this flag is removed
   - your other services should block this group for authorization
-- **disabled user**: a user that we pretend does not exist
+- **disabled user**:
+  - a user that we pretend does not exist
   - TODO user can disable their account in the GUI
   - TODO if a user is inactive for too long, they expire and become disabled
   - `sshpublickey` attribute should be empty
   - your other services should block this group for authorization
   - if you have any integrations (ex: creating home directories), they should take care to ignore these users
-- **disabled group**: a PI group that we pretend does not exist
+- **disabled group**:
+  - a PI group that we pretend does not exist
   - owner can disable their group in the GUI, admin can disable any group in the GUI
   - if the owner is disabled, their group is also disabled
   - `memberuid` attribute should be empty
   - if you have any integrations (ex: updating slurm account DB), they should take care to ignore these PI groups
-- **association**: a user is _associated_ with a PI group (and vice versa) if they are the owner, a member, or a manager
-- **manager**: a user who has been granted authority over a PI group
+- **association**:
+  - a user is _associated_ with a PI group (and vice versa) if they are the owner, a member, or a manager
+- **manager**:
+  - a user who has been granted authority over a PI group
   - a manager must also be a member
   - TODO there is no GUI for a PI to promote a user to manager, only an admin can do it
