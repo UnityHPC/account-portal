@@ -57,7 +57,7 @@ class UnityDeployment
         $dir = new \DirectoryIterator(self::getCustomIDMappingsDirPath());
         foreach ($dir as $fileinfo) {
             $filename = $fileinfo->getFilename();
-            if ($fileinfo->isDot() || $filename == "README.md") {
+            if ($fileinfo->isDot()) {
                 continue;
             }
             if ($fileinfo->getExtension() == "csv") {
