@@ -13,6 +13,7 @@ class UnityConfig
         $CONFIG = self::pullConfig($CONFIG, $deploy_loc);
         if (array_key_exists("HTTP_HOST", $_SERVER)) {
             $cur_url = $_SERVER["HTTP_HOST"];
+            self::assertHttpHostValid($cur_url);
             $url_override_path = $deploy_loc . "/overrides/" . $cur_url;
             if (is_dir($url_override_path)) {
                 $CONFIG = self::pullConfig($CONFIG, $url_override_path);
@@ -75,6 +76,16 @@ class UnityConfig
         $idlelock_day = CONFIG["expiry"]["idlelock_day"];
         $disable_warning_days = CONFIG["expiry"]["disable_warning_days"];
         $disable_day = CONFIG["expiry"]["disable_day"];
+        if (count($idlelock_warning_days) === 0) {
+            throw new InvalidConfigurationException(
+                '$CONFIG["expiry"]["idlelock_warning_days"] must not be empty!',
+            );
+        }
+        if (count($disable_warning_days) === 0) {
+            throw new InvalidConfigurationException(
+                '$CONFIG["expiry"]["disable_warning_days"] must not be empty!',
+            );
+        }
         if (!self::doesArrayHaveOnlyIntegerValues($idlelock_warning_days)) {
             throw new InvalidConfigurationException(
                 '$CONFIG["expiry"]["idlelock_warning_days"] must be a list of integers!',
@@ -96,9 +107,8 @@ class UnityConfig
             );
         }
 
-        $final_disable_warning_day = $disable_warning_days[array_key_last($disable_warning_days)];
-        $final_idlelock_warning_day =
-            $idlelock_warning_days[array_key_last($idlelock_warning_days)];
+        $final_disable_warning_day = _array_last($disable_warning_days);
+        $final_idlelock_warning_day = _array_last($idlelock_warning_days);
         if ($disable_day <= $final_disable_warning_day) {
             throw new InvalidConfigurationException(
                 "disable day must be greater than the last disable warning day",
@@ -113,6 +123,13 @@ class UnityConfig
             throw new InvalidConfigurationException(
                 "disable day must be greater than idlelock day",
             );
+        }
+    }
+
+    private static function assertHttpHostValid(string $host): void
+    {
+        if (!_preg_match("/^[a-zA-Z0-9._-]+$/", $host)) {
+            throw new \Exception("HTTP_HOST '$host' contains invalid characters!");
         }
     }
 }

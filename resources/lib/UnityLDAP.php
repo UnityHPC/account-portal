@@ -136,8 +136,12 @@ class UnityLDAP extends LDAPConn
             }
             if ($fileinfo->getExtension() == "csv") {
                 $handle = _fopen($fileinfo->getPathname(), "r");
-                while (($row = fgetcsv($handle, null, ",")) !== false) {
-                    array_push($output, $row);
+                try {
+                    while (($row = fgetcsv($handle, null, ",")) !== false) {
+                        array_push($output, $row);
+                    }
+                } finally {
+                    _fclose($handle);
                 }
             } else {
                 UnityHTTPD::errorLog(
@@ -147,7 +151,18 @@ class UnityLDAP extends LDAPConn
             }
         }
         $output_map = [];
-        foreach ($output as [$uid, $uidNumber_str]) {
+        foreach ($output as $i => $row) {
+            $num_columns = count($row);
+            if ($num_columns !== 2) {
+                throw new \Exception(
+                    sprintf(
+                        "custom user mapping %s has %s columns, expected 2 columns",
+                        _json_encode($row),
+                        $num_columns,
+                    ),
+                );
+            }
+            [$uid, $uidNumber_str] = $row;
             if ($uidNumber_str === null) {
                 throw new RuntimeException("uidNumber_str is null");
             }

@@ -262,6 +262,14 @@ function _fopen(
     return $output;
 }
 
+function _fclose(mixed $handle): void
+{
+    $output = fclose($handle);
+    if ($output === false) {
+        throw new \Exception("fclose returned false!");
+    }
+}
+
 /** @throws Exception */
 function _ob_get_clean(): string
 {
@@ -280,4 +288,13 @@ function _curl_exec(CurlHandle $handle): string
         throw new CurlException(curl_error($handle));
     }
     return $output;
+}
+
+/** @param mixed[] $x */
+function _array_last(array $x): mixed
+{
+    if (count($x) === 0) {
+        throw new Exception("cannot get the last element of an empty array");
+    }
+    return $x[array_key_last($x)];
 }
