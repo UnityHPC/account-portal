@@ -83,7 +83,7 @@ class UnityConfig
         }
         if (count($disable_warning_days) === 0) {
             throw new InvalidConfigurationException(
-                '$CONFIG["expiry"]["idlelock_warning_days"] must not be empty!',
+                '$CONFIG["expiry"]["disable_warning_days"] must not be empty!',
             );
         }
         if (!self::doesArrayHaveOnlyIntegerValues($idlelock_warning_days)) {
