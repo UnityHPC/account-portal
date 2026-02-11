@@ -18,14 +18,17 @@ if (!$group->exists()) {
     _die("No such group '$gid'\n", 1);
 }
 $handle = _fopen($filename, "r");
-while (($line = fgets($handle)) !== false) {
-    $uid = trim($line);
-    $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
-    if (!$group->memberUIDExists($user->uid)) {
-        print "Skipping '$uid' who doesn't appear to be in '$gid'\n";
-        continue;
+try {
+    while (($line = fgets($handle)) !== false) {
+        $uid = trim($line);
+        $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+        if (!$group->memberUIDExists($user->uid)) {
+            print "Skipping '$uid' who doesn't appear to be in '$gid'\n";
+            continue;
+        }
+        $group->removeUser($user);
     }
-    $group->removeUser($user);
+} finally {
+    _fclose($handle);
 }
-fclose($handle);
 
