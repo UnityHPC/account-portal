@@ -18,6 +18,7 @@
   `resources/**/*.php` should throw exceptions instead.
 - all pages under `webroot/admin/` must check for `$USER->getFlag(UserFlag::ADMIN)` and call `UnityHTTPD::forbidden()` if not admin.
 - All these conventions should be enforced with `pre-commit` / github CI if possible
+- If an HTML button or `input[type="submit"]` is disabled, it should have a `title` explaining why, or a `<label>` or some other nearby text
 
 ## Development Environment
 
