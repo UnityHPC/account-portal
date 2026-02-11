@@ -4,6 +4,7 @@ require_once __DIR__ . "/../../resources/autoload.php";
 
 use UnityWebPortal\lib\UnityHTTPD;
 use UnityWebPortal\lib\UserFlag;
+use UnityWebPortal\lib\UnityDeployment;
 
 if ($USER->exists() && (!$USER->getFlag(UserFlag::DISABLED))) {
     UnityHTTPD::redirect(getURL("panel/account.php"));
@@ -21,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     // header.php will redirect to this same page again and then this page will redirect to account
 }
-require getTemplatePath("header.php");
+require UnityDeployment::getTemplatePath("header.php");
 $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 ?>
 
@@ -41,4 +42,4 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
     <?php echo $CSRFTokenHiddenFormInput; ?>
     <input type='submit' value='Register'>
 </form>
-<?php require getTemplatePath("footer.php"); ?>
+<?php require UnityDeployment::getTemplatePath("footer.php"); ?>

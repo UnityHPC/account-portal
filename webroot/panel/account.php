@@ -8,6 +8,7 @@ use UnityWebPortal\lib\exceptions\EncodingUnknownException;
 use UnityWebPortal\lib\exceptions\EncodingConversionException;
 use UnityWebPortal\lib\exceptions\ArrayKeyException;
 use UnityWebPortal\lib\UnitySQL;
+use UnityWebPortal\lib\UnityDeployment;
 
 $hasGroups = count($USER->getPIGroupGIDs()) > 0;
 
@@ -139,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
 }
 
-require getTemplatePath("header.php");
+require UnityDeployment::getTemplatePath("header.php");
 $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 
 $uid = $USER->uid;
@@ -386,4 +387,4 @@ if ($hasGroups) {
     }
 </style>
 
-<?php require getTemplatePath("footer.php"); ?>
+<?php require UnityDeployment::getTemplatePath("footer.php"); ?>
