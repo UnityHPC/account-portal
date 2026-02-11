@@ -60,19 +60,6 @@ CREATE TABLE user_last_logins (
    last_login TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
-DELIMITER //
-CREATE TRIGGER update_last_login
-AFTER INSERT ON audit_log
-FOR EACH ROW
-BEGIN
-   IF NEW.action_type = 'user_login' THEN
-       INSERT INTO user_last_logins (operator, last_login)
-       VALUES (NEW.operator, NEW.timestamp)
-       ON DUPLICATE KEY UPDATE last_login = NEW.timestamp;
-   END IF;
-END;//
-DELIMITER ;
-
 -- --------------------------------------------------------
 
 --

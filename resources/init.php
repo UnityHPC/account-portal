@@ -82,7 +82,7 @@ if (isset($_SERVER["REMOTE_USER"])) {
     $_SESSION["user_exists"] = $USER->exists() && !$USER->getFlag(UserFlag::DISABLED);
     $_SESSION["is_pi"] = $USER->isPI();
 
-    $SQL->addLog("user_login", $OPERATOR->uid);
+    $SQL->updateUserLastLogin($OPERATOR->uid);
 
     $USER->updateIsQualified(); // in case manual changes have been made to PI groups
 
