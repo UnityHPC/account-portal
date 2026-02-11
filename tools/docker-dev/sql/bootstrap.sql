@@ -25,18 +25,6 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `account_deletion_requests`
---
-
-CREATE TABLE `account_deletion_requests` (
-  `id` int(11) NOT NULL,
-  `timestamp` timestamp NOT NULL DEFAULT current_timestamp(),
-  `uid` varchar(128) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `audit_log`
 --
 
@@ -93,12 +81,6 @@ CREATE TABLE `requests` (
 --
 
 --
--- Indexes for table `account_deletion_requests`
---
-ALTER TABLE `account_deletion_requests`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `audit_log`
 --
 ALTER TABLE `audit_log`
@@ -113,12 +95,6 @@ ALTER TABLE `requests`
 --
 -- AUTO_INCREMENT for dumped tables
 --
-
---
--- AUTO_INCREMENT for table `account_deletion_requests`
---
-ALTER TABLE `account_deletion_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `audit_log`

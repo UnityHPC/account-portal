@@ -5,7 +5,6 @@ namespace UnityWebPortal\lib;
 use PDO;
 
 /**
- * @phpstan-type account_deletion_request array{timestamp: string, uid: string}
  * @phpstan-type user_last_login array{operator: string, last_login: string}
  * @phpstan-type request array{request_for: string, uid: string, timestamp: string}
  */
