@@ -13,6 +13,7 @@ class UnityConfig
         $CONFIG = self::pullConfig($CONFIG, $deploy_loc);
         if (array_key_exists("HTTP_HOST", $_SERVER)) {
             $cur_url = $_SERVER["HTTP_HOST"];
+            self::assertHttpHostValid($cur_url);
             $url_override_path = $deploy_loc . "/overrides/" . $cur_url;
             if (is_dir($url_override_path)) {
                 $CONFIG = self::pullConfig($CONFIG, $url_override_path);
@@ -122,6 +123,13 @@ class UnityConfig
             throw new InvalidConfigurationException(
                 "disable day must be greater than idlelock day",
             );
+        }
+    }
+
+    private static function assertHttpHostValid(string $host): void
+    {
+        if (!_preg_match("/^[a-zA-Z0-9.-_]$/", $host)) {
+            throw new \Exception("HTTP_HOST contains invalid characters!");
         }
     }
 }
