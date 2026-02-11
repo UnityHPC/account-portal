@@ -154,7 +154,13 @@ class UnityLDAP extends LDAPConn
         foreach ($output as $i => $row) {
             $num_columns = count($row);
             if ($num_columns !== 2) {
-                throw new \Exception("row number $i has $num_columns columns, expected 2 columns");
+                throw new \Exception(
+                    sprintf(
+                        "custom user mapping %s has %s columns, expected 2 columns",
+                        _json_encode($row),
+                        $num_columns,
+                    ),
+                );
             }
             [$uid, $uidNumber_str] = $row;
             if ($uidNumber_str === null) {
