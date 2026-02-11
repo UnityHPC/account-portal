@@ -129,7 +129,7 @@ class UnityConfig
     private static function assertHttpHostValid(string $host): void
     {
         if (!_preg_match("/^[a-zA-Z0-9.-_]$/", $host)) {
-            throw new \Exception("HTTP_HOST contains invalid characters!");
+            throw new \Exception("HTTP_HOST '$host' contains invalid characters!");
         }
     }
 }
