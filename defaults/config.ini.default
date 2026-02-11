@@ -128,3 +128,6 @@ disable_warning_days[] = 360
 disable_warning_days[] = 380
 disable_warning_days[] = 399
 disable_day = 400
+
+[api]
+keys[] = insert_key_here ; API keys for admin/api/...
