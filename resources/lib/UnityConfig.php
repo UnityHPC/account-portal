@@ -73,34 +73,6 @@ class UnityConfig
         self::validateMailSmtpConfig($CONFIG);
     }
 
-    /** @param mixed[] $x */
-    private static function validateArrayNotEmpty(array $x, string $name): void
-    {
-        if (count($x) === 0) {
-            throw new InvalidConfigurationException("$name must not be empty");
-        }
-    }
-
-    private static function validateStringNotEmpty(string $x, string $name): void
-    {
-        if (empty($x)) {
-            throw new InvalidConfigurationException("$name must not be empty");
-        }
-    }
-
-    /** @param mixed[] $options */
-    private static function validateOneOf(string $x, string $name, array $options): void
-    {
-        foreach ($options as $option) {
-            if ($x === $option) {
-                return;
-            }
-        }
-        throw new InvalidConfigurationException(
-            sprintf("%s must be one of %s", $name, _json_encode($options)),
-        );
-    }
-
     /** @param mixed[] $CONFIG */
     private static function validateExpiryConfig(array $CONFIG): void
     {
@@ -146,6 +118,34 @@ class UnityConfig
             "ssl",
         ]);
         self::validateOneOf($CONFIG["smtp"]["ssl_verify"], '$CONFIG["smtp"]["ssl_verify"]', [0, 1]);
+    }
+
+    /** @param mixed[] $x */
+    private static function validateArrayNotEmpty(array $x, string $name): void
+    {
+        if (count($x) === 0) {
+            throw new InvalidConfigurationException("$name must not be empty");
+        }
+    }
+
+    private static function validateStringNotEmpty(string $x, string $name): void
+    {
+        if (empty($x)) {
+            throw new InvalidConfigurationException("$name must not be empty");
+        }
+    }
+
+    /** @param mixed[] $options */
+    private static function validateOneOf(string $x, string $name, array $options): void
+    {
+        foreach ($options as $option) {
+            if ($x === $option) {
+                return;
+            }
+        }
+        throw new InvalidConfigurationException(
+            sprintf("%s must be one of %s", $name, _json_encode($options)),
+        );
     }
 
     private static function assertHttpHostValid(string $host): void
