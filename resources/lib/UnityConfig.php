@@ -112,8 +112,8 @@ class UnityConfig
     {
         self::validateStringNotEmpty($CONFIG["smtp"]["host"], '$CONFIG["smtp"]["host"]');
         self::validateStringNotEmpty($CONFIG["smtp"]["port"], '$CONFIG["smtp"]["port"]');
-        self::validateStringNotEmpty($CONFIG["smtp"]["security"], '$CONFIG["smtp"]["security"]');
         self::validateOneOf($CONFIG["smtp"]["security"], '$CONFIG["smtp"]["security"]', [
+            "",
             "tls",
             "ssl",
         ]);
