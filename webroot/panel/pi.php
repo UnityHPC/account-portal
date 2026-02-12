@@ -219,7 +219,7 @@ if (!$user_is_owner) {
         <input type='submit' value='Disable PI Group' class='danger'>
     ";
 }
-echo "</div></form>";
+echo "</form></div>";
 
 ?>
 

@@ -185,7 +185,6 @@ function ensureUserDoesNotExist(string $uid)
 {
     global $SQL, $LDAP;
     $SQL->deleteRequestsByUser($uid);
-    $SQL->deleteAccountDeletionRequest($uid);
     $user_entry = $LDAP->getUserEntry($uid);
     if ($user_entry->exists()) {
         $org_gid = $user_entry->getAttribute("o")[0];
@@ -227,14 +226,6 @@ function ensureOrgGroupDoesNotExist(string $gid)
     $org_group_entry = $LDAP->getOrgGroupEntry($gid);
     if ($org_group_entry->exists()) {
         $org_group_entry->delete();
-    }
-}
-
-function ensureUserNotRequestedAccountDeletion()
-{
-    global $USER, $SQL;
-    if ($SQL->accDeletionRequestExists($USER->uid)) {
-        $SQL->deleteAccountDeletionRequest($USER->uid);
     }
 }
 
@@ -344,7 +335,6 @@ class UnityWebPortalTestCase extends TestCase
                 $this->assertTrue($USER->exists());
                 $this->assertFalse($USER->isPI());
                 $this->assertEqualsCanonicalizing([], $USER->getPIGroupGIDs());
-                $this->assertFalse($USER->hasRequestedAccountDeletion());
                 $this->assertEqualsCanonicalizing([], $SQL->getRequestsByUser($USER->uid));
                 $this->assertFalse($USER->getFlag(UserFlag::ADMIN));
                 $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
@@ -369,7 +359,6 @@ class UnityWebPortalTestCase extends TestCase
                 break;
             case "EmptyPIGroupOwner":
                 $this->assertTrue($USER->isPI());
-                $this->assertFalse($USER->hasRequestedAccountDeletion());
                 $pi_group = $USER->getPIGroup();
                 $this->assertEqualsCanonicalizing([$USER->uid], $pi_group->getMemberUIDs());
                 $this->assertEqualsCanonicalizing([], $pi_group->getRequests());
@@ -418,7 +407,6 @@ class UnityWebPortalTestCase extends TestCase
                 $this->assertTrue($USER->exists());
                 $this->assertFalse($USER->isPI());
                 $this->assertGreaterThanOrEqual(1, count($USER->getPIGroupGIDs()));
-                $this->assertFalse($USER->hasRequestedAccountDeletion());
                 $this->assertEqualsCanonicalizing([], $SQL->getRequestsByUser($USER->uid));
                 $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
                 $this->assertFalse($USER->getFlag(UserFlag::IDLELOCKED));
@@ -430,7 +418,6 @@ class UnityWebPortalTestCase extends TestCase
                 break;
             case "NormalPI":
                 $this->assertTrue($USER->isPI());
-                $this->assertFalse($USER->hasRequestedAccountDeletion());
                 $this->assertGreaterThanOrEqual(2, count($USER->getPIGroup()->getMemberUIDs()));
                 break;
             case "HasOneSshKey":
@@ -481,31 +468,6 @@ class UnityWebPortalTestCase extends TestCase
     {
         global $USER, $SQL;
         $this->assertEquals($expected, $SQL->requestExists($USER->uid, $gid));
-    }
-
-    public function getNumberAccountDeletionRequests()
-    {
-        global $USER, $SQL;
-        $stmt = $SQL->getConn()->prepare("SELECT * FROM account_deletion_requests WHERE uid=:uid");
-        $uid = $USER->uid;
-        $stmt->bindParam(":uid", $uid);
-        $stmt->execute();
-        return count($stmt->fetchAll());
-    }
-
-    public function assertNumberAccountDeletionRequests(int $x)
-    {
-        global $USER, $SQL;
-        if ($x == 0) {
-            $this->assertFalse($USER->hasRequestedAccountDeletion());
-            $this->assertFalse($SQL->accDeletionRequestExists($USER->uid));
-        } elseif ($x > 0) {
-            $this->assertTrue($USER->hasRequestedAccountDeletion());
-            $this->assertTrue($SQL->accDeletionRequestExists($USER->uid));
-        } else {
-            throw new RuntimeException("x must not be negative");
-        }
-        $this->assertEquals($x, $this->getNumberAccountDeletionRequests());
     }
 
     public function assertRequestedPIGroup(bool $expected)
@@ -617,7 +579,7 @@ class UnityWebPortalTestCase extends TestCase
     }
 }
 
-function getSomeUIDsOfQualifiedUsersNotRequestedAccountDeletion()
+function getSomeUIDsOfQualifiedUsers()
 {
     return [
         "user1_org1_test",

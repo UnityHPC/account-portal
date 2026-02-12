@@ -53,9 +53,6 @@ class PIRemoveUserTest extends UnityWebPortalTestCase
         foreach ($memberUIDs as $uid) {
             if ($uid != $piUid) {
                 $memberToDelete = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
-                if ($memberToDelete->hasRequestedAccountDeletion()) {
-                    continue;
-                }
                 break;
             }
         }
