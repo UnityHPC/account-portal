@@ -70,7 +70,7 @@ class UnityConfig
     public static function validateConfig(array $CONFIG): void
     {
         self::validateExpiryConfig($CONFIG);
-        self::validateMailSmtpConfig($CONFIG);
+        self::validateSmtpConfig($CONFIG);
     }
 
     /** @param mixed[] $CONFIG */
@@ -108,7 +108,7 @@ class UnityConfig
     }
 
     /** @param mixed[] $CONFIG */
-    private static function validateMailSmtpConfig(array $CONFIG): void
+    private static function validateSmtpConfig(array $CONFIG): void
     {
         self::validateStringNotEmpty($CONFIG["smtp"]["host"], '$CONFIG["smtp"]["host"]');
         self::validateStringNotEmpty($CONFIG["smtp"]["port"], '$CONFIG["smtp"]["port"]');
