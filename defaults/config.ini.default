@@ -58,7 +58,7 @@ port = "1025"  ; port of remote smtp server
 security = ""  ; leave blank for no encryption, "ssl", or "tls"
 user = ""  ; smtp username, if exists
 pass = ""  ; smtp password, if exists
-ssl_verify = false  ; set to 1 to verify ssl certificates
+ssl_verify = false  ; set to true to verify ssl certificates
 
 [colors]
 light_background = "#ffffff"  ; Background color when in light mode
