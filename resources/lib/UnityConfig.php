@@ -41,71 +41,74 @@ class UnityConfig
     }
 
     /** @param mixed[] $x */
-    private static function doesArrayHaveOnlyIntegerValues(array $x): bool
+    private static function validateAllValuesAreInts(array $x, string $name): void
     {
         foreach ($x as $value) {
             if (!is_int($value)) {
-                return false;
+                throw new InvalidConfigurationException("all values of $name must be integers");
             }
         }
-        return true;
     }
 
-    /** @param int[] $x */
-    private static function isArrayMonotonicallyIncreasing(array $x): bool
+    /** @param mixed[] $x */
+    private static function validateArrayIsMonotonicallyIncreasing(array $x, string $name): void
     {
-        if (count($x) <= 1) {
-            return true;
-        }
+        self::validateArrayNotEmpty($x, $name);
+        self::validateAllValuesAreInts($x, $name);
         $remaining_values = $x;
         $last_value = array_shift($remaining_values);
         while (count($remaining_values)) {
             $this_value = array_shift($remaining_values);
             if ($this_value < $last_value) {
-                return false;
+                throw new InvalidConfigurationException("$name must be monotonically increasing");
             }
             $last_value = $this_value;
         }
-        return true;
+    }
+
+    /** @param mixed[] $x */
+    private static function validateArrayNotEmpty(array $x, string $name): void
+    {
+        if (count($x) === 0) {
+            throw new InvalidConfigurationException("$name must not be empty");
+        }
+    }
+
+    private static function validateStringNotEmpty(string $x, string $name): void
+    {
+        if (empty($x)) {
+            throw new InvalidConfigurationException("$name must not be empty");
+        }
+    }
+
+    /** @param mixed[] $options */
+    private static function validateOneOf(string $x, string $name, array $options): void
+    {
+        foreach ($options as $option) {
+            if ($x === $option) {
+                return;
+            }
+        }
+        throw new InvalidConfigurationException(
+            sprintf("%s must be one of %s", $name, _json_encode($options)),
+        );
     }
 
     /** @param mixed[] $CONFIG */
-    public static function validateConfig(array $CONFIG): void
+    private static function validateExpiryConfig(array $CONFIG): void
     {
         $idlelock_warning_days = CONFIG["expiry"]["idlelock_warning_days"];
         $idlelock_day = CONFIG["expiry"]["idlelock_day"];
         $disable_warning_days = CONFIG["expiry"]["disable_warning_days"];
         $disable_day = CONFIG["expiry"]["disable_day"];
-        if (count($idlelock_warning_days) === 0) {
-            throw new InvalidConfigurationException(
-                '$CONFIG["expiry"]["idlelock_warning_days"] must not be empty!',
-            );
-        }
-        if (count($disable_warning_days) === 0) {
-            throw new InvalidConfigurationException(
-                '$CONFIG["expiry"]["disable_warning_days"] must not be empty!',
-            );
-        }
-        if (!self::doesArrayHaveOnlyIntegerValues($idlelock_warning_days)) {
-            throw new InvalidConfigurationException(
-                '$CONFIG["expiry"]["idlelock_warning_days"] must be a list of integers!',
-            );
-        }
-        if (!self::doesArrayHaveOnlyIntegerValues($disable_warning_days)) {
-            throw new InvalidConfigurationException(
-                '$CONFIG["expiry"]["disable_warning_days"] must be a list of integers!',
-            );
-        }
-        if (!self::isArrayMonotonicallyIncreasing($idlelock_warning_days)) {
-            throw new InvalidConfigurationException(
-                '$CONFIG["expiry"]["idlelock_warning_days"] must be monotonically increasing!',
-            );
-        }
-        if (!self::isArrayMonotonicallyIncreasing($disable_warning_days)) {
-            throw new InvalidConfigurationException(
-                '$CONFIG["expiry"]["disable_warning_days"] must be monotonically increasing!',
-            );
-        }
+        self::validateArrayIsMonotonicallyIncreasing(
+            $CONFIG["expiry"]["idlelock_warning_days"],
+            '$CONFIG["expiry"]["idlelock_warning_days"]',
+        );
+        self::validateArrayIsMonotonicallyIncreasing(
+            $CONFIG["expiry"]["disable_warning_days"],
+            '$CONFIG["expiry"]["disable_warning_days"]',
+        );
 
         $final_disable_warning_day = _array_last($disable_warning_days);
         $final_idlelock_warning_day = _array_last($idlelock_warning_days);
@@ -124,6 +127,26 @@ class UnityConfig
                 "disable day must be greater than idlelock day",
             );
         }
+    }
+
+    /** @param mixed[] $CONFIG */
+    private static function validateMailSmtpConfig(array $CONFIG): void
+    {
+        self::validateStringNotEmpty($CONFIG["smtp"]["host"], '$CONFIG["smtp"]["host"]');
+        self::validateStringNotEmpty($CONFIG["smtp"]["port"], '$CONFIG["smtp"]["port"]');
+        self::validateStringNotEmpty($CONFIG["smtp"]["security"], '$CONFIG["smtp"]["security"]');
+        self::validateOneOf($CONFIG["smtp"]["security"], '$CONFIG["smtp"]["security"]', [
+            "tls",
+            "ssl",
+        ]);
+        self::validateOneOf($CONFIG["smtp"]["ssl_verify"], '$CONFIG["smtp"]["ssl_verify"]', [0, 1]);
+    }
+
+    /** @param mixed[] $CONFIG */
+    public static function validateConfig(array $CONFIG): void
+    {
+        self::validateExpiryConfig($CONFIG);
+        self::validateMailSmtpConfig($CONFIG);
     }
 
     private static function assertHttpHostValid(string $host): void
