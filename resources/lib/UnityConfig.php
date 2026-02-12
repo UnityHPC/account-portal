@@ -66,6 +66,13 @@ class UnityConfig
         }
     }
 
+    /** @param mixed[] $CONFIG */
+    public static function validateConfig(array $CONFIG): void
+    {
+        self::validateExpiryConfig($CONFIG);
+        self::validateMailSmtpConfig($CONFIG);
+    }
+
     /** @param mixed[] $x */
     private static function validateArrayNotEmpty(array $x, string $name): void
     {
@@ -139,13 +146,6 @@ class UnityConfig
             "ssl",
         ]);
         self::validateOneOf($CONFIG["smtp"]["ssl_verify"], '$CONFIG["smtp"]["ssl_verify"]', [0, 1]);
-    }
-
-    /** @param mixed[] $CONFIG */
-    public static function validateConfig(array $CONFIG): void
-    {
-        self::validateExpiryConfig($CONFIG);
-        self::validateMailSmtpConfig($CONFIG);
     }
 
     private static function assertHttpHostValid(string $host): void
