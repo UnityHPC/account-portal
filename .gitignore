@@ -12,22 +12,21 @@ vendor
 
 # don't track site configs
 deployment/**/*
-!deployment/overrides/
-!deployment/overrides/phpunit/
-!deployment/overrides/phpunit/config/
-!deployment/overrides/phpunit/config/config.ini
-!deployment/overrides/worker/
-!deployment/overrides/worker/config/
-!deployment/overrides/worker/config/config.ini
-!deployment/overrides/course-creator/
-!deployment/overrides/course-creator/config/
-!deployment/overrides/course-creator/config/config.ini
-!deployment/config/
-!deployment/config/README.md
-!deployment/mail_overrides/
-!deployment/mail_overrides/README.md
-!deployment/templates_overrides/
-!deployment/templates_overrides/README.md
+!deployment/domain_overrides/
+!deployment/domain_overrides/phpunit/
+!deployment/domain_overrides/phpunit/config.ini
+!deployment/domain_overrides/worker/
+!deployment/domain_overrides/worker/config.ini
+!deployment/domain_overrides/course-creator/
+!deployment/domain_overrides/course-creator/config.ini
+!deployment/custom_user_mappings/
+!deployment/custom_user_mappings/.gitinclude
+!deployment/config.base.ini
+!deployment/README.md
+!deployment/mail/
+!deployment/mail/.gitinclude
+!deployment/templates/
+!deployment/templates/.gitinclude
 
 .phpunit.result.cache
 .php-cs-fixer.cache

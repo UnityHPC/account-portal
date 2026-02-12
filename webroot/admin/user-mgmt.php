@@ -4,6 +4,7 @@ require_once __DIR__ . "/../../resources/autoload.php";
 
 use UnityWebPortal\lib\UnityHTTPD;
 use UnityWebPortal\lib\UserFlag;
+use UnityWebPortal\lib\UnityDeployment;
 
 if (!$USER->getFlag(UserFlag::ADMIN)) {
     UnityHTTPD::forbidden("not an admin", "You are not an admin.");
@@ -19,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-require getTemplatePath("header.php");
+require UnityDeployment::getTemplatePath("header.php");
 $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 $flags_to_display = array_filter(UserFlag::cases(), fn($x) => $x !== UserFlag::DISABLED);
 ?>
@@ -120,4 +121,4 @@ $(document).ready(() => {
     });
 });
 </script>
-<?php require getTemplatePath("footer.php"); ?>
+<?php require UnityDeployment::getTemplatePath("footer.php"); ?>

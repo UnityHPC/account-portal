@@ -10,9 +10,6 @@ use Exception;
  */
 class UnityMailer extends PHPMailer
 {
-    private string $content_dir = __DIR__ . "/../mail"; // location of all email templates
-    private string $override_dir = __DIR__ . "/../../deployment/mail";
-
     private string $MSG_SENDER_EMAIL;
     private string $MSG_SENDER_NAME;
     private string $MSG_SUPPORT_EMAIL;
@@ -85,22 +82,9 @@ class UnityMailer extends PHPMailer
         $this->setFrom($this->MSG_SENDER_EMAIL, $this->MSG_SENDER_NAME);
         $this->addReplyTo($this->MSG_SUPPORT_EMAIL, $this->MSG_SUPPORT_NAME);
 
-        $template_filename = $template . ".php";
-        if (file_exists($this->override_dir . "/" . $template_filename)) {
-            $template_path = $this->override_dir . "/" . $template_filename;
-        } else {
-            $template_path = $this->content_dir . "/" . $template_filename;
-        }
-
-        if (file_exists($this->override_dir . "/footer.php")) {
-            $footer_template_path = $this->override_dir . "/footer.php";
-        } else {
-            $footer_template_path = $this->content_dir . "/footer.php";
-        }
-
         ob_start();
-        include $template_path;
-        include $footer_template_path;
+        include UnityDeployment::getMailPath($template);
+        include UnityDeployment::getMailPath("footer");
         $mes_html = _ob_get_clean();
         $this->msgHTML($mes_html);
 

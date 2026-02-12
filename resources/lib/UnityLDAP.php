@@ -2,7 +2,6 @@
 
 namespace UnityWebPortal\lib;
 
-use RuntimeException;
 use UnityWebPortal\lib\exceptions\EntryNotFoundException;
 use PHPOpenLDAPer\LDAPConn;
 use PHPOpenLDAPer\LDAPEntry;
@@ -34,8 +33,6 @@ class UnityLDAP extends LDAPConn
     // isDisabled unset or set to "FALSE"
     private static string $NON_DISABLED_FILTER = "(|(!(isDisabled=*))(isDisabled=FALSE))";
 
-    private string $custom_mappings_path =
-        __DIR__ . "/../../" . CONFIG["ldap"]["custom_user_mappings_dir"];
     private string $def_user_shell = CONFIG["ldap"]["def_user_shell"];
     private int $offset_UIDGID = CONFIG["ldap"]["offset_UIDGID"];
     private int $offset_PIGID = CONFIG["ldap"]["offset_PIGID"];
@@ -74,7 +71,7 @@ class UnityLDAP extends LDAPConn
     public function getNextUIDGIDNumber(string $uid): int
     {
         $IDNumsInUse = array_merge($this->getAllUIDNumbersInUse(), $this->getAllGIDNumbersInUse());
-        $customIDMappings = $this->getCustomIDMappings();
+        $customIDMappings = UnityDeployment::getCustomIDMappings();
         $customMappedID = $customIDMappings[$uid] ?? null;
         if (!is_null($customMappedID) && !in_array($customMappedID, $IDNumsInUse)) {
             return $customMappedID;
@@ -87,7 +84,7 @@ class UnityLDAP extends LDAPConn
         }
         return $this->getNextIDNumber(
             $this->offset_UIDGID,
-            array_merge($IDNumsInUse, array_values($this->getCustomIDMappings())),
+            array_merge($IDNumsInUse, array_values(UnityDeployment::getCustomIDMappings())),
         );
     }
 
@@ -95,7 +92,10 @@ class UnityLDAP extends LDAPConn
     {
         return $this->getNextIDNumber(
             $this->offset_PIGID,
-            array_merge($this->getAllGIDNumbersInUse(), array_values($this->getCustomIDMappings())),
+            array_merge(
+                $this->getAllGIDNumbersInUse(),
+                array_values(UnityDeployment::getCustomIDMappings()),
+            ),
         );
     }
 
@@ -103,7 +103,10 @@ class UnityLDAP extends LDAPConn
     {
         return $this->getNextIDNumber(
             $this->offset_ORGGID,
-            array_merge($this->getAllGIDNumbersInUse(), array_values($this->getCustomIDMappings())),
+            array_merge(
+                $this->getAllGIDNumbersInUse(),
+                array_values(UnityDeployment::getCustomIDMappings()),
+            ),
         );
     }
 
@@ -122,53 +125,6 @@ class UnityLDAP extends LDAPConn
             $new_id++;
         }
         return $new_id;
-    }
-
-    /** @return array<string, int> */
-    private function getCustomIDMappings(): array
-    {
-        $output = [];
-        $dir = new \DirectoryIterator($this->custom_mappings_path);
-        foreach ($dir as $fileinfo) {
-            $filename = $fileinfo->getFilename();
-            if ($fileinfo->isDot() || $filename == "README.md") {
-                continue;
-            }
-            if ($fileinfo->getExtension() == "csv") {
-                $handle = _fopen($fileinfo->getPathname(), "r");
-                try {
-                    while (($row = fgetcsv($handle, null, ",")) !== false) {
-                        array_push($output, $row);
-                    }
-                } finally {
-                    _fclose($handle);
-                }
-            } else {
-                UnityHTTPD::errorLog(
-                    "warning",
-                    "custom ID mapping file '$filename' ignored, extension != .csv",
-                );
-            }
-        }
-        $output_map = [];
-        foreach ($output as $i => $row) {
-            $num_columns = count($row);
-            if ($num_columns !== 2) {
-                throw new \Exception(
-                    sprintf(
-                        "custom user mapping %s has %s columns, expected 2 columns",
-                        _json_encode($row),
-                        $num_columns,
-                    ),
-                );
-            }
-            [$uid, $uidNumber_str] = $row;
-            if ($uidNumber_str === null) {
-                throw new RuntimeException("uidNumber_str is null");
-            }
-            $output_map[$uid] = digits2int($uidNumber_str);
-        }
-        return $output_map;
     }
 
     /** @return int[] */

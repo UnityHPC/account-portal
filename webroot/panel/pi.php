@@ -5,6 +5,7 @@ require_once __DIR__ . "/../../resources/autoload.php";
 use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UnityHTTPD;
 use UnityWebPortal\lib\UnityGroup;
+use UnityWebPortal\lib\UnityDeployment;
 
 if (($gid = $_GET["gid"] ?? null) !== null) {
     $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
@@ -80,7 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-require getTemplatePath("header.php");
+require UnityDeployment::getTemplatePath("header.php");
 $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 
 if ($user_is_owner) {
@@ -238,4 +239,4 @@ echo "</form></div>";
     });
 </script>
 
-<?php require getTemplatePath("footer.php"); ?>
+<?php require UnityDeployment::getTemplatePath("footer.php"); ?>

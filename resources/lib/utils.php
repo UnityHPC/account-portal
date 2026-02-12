@@ -180,16 +180,6 @@ function shortenString(
         substr($x, -1 * $trailing_chars, $trailing_chars);
 }
 
-function getTemplatePath(string $basename): string
-{
-    $template_path = __DIR__ . "/../templates/$basename";
-    $override_path = __DIR__ . "/../../deployment/templates_overrides/$basename";
-    if (file_exists($override_path)) {
-        return $override_path;
-    }
-    return $template_path;
-}
-
 /**
  * @param-out int $count
  * @throws Exception

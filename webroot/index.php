@@ -1,6 +1,9 @@
 <?php
 
 require_once __DIR__ . "/../resources/autoload.php";
-require getTemplatePath("header.php");
-require getTemplatePath("home.php");
-require getTemplatePath("footer.php");
+
+use UnityWebPortal\lib\UnityDeployment;
+
+require UnityDeployment::getTemplatePath("header.php");
+require UnityDeployment::getTemplatePath("home.php");
+require UnityDeployment::getTemplatePath("footer.php");

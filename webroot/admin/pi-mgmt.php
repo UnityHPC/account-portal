@@ -7,6 +7,7 @@ use UnityWebPortal\lib\UnityGroup;
 use UnityWebPortal\lib\UnityHTTPD;
 use UnityWebPortal\lib\UnitySQL;
 use UnityWebPortal\lib\UserFlag;
+use UnityWebPortal\lib\UnityDeployment;
 
 if (!$USER->getFlag(UserFlag::ADMIN)) {
     UnityHTTPD::forbidden("not an admin", "You are not an admin.");
@@ -56,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-require getTemplatePath("header.php");
+require UnityDeployment::getTemplatePath("header.php");
 $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 ?>
 
@@ -218,4 +219,4 @@ th.details-control::before {
     content: "";
 }
 </style>
-<?php require getTemplatePath("footer.php"); ?>
+<?php require UnityDeployment::getTemplatePath("footer.php"); ?>

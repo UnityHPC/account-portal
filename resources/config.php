@@ -1,7 +1,5 @@
 <?php
 
-use UnityWebPortal\lib\UnityConfig;
+use UnityWebPortal\lib\UnityDeployment;
 
-define("CONFIG", UnityConfig::getConfig(__DIR__ . "/../defaults", __DIR__ . "/../deployment"));
-
-UnityConfig::validateConfig(CONFIG);
+define("CONFIG", UnityDeployment::getConfig());

@@ -4,6 +4,7 @@ require_once __DIR__ . "/../../resources/autoload.php";
 
 use UnityWebPortal\lib\UnityGroup;
 use UnityWebPortal\lib\UnityHTTPD;
+use UnityWebPortal\lib\UnityDeployment;
 
 $getPIGroupFromPost = function () {
     global $LDAP, $SQL, $MAILER, $WEBHOOK;
@@ -59,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 
-require getTemplatePath("header.php");
+require UnityDeployment::getTemplatePath("header.php");
 $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 ?>
 
@@ -258,4 +259,4 @@ echo "</table>";
     });
 </script>
 
-<?php require getTemplatePath("footer.php"); ?>
+<?php require UnityDeployment::getTemplatePath("footer.php"); ?>
