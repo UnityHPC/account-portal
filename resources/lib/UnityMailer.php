@@ -3,7 +3,6 @@
 namespace UnityWebPortal\lib;
 
 use PHPMailer\PHPMailer\PHPMailer;
-use Exception;
 
 /**
  * This is a class that uses PHPmailer to send emails based on templates
@@ -35,24 +34,9 @@ class UnityMailer extends PHPMailer
         $this->MSG_ADMIN_NAME = CONFIG["mail"]["admin_name"];
         $this->MSG_PI_APPROVAL_EMAIL = CONFIG["mail"]["pi_approve"];
         $this->MSG_PI_APPROVAL_NAME = CONFIG["mail"]["pi_approve_name"];
-        if (empty(CONFIG["smtp"]["host"])) {
-            throw new Exception("SMTP server hostname not set");
-        }
         $this->Host = CONFIG["smtp"]["host"];
-
-        if (empty(CONFIG["smtp"]["port"])) {
-            throw new Exception("SMTP server port not set");
-        }
         $this->Port = CONFIG["smtp"]["port"];
-
-        $security = CONFIG["smtp"]["security"];
-        $security_conf_valid = empty($security) || $security == "tls" || $security == "ssl";
-        if (!$security_conf_valid) {
-            throw new Exception(
-                "SMTP security is not set correctly, leave empty, use 'tls', or 'ssl'",
-            );
-        }
-        $this->SMTPSecure = $security;
+        $this->SMTPSecure = CONFIG["smtp"]["security"];
 
         if (!empty(CONFIG["smtp"]["user"])) {
             $this->SMTPAuth = true;
@@ -65,7 +49,7 @@ class UnityMailer extends PHPMailer
             $this->Password = CONFIG["smtp"]["pass"];
         }
 
-        if (CONFIG["smtp"]["ssl_verify"] == "false") {
+        if (CONFIG["smtp"]["ssl_verify"] === 0) {
             $this->SMTPOptions = [
                 "ssl" => [
                     "verify_peer" => false,
