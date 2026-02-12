@@ -157,6 +157,8 @@ rm "$prod" && ln -s "$old" "$prod"
   - `disable_day`: day number when a user will be disabled
   - a "day number" starts counting from the last day that a user logged in, so on day 5, the user last logged in 5 days ago
 - drop the `account_deletion_requests` table
+- a new LDAP posixGroup needs to be created for "immortal" users, who are exempt from automatic account expiration
+  - the `[ldap]user_flag_groups[immortal]` open must also be defined
 
 ### 1.5 -> 1.6
 

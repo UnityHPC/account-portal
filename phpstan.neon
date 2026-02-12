@@ -55,6 +55,8 @@ parameters:
         - test/functional/PIBecomeDenyTest.php
         - test/functional/UserDisableTest.php
         - webroot/panel/pi.php
+        - resources/lib/UnityMailer.php
+        - test/functional/ExpiryTest.php
     # $Subject is written by mail templates
     - messages:
         - '#Property UnityWebPortal\\lib\\UnityWebhook::\$Subject is never written, only read\.#'

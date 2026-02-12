@@ -22,6 +22,8 @@ class UnityMailer extends PHPMailer
     private string $MSG_PI_APPROVAL_EMAIL;
     private string $MSG_PI_APPROVAL_NAME;
 
+    private bool $cancelled; // a template can cancel itself by setting $this->cancelled = true
+
     public function __construct()
     {
         parent::__construct();
@@ -98,11 +100,15 @@ class UnityMailer extends PHPMailer
             $footer_template_path = $this->content_dir . "/footer.php";
         }
 
+        $this->cancelled = false;
         ob_start();
         include $template_path;
         include $footer_template_path;
         $mes_html = _ob_get_clean();
         $this->msgHTML($mes_html);
+        if ($this->cancelled) {
+            return false;
+        }
 
         if ($recipients == "admin") {
             $this->addBCC($this->MSG_ADMIN_EMAIL, $this->MSG_ADMIN_NAME);

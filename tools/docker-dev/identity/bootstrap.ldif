@@ -54,9 +54,16 @@ objectclass: posixGroup
 objectclass: top
 memberuid: user6_org1_test
 
+dn: cn=immortal,dc=unityhpc,dc=test
+cn: immortal
+gidnumber: 504
+objectclass: posixGroup
+objectclass: top
+memberuid: user13_org1_test
+
 dn: cn=disabled,dc=unityhpc,dc=test
 cn: disabled
-gidnumber: 504
+gidnumber: 505
 objectclass: posixGroup
 objectclass: top
 memberuid: user7_org1_test
@@ -13448,14 +13455,6 @@ dn: cn=pi_user1187_org1_test,ou=pi_groups,dc=unityhpc,dc=test
 cn: pi_user1187_org1_test
 gidnumber: 10208
 memberuid: user1187_org1_test
-objectclass: piGroup
-objectclass: posixGroup
-objectclass: top
-
-dn: cn=pi_user13_org1_test,ou=pi_groups,dc=unityhpc,dc=test
-cn: pi_user13_org1_test
-gidnumber: 10226
-memberuid: user13_org1_test
 objectclass: piGroup
 objectclass: posixGroup
 objectclass: top
