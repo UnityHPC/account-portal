@@ -55,6 +55,9 @@ class UnityConfig
     {
         self::validateArrayNotEmpty($x, $name);
         self::validateAllValuesAreInts($x, $name);
+        if (count($x) === 1) {
+            return;
+        }
         $remaining_values = $x;
         $last_value = array_shift($remaining_values);
         while (count($remaining_values)) {
