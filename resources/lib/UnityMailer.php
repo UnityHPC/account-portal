@@ -49,7 +49,7 @@ class UnityMailer extends PHPMailer
             $this->Password = CONFIG["smtp"]["pass"];
         }
 
-        if (CONFIG["smtp"]["ssl_verify"] === 0) {
+        if (CONFIG["smtp"]["ssl_verify"] === "false") {
             $this->SMTPOptions = [
                 "ssl" => [
                     "verify_peer" => false,

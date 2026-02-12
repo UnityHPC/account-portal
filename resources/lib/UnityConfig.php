@@ -117,7 +117,10 @@ class UnityConfig
             "tls",
             "ssl",
         ]);
-        self::validateOneOf($CONFIG["smtp"]["ssl_verify"], '$CONFIG["smtp"]["ssl_verify"]', [0, 1]);
+        self::validateOneOf($CONFIG["smtp"]["ssl_verify"], '$CONFIG["smtp"]["ssl_verify"]', [
+            "true",
+            "false",
+        ]);
     }
 
     /** @param mixed[] $x */
@@ -141,6 +144,10 @@ class UnityConfig
         foreach ($options as $option) {
             if ($x === $option) {
                 return;
+            } else {
+                var_dump($x);
+                echo "is not equal to...\n";
+                var_dump($option);
             }
         }
         throw new InvalidConfigurationException(
