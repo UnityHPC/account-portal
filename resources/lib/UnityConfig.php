@@ -117,10 +117,7 @@ class UnityConfig
             "tls",
             "ssl",
         ]);
-        self::validateOneOf($CONFIG["smtp"]["ssl_verify"], '$CONFIG["smtp"]["ssl_verify"]', [
-            "true",
-            "false",
-        ]);
+        self::validateIsBool($CONFIG["smtp"]["ssl_verify"], '$CONFIG["smtp"]["ssl_verify"]');
     }
 
     /** @param mixed[] $x */
@@ -135,6 +132,13 @@ class UnityConfig
     {
         if (empty($x)) {
             throw new InvalidConfigurationException("$name must not be empty");
+        }
+    }
+
+    private static function validateIsBool(mixed $x, string $name): void
+    {
+        if (!is_bool($x)) {
+            throw new InvalidConfigurationException("$name must be a boolean");
         }
     }
 
