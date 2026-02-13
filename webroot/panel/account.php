@@ -155,32 +155,37 @@ $isPI = $USER->isPI();
 
 if ($isPI) {
     echo "
-        <p>You are curently a <strong>principal investigator</strong> on the UnityHPC Platform</p>
+        <p>You are currently a <strong>principal investigator</strong> on the UnityHPC Platform.</p>
     ";
-} elseif ($USER->getFlag(UserFlag::QUALIFIED)) {
-    echo "<p>You are curently a <strong>qualified user</strong> on the UnityHPC Platform</p>";
 } else {
-    $tos_url = CONFIG["site"]["terms_of_service_url"];
-    $form_url = getURL("panel/groups.php");
-    echo "
-        <p>
-            You are currently an <strong>unqualified user</strong>, and will be
-            <strong>unable to access UnityHPC Platform services</strong>.
-            To become qualified, request to join a PI group, or if you are a PI, request a PI group.
-            Do not request a PI group if you are a student.
-        </p>
-        <br>
-        <form action='$form_url' method='GET'>
-            <label>
-                <input type='checkbox' name='tos' value='agree' required />
-                I have read and accept the
-                <a target='_blank' href='$tos_url'>Terms of Service</a>.
-            </label>
+    if ($USER->getPIGroup()->exists() && $USER->getPIGroup()->getIsDisabled()) {
+        echo "<p>You are no longer a PI because your PI group is disabled.</p>";
+    }
+    if ($USER->getFlag(UserFlag::QUALIFIED)) {
+        echo "<p>You are currently a <strong>qualified user</strong> on the UnityHPC Platform.</p>";
+    } else {
+        $tos_url = CONFIG["site"]["terms_of_service_url"];
+        $form_url = getURL("panel/groups.php");
+        echo "
+            <p>
+                You are currently an <strong>unqualified user</strong>, and will be
+                <strong>unable to access UnityHPC Platform services</strong>.
+                To become qualified, request to join a PI group, or if you are a PI, request a PI group.
+                Do not request a PI group if you are a student.
+            </p>
             <br>
-            <input type='submit' value='Request to Join a PI Group' />
-        </form>
-        <br>
-    ";
+            <form action='$form_url' method='GET'>
+                <label>
+                    <input type='checkbox' name='tos' value='agree' required />
+                    I have read and accept the
+                    <a target='_blank' href='$tos_url'>Terms of Service</a>.
+                </label>
+                <br>
+                <input type='submit' value='Request to Join a PI Group' />
+            </form>
+            <br>
+        ";
+    }
 }
 
 if (!$isPI) {
@@ -202,7 +207,13 @@ if (!$isPI) {
             <input type='hidden' name='form_type' value='cancel_pi_request'/>
         ";
     } else {
-        $onclick = "return confirm(\"Are you sure you want to request a PI account?\")";
+        if ($USER->getPIGroup()->exists() && $USER->getPIGroup()->getIsDisabled()) {
+            $button_msg = "Request to Re-Enable PI Group";
+            $onclick = "return confirm(\"Are you sure you want to re-enable your old PI group?\")";
+        } else {
+            $button_msg = "Request PI Group";
+            $onclick = "return confirm(\"Are you sure you want to request a PI group?\")";
+        }
         $tos_url = CONFIG["site"]["terms_of_service_url"];
         $account_policy_url = CONFIG["site"]["account_policy_url"];
         echo "
@@ -218,7 +229,7 @@ if (!$isPI) {
             </label>
             <br>
             <input type='hidden' name='form_type' value='pi_request'/>
-            <input type='submit' value='Request a PI Group' onclick='$onclick'/>
+            <input type='submit' value='$button_msg' onclick='$onclick'/>
         ";
     }
     echo "</form>";

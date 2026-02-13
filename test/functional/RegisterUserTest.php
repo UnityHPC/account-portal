@@ -22,6 +22,11 @@ class RegisterUserTest extends UnityWebPortalTestCase
         http_post(__DIR__ . "/../../webroot/panel/new_account.php", ["eula" => "agree"]);
     }
 
+    private function reEnable()
+    {
+        http_post(__DIR__ . "/../../webroot/panel/disabled_account.php", ["eula" => "agree"]);
+    }
+
     #[DataProvider("provider")]
     public function testRegisterUserAndCreateOrg($nickname, $expected_uid_gid)
     {
@@ -54,8 +59,8 @@ class RegisterUserTest extends UnityWebPortalTestCase
         $this->switchUser("DisabledNotPI");
         $this->assertTrue($USER->getFlag(UserFlag::DISABLED));
         try {
-            $this->register();
-            $this->assertMessageExists(UnityHTTPDMessageLevel::INFO, "/.*/", "/re-enabled/");
+            $this->reEnable();
+            $this->assertMessageExists(UnityHTTPDMessageLevel::SUCCESS, "/Re-Enabled/", "/.*/");
             $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
         } finally {
             $USER->setFlag(UserFlag::DISABLED, true);
@@ -69,8 +74,8 @@ class RegisterUserTest extends UnityWebPortalTestCase
         $this->assertTrue($USER->getFlag(UserFlag::DISABLED));
         $this->assertFalse($USER->isPI());
         try {
-            $this->register();
-            $this->assertMessageExists(UnityHTTPDMessageLevel::INFO, "/.*/", "/re-enabled/");
+            $this->reEnable();
+            $this->assertMessageExists(UnityHTTPDMessageLevel::SUCCESS, "/Re-Enabled/", "/.*/");
             $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
             $this->assertFalse($USER->isPI());
         } finally {

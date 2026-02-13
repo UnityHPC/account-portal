@@ -1,6 +1,7 @@
 <?php
 
 use UnityWebPortal\lib\UnityHTTPD;
+use UnityWebPortal\lib\UserFlag;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // another page should have already validated and we can't validate the same token twice
@@ -22,14 +23,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 if (isset($SSO)) {
-    if (
-        !$_SESSION["user_exists"]
-        && !str_ends_with($_SERVER['PHP_SELF'], "/panel/new_account.php")
-    ) {
+    if (!$USER->exists() && !str_ends_with($_SERVER["PHP_SELF"], "/panel/new_account.php")) {
         UnityHTTPD::redirect(getURL("panel/new_account.php"));
     }
+    if (
+        $USER->getFlag(UserFlag::DISABLED) &&
+        !str_ends_with($_SERVER["PHP_SELF"], "/panel/disabled_account.php")
+    ) {
+        UnityHTTPD::redirect(getURL("panel/disabled_account.php"));
+    }
 }
-
 ?>
 
 <!DOCTYPE html>
