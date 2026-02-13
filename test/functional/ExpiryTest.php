@@ -46,7 +46,7 @@ class ExpiryTest extends UnityWebPortalTestCase
         $this->switchUser("Admin");
         $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
         $ssh_keys_before = $user->getSSHKeys();
-        $last_login_before = callPrivateMethod($SQL, "getUserLastLogin", $uid);
+        $last_login_before = $SQL->getUserLastLogin($uid);
         $this->assertFalse($user->getFlag(UserFlag::IDLELOCKED));
         $this->assertFalse($user->getFlag(UserFlag::DISABLED));
         if ($is_pi) {
@@ -140,7 +140,7 @@ class ExpiryTest extends UnityWebPortalTestCase
     {
         global $USER, $SQL;
         $this->switchUser("Blank");
-        $last_login_before = callPrivateMethod($SQL, "getUserLastLogin", $USER->uid);
+        $last_login_before = $SQL->getUserLastLogin($USER->uid);
         try {
             // set last login to one day after epoch
             callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, 1 * 24 * 60 * 60);
@@ -174,7 +174,7 @@ class ExpiryTest extends UnityWebPortalTestCase
     {
         global $USER, $SQL;
         $this->switchUser("EmptyPIGroupOwner");
-        $last_login_before = callPrivateMethod($SQL, "getUserLastLogin", $USER->uid);
+        $last_login_before = $SQL->getUserLastLogin($USER->uid);
         $owner = $USER;
         $pi_group = $USER->getPIGroup();
         $this->switchUser("Blank");
@@ -239,7 +239,7 @@ class ExpiryTest extends UnityWebPortalTestCase
         $manager_uid = self::$NICKNAME2UID["Admin"];
         $manager = new UnityUser($manager_uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
         $this->switchUser("Blank");
-        $last_login_before = callPrivateMethod($SQL, "getUserLastLogin", $USER->uid);
+        $last_login_before = $SQL->getUserLastLogin($USER->uid);
         try {
             $pi_group->newUserRequest($USER, false);
             $pi_group->approveUser($USER, false);

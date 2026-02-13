@@ -188,8 +188,7 @@ class UnitySQL
         $stmt->execute();
     }
 
-    /* for testing purposes */
-    private function getUserLastLogin(string $uid): ?int
+    public function getUserLastLogin(string $uid): ?int
     {
         $table = self::TABLE_USER_LAST_LOGINS;
         $stmt = $this->conn->prepare("SELECT * FROM $table WHERE operator=:uid");
