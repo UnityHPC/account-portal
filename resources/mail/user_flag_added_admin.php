@@ -35,6 +35,13 @@ case UserFlag::QUALIFIED: ?>
 <?php break; ?>
 
 <?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
+<?php case UserFlag::IMMORTAL: ?>
+<?php $this->Subject = "User Immortalized"; ?>
+<p>Hello,</p>
+<p>User "<?php echo $data["user"] ?>" has been made immortal (exempt from expiry). </p>
+<?php break; ?>
+
+<?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
 <?php default: ?>
 <?php throw new \Exception("unknown flag: " . $data["flag"]); ?>
 <?php endswitch; ?>
