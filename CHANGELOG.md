@@ -1,4 +1,8 @@
-### Version-specific update instructions:
+# Changelog
+
+For details on the changes in each release, see [the Releases page](https://github.com/UnityHPC/account-portal/releases).
+
+## Version-specific update instructions:
 
 ### 1.6 -> 1.7
 
