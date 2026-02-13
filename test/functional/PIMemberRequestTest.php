@@ -2,6 +2,9 @@
 
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use UnityWebPortal\lib\UnityHTTPD;
+use PHPUnit\Framework\Attributes\DataProvider;
+use TRegx\PhpUnit\DataProviders\DataProvider as TRegxDataProvider;
+use UnityWebPortal\lib\UserFlag;
 
 class PIMemberRequestTest extends UnityWebPortalTestCase
 {
@@ -20,6 +23,58 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
             "form_type" => "cancelPIForm",
             "pi" => $gid,
         ]);
+    }
+
+    private function approveUserByPI(string $uid, string $gid)
+    {
+        global $USER;
+        assert($USER->getPIGroup()->gid === $gid, "signed in user must be the group owner");
+        http_post(__DIR__ . "/../../webroot/panel/pi.php", [
+            "form_type" => "userReq",
+            "action" => "Approve",
+            "uid" => $uid,
+        ]);
+    }
+
+    private function approveUserByAdmin(string $uid, string $gid)
+    {
+        $this->switchUser("Admin");
+        try {
+            http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
+                "form_type" => "reqChild",
+                "action" => "Approve",
+                "pi" => $gid,
+                "uid" => $uid,
+            ]);
+        } finally {
+            $this->switchBackUser();
+        }
+    }
+
+    private function denyRequestByPI(string $uid)
+    {
+        http_post(__DIR__ . "/../../webroot/panel/pi.php", [
+            "form_type" => "userReq",
+            "action" => "Deny",
+            "uid" => $uid,
+        ]);
+    }
+
+    private function denyRequestByAdmin(string $uid)
+    {
+        global $USER;
+        $gid = $USER->getPIGroup()->gid;
+        $this->switchUser("Admin");
+        try {
+            http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
+                "form_type" => "reqChild",
+                "action" => "Deny",
+                "pi" => $gid,
+                "uid" => $uid,
+            ]);
+        } finally {
+            $this->switchBackUser();
+        }
     }
 
     public function testRequestMembershipAndCancel()
@@ -108,6 +163,86 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
             if ($SQL->requestExists($USER->uid, $gid)) {
                 $SQL->removeRequest($USER->uid, $gid);
             }
+        }
+    }
+
+    public static function providerApprove(): TRegxDataProvider
+    {
+        return TRegxDataProvider::list("approveUserByPI", "approveUserByAdmin");
+    }
+
+    #[DataProvider("providerApprove")]
+    public function testApproveNonexistentRequest($methodName)
+    {
+        global $USER;
+        $this->switchUser("Blank");
+        $uid = $USER->uid;
+        $this->switchUser("EmptyPIGroupOwner");
+        $piGroup = $USER->getPIGroup();
+        try {
+            $this->expectException(Exception::class); // FIXME more specific exception type
+            $this->$methodName($uid, $piGroup->gid);
+        } finally {
+            $this->switchUser("Blank", validate: false);
+            ensureUserNotInPIGroup($piGroup);
+        }
+    }
+
+    #[DataProvider("providerApprove")]
+    public function testApproveMember($methodName)
+    {
+        global $USER, $SSO, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        $this->switchUser("EmptyPIGroupOwner");
+        $pi_uid = $USER->uid;
+        $pi_group = $USER->getPIGroup();
+        $gid = $pi_group->gid;
+        $this->switchUser("Blank");
+        try {
+            $pi_group->newUserRequest($USER);
+            $this->assertTrue($pi_group->requestExists($USER));
+            $this->assertRequestedMembership(true, $gid);
+
+            $approve_uid = $SSO["user"];
+            $this->switchUser("EmptyPIGroupOwner", validate: false);
+            $this->$methodName($approve_uid, $gid);
+            $this->switchUser("Blank", validate: false);
+
+            $this->assertFalse($pi_group->requestExists($USER));
+            $this->assertRequestedMembership(false, $gid);
+            $this->assertTrue($pi_group->memberUIDExists($USER->uid));
+            $this->assertTrue($USER->getFlag(UserFlag::QUALIFIED));
+        } finally {
+            $this->switchUser("Blank", validate: false);
+            ensureUserNotInPIGroup($pi_group);
+            $this->assertGroupMembers($pi_group, [$pi_uid]);
+            $SQL->removeRequest($USER->uid, $gid);
+        }
+    }
+
+    public static function providerDeny()
+    {
+        return TRegxDataProvider::list("denyRequestByPI", "denyRequestByAdmin");
+    }
+
+    #[DataProvider("providerDeny")]
+    public function testDenyRequest(string $methodName)
+    {
+        global $USER, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        $this->switchUser("Blank");
+        $requestedUser = $USER;
+        $this->switchUser("EmptyPIGroupOwner");
+        $pi = $USER;
+        $piGroup = $USER->getPIGroup();
+        $this->assertEmpty($piGroup->getRequests());
+        $this->assertEqualsCanonicalizing([$pi->uid], $piGroup->getMemberUIDs());
+        try {
+            $piGroup->newUserRequest($requestedUser);
+            $this->assertNotEmpty($piGroup->getRequests());
+            $this->$methodName($requestedUser->uid);
+            $this->assertEmpty($piGroup->getRequests());
+            $this->assertEqualsCanonicalizing([$pi->uid], $piGroup->getMemberUIDs());
+        } finally {
+            $SQL->removeRequest($requestedUser->uid, $piGroup->gid);
         }
     }
 }

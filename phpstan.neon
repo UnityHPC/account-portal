@@ -52,7 +52,7 @@ parameters:
     - messages:
         - '#If condition is always false\.#'
       paths:
-        - test/functional/PIBecomeDenyTest.php
+        - test/functional/PIBecomeRequestTest.php
         - test/functional/UserDisableTest.php
         - webroot/panel/pi.php
     # $Subject is written by mail templates
