@@ -1,5 +1,9 @@
 /* Navbar */
 
+:root {
+  --header-height: 50px;
+}
+
 hr.navHR {
   margin-left: 10px;
   margin-right: 10px;
@@ -7,13 +11,9 @@ hr.navHR {
 
 nav.mainNav {
   background: var(--accent);
-  position: fixed;
-  left: 0;
-  top: 45px;
   font-size: 11pt;
-  overflow: hidden;
   white-space: nowrap;
-  z-index: 100;
+  z-index: 9;
 }
 
 nav.mainNav a {
@@ -40,11 +40,7 @@ nav.mainNav a.active {
 
 header {
   background: var(--accent);
-  height: 50px;
-  width: 250px;
-  position: fixed;
-  top: 0;
-  left: 0;
+  height: var(--header-height);
   z-index: 10;
 }
 
@@ -74,38 +70,35 @@ header > a.unity-state:hover {
 header > button.hamburger {
   background: var(--accent);
   padding: 0;
-  right: 23px;
-  height: 60%;
+  float: right;
 }
 
 header > button.hamburger > img {
-  position: relative;
-  height: 100%;
+  height: calc(var(--header-height) * 0.6);
+  margin-top: calc(var(--header-height) * 0.2);
+  margin-right: calc(var(--header-height) * 0.2);
 }
 
 /* MOBILE VIEW */
 
 @media only screen and (max-width: 1000px) {
-  nav.mainNav {
-    right: 0;
-  }
-
   header {
     width: 100%;
-  }
-
-  main {
-    /* Header element height + 2*element padding */
-    margin-top: 45px;
   }
 }
 
 /* DESKTOP VIEW */
 
 @media only screen and (min-width: 1001px) {
+  :root {
+    --navbar-width: 250px;
+  }
+
   nav.mainNav {
-    bottom: 0;
-    width: 250px;
+    position: fixed;
+    width: var(--navbar-width);
+    padding-top: var(--header-height);
+    height: 100%;
   }
 
   header > button.hamburger {
@@ -113,10 +106,17 @@ header > button.hamburger > img {
   }
 
   main {
-    margin-left: 250px;
+    margin-left: var(--navbar-width);
   }
 
   footer {
-    margin-left: 250px;
+    margin-left: var(--navbar-width);
+  }
+
+  header {
+    width: var(--navbar-width);
+    position: fixed;
+    top: 0;
+    left: 0;
   }
 }
