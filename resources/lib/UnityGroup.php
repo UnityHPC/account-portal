@@ -193,10 +193,6 @@ class UnityGroup extends PosixGroup
         \ensure($new_user->exists());
         $this->addMemberUID($new_user->uid);
         $this->SQL->removeRequest($new_user->uid, $this->gid);
-        $this->SQL->addLog(
-            "approved_user",
-            _json_encode(["user" => $new_user->uid, "group" => $this->gid]),
-        );
         if ($send_mail) {
             $this->MAILER->sendMail($new_user->getMail(), "group_user_added", [
                 "group" => $this->gid,
@@ -252,10 +248,6 @@ class UnityGroup extends PosixGroup
             throw new Exception("Cannot delete group owner from group. Disable group instead");
         }
         $this->removeMemberUID($new_user->uid);
-        $this->SQL->addLog(
-            "removed_user",
-            _json_encode(["user" => $new_user->uid, "group" => $this->gid]),
-        );
         if ($send_mail) {
             $this->MAILER->sendMail($new_user->getMail(), "group_user_removed", [
                 "group" => $this->gid,
@@ -476,12 +468,19 @@ class UnityGroup extends PosixGroup
         return $this->entry->getAttribute("managerUid");
     }
 
+    public function addMemberUID(string $uid): void
+    {
+        parent::addMemberUID($uid);
+        $this->SQL->addLog("added_user", _json_encode(["user" => $uid, "group" => $this->gid]));
+    }
+
     public function removeMemberUID(string $uid): void
     {
         if ($this->managerUIDExists($uid)) {
             $this->removeManagerUID($uid);
         }
         parent::removeMemberUID($uid);
+        $this->SQL->addLog("removed_user", _json_encode(["user" => $uid, "group" => $this->gid]));
     }
 
     public function addPlusAddressToMail(string $mail): string
