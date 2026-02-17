@@ -162,7 +162,7 @@ class UnityGroup extends PosixGroup
         }
         $this->SQL->removeRequest($this->getOwner()->uid, UnitySQL::REQUEST_BECOME_PI);
         if ($send_mail) {
-            $this->MAILER->sendMail("group_request_admin", "group_request_cancelled", [
+            $this->MAILER->sendMail("pi_approve", "group_request_cancelled", [
                 "uid" => $this->getOwner()->uid,
             ]);
         }
