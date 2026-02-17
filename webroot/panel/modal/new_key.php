@@ -38,7 +38,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 
     <div id="key_paste">
         <textarea placeholder="ssh-rsa AAARs1..." form="newKeyform" name="key"></textarea>
-        <input type="submit" value="Add Key" id="add-key" disabled />
+        <input type="submit" value="Add Key" disabled />
         <br>
         <p id="key_invalid_explanation" style="margin-top: 10px;"></p>
     </div>
