@@ -107,11 +107,10 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
         }, 300);
     });
 
-    $("#key_paste > textarea").on("input", function() {
+    $("textarea[name=key]").on("input", function() {
         var key = $(this).val();
-        var submit = $(this).siblings("input[type=submit]")
         if (key == "") {
-            submit.prop("disabled", true);
+            $("input[id=add-key]").prop("disabled", true);
             $("#key_invalid_explanation").text("");
             return;
         }
