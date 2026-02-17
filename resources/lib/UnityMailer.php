@@ -5,6 +5,8 @@ namespace UnityWebPortal\lib;
 use PHPMailer\PHPMailer\PHPMailer;
 use Exception;
 
+class UnityMailerException extends Exception {}
+
 /**
  * This is a class that uses PHPmailer to send emails based on templates
  */
@@ -80,7 +82,7 @@ class UnityMailer extends PHPMailer
      * @param string|string[] $recipients
      * @param ?mixed[] $data
      */
-    public function sendMail(string|array $recipients, string $template, ?array $data = null): bool
+    public function sendMail(string|array $recipients, string $template, ?array $data = null): void
     {
         $this->setFrom($this->MSG_SENDER_EMAIL, $this->MSG_SENDER_NAME);
         $this->addReplyTo($this->MSG_SUPPORT_EMAIL, $this->MSG_SUPPORT_NAME);
@@ -118,11 +120,10 @@ class UnityMailer extends PHPMailer
             }
         }
 
-        if (parent::send()) {
-            $this->clearAllRecipients();
-            return true;
-        } else {
-            return false;
+        $output = parent::send();
+        if ($output === false) {
+            throw new UnityMailerException($this->ErrorInfo);
         }
+        $this->clearAllRecipients();
     }
 }
