@@ -101,6 +101,9 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
         generateKey(type);
         setTimeout(() => {
             $(this).siblings("input[type=submit]").prop("disabled", false);
+            // for some reason $(this).siblings("button") is missing btnLin
+            // btnLin is in $(this).siblings().prevObject
+            $("#key_generate > button").prop("disabled", true);
         }, 300);
     });
 
