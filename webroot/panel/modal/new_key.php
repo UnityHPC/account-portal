@@ -112,7 +112,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
         var submit = $(this).siblings("input[type=submit]")
         if (key == "") {
             submit.prop("disabled", true);
-            $("#key_invalid_explanation").text("");
+            $("#key_invalid_explanation").text("").hide();
             return;
         }
         $.ajax({
@@ -123,15 +123,15 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
             success: function(result) {
                 if (result.is_valid) {
                     submit.prop("disabled", false);
-                    $("#key_invalid_explanation").text("");
+                    $("#key_invalid_explanation").text("").show();
                 } else {
                     submit.prop("disabled", true);
-                    $("#key_invalid_explanation").text(result.explanation);
+                    $("#key_invalid_explanation").text(result.explanation).show();
                 }
             },
             error: function(result) {
                 submit.prop("disabled", true);
-                $("#key_invalid_explanation").html(result.responseText);
+                $("#key_invalid_explanation").html(result.responseText).show();
             }
         });
     });
