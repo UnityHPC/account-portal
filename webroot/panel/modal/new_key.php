@@ -53,6 +53,11 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
         <input type="hidden" name="gen_key" />
         <button type="button" class="btnLin">OpenSSH</button>
         <button type="button" class="btnWin">PuTTY</button>
+        <input type="submit" value="Upload Public Key" disabled />
+        <br>
+        <p style="margin-top: 10px;">
+            Once you download your private key, you must also upload your public key.
+        </p>
     </div>
 
     <div style="display: none;" id="key_github">
@@ -78,7 +83,6 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
             success: function(result) {
                 $("input[type=hidden][name=gen_key]").val(result.public);
                 downloadFile(result.private, "privkey." + type); // Force download of private key
-                $("#newKeyform").submit();
             },
             error: function (result) {
                 $("#key_generate").append(result.responseText);
@@ -94,13 +98,17 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
             var type = "key";
         }
 
-        setTimeout(() => generateKey(type), 300);
+        generateKey(type);
+        setTimeout(() => {
+            $(this).siblings("input[type=submit]").prop("disabled", false);
+        }, 300);
     });
 
-    $("textarea[name=key]").on("input", function() {
+    $("#key_paste > textarea").on("input", function() {
         var key = $(this).val();
+        var submit = $(this).siblings("input[type=submit]")
         if (key == "") {
-            $("input[id=add-key]").prop("disabled", true);
+            submit.prop("disabled", true);
             $("#key_invalid_explanation").text("");
             return;
         }
