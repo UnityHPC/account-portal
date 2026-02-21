@@ -123,7 +123,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
             success: function(result) {
                 if (result.is_valid) {
                     submit.prop("disabled", false);
-                    $("#key_invalid_explanation").text("").show();
+                    $("#key_invalid_explanation").text("").hide();
                 } else {
                     submit.prop("disabled", true);
                     $("#key_invalid_explanation").text(result.explanation).show();
