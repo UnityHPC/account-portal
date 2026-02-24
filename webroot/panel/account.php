@@ -155,21 +155,21 @@ $isPI = $USER->isPI();
 
 if ($isPI) {
     echo "
-        <p>You are currently a <strong>principal investigator</strong> on the UnityHPC Platform.</p>
+        <p>You are currently a <strong>principal investigator</strong> on the Unity HPC Platform.</p>
     ";
 } else {
     if ($USER->getPIGroup()->exists() && $USER->getPIGroup()->getIsDisabled()) {
         echo "<p>You are no longer a PI because your PI group is disabled.</p>";
     }
     if ($USER->getFlag(UserFlag::QUALIFIED)) {
-        echo "<p>You are currently a <strong>qualified user</strong> on the UnityHPC Platform.</p>";
+        echo "<p>You are currently a <strong>qualified user</strong> on the Unity HPC Platform.</p>";
     } else {
         $tos_url = CONFIG["site"]["terms_of_service_url"];
         $form_url = getURL("panel/groups.php");
         echo "
             <p>
                 You are currently an <strong>unqualified user</strong>, and will be
-                <strong>unable to access UnityHPC Platform services</strong>.
+                <strong>unable to access Unity HPC Platform services</strong>.
                 To become qualified, request to join a PI group, or if you are a PI, request a PI group.
                 Do not request a PI group if you are a student.
             </p>
@@ -284,7 +284,7 @@ echo "
         <p>
             <strong>Disable Account</strong>
             <br>
-            You will lose access to UnityHPC Platform services
+            You will lose access to Unity HPC Platform services
             and your home directory will be permanently deleted.
             Your account can later be re-enabled.
         </p>

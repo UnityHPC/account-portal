@@ -25,10 +25,10 @@ Their details are below:
 
 <p>
     This user is expiring according to our <?php echo $policy_hyperlink; ?>.
-    They have lost acces to UnityHPC Platform services until they reset the inactivity timer by logging in to the <?php echo $portal_hyperlink; ?>.
+    They have lost acces to Unity HPC Platform services until they reset the inactivity timer by logging in to the <?php echo $portal_hyperlink; ?>.
 </p>
 
 <p>
-    If this user is no longer actively participating in your group using UnityHPC Platform services,
+    If this user is no longer actively participating in your group using Unity HPC Platform services,
     you might consider removing them from your group in the <?php echo $pi_hyperlink; ?>.
 </p>

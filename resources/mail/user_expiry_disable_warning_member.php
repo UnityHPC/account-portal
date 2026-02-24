@@ -13,7 +13,7 @@ $pi_group_gid = $data["pi_group_gid"];
 echo "
     The PI group $pi_group_gid is scheduled to be disabled on $expiration_date because the group owner has been idle for too long.
     Upon expiration, this group's files will be permanently deleted,
-    and you will lose access to UnityHPC Platform services unless you are a member of any other PI group.
+    and you will lose access to Unity HPC Platform services unless you are a member of any other PI group.
     If you don't wish for this to happen,
     remind your PI to reset the inactivity timer by simply logging in to the $portal_hyperlink.
     For more information, see our $policy_hyperlink.

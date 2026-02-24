@@ -7,9 +7,9 @@ repo = "https://github.com/UnityHPC/unity-web-portal"  ; Upstream URL for the we
 
 [site]
 prefix = ""  ; prefix of website, no ending / should be included
-name = "UnityHPC Account Portal"  ; Name of the website
+name = "Unity HPC Account Portal"  ; Name of the website
 url = "http://127.0.0.1:8000/"  ; URL of the website
-description = "The UnityHPC Account Portal is an identity management GUI for research computing"  ; Description of the website
+description = "The Unity HPC Account Portal is an identity management GUI for research computing"  ; Description of the website
 logo = "logo.png"  ; path to logo file, in the webroot/assets/branding folder
 terms_of_service_url = "https://github.com" ;
 account_policy_url = "https://github.com" ;

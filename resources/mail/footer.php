@@ -3,7 +3,7 @@
 >
   <span>
     You are receiving this email because you have an account
-    on the <?php echo getHyperlink("UnityHPC Platform", "/"); ?>.
+    on the <?php echo getHyperlink("Unity HPC Platform", "/"); ?>.
     If you would like to stop receiving these emails,
     you may request to close your account by replying to this email.
   </span>
