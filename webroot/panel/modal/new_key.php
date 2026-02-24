@@ -38,7 +38,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 
     <div id="key_paste">
         <textarea placeholder="ssh-rsa AAARs1..." form="newKeyform" name="key"></textarea>
-        <input type="submit" value="Add Key" id="add-key" disabled />
+        <input type="submit" value="Add Key" disabled />
         <br>
         <p id="key_invalid_explanation" style="margin-top: 10px;"></p>
     </div>
@@ -107,11 +107,12 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
         }, 300);
     });
 
-    $("textarea[name=key]").on("input", function() {
+    $("#key_paste > textarea").on("input", function() {
         var key = $(this).val();
+        var submit = $(this).siblings("input[type=submit]")
         if (key == "") {
-            $("input[id=add-key]").prop("disabled", true);
-            $("#key_invalid_explanation").text("");
+            submit.prop("disabled", true);
+            $("#key_invalid_explanation").text("").hide();
             return;
         }
         $.ajax({
@@ -121,16 +122,16 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
             data: {key: key},
             success: function(result) {
                 if (result.is_valid) {
-                    $("input[id=add-key]").prop("disabled", false);
-                    $("#key_invalid_explanation").text("");
+                    submit.prop("disabled", false);
+                    $("#key_invalid_explanation").text("").hide();
                 } else {
-                    $("input[id=add-key]").prop("disabled", true);
-                    $("#key_invalid_explanation").text(result.explanation);
+                    submit.prop("disabled", true);
+                    $("#key_invalid_explanation").text(result.explanation).show();
                 }
             },
             error: function(result) {
-                $("input[id=add-key]").prop("disabled", true);
-                $("#key_invalid_explanation").html(result.responseText);
+                submit.prop("disabled", true);
+                $("#key_invalid_explanation").html(result.responseText).show();
             }
         });
     });
