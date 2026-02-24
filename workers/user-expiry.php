@@ -14,7 +14,8 @@ $cli->description(
 )
     ->opt("dry-run", "Print actions without actually doing anything.", false, "boolean")
     ->opt("verbose", "Print which emails are sent.", false, "boolean")
-    ->opt("timestamp", "Use this unix timestamp instead of right now", false, "int");
+    ->opt("timestamp", "Use this unix timestamp instead of right now", false, "int")
+    ->opt("email-sleep-seconds", "Number of seconds to sleep after sending an email", false, "int");
 $args = $cli->parse($argv, true);
 
 $idlelock_warning_days = CONFIG["expiry"]["idlelock_warning_days"];
@@ -68,6 +69,9 @@ function sendMail(array|string $recipients, string $template, ?array $data = nul
     }
     if (!$args["dry-run"]) {
         $MAILER->sendMail($recipients, $template, $data);
+        if (isset($args["email-sleep-seconds"])) {
+            sleep($args["email-sleep-seconds"]);
+        }
     }
 }
 
