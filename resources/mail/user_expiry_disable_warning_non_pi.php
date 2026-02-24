@@ -11,7 +11,7 @@ $policy_hyperlink = getHyperlink("account policy", CONFIG["site"]["account_polic
 
 echo "
     Your account is scheduled to be disabled on $expiration_date because you have been idle for too long.
-    Upon expiration, you will lose access to UnityHPC Platform services.
+    Upon expiration, you will lose access to Unity HPC Platform services.
     If you don't wish for this to happen,
     reset the inactivity timer by simply logging in to the $portal_hyperlink.
     For more information, see our $policy_hyperlink.

@@ -1,4 +1,4 @@
-# Contributing to the UnityHPC Platform Account Portal
+# Contributing to the Unity HPC Platform Account Portal
 
 ## Conventions
 

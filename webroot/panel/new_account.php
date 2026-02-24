@@ -25,7 +25,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
     <strong>Email&nbsp;&nbsp;</strong>
     <?php echo $SSO["mail"]; ?>
 </div>
-<p>Your UnityHPC username will be <strong><?php echo $SSO["user"]; ?></strong>.</p>
+<p>Your Unity HPC username will be <strong><?php echo $SSO["user"]; ?></strong>.</p>
 <br>
 <form action="" method="POST">
     <?php echo $CSRFTokenHiddenFormInput; ?>

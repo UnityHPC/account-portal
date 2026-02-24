@@ -5,7 +5,7 @@ $this->Subject = "PI Account Approved"; ?>
 <p>Hello,</p>
 
 <p>
-Your request for a PI account on the UnityHPC Platform has been approved.
+Your request for a PI account on the Unity HPC Platform has been approved.
 You can access the management page for your group
 <?php echo getHyperlink("on this page", "panel/pi.php"); ?>.
 </p>

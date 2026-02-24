@@ -1,6 +1,6 @@
 ![UNITY](https://user-images.githubusercontent.com/40907639/137608695-2d914da2-1ecc-480b-a47e-a9e33b2b1b45.png)
 
-# UnityHPC Account Portal
+# Unity HPC Account Portal
 
 An identity management GUI for research computing written in PHP and built on MariaDB and OpenLDAP.
 

@@ -18,7 +18,7 @@ enum UserFlag: string
 }
 
 /**
- * An LDAP connection class which extends LDAPConn tailored for the UnityHPC Platform
+ * An LDAP connection class which extends LDAPConn tailored for the Unity HPC Platform
  * @phpstan-type attributes array<string, array<int|string>>
  */
 class UnityLDAP extends LDAPConn

@@ -4,8 +4,8 @@ case UserFlag::QUALIFIED: ?>
 <?php $this->Subject = "User Qualified"; ?>
 <p>Hello,</p>
 <p>
-    Your account on the UnityHPC Platform has been qualified.
-    You should now be able to access UnityHPC Platform services.
+    Your account on the Unity HPC Platform has been qualified.
+    You should now be able to access Unity HPC Platform services.
     Your account details are below:
 </p>
 <p>
@@ -25,7 +25,7 @@ page in our documentation for next steps.
 <?php case UserFlag::DISABLED: ?>
 <?php $this->Subject = "User Disabled"; ?>
 <p>Hello,</p>
-<p>Your account on the UnityHPC Platform has been disabled.</p>
+<p>Your account on the Unity HPC Platform has been disabled.</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 <?php break; ?>
 
@@ -33,7 +33,7 @@ page in our documentation for next steps.
 <?php case UserFlag::LOCKED: ?>
 <?php $this->Subject = "User Locked"; ?>
 <p>Hello,</p>
-<p>Your account on the UnityHPC Platform has been locked.</p>
+<p>Your account on the Unity HPC Platform has been locked.</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 <?php break; ?>
 
@@ -41,7 +41,7 @@ page in our documentation for next steps.
 <?php case UserFlag::IDLELOCKED: ?>
 <?php $this->Subject = "User Locked"; ?>
 <p>Hello,</p>
-<p>Your account on the UnityHPC Platform has been locked due to inactivity.</p>
+<p>Your account on the Unity HPC Platform has been locked due to inactivity.</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 <?php break; ?>
 
@@ -49,7 +49,7 @@ page in our documentation for next steps.
 <?php case UserFlag::ADMIN: ?>
 <?php $this->Subject = "User Promoted"; ?>
 <p>Hello,</p>
-<p>Your account on the UnityHPC Platform has been promoted to admin.</p>
+<p>Your account on the Unity HPC Platform has been promoted to admin.</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 <?php break; ?>
 
@@ -57,7 +57,7 @@ page in our documentation for next steps.
 <?php case UserFlag::IMMORTAL: ?>
 <?php $this->Subject = "User Immortalized"; ?>
 <p>Hello,</p>
-<p>Your account on the UnityHPC Platform has been made immortal (exempt from expiry).</p>
+<p>Your account on the Unity HPC Platform has been made immortal (exempt from expiry).</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 <?php break; ?>
 

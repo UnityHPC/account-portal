@@ -6,7 +6,7 @@ use Exception;
 use UnityWebPortal\lib\exceptions\EntryNotFoundException;
 
 /**
- * Class that represents a single PI group in the UnityHPC Platform.
+ * Class that represents a single PI group in the Unity HPC Platform.
  */
 class UnityGroup extends PosixGroup
 {
