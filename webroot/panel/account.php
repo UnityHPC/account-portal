@@ -120,6 +120,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             UnityHTTPD::messageSuccess("Account Disabled", "");
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
+        case "update_name_email":
+            $USER->setFirstname($SSO["firstname"]);
+            $USER->setLastname($SSO["lastname"]);
+            $USER->setFullname($SSO["name"]);
+            $USER->setMail($SSO["mail"]);
     }
 }
 
@@ -147,12 +152,29 @@ echo "
             <td><code>$mail</code></td>
         </tr>
     </table>
-    <hr>
-    <h2>Account Status</h2>
 ";
 
-$isPI = $USER->isPI();
+if (
+    $SSO["firstname"] !== $USER->getFirstname()
+    || $SSO["lastname"] !== $USER->getLastname()
+    || $SSO["gecos"] !== $USER->getFullname()
+    || $SSO["mail"] !== $USER->getMail()
+) {
+    echo "
+        <p>
+            The name/email from your SSO login does not match the name/email we have on file.
+            Would you like to update your name/email?
+        <p>
+        <form action='' method='POST' aria-label='Update Name/Email'>
+            $CSRFTokenHiddenFormInput
+            <input type='hidden' name='form_type' value='update_name_email' />
+            <input type='submit' value='Update Name/Email' />
+        </form>
+    ";
+}
 
+echo "<hr><h2>Account Status</h2>";
+$isPI = $USER->isPI();
 if ($isPI) {
     echo "
         <p>You are currently a <strong>principal investigator</strong> on the UnityHPC Platform.</p>

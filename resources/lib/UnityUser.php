@@ -44,9 +44,6 @@ class UnityUser
         return $this->uid;
     }
 
-    /**
-     * This is the method that is run when a new account is created
-     */
     public function init(
         string $firstname,
         string $lastname,
@@ -141,9 +138,6 @@ class UnityUser
         }
     }
 
-    /**
-     * Returns the ldap group entry corresponding to the user
-     */
     public function getUserGroupEntry(): LDAPEntry
     {
         return $this->LDAP->getUserGroupEntry($this->uid);
@@ -154,74 +148,68 @@ class UnityUser
         return $this->entry->exists() && $this->getUserGroupEntry()->exists();
     }
 
+    private function setAttribute(string $key, mixed $val): void
+    {
+        $before = $this->entry->getAttribute($key);
+        $this->entry->setAttribute($key, $val);
+        $this->SQL->addLog(
+            "attribute_changed",
+            _json_encode([
+                "uid" => $this->uid,
+                "attribute" => $key,
+                "before" => $before,
+                "after" => (array) $val,
+            ]),
+        );
+    }
+
     public function setOrg(string $org): void
     {
-        $this->entry->setAttribute("o", $org);
+        $this->setAttribute("o", $org);
     }
 
     public function getOrg(): string
     {
-        $this->entry->ensureExists();
         return $this->entry->getAttribute("o")[0];
     }
 
-    /**
-     * Sets the firstname of the account and the corresponding ldap entry if it exists
-     */
     public function setFirstname(string $firstname): void
     {
-        $this->entry->setAttribute("givenname", $firstname);
-        $this->SQL->addLog("firstname_changed", $this->uid);
+        $this->setAttribute("givenName", $firstname);
     }
 
-    /**
-     * Gets the firstname of the account
-     */
     public function getFirstname(): string
     {
-        $this->entry->ensureExists();
         return $this->entry->getAttribute("givenname")[0];
     }
 
-    /**
-     * Sets the lastname of the account and the corresponding ldap entry if it exists
-     */
     public function setLastname(string $lastname): void
     {
-        $this->entry->setAttribute("sn", $lastname);
-        $this->SQL->addLog("lastname_changed", $this->uid);
+        $this->setAttribute("sn", $lastname);
     }
 
-    /**
-     * Get method for the lastname on the account
-     */
     public function getLastname(): string
     {
-        $this->entry->ensureExists();
         return $this->entry->getAttribute("sn")[0];
+    }
+
+    public function setFullname(string $fullname)
+    {
+        $this->setAttribute("gecos", $fullname);
     }
 
     public function getFullname(): string
     {
-        $this->entry->ensureExists();
-        return $this->getFirstname() . " " . $this->getLastname();
+        return $this->entry->getAttribute("gecos");
     }
 
-    /**
-     * Sets the mail in the account and the ldap entry
-     */
     public function setMail(string $email): void
     {
-        $this->entry->setAttribute("mail", $email);
-        $this->SQL->addLog("email_changed", $this->uid);
+        $this->setAttribute("mail", $email);
     }
 
-    /**
-     * Method to get the mail instance var
-     */
     public function getMail(): string
     {
-        $this->entry->ensureExists();
         return $this->entry->getAttribute("mail")[0];
     }
 
@@ -238,9 +226,7 @@ class UnityUser
         return true;
     }
 
-    /**
-     *  @throws ArrayKeyException
-     */
+    /** @throws ArrayKeyException */
     public function removeSSHKey(string $key, bool $send_mail = true): void
     {
         $keys_before = $this->getSSHKeys();
@@ -254,31 +240,17 @@ class UnityUser
         $this->setSSHKeys($keys_after, $send_mail);
     }
 
-    /**
-     * Sets the SSH keys on the account and the corresponding entry
-     * @param string[] $keys
-     */
+    /** @param string[] $keys */
     private function setSSHKeys(array $keys, bool $send_mail = true): void
     {
         \ensure($this->entry->exists());
-        $this->entry->setAttribute("sshpublickey", $keys);
-        $this->SQL->addLog("sshkey_modify", $this->uid);
-        if ($send_mail) {
-            $this->MAILER->sendMail($this->getMail(), "user_sshkey", [
-                "keys" => $this->getSSHKeys(),
-            ]);
-        }
+        $this->setAttribute("sshpublickey", $keys);
     }
 
-    /**
-     * Returns the SSH keys attached to the account
-     * @return string[]
-     */
+    /** @return string[] */
     public function getSSHKeys(): array
     {
-        $this->entry->ensureExists();
-        $result = $this->entry->getAttribute("sshpublickey");
-        return $result;
+        return $this->entry->getAttribute("sshpublickey");
     }
 
     /* checks if key exists, ignoring the optional comment suffix */
@@ -294,9 +266,6 @@ class UnityUser
         return false;
     }
 
-    /**
-     * Sets the login shell for the account
-     */
     public function setLoginShell(string $shell, bool $send_mail = true): void
     {
         // ldap schema syntax is "IA5 String (1.3.6.1.4.1.1466.115.121.1.26)"
@@ -310,8 +279,7 @@ class UnityUser
             throw new Exception("login shell must not be empty!");
         }
         \ensure($this->entry->exists());
-        $this->entry->setAttribute("loginshell", $shell);
-        $this->SQL->addLog("loginshell_changed", $this->uid);
+        $this->setAttribute("loginshell", $shell);
         if ($send_mail) {
             $this->MAILER->sendMail($this->getMail(), "user_loginshell", [
                 "new_shell" => $this->getLoginShell(),
@@ -319,34 +287,21 @@ class UnityUser
         }
     }
 
-    /**
-     * Gets the login shell of the account
-     */
     public function getLoginShell(): string
     {
-        $this->entry->ensureExists();
         return $this->entry->getAttribute("loginshell")[0];
     }
 
     public function setHomeDir(string $home): void
     {
-        \ensure($this->entry->exists());
-        $this->entry->setAttribute("homedirectory", $home);
-        $this->SQL->addLog("homedir_changed", $this->uid);
+        $this->setAttribute("homedirectory", $home);
     }
 
-    /**
-     * Gets the home directory of the user
-     */
     public function getHomeDir(): string
     {
-        $this->entry->ensureExists();
         return $this->entry->getAttribute("homedirectory")[0];
     }
 
-    /**
-     * Checks if current user is a PI
-     */
     public function isPI(): bool
     {
         return $this->getPIGroup()->exists() && !$this->getPIGroup()->getIsDisabled();
@@ -368,18 +323,12 @@ class UnityUser
         return new UnityOrg($this->getOrg(), $this->LDAP);
     }
 
-    /**
-     * Gets the groups this user is assigned to, can be more than one
-     * @return string[]
-     */
+    /** @return string[] */
     public function getPIGroupGIDs(): array
     {
         return $this->LDAP->getNonDisabledPIGroupGIDsWithMemberUID($this->uid);
     }
 
-    /**
-     * Checks whether a user is in a group or not
-     */
     public function isInGroup(string $uid, UnityGroup $group): bool
     {
         return in_array($uid, $group->getMemberUIDs());
