@@ -59,9 +59,10 @@ See the Docker Compose environment (`tools/docker-dev/`) for an (unsafe for prod
        - `npx copy-files-from-to`
    - `httpd` `DocumentRoot` set to `webroot/`
    - `httpd` Authentication
-     - Any authentication will do as long as it defines `REMOTE_USER`, `givenName`, `sn`, and `mail`
+     - Any authentication will do as long as it defines `REMOTE_USER`, `givenName`, `sn`
        - `REMOTE_USER` must take the form `username@org`
        - `givenName` is first name, `sn` is last name
+       - `mail` attribute is preferred, but `REMOTE_USER` will be used as an email address if `mail` is absent
      - Unity uses Shibboleth SP and the Apache Shibboleth module (`apt install shibboleth-sp-utils libapache2-mod-shib` on Ubuntu)
    - `httpd` Authorization
      - Restricted access to `webroot/admin/`
