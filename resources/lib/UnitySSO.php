@@ -67,6 +67,7 @@ class UnitySSO
             "firstname" => self::getAttribute("givenName"),
             "lastname" => self::getAttribute("sn"),
             "name" => self::getAttribute("givenName") . " " . self::getAttribute("sn"),
+            // rescloud.umass.edu is one example of an IDP that does not send the mail attribute
             "mail" => self::getAttribute("mail", "eppn"),
         ];
     }
