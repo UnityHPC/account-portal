@@ -82,6 +82,7 @@ if (isset($_SERVER["REMOTE_USER"])) {
     $_SESSION["user_exists"] = $USER->exists() && !$USER->getFlag(UserFlag::DISABLED);
     $_SESSION["is_pi"] = $USER->isPI();
 
+    $last_login = $SQL->getUserLastLogin($USER->uid);
     $SQL->addLog("user_login", $OPERATOR->uid);
 
     $USER->updateIsQualified(); // in case manual changes have been made to PI groups
@@ -96,5 +97,17 @@ if (isset($_SERVER["REMOTE_USER"])) {
             "Account Unlocked",
             "Your account was previously locked due to inactivity.",
         );
+    } elseif ($last_login !== null) {
+        $idlelock_averted_timestamp = $last_login + CONFIG["expiry"]["idlelock_day"] * 60 * 60 * 24;
+        $seconds_until_idlelock_averted = $idlelock_averted_timestamp - time();
+        $days_until_idlelock_averted = intdiv($seconds_until_idlelock_averted, 60 * 60 * 24);
+        $warning_threshold = CONFIG["site"]["idlelock_warning_days"][0];
+        if ($days_until_idlelock_averted > $warning_threshold) {
+            $idlelock_averted_date = date("Y/m/d", $idlelock_averted_timestamp);
+            UnityHTTPD::messageSuccess(
+                "Inactivity Timer Reset",
+                "Your account's scheduled idle-lock on $idlelock_averted_date is cancelled.",
+            );
+        }
     }
 }
