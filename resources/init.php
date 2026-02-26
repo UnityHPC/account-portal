@@ -105,7 +105,7 @@ if (isset($_SERVER["REMOTE_USER"])) {
             $idlelock_averted_date = date("Y/m/d", $idlelock_averted_timestamp);
             UnityHTTPD::messageSuccess(
                 "Inactivity Timer Reset",
-                "Your account's scheduled idle-lock on $idlelock_averted_date is cancelled.",
+                "Your account's scheduled locking on $idlelock_averted_date is now cancelled.",
             );
         }
     }
