@@ -1,7 +1,7 @@
 <?php
 
 $this->Subject = "Group Member Disabled, Removed";
-$policy_hyperlink = getHyperlink("account policy", CONFIG["site"]["account_policy_url"]);
+$policy_hyperlink = formatHyperlink("account policy", CONFIG["site"]["account_expiration_policy_url"]);
 ?>
 
 <p>Hello,</p>

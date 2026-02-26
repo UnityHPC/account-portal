@@ -18,6 +18,6 @@ $this->Subject = "PI Group Request"; ?>
 
 <p>
 You can approve this account
-<?php echo getHyperlink("here", "admin/pi-mgmt.php"); ?>
+<?php echo getRelativeHyperlink("here", "admin/pi-mgmt.php"); ?>
 .
 </p>

@@ -24,7 +24,7 @@ $_SESSION["pi_group_gid_to_owner_gecos_and_mail"] = $pi_group_gid_to_owner_gecos
 <form
     id="newPIform"
     method="POST"
-    action="<?php echo getURL("panel/groups.php"); ?>"
+    action="<?php echo getRelativeURL("panel/groups.php"); ?>"
 >
     <?php echo $CSRFTokenHiddenFormInput; ?>
     <input type="hidden" name="form_type" value="addPIform">
@@ -56,7 +56,7 @@ $_SESSION["pi_group_gid_to_owner_gecos_and_mail"] = $pi_group_gid_to_owner_gecos
         function updateSearch() {
             const query = input.val();
             $.ajax({
-                url: '<?php echo getURL("panel/ajax/pi_search.php") ?>',
+                url: '<?php echo getRelativeURL("panel/ajax/pi_search.php") ?>',
                 data: {"search": query},
                 success: function(data) {
                     const results = JSON.parse(data);

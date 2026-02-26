@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     switch ($_POST["form_type"]) {
         case "viewAsUser":
             $_SESSION["viewUser"] = $_POST["uid"];
-            UnityHTTPD::redirect(getURL("panel/account.php"));
+            UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
             break; /** @phpstan-ignore deadCode.unreachable */
     }
 }

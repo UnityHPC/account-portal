@@ -132,7 +132,7 @@ function pathNormalize(string $path): string
     return _preg_replace("#/+#", "/", $path);
 }
 
-function getURL(string ...$relative_url_components): string
+function getRelativeURL(string ...$relative_url_components): string
 {
     if (!preg_match("#^\w+://#", CONFIG["site"]["url"])) {
         throw new RuntimeException('CONFIG[site][url] does not have a scheme! (ex: "https://")');
@@ -145,10 +145,14 @@ function getURL(string ...$relative_url_components): string
     return $site_url_scheme . $path_normalized;
 }
 
-function getHyperlink(string $text, string ...$url_components): string
+function getRelativeHyperlink(string $text, string ...$url_components): string
+{
+    return formatHyperlink($text, getRelativeURL(...$url_components));
+}
+
+function formatHyperlink(string $text, string $url): string
 {
     $text = htmlspecialchars($text);
-    $url = getURL(...$url_components);
     return "<a href='$url'>$text</a>";
 }
 

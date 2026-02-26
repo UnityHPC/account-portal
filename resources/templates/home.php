@@ -4,7 +4,7 @@
     Here you can manage your SSH keys, join and leave PI groups, manage your own PI group, and more.
     <?php
     if (!($_SESSION["user_exists"] ?? false)) {
-        $hyperlink = getHyperlink("Log In", "panel/account.php");
+        $hyperlink = getRelativeHyperlink("Log In", "panel/account.php");
         echo "Please $hyperlink for more information.";
     }
     ?>

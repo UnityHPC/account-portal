@@ -165,7 +165,7 @@ if ($isPI) {
         echo "<p>You are currently a <strong>qualified user</strong> on the Unity HPC Platform.</p>";
     } else {
         $tos_url = CONFIG["site"]["terms_of_service_url"];
-        $form_url = getURL("panel/groups.php");
+        $form_url = getRelativeURL("panel/groups.php");
         echo "
             <p>
                 You are currently an <strong>unqualified user</strong>, and will be
@@ -215,12 +215,12 @@ if (!$isPI) {
             $onclick = "return confirm(\"Are you sure you want to request a PI group?\")";
         }
         $tos_url = CONFIG["site"]["terms_of_service_url"];
-        $account_policy_url = CONFIG["site"]["account_policy_url"];
+        $pi_qualification_docs_url = CONFIG["site"]["pi_qualification_docs_url"];
         echo "
             <label>
                 <input type='checkbox' name='confirm_pi' value='agree' required>
                 I have read the PI
-                <a target='_blank' href='$account_policy_url'> account policy</a> guidelines.
+                <a target='_blank' href='$pi_qualification_docs_url'> account policy</a> guidelines.
             </label>
             <br>
             <label><input type='checkbox' name='tos' value='agree' required>
@@ -327,7 +327,7 @@ echo "</form></div>";
 ?>
 
 <script>
-    const url = '<?php echo getURL("panel/modal/new_key.php")?>';
+    const url = '<?php echo getRelativeURL("panel/modal/new_key.php")?>';
     const ldapLoginShell = '<?php echo $USER->getLoginShell(); ?>';
 
     $("button.btnAddKey").click(function() {

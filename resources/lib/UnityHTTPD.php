@@ -40,7 +40,7 @@ class UnityHTTPD
     */
     public static function redirect(?string $dest = null): never
     {
-        $dest ??= getURL($_SERVER["REQUEST_URI"]);
+        $dest ??= getRelativeURL($_SERVER["REQUEST_URI"]);
         header("Location: $dest");
         http_response_code(302);
         if (CONFIG["site"]["enable_redirect_message"]) {

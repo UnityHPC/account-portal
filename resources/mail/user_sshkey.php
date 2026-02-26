@@ -14,7 +14,7 @@ You have modified the SSH keys on your Unity account. These public keys are curr
 
 <p>
 You can view the SSH public keys attached to your account on the
-<?php echo getHyperlink("account settings", "/panel/account.php"); ?>
+<?php echo getRelativeHyperlink("account settings", "/panel/account.php"); ?>
 page.
 </p>
 

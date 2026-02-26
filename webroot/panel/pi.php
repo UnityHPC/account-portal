@@ -75,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             $group->disable();
             UnityHTTPD::messageSuccess("Group Disabled", "");
-            UnityHTTPD::redirect(getURL("panel/account.php"));
+            UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
             break; /** @phpstan-ignore deadCode.unreachable */
     }
 }
@@ -135,7 +135,7 @@ if (count($assocs) > 0) {
 echo "<h2>Users in Group</h2>";
 
 if (count($assocs) === 1) {
-    $hyperlink = getHyperlink("My PIs", "panel/groups.php");
+    $hyperlink = getRelativeHyperlink("My PIs", "panel/groups.php");
     echo "
         <p>
             You do not have any users in your group.

@@ -5,12 +5,12 @@ require_once __DIR__ . "/../../resources/autoload.php";
 use UnityWebPortal\lib\UnityHTTPD;
 
 if ($USER->exists()) {
-    UnityHTTPD::redirect(getURL("panel/account.php"));
+    UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     UnityHTTPD::validatePostCSRFToken();
     $USER->init($SSO["firstname"], $SSO["lastname"], $SSO["mail"], $SSO["org"]);
-    UnityHTTPD::redirect(getURL("panel/account.php"));
+    UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
 }
 require getTemplatePath("header.php");
 $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
