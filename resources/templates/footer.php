@@ -10,7 +10,7 @@
     for ($i = 0; $i < count($footer_logos); $i++) {
         echo
         "<a target='_blank' href='" . $footer_links[$i] . "'>
-        <img src='" . getURL("assets", $footer_logos[$i]) . "'
+        <img src='" . getRelativeURL("assets", $footer_logos[$i]) . "'
         draggable='false' title='" . $footer_titles[$i] . "'></a>";
     }
     ?>
@@ -31,7 +31,7 @@
 </body>
 <?php
 foreach (["global-late", "messages"] as $x) {
-    $url = getURL("js/$x.js?cache_bust_increment_me=" . CONFIG["upstream"]["version"]);
+    $url = getRelativeURL("js/$x.js?cache_bust_increment_me=" . CONFIG["upstream"]["version"]);
     echo "<script src='$url'></script>";
 }
 ?>

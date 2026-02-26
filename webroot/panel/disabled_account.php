@@ -6,13 +6,13 @@ use UnityWebPortal\lib\UnityHTTPD;
 use UnityWebPortal\lib\UserFlag;
 
 if (!$USER->getFlag(UserFlag::DISABLED)) {
-    UnityHTTPD::redirect(getURL("panel/account.php"));
+    UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     UnityHTTPD::validatePostCSRFToken();
     $USER->reEnable();
     UnityHTTPD::messageSuccess("Account Re-Enabled", "");
-    UnityHTTPD::redirect(getURL("panel/account.php"));
+    UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
 }
 require getTemplatePath("header.php");
 $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();

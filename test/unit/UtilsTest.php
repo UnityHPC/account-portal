@@ -128,7 +128,7 @@ class UtilsTest extends UnityWebPortalTestCase
     #[DataProvider("URLComponentProvider")]
     public function testGetURL(array $relative_url_components, string $expected)
     {
-        $this->assertEquals($expected, getURL(...$relative_url_components));
+        $this->assertEquals($expected, getRelativeURL(...$relative_url_components));
     }
 
     public static function shortenStringProvider()

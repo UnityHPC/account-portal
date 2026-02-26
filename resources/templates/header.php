@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         && ($_POST["form_type"] ?? null) == "clearView"
     ) {
         unset($_SESSION["viewUser"]);
-        UnityHTTPD::redirect(getURL("admin/user-mgmt.php"));
+        UnityHTTPD::redirect(getRelativeURL("admin/user-mgmt.php"));
     }
     // Webroot files need to handle their own POSTs before loading the header
     // so that they can do UnityHTTPD::badRequest before anything else has been printed.
@@ -24,13 +24,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 if (isset($SSO)) {
     if (!$USER->exists() && !str_ends_with($_SERVER["PHP_SELF"], "/panel/new_account.php")) {
-        UnityHTTPD::redirect(getURL("panel/new_account.php"));
+        UnityHTTPD::redirect(getRelativeURL("panel/new_account.php"));
     }
     if (
         $USER->getFlag(UserFlag::DISABLED) &&
         !str_ends_with($_SERVER["PHP_SELF"], "/panel/disabled_account.php")
     ) {
-        UnityHTTPD::redirect(getURL("panel/disabled_account.php"));
+        UnityHTTPD::redirect(getRelativeURL("panel/disabled_account.php"));
     }
 }
 ?>
@@ -46,7 +46,7 @@ if (isset($SSO)) {
       "buttons.colVis.min", "buttons.html5.min",
     ];
     foreach ($scripts as $x) {
-        $url = getURL("js/$x.js?cache_bust_increment_me=" . CONFIG["upstream"]["version"]);
+        $url = getRelativeURL("js/$x.js?cache_bust_increment_me=" . CONFIG["upstream"]["version"]);
         echo "<script src='$url'></script>";
     }
     ?>
@@ -67,7 +67,7 @@ if (isset($SSO)) {
       "dataTables.dataTables.min", "columnControl.dataTables.min", "buttons.dataTables.min",
     ];
     foreach ($stylesheets as $x) {
-        $url = getURL("css/$x.css?cache_bust_increment_me=" . CONFIG["upstream"]["version"]);
+        $url = getRelativeURL("css/$x.css?cache_bust_increment_me=" . CONFIG["upstream"]["version"]);
         echo "<link rel='stylesheet' type='text/css' href='$url' />";
     }
     ?>
@@ -82,11 +82,11 @@ if (isset($SSO)) {
 
    <header>
      <img id="imgLogo" draggable=false
-     src="<?php echo getURL("assets", CONFIG["site"]["logo"]); ?>" alt="Unity Logo">
+     src="<?php echo getRelativeURL("assets", CONFIG["site"]["logo"]); ?>" alt="Unity Logo">
      <button class="hamburger vertical-align">
        <img
          draggable="false"
-         src="<?php echo getURL("assets/menu.png") ?>"
+         src="<?php echo getRelativeURL("assets/menu.png") ?>"
          alt="Menu Button"
        >
      </button>
@@ -95,7 +95,7 @@ if (isset($SSO)) {
   <nav class="mainNav">
     <?php
     // Public Items - Always Visible
-    echo getHyperlink("Home", "index.php") . "\n";
+    echo getRelativeHyperlink("Home", "index.php") . "\n";
 
     $num_additional_items = count(CONFIG["menuitems"]["labels"]);
     for ($i = 0; $i < $num_additional_items; $i++) {
@@ -106,12 +106,12 @@ if (isset($SSO)) {
     if (isset($_SESSION["user_exists"]) && $_SESSION["user_exists"]) {
         echo "<hr class='navHR'>\n";
         // Menu Items for Present Users
-        echo getHyperlink("Account Settings", "panel/account.php") . "\n";
-        echo getHyperlink("My PIs", "panel/groups.php") . "\n";
+        echo getRelativeHyperlink("Account Settings", "panel/account.php") . "\n";
+        echo getRelativeHyperlink("My PIs", "panel/groups.php") . "\n";
 
         if (isset($_SESSION["is_pi"]) && $_SESSION["is_pi"]) {
             // PI only pages
-            echo getHyperlink("My Users", "panel/pi.php") . "\n";
+            echo getRelativeHyperlink("My Users", "panel/pi.php") . "\n";
         }
 
         // additional branding items
@@ -127,11 +127,11 @@ if (isset($SSO)) {
         ) {
             echo "<hr class='navHR'>\n";
             // Admin only pages
-            echo getHyperlink("User Management", "admin/user-mgmt.php") . "\n";
-            echo getHyperlink("PI Management", "admin/pi-mgmt.php") . "\n";
+            echo getRelativeHyperlink("User Management", "admin/user-mgmt.php") . "\n";
+            echo getRelativeHyperlink("PI Management", "admin/pi-mgmt.php") . "\n";
         }
     } else {
-        echo getHyperlink("Login / Request Account", "panel/account.php") . "\n";
+        echo getRelativeHyperlink("Login / Request Account", "panel/account.php") . "\n";
     }
     ?>
   </nav>
@@ -146,7 +146,7 @@ if (isset($SSO)) {
     </div>
   </div>
   <script
-    src="<?php echo getURL("js/modal.js?cache_bust_increment_me=" . CONFIG["upstream"]["version"]) ?>"
+    src="<?php echo getRelativeURL("js/modal.js?cache_bust_increment_me=" . CONFIG["upstream"]["version"]) ?>"
   ></script>
   <main>
 

@@ -165,7 +165,7 @@ if ($isPI) {
         echo "<p>You are currently a <strong>qualified user</strong> on the Unity HPC Platform.</p>";
     } else {
         $tos_url = CONFIG["site"]["terms_of_service_url"];
-        $form_url = getURL("panel/groups.php");
+        $form_url = getRelativeURL("panel/groups.php");
         echo "
             <p>
                 You are currently an <strong>unqualified user</strong>, and will be
@@ -327,7 +327,7 @@ echo "</form></div>";
 ?>
 
 <script>
-    const url = '<?php echo getURL("panel/modal/new_key.php")?>';
+    const url = '<?php echo getRelativeURL("panel/modal/new_key.php")?>';
     const ldapLoginShell = '<?php echo $USER->getLoginShell(); ?>';
 
     $("button.btnAddKey").click(function() {

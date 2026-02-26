@@ -144,7 +144,7 @@ if (count($req_filtered) > 0) {
 echo "<h2>Current Groups</h2>";
 
 if ($USER->isPI() && count($PIGroupGIDs) == 1) {
-    $url = getURL("panel/pi.php");
+    $url = getRelativeURL("panel/pi.php");
     echo "
         You are only a member of your own PI group.
         Navigate to the
@@ -154,7 +154,7 @@ if ($USER->isPI() && count($PIGroupGIDs) == 1) {
 }
 
 if (count($PIGroupGIDs) == 0) {
-    $url = getURL("panel/groups.php");
+    $url = getRelativeURL("panel/groups.php");
     echo "You are not a member of any groups. Request to join a PI using the button below,
     or request your own PI account on the <a href='$url'>account settings</a> page";
 }
@@ -202,7 +202,7 @@ foreach ($PIGroupGIDs as $gid) {
         </form>
     ";
     if (in_array($USER->uid, $PIGroupManagers[$gid])) {
-        $url = getURL("panel/pi.php");
+        $url = getRelativeURL("panel/pi.php");
         echo "
             <form action='$url' method='GET'>
                 <input type='hidden' name='gid' value='$gid'>
@@ -226,7 +226,7 @@ echo "</table>";
 
 <script>
     $("button.btnAddPI").click(function () {
-        openModal("Add New PI", "<?php echo getURL("panel/modal/new_pi.php"); ?>");
+        openModal("Add New PI", "<?php echo getRelativeURL("panel/modal/new_pi.php"); ?>");
     });
 </script>
 
