@@ -396,6 +396,18 @@ class UnityWebPortalTestCase extends TestCase
         $this->assertNotEmpty($messages_with_title_and_body_and_level, $error_msg);
     }
 
+    public function assertNumberOfMessages(int $expected)
+    {
+        $messages = UnityHTTPD::getMessages();
+        $found = count($messages);
+        $this->assertEquals(
+            $expected,
+            $found,
+            "expected $expected messages, found $found: " . _json_encode($messages, JSON_PRETTY_PRINT)
+        );
+
+    }
+
     public function assertGroupMembers(UnityGroup $group, array $expected_members)
     {
         sort($expected_members);
