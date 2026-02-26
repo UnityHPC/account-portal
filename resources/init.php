@@ -99,9 +99,9 @@ if (isset($_SERVER["REMOTE_USER"])) {
         );
     }
     if ($last_login !== null) {
-        $days = fn($seconds) => $seconds * 60 * 60 * 24;
         $first_idlelock_warning_day = CONFIG["expiry"]["idlelock_warning_days"][0];
         $idlelock_averted_day = CONFIG["expiry"]["idlelock_day"];
+        $days = fn($seconds) => $seconds * 60 * 60 * 24;
         $first_idlelock_warning_timestamp = $last_login + $days($first_idlelock_warning_day);
         $idlelock_averted_timestamp = $last_login + $days($idlelock_averted_day);
         // if user logged in after the 1st warning and before the idlelock
