@@ -98,6 +98,7 @@ if (isset($_SERVER["REMOTE_USER"])) {
             "Your account was previously locked due to inactivity.",
         );
     }
+
     if ($last_login !== null) {
         $first_idlelock_warning_day = CONFIG["expiry"]["idlelock_warning_days"][0];
         $idlelock_averted_day = CONFIG["expiry"]["idlelock_day"];
