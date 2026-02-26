@@ -97,12 +97,16 @@ if (isset($_SERVER["REMOTE_USER"])) {
             "Account Unlocked",
             "Your account was previously locked due to inactivity.",
         );
-    } elseif ($last_login !== null) {
+    }
+    if ($last_login !== null) {
         $days = fn($seconds) => $seconds * 60 * 60 * 24;
         $first_idlelock_warning_day = CONFIG["expiry"]["idlelock_warning_days"][0];
         $idlelock_averted_day = CONFIG["expiry"]["idlelock_day"];
-        if (time() > $last_login + $days($first_idlelock_warning_day)) {
-            $idlelock_averted_date = date("Y/m/d", $last_login + $days($idlelock_averted_day));
+        $first_idlelock_warning_timestamp = $last_login + $days($first_idlelock_warning_day);
+        $idlelock_averted_timestamp = $last_login + $days($idlelock_averted_day);
+        // if user logged in after the 1st warning and before the idlelock
+        if ($first_idlelock_warning_day < time() && time() < $idlelock_averted_timestamp) {
+            $idlelock_averted_date = date("Y/m/d", $idlelock_averted_timestamp);
             UnityHTTPD::messageSuccess(
                 "Inactivity Timer Reset",
                 "Your account's scheduled locking on $idlelock_averted_date is now cancelled.",
