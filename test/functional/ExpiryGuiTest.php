@@ -1,8 +1,10 @@
 <?php
+
 use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 
-class IdleUnlockTest extends UnityWebPortalTestCase
+
+class ExpiryGuiTest extends UnityWebPortalTestCase
 {
     public function testIdleUnlock()
     {
