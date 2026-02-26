@@ -147,8 +147,12 @@ function getRelativeURL(string ...$relative_url_components): string
 
 function getRelativeHyperlink(string $text, string ...$url_components): string
 {
+    return fmtHyperlink($text, getRelativeURL(...$url_components));
+}
+
+function fmtHyperlink(string $text, string $url): string
+{
     $text = htmlspecialchars($text);
-    $url = getRelativeURL(...$url_components);
     return "<a href='$url'>$text</a>";
 }
 

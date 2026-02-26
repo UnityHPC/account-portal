@@ -215,12 +215,12 @@ if (!$isPI) {
             $onclick = "return confirm(\"Are you sure you want to request a PI group?\")";
         }
         $tos_url = CONFIG["site"]["terms_of_service_url"];
-        $account_policy_url = CONFIG["site"]["account_policy_url"];
+        $pi_qualification_docs_url = CONFIG["site"]["pi_qualification_docs_url"];
         echo "
             <label>
                 <input type='checkbox' name='confirm_pi' value='agree' required>
                 I have read the PI
-                <a target='_blank' href='$account_policy_url'> account policy</a> guidelines.
+                <a target='_blank' href='$pi_qualification_docs_url'> account policy</a> guidelines.
             </label>
             <br>
             <label><input type='checkbox' name='tos' value='agree' required>

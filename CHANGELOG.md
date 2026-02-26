@@ -36,6 +36,8 @@ For details on the changes in each release, see [the Releases page](https://gith
   - authentication: none
 - a new LDAP posixGroup needs to be created for "immortal" users, who are exempt from automatic account expiration
   - the `[ldap]user_flag_groups[immortal]` open must also be defined
+- the `[site]account_policy_url` option has been renamed to `[site]pi_qualification_docs_url`
+- the `[site]account_expiration_policy_url` option must be defined
 
 ### 1.5 -> 1.6
 

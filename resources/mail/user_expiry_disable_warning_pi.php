@@ -7,7 +7,7 @@ $idle_days = $data["idle_days"];
 $expiration_date = $data["expiration_date"];
 $is_final_warning = $data["is_final_warning"];
 $portal_hyperlink = getRelativeHyperlink("account portal");
-$policy_hyperlink = getRelativeHyperlink("account policy", CONFIG["site"]["account_policy_url"]);
+$policy_hyperlink = fmtHyperlink("account policy", CONFIG["site"]["account_expiration_policy_url"]);
 $pi_group_gid = $data["pi_group_gid"];
 
 echo "
