@@ -2,7 +2,7 @@
 
 $this->Subject = "Group Member Idle-Locked";
 $portal_hyperlink = getRelativeHyperlink("account portal");
-$policy_hyperlink = fmtHyperlink("account policy", CONFIG["site"]["account_expiration_policy_url"]);
+$policy_hyperlink = formatHyperlink("account policy", CONFIG["site"]["account_expiration_policy_url"]);
 $pi_hyperlink = getRelativeHyperlink("group management page", "panel/pi.php");
 ?>
 
