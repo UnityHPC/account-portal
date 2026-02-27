@@ -31,11 +31,13 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
         }
     }
 
-    private function setLastLogin(int $days_ago, int $seconds_offset = 0): void
+    private function assertIdleDays(int $expected)
     {
-        global $SQL, $USER;
-        $x = time() - $days_ago * 24 * 60 * 60 + $seconds_offset;
-        callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, $x);
+        global $USER, $SQL;
+        $this->assertEquals(
+            $expected,
+            $SQL->convertLastLoginToDaysIdle($SQL->getUserLastLogin($USER->uid)),
+        );
     }
 
     public function testInactivityTimerResetConfirmation()
@@ -48,7 +50,6 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
         $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
         // see deployment/overrides/phpunit/config/config.ini
         $this->assertEquals(CONFIG["expiry"]["idlelock_warning_days"][0], 2);
-        $this->assertEquals(CONFIG["expiry"]["idlelock_day"], 4);
         try {
             // null ////////////////////////////////////////////////////////////////////////////////
             callPrivateMethod($SQL, "removeUserLastLogin", $USER->uid);
@@ -57,13 +58,15 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
             $this->assertNumberOfMessages(0);
             UnityHTTPD::clearMessages();
             // 1 second before 1st warning /////////////////////////////////////////////////////////
-            $this->setLastLogin(days_ago: 2, seconds_offset: -1);
+            callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, strtotime("-2 days +1 second"));
+            $this->assertIdleDays(1);
             session_write_close();
             $this->http_get(__DIR__ . "/../../resources/init.php");
             $this->assertNumberOfMessages(0);
             UnityHTTPD::clearMessages();
             // moment of 1st warning ///////////////////////////////////////////////////////////////
-            $this->setLastLogin(days_ago: 2);
+            callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, strtotime("-2 days"));
+            $this->assertIdleDays(2);
             session_write_close();
             $this->http_get(__DIR__ . "/../../resources/init.php");
             $this->assertMessageExists(
@@ -74,7 +77,6 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
             $this->assertNumberOfMessages(1);
             UnityHTTPD::clearMessages();
             // idlelocked //////////////////////////////////////////////////////////////////////////
-            $this->setLastLogin(days_ago: 4);
             $USER->setFlag(UserFlag::IDLELOCKED, true);
             session_write_close();
             $this->http_get(__DIR__ . "/../../resources/init.php");
