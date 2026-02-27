@@ -16,11 +16,26 @@ jobs:
         uses: docker/setup-buildx-action@v3
       - name: Build docker-compose images with cache
         run: |
-          docker buildx bake \
-            --file ./tools/docker-dev/docker-compose.yml \
-            --set "*.cache-from=type=gha" \
-            --set "*.cache-to=type=gha,mode=max" \
-            --load
+          docker buildx build \
+            --tag identity \
+            --cache-from type=gha \
+            --cache-to type=gha,mode=max \
+            --load \
+            ./tools/docker-dev/identity
+
+          docker buildx build \
+            --tag sql \
+            --cache-from type=gha \
+            --cache-to type=gha,mode=max \
+            --load \
+            ./tools/docker-dev/sql
+
+          docker buildx build \
+            --tag web \
+            --cache-from type=gha \
+            --cache-to type=gha,mode=max \
+            --load \
+            ./tools/docker-dev/web
       - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
