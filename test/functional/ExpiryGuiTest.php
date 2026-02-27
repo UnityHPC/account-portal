@@ -55,6 +55,7 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
         try {
             // very first login ////////////////////////////////////////////////////////////////////
             callPrivateMethod($SQL, "removeUserLastLogin", $USER->uid);
+            $this->assertIdleDays(0);
             session_write_close();
             $this->http_get(__DIR__ . "/../../resources/init.php");
             $this->assertNumberOfMessages(0);
