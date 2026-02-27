@@ -264,7 +264,6 @@ function accessPrivateVariable($obj, string $name)
 {
     $class = new \ReflectionClass($obj);
     $property = $class->getProperty($name);
-    $property->setAccessible(true);
     return $property->getValue($obj);
 }
 
