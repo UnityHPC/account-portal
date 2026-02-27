@@ -163,6 +163,12 @@ class UnitySQL
         return $stmt->fetchAll();
     }
 
+    public function convertLastLoginToDaysIdle(int $timestamp)
+    {
+        $idle_seconds = time() - $timestamp;
+        return intdiv($idle_seconds, 60 * 60 * 24);
+    }
+
     /* for testing purposes */
     private function setUserLastLogin(string $uid, int $timestamp): void
     {

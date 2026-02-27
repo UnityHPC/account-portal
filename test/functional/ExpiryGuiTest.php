@@ -4,7 +4,6 @@ use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnityHTTPD;
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 
-
 class ExpiryGuiTest extends UnityWebPortalTestCase
 {
     public function testIdleUnlock()
@@ -32,13 +31,14 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
         }
     }
 
-    private function setLastLoginDaysAgo(int $days_ago): void
+    private function setLastLogin(int $days_ago, int $seconds_offset = 0): void
     {
         global $SQL, $USER;
-        callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, time() - $days_ago * 24 * 60 * 60);
+        $x = time() - $days_ago * 24 * 60 * 60 + $seconds_offset;
+        callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, $x);
     }
 
-    public function testConfirmationMessages()
+    public function testInactivityTimerResetConfirmation()
     {
         global $SQL, $USER;
         $this->switchUser("Blank");
@@ -56,32 +56,50 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
             http_get(__DIR__ . "/../../resources/init.php");
             $this->assertNumberOfMessages(0);
             UnityHTTPD::clearMessages();
+            // 1 second before 1st warning /////////////////////////////////////////////////////////
+            $this->setLastLogin(days_ago: 1, seconds_offset: -1);
+            session_destroy();
+            http_get(__DIR__ . "/../../resources/init.php");
+            $this->assertNumberOfMessages(0);
+            UnityHTTPD::clearMessages();
             // 1 ///////////////////////////////////////////////////////////////////////////////////
-            $this->setLastLoginDaysAgo(1);
+            $this->setLastLogin(days_ago: 1);
             session_destroy();
             http_get(__DIR__ . "/../../resources/init.php");
             $this->assertNumberOfMessages(0);
             UnityHTTPD::clearMessages();
             // 2 ///////////////////////////////////////////////////////////////////////////////////
-            $this->setLastLoginDaysAgo(2);
+            $this->setLastLogin(days_ago: 2);
             session_destroy();
             http_get(__DIR__ . "/../../resources/init.php");
-            $this->assertMessageExists(UnityHTTPDMessageLevel::SUCCESS, "/Inactivity Timer Reset/", "/.*/");
+            $this->assertMessageExists(
+                UnityHTTPDMessageLevel::SUCCESS,
+                "/Inactivity Timer Reset/",
+                "/.*/",
+            );
             $this->assertNumberOfMessages(1);
             UnityHTTPD::clearMessages();
             // 3 ///////////////////////////////////////////////////////////////////////////////////
-            $this->setLastLoginDaysAgo(3);
+            $this->setLastLogin(days_ago: 3);
             session_destroy();
             http_get(__DIR__ . "/../../resources/init.php");
-            $this->assertMessageExists(UnityHTTPDMessageLevel::SUCCESS, "/Inactivity Timer Reset/", "/.*/");
+            $this->assertMessageExists(
+                UnityHTTPDMessageLevel::SUCCESS,
+                "/Inactivity Timer Reset/",
+                "/.*/",
+            );
             $this->assertNumberOfMessages(1);
             UnityHTTPD::clearMessages();
             // idlelocked //////////////////////////////////////////////////////////////////////////
-            $this->setLastLoginDaysAgo(4);
+            $this->setLastLogin(days_ago: 4);
             $USER->setFlag(UserFlag::IDLELOCKED, true);
             session_destroy();
             http_get(__DIR__ . "/../../resources/init.php");
-            $this->assertMessageExists(UnityHTTPDMessageLevel::SUCCESS, "/Account Unlocked/", "/.*/");
+            $this->assertMessageExists(
+                UnityHTTPDMessageLevel::SUCCESS,
+                "/Account Unlocked/",
+                "/.*/",
+            );
             $this->assertNumberOfMessages(1);
             UnityHTTPD::clearMessages();
             // disabled ////////////////////////////////////////////////////////////////////////////
@@ -91,7 +109,6 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
             http_get(__DIR__ . "/../../webroot/panel/account.php", ignore_die: true);
             $this->assertNumberOfMessages(0);
             UnityHTTPD::clearMessages();
-
         } finally {
             $USER->setFlag(UserFlag::IDLELOCKED, false);
             if ($USER->getFlag(UserFlag::DISABLED)) {
@@ -105,5 +122,4 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
             callPrivateMethod($USER, "setSSHKeys", $ssh_keys_before);
         }
     }
-
 }
