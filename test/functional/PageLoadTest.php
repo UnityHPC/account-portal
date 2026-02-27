@@ -103,10 +103,11 @@ class PageLoadTest extends UnityWebPortalTestCase
         $this->assertMatchesRegularExpression("/panel\/disabled_account\.php/", $output);
     }
 
-    public function testLoadPageLockedUser()
+    #[DataProvider("phpFilesWithNormalHeaderRedirects")]
+    public function testLoadPageLockedUser($path)
     {
         $this->switchUser("Locked");
-        $output = $this->http_get(__DIR__ . "/../../webroot/panel/account.php", ignore_die: true);
+        $output = $this->http_get($path, ignore_die: true);
         $this->assertMatchesRegularExpression("/Your account is locked\./", $output);
     }
 
