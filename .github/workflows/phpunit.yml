@@ -44,4 +44,5 @@ jobs:
       - uses: hoverkraft-tech/compose-action@v2.0.1
         with:
           compose-file: "./tools/docker-dev/docker-compose.yml"
+          compose-flags: "--no-build"
       - run: docker compose -f ./tools/docker-dev/docker-compose.yml exec -w '/var/www/unity-web-portal' web bash -c 'XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-clover="$(mktemp --suffix=.xml)" -d --min-coverage=./coverage.php'
