@@ -16,12 +16,16 @@ class SSHKeyDeleteTest extends UnityWebPortalTestCase
         self::$initialKeys = $USER->getSSHKeys();
     }
 
-    private function deleteKey(string $key): void
+    private function deleteKey(string $key, bool $do_validate_messages = true): void
     {
-        http_post(__DIR__ . "/../../webroot/panel/account.php", [
-            "form_type" => "delKey",
-            "delKey" => $key,
-        ]);
+        $this->http_post(
+            __DIR__ . "/../../webroot/panel/account.php",
+            [
+                "form_type" => "delKey",
+                "delKey" => $key,
+            ],
+            do_validate_messages: $do_validate_messages,
+        );
     }
 
     public static function getGarbageKeys()
@@ -35,7 +39,7 @@ class SSHKeyDeleteTest extends UnityWebPortalTestCase
     {
         global $USER;
         try {
-            $this->deleteKey($key);
+            $this->deleteKey($key, do_validate_messages: false);
             $this->assertEquals(self::$initialKeys, $USER->getSSHKeys());
             $this->assertMessageExists(UnityHTTPDMessageLevel::ERROR, "/.*/", "/Key not found/");
         } finally {

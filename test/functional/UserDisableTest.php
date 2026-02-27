@@ -10,7 +10,7 @@ class UserDisableTest extends UnityWebPortalTestCase
         $this->switchUser("Blank");
         $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
         try {
-            http_post(__DIR__ . "/../../webroot/panel/account.php", [
+            $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
                 "form_type" => "disable",
             ]);
             $this->assertTrue($USER->getFlag(UserFlag::DISABLED));
@@ -27,9 +27,13 @@ class UserDisableTest extends UnityWebPortalTestCase
         $this->switchUser("EmptyPIGroupOwner");
         $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
         try {
-            http_post(__DIR__ . "/../../webroot/panel/account.php", [
-                "form_type" => "disable",
-            ]);
+            $this->http_post(
+                __DIR__ . "/../../webroot/panel/account.php",
+                [
+                    "form_type" => "disable",
+                ],
+                do_validate_messages: false,
+            );
             $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
             $this->assertMessageExists(UnityHTTPDMessageLevel::ERROR, "/.*/", "/You are a PI/");
         } finally {
@@ -45,9 +49,13 @@ class UserDisableTest extends UnityWebPortalTestCase
         $this->switchUser("EmptyPIGroupOwner");
         $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
         try {
-            http_post(__DIR__ . "/../../webroot/panel/account.php", [
-                "form_type" => "disable",
-            ]);
+            $this->http_post(
+                __DIR__ . "/../../webroot/panel/account.php",
+                [
+                    "form_type" => "disable",
+                ],
+                do_validate_messages: false,
+            );
             $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
             $this->assertMessageExists(UnityHTTPDMessageLevel::ERROR, "/.*/", "/you are a member/");
         } finally {

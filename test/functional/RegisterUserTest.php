@@ -19,12 +19,14 @@ class RegisterUserTest extends UnityWebPortalTestCase
 
     private function register()
     {
-        http_post(__DIR__ . "/../../webroot/panel/new_account.php", ["eula" => "agree"]);
+        $this->http_post(__DIR__ . "/../../webroot/panel/new_account.php", ["eula" => "agree"]);
     }
 
     private function reEnable()
     {
-        http_post(__DIR__ . "/../../webroot/panel/disabled_account.php", ["eula" => "agree"]);
+        $this->http_post(__DIR__ . "/../../webroot/panel/disabled_account.php", [
+            "eula" => "agree",
+        ]);
     }
 
     #[DataProvider("provider")]

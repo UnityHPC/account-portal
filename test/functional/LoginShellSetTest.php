@@ -41,7 +41,7 @@ class LoginShellSetTest extends UnityWebPortalTestCase
         if (!$this->isShellValid($shell)) {
             $this->expectException("Exception");
         }
-        http_post(__DIR__ . "/../../webroot/panel/account.php", [
+        $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
             "form_type" => "loginshell",
             "shellSelect" => $shell,
         ]);

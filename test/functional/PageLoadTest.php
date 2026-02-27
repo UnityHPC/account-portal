@@ -76,7 +76,7 @@ class PageLoadTest extends UnityWebPortalTestCase
     public function testLoadPage($nickname, $path, $regex, $ignore_die = false)
     {
         $this->switchUser($nickname);
-        $output = http_get(__DIR__ . "/../../webroot/" . $path, ignore_die: $ignore_die);
+        $output = $this->http_get(__DIR__ . "/../../webroot/" . $path, ignore_die: $ignore_die);
         $this->assertMatchesRegularExpression($regex, $output);
     }
 
@@ -84,7 +84,7 @@ class PageLoadTest extends UnityWebPortalTestCase
     public function testLoadAdminPageNotAnAdmin($path)
     {
         $this->switchUser("Blank");
-        $output = http_get($path, ignore_die: true);
+        $output = $this->http_get($path, ignore_die: true);
         $this->assertMatchesRegularExpression("/You are not an admin\./", $output);
     }
 
@@ -92,7 +92,7 @@ class PageLoadTest extends UnityWebPortalTestCase
     public function testLoadPageNonexistentUser($path)
     {
         $this->switchUser("NonExistent");
-        $output = http_get($path, ignore_die: true);
+        $output = $this->http_get($path, ignore_die: true);
         $this->assertMatchesRegularExpression("/panel\/new_account\.php/", $output);
     }
 
@@ -100,7 +100,7 @@ class PageLoadTest extends UnityWebPortalTestCase
     public function testLoadPageDisabled($path)
     {
         $this->switchUser("Disabled");
-        $output = http_get($path, ignore_die: true);
+        $output = $this->http_get($path, ignore_die: true);
         $this->assertMatchesRegularExpression("/panel\/disabled_account\.php/", $output);
     }
 
@@ -123,7 +123,7 @@ class PageLoadTest extends UnityWebPortalTestCase
         $gids = $LDAP->getNonDisabledPIGroupGIDsWithManagerUID($USER->uid);
         $this->assertTrue(count($gids) > 0);
         $gid = $gids[0];
-        $output = http_get(__DIR__ . "/../../webroot/panel/pi.php", [
+        $output = $this->http_get(__DIR__ . "/../../webroot/panel/pi.php", [
             "gid" => $gid,
         ]);
         $this->assertMatchesRegularExpression("/PI Group '$gid'/", $output);
@@ -135,7 +135,7 @@ class PageLoadTest extends UnityWebPortalTestCase
         $this->switchUser("EmptyPIGroupOwner");
         $gid = $USER->getPIGroup()->gid;
         $this->switchUser("Blank");
-        $output = http_get(
+        $output = $this->http_get(
             __DIR__ . "/../../webroot/panel/pi.php",
             ["gid" => $gid],
             ignore_die: true,
@@ -146,7 +146,7 @@ class PageLoadTest extends UnityWebPortalTestCase
     public function testLoadPIPageForNonexistentGroup()
     {
         $this->switchUser("Blank");
-        $output = http_get(
+        $output = $this->http_get(
             __DIR__ . "/../../webroot/panel/pi.php",
             ["gid" => "foobar"],
             ignore_die: true,
@@ -157,14 +157,14 @@ class PageLoadTest extends UnityWebPortalTestCase
     public function testLoadPIPageForDisabledGroup()
     {
         $this->switchUser("ReenabledOwnerOfDisabledPIGroup");
-        $output = http_get(__DIR__ . "/../../webroot/panel/pi.php", ignore_die: true);
+        $output = $this->http_get(__DIR__ . "/../../webroot/panel/pi.php", ignore_die: true);
         $this->assertMatchesRegularExpression("/This group is disabled/", $output);
     }
 
     public function testLoadPIPageForAnotherDisabledGroup()
     {
         $this->switchUser("DisabledPIGroup_user9_org3_test_Manager");
-        $output = http_get(
+        $output = $this->http_get(
             __DIR__ . "/../../webroot/panel/pi.php",
             ["gid" => "pi_user9_org3_test"],
             ignore_die: true,
@@ -178,7 +178,7 @@ class PageLoadTest extends UnityWebPortalTestCase
         $this->switchUser("CourseGroupManager");
         $gids = $LDAP->getNonDisabledPIGroupGIDsWithManagerUID($USER->uid);
         $this->assertTrue(count($gids) > 0);
-        $output = http_get(__DIR__ . "/../../webroot/panel/groups.php");
+        $output = $this->http_get(__DIR__ . "/../../webroot/panel/groups.php");
         foreach ($gids as $gid) {
             $this->assertMatchesRegularExpression("/name='gid' value='$gid'/", $output);
         }
