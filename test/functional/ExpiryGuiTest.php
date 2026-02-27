@@ -50,6 +50,8 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
         $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
         // see deployment/overrides/phpunit/config/config.ini
         $this->assertEquals(CONFIG["expiry"]["idlelock_warning_days"][0], 2);
+        $this->assertEquals(CONFIG["expiry"]["idlelock_day"], 4);
+        $this->assertEquals(CONFIG["expiry"]["disable_day"], 8);
         try {
             // null ////////////////////////////////////////////////////////////////////////////////
             callPrivateMethod($SQL, "removeUserLastLogin", $USER->uid);
@@ -57,7 +59,7 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
             $this->http_get(__DIR__ . "/../../resources/init.php");
             $this->assertNumberOfMessages(0);
             UnityHTTPD::clearMessages();
-            // 1 second before 1st warning /////////////////////////////////////////////////////////
+            // moment before 1st warning ///////////////////////////////////////////////////////////
             callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, strtotime("-2 days +1 second"));
             $this->assertIdleDays(1);
             session_write_close();
@@ -76,7 +78,21 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
             );
             $this->assertNumberOfMessages(1);
             UnityHTTPD::clearMessages();
-            // idlelocked //////////////////////////////////////////////////////////////////////////
+            // moment before idlelock //////////////////////////////////////////////////////////////
+            callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, strtotime("-4 days +1 second"));
+            $this->assertIdleDays(3);
+            session_write_close();
+            $this->http_get(__DIR__ . "/../../resources/init.php");
+            $this->assertMessageExists(
+                UnityHTTPDMessageLevel::SUCCESS,
+                "/Inactivity Timer Reset/",
+                "/.*/",
+            );
+            $this->assertNumberOfMessages(1);
+            UnityHTTPD::clearMessages();
+            // moment of idlelock //////////////////////////////////////////////////////////////////
+            callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, strtotime("-4 days"));
+            $this->assertIdleDays(4);
             $USER->setFlag(UserFlag::IDLELOCKED, true);
             session_write_close();
             $this->http_get(__DIR__ . "/../../resources/init.php");
@@ -87,8 +103,22 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
             );
             $this->assertNumberOfMessages(1);
             UnityHTTPD::clearMessages();
-            // disabled ////////////////////////////////////////////////////////////////////////////
+            // moment before disable ///////////////////////////////////////////////////////////////
+            callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, strtotime("-8 days +1 second"));
+            $this->assertIdleDays(7);
             $USER->setFlag(UserFlag::IDLELOCKED, true);
+            session_write_close();
+            $this->http_get(__DIR__ . "/../../resources/init.php");
+            $this->assertMessageExists(
+                UnityHTTPDMessageLevel::SUCCESS,
+                "/Account Unlocked/",
+                "/.*/",
+            );
+            $this->assertNumberOfMessages(1);
+            UnityHTTPD::clearMessages();
+            // moment of disable ///////////////////////////////////////////////////////////////////
+            callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, strtotime("-8 days"));
+            $this->assertIdleDays(8);
             $USER->disable();
             session_write_close();
             $this->http_get(__DIR__ . "/../../webroot/panel/account.php", ignore_die: true);
