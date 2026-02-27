@@ -403,9 +403,13 @@ class UnityWebPortalTestCase extends TestCase
         $this->assertEquals(
             $expected,
             $found,
-            "expected $expected messages, found $found: " . _json_encode($messages, JSON_PRETTY_PRINT)
+            sprintf(
+                "expected %s messages, found %s: %s",
+                $expected,
+                $found,
+                _json_encode($messages, JSON_PRETTY_PRINT),
+            ),
         );
-
     }
 
     public function assertGroupMembers(UnityGroup $group, array $expected_members)
