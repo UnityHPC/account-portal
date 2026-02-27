@@ -1,7 +1,6 @@
 <?php
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use UnityWebPortal\lib\exceptions\NoDieException;
 use TRegx\PhpUnit\DataProviders\DataProvider as TRegxDataProvider;
 
 class PageLoadTest extends UnityWebPortalTestCase
@@ -106,13 +105,8 @@ class PageLoadTest extends UnityWebPortalTestCase
 
     public function testLoadPageLockedUser()
     {
-        ob_start();
-        try {
-            $this->switchUser("Locked");
-        } catch (NoDieException) {
-            // ignore
-        }
-        $output = _ob_get_clean();
+        $this->switchUser("Locked");
+        $output = $this->http_get(__DIR__ . "/../../webroot/panel/account.php", ignore_die: true);
         $this->assertMatchesRegularExpression("/Your account is locked\./", $output);
     }
 
