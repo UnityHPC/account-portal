@@ -52,17 +52,15 @@ jobs:
       - name: Pull cache images to local Docker
         run: |
           docker pull ghcr.io/${{ env.REPO_OWNER }}/unity-dev-identity:latest
-          docker tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-identity:latest identity
+          docker tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-identity:latest docker-dev-identity
           docker pull ghcr.io/${{ env.REPO_OWNER }}/unity-dev-sql:latest
-          docker tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-sql:latest sql
+          docker tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-sql:latest docker-dev-sql
           docker pull ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:latest
-          docker tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:latest web
+          docker tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:latest docker-dev-web
       - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
           tools: composer
       - run: composer install --dev
-      - uses: hoverkraft-tech/compose-action@v2.0.1
-        with:
-          compose-file: "./tools/docker-dev/docker-compose.yml"
+      - run: docker compose -f ./tools/docker-dev/docker-compose.yml up -d --no-build
       - run: docker compose -f ./tools/docker-dev/docker-compose.yml exec -w '/var/www/unity-web-portal' web bash -c 'XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-clover="$(mktemp --suffix=.xml)" -d --min-coverage=./coverage.php'
