@@ -82,19 +82,23 @@ if (isset($_SERVER["REMOTE_USER"])) {
     $_SESSION["user_exists"] = $USER->exists() && !$USER->getFlag(UserFlag::DISABLED);
     $_SESSION["is_pi"] = $USER->isPI();
 
+    $days_idle = $SQL->convertLastLoginToDaysIdle($SQL->getUserLastLogin($USER->uid));
     $SQL->addLog("user_login", $OPERATOR->uid);
 
     $USER->updateIsQualified(); // in case manual changes have been made to PI groups
 
-    if ($USER->getFlag(UserFlag::LOCKED)) {
-        UnityHTTPD::forbidden("locked", "Your account is locked.");
-    }
-
-    if ($OPERATOR == $USER && $USER->getFlag(UserFlag::IDLELOCKED)) {
-        $USER->setFlag(UserFlag::IDLELOCKED, false);
-        UnityHTTPD::messageSuccess(
-            "Account Unlocked",
-            "Your account was previously locked due to inactivity.",
-        );
+    if ($OPERATOR == $USER && !$USER->getFlag(UserFlag::DISABLED)) {
+        if ($USER->getFlag(UserFlag::IDLELOCKED)) {
+            $USER->setFlag(UserFlag::IDLELOCKED, false);
+            UnityHTTPD::messageSuccess(
+                "Account Unlocked",
+                "Your account was previously locked due to inactivity.",
+            );
+        } elseif ($days_idle >= CONFIG["expiry"]["idlelock_warning_days"][0]) {
+            UnityHTTPD::messageSuccess(
+                "Inactivity Timer Reset",
+                "Your account's scheduled locking is now cancelled.",
+            );
+        }
     }
 }

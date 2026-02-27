@@ -4,7 +4,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UserFlag;
 
-class ExpiryTest extends UnityWebPortalTestCase
+class ExpiryWorkerTest extends UnityWebPortalTestCase
 {
     public static function provider()
     {
@@ -40,7 +40,7 @@ class ExpiryTest extends UnityWebPortalTestCase
     }
 
     #[DataProvider("provider")]
-    public function testExpiry(string $uid, string $mail, bool $is_pi)
+    public function testExpiryWorker(string $uid, string $mail, bool $is_pi)
     {
         global $LDAP, $SQL, $MAILER, $WEBHOOK;
         $this->switchUser("Admin");
