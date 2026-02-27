@@ -31,6 +31,7 @@
 1. If you're on Windows, use [WSL](https://learn.microsoft.com/en-us/windows/wsl/)
 1. Download and install [docker desktop](https://www.docker.com/products/docker-desktop/)
    1. Linux users only: Download and install docker compose plugin (`apt install docker-compose-plugin && ln -s /usr/libexec/docker/cli-plugins/docker-compose /bin/docker-compose` on Ubuntu)
+1. `docker login`
 1. In `tools/docker-dev` Run the build script: `./build.sh`
 1. Run the environment: `./run.sh`. Press `CTRL+C` to exit
 1. Install [pre-commit](https://pre-commit.com/)
