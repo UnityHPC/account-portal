@@ -68,71 +68,6 @@ $HTTP_HEADER_TEST_INPUTS = [
     _mb_convert_encoding("Hello, World!", "UTF-16"),
 ];
 
-function http_post(
-    string $phpfile,
-    array $post_data,
-    array $query_parameters = [],
-    bool $do_generate_csrf_token = true,
-): string {
-    global $LDAP, $SQL, $MAILER, $WEBHOOK, $GITHUB, $SITE, $SSO, $USER, $LOC_HEADER, $LOC_FOOTER;
-    $_PREVIOUS_SERVER = $_SERVER;
-    $_SERVER["REQUEST_METHOD"] = "POST";
-    $_SERVER["PHP_SELF"] = _preg_replace("/.*webroot\//", "/", $phpfile);
-    $_SERVER["REQUEST_URI"] = _preg_replace("/.*webroot\//", "/", $phpfile); // Slightly imprecise because it doesn't include get parameters
-    if (!array_key_exists("csrf_token", $post_data) && $do_generate_csrf_token) {
-        $post_data["csrf_token"] = CSRFToken::generate();
-    }
-    $_POST = $post_data;
-    $_GET = $query_parameters;
-    ob_start();
-    try {
-        $post_did_redirect_or_die = false;
-        try {
-            include $phpfile;
-        } catch (UnityWebPortal\lib\exceptions\NoDieException $e) {
-            $post_did_redirect_or_die = true;
-        }
-        // https://en.wikipedia.org/wiki/Post/Redirect/Get
-        ensure($post_did_redirect_or_die, "post did not redirect or die!");
-        return _ob_get_clean();
-    } catch (Exception $e) {
-        _ob_get_clean(); //discard output
-        throw $e;
-    } finally {
-        unset($_POST);
-        unset($_GET);
-        $_SERVER = $_PREVIOUS_SERVER;
-    }
-}
-
-function http_get(string $phpfile, array $get_data = [], bool $ignore_die = false): string
-{
-    global $LDAP, $SQL, $MAILER, $WEBHOOK, $GITHUB, $SITE, $SSO, $USER, $LOC_HEADER, $LOC_FOOTER;
-    $_PREVIOUS_SERVER = $_SERVER;
-    $_SERVER["REQUEST_METHOD"] = "GET";
-    $_SERVER["PHP_SELF"] = _preg_replace("/.*webroot\//", "/", $phpfile);
-    $_SERVER["REQUEST_URI"] = _preg_replace("/.*webroot\//", "/", $phpfile); // Slightly imprecise because it doesn't include get parameters
-    $_GET = $get_data;
-    ob_start();
-    try {
-        include $phpfile;
-        return _ob_get_clean();
-    } catch (UnityWebPortal\lib\exceptions\NoDieException $e) {
-        if ($ignore_die) {
-            return _ob_get_clean();
-        } else {
-            _ob_get_clean(); // discard output
-            throw $e;
-        }
-    } catch (Exception $e) {
-        _ob_get_clean(); //discard output
-        throw $e;
-    } finally {
-        unset($_GET);
-        $_SERVER = $_PREVIOUS_SERVER;
-    }
-}
-
 /**
  * runs a worker script, then refreshes all LDAP entries to pick up changes
  * @throws RuntimeException
@@ -335,8 +270,8 @@ class UnityWebPortalTestCase extends TestCase
             case "Blank":
                 $this->assertTrue($USER->exists());
                 $this->assertFalse($USER->isPI());
-                $this->assertEqualsCanonicalizing([], $USER->getPIGroupGIDs());
-                $this->assertEqualsCanonicalizing([], $SQL->getRequestsByUser($USER->uid));
+                $this->assertEmpty($USER->getPIGroupGIDs());
+                $this->assertEmpty($SQL->getRequestsByUser($USER->uid));
                 $this->assertFalse($USER->getFlag(UserFlag::ADMIN));
                 $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
                 $this->assertFalse($USER->getFlag(UserFlag::IDLELOCKED));
@@ -362,7 +297,7 @@ class UnityWebPortalTestCase extends TestCase
                 $this->assertTrue($USER->isPI());
                 $pi_group = $USER->getPIGroup();
                 $this->assertEqualsCanonicalizing([$USER->uid], $pi_group->getMemberUIDs());
-                $this->assertEqualsCanonicalizing([], $pi_group->getRequests());
+                $this->assertEmpty($pi_group->getRequests());
                 break;
             case "Disabled":
                 $this->assertTrue($USER->getFlag(UserFlag::DISABLED));
@@ -389,7 +324,7 @@ class UnityWebPortalTestCase extends TestCase
                 $this->assertTrue($USER->getPIGroup()->getIsDisabled());
                 break;
             case "HasNoSshKeys":
-                $this->assertEqualsCanonicalizing([], $USER->getSSHKeys());
+                $this->assertEmpty($USER->getSSHKeys());
                 break;
             case "IdleLocked":
                 // this cannot be validated automatically because the user is already idle
@@ -412,7 +347,7 @@ class UnityWebPortalTestCase extends TestCase
                 $this->assertTrue($USER->exists());
                 $this->assertFalse($USER->isPI());
                 $this->assertGreaterThanOrEqual(1, count($USER->getPIGroupGIDs()));
-                $this->assertEqualsCanonicalizing([], $SQL->getRequestsByUser($USER->uid));
+                $this->assertEmpty($SQL->getRequestsByUser($USER->uid));
                 $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
                 $this->assertFalse($USER->getFlag(UserFlag::IDLELOCKED));
                 $this->assertFalse($USER->getFlag(UserFlag::LOCKED));
@@ -568,7 +503,7 @@ class UnityWebPortalTestCase extends TestCase
         include __DIR__ . "/../resources/autoload.php";
         if ($validate) {
             try {
-            $this->validateUser($nickname);
+                $this->validateUser($nickname);
             } catch (Exception $e) {
                 throw new \Exception("switchUser validation failed!", previous: $e);
             }
@@ -585,6 +520,116 @@ class UnityWebPortalTestCase extends TestCase
     function setUp(): void
     {
         $this->assertArrayNotHasKey("REQUEST_METHOD", $_SERVER);
+    }
+
+    function assertNoWarningErrorMessages()
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return;
+        }
+        $messages = UnityHTTPD::getMessages();
+        $warning_or_error_messages = array_filter(
+            $messages,
+            fn($x) => in_array($x[2], [
+                UnityHTTPDMessageLevel::WARNING,
+                UnityHTTPDMessageLevel::ERROR,
+            ]),
+        );
+        $err_msg = "unexpected messages: " . _json_encode($warning_or_error_messages);
+        $this->assertEmpty($warning_or_error_messages, $err_msg);
+    }
+
+    function http_post(
+        string $phpfile,
+        array $post_data,
+        array $query_parameters = [],
+        bool $do_generate_csrf_token = true,
+        bool $do_validate_messages = true,
+    ): string {
+        global $LDAP,
+            $SQL,
+            $MAILER,
+            $WEBHOOK,
+            $GITHUB,
+            $SITE,
+            $SSO,
+            $USER,
+            $LOC_HEADER,
+            $LOC_FOOTER;
+        if ($do_validate_messages) {
+            $this->assertNoWarningErrorMessages();
+        }
+        $_PREVIOUS_SERVER = $_SERVER;
+        $_SERVER["REQUEST_METHOD"] = "POST";
+        $_SERVER["PHP_SELF"] = _preg_replace("/.*webroot\//", "/", $phpfile);
+        $_SERVER["REQUEST_URI"] = _preg_replace("/.*webroot\//", "/", $phpfile); // Slightly imprecise because it doesn't include get parameters
+        if (!array_key_exists("csrf_token", $post_data) && $do_generate_csrf_token) {
+            $post_data["csrf_token"] = CSRFToken::generate();
+        }
+        $_POST = $post_data;
+        $_GET = $query_parameters;
+        ob_start();
+        try {
+            $post_did_redirect_or_die = false;
+            try {
+                include $phpfile;
+            } catch (UnityWebPortal\lib\exceptions\NoDieException $e) {
+                $post_did_redirect_or_die = true;
+            }
+            // https://en.wikipedia.org/wiki/Post/Redirect/Get
+            ensure($post_did_redirect_or_die, "post did not redirect or die!");
+        } finally {
+            $output = _ob_get_clean();
+            unset($_POST);
+            unset($_GET);
+            $_SERVER = $_PREVIOUS_SERVER;
+        }
+        if ($do_validate_messages) {
+            $this->assertNoWarningErrorMessages();
+        }
+        return $output;
+    }
+
+    function http_get(
+        string $phpfile,
+        array $get_data = [],
+        bool $ignore_die = false,
+        $do_validate_messages = true,
+    ): string {
+        global $LDAP,
+            $SQL,
+            $MAILER,
+            $WEBHOOK,
+            $GITHUB,
+            $SITE,
+            $SSO,
+            $USER,
+            $LOC_HEADER,
+            $LOC_FOOTER;
+        if ($do_validate_messages) {
+            $this->assertNoWarningErrorMessages();
+        }
+        $_PREVIOUS_SERVER = $_SERVER;
+        $_SERVER["REQUEST_METHOD"] = "GET";
+        $_SERVER["PHP_SELF"] = _preg_replace("/.*webroot\//", "/", $phpfile);
+        $_SERVER["REQUEST_URI"] = _preg_replace("/.*webroot\//", "/", $phpfile); // Slightly imprecise because it doesn't include get parameters
+        $_GET = $get_data;
+        ob_start();
+        try {
+            include $phpfile;
+        } catch (UnityWebPortal\lib\exceptions\NoDieException $e) {
+            if (!$ignore_die) {
+                throw $e;
+            }
+        } finally {
+            $output = _ob_get_clean();
+            unset($_GET);
+            $_SERVER = $_PREVIOUS_SERVER;
+        }
+        if ($do_validate_messages) {
+            $this->assertNoWarningErrorMessages();
+        }
+        return $output;
     }
 }
 

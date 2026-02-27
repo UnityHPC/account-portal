@@ -1,6 +1,7 @@
 <?php
 
-use UnityWebPortal\lib\UserFlag;
+use UnityWebPortal\lib\UnityHTTPDMessageLevel;
+use UnityWebPortal\lib\UnityHTTPD;
 
 // TODO use DataProvider
 class ViewAsUserTest extends UnityWebPortalTestCase
@@ -13,7 +14,7 @@ class ViewAsUserTest extends UnityWebPortalTestCase
         // $this->assertTrue($USER->getFlag(UserFlag::ADMIN));
         $beforeUid = $USER->uid;
         // $this->assertNotEquals($afterUid, $beforeUid);
-        http_post(__DIR__ . "/../../webroot/admin/user-mgmt.php", [
+        $this->http_post(__DIR__ . "/../../webroot/admin/user-mgmt.php", [
             "form_type" => "viewAsUser",
             "uid" => $afterUid,
         ]);
@@ -21,18 +22,18 @@ class ViewAsUserTest extends UnityWebPortalTestCase
         // redirect means that php process dies and user's browser will initiate a new one
         // this makes `require_once autoload.php` run again and init.php changes $USER
         session_write_close();
-        http_get(__DIR__ . "/../../resources/init.php");
+        $this->http_get(__DIR__ . "/../../resources/init.php");
         // now we should be new user
         $this->assertEquals($afterUid, $USER->uid);
         // $this->assertTrue($_SESSION["user_exists"]);
-        http_post(__DIR__ . "/../../webroot/panel/account.php", [
+        $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
             "form_type" => "clearView",
         ]);
         $this->assertArrayNotHasKey("viewUser", $_SESSION);
         // redirect means that php process dies and user's browser will initiate a new one
         // this makes `require_once autoload.php` run again and init.php changes $USER
         session_write_close();
-        http_get(__DIR__ . "/../../resources/init.php");
+        $this->http_get(__DIR__ . "/../../resources/init.php");
         // now we should be back to original user
         $this->assertEquals($beforeUid, $USER->uid);
     }
@@ -58,10 +59,16 @@ class ViewAsUserTest extends UnityWebPortalTestCase
         $this->switchUser("Admin");
         $adminUid = $USER->uid;
         $this->switchUser("Blank");
-        http_post(__DIR__ . "/../../webroot/admin/user-mgmt.php", [
-            "form_type" => "viewAsUser",
-            "uid" => $adminUid,
-        ]);
+        $this->http_post(
+            __DIR__ . "/../../webroot/admin/user-mgmt.php",
+            [
+                "form_type" => "viewAsUser",
+                "uid" => $adminUid,
+            ],
+            do_validate_messages: false,
+        );
+        $this->assertMessageExists(UnityHTTPDMessageLevel::ERROR, "/.*/", "/not an admin/");
+        UnityHTTPD::clearMessages();
         $this->assertArrayNotHasKey("viewUser", $_SESSION);
     }
 

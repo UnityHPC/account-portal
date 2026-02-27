@@ -16,7 +16,7 @@ class PIDisableTest extends UnityWebPortalTestCase
         $this->assertTrue($pi_group->getOwner()->getFlag(UserFlag::QUALIFIED));
         try {
             $this->switchUser("Admin");
-            http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
+            $this->http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
                 "form_type" => "disable",
                 "pi" => $pi_group->gid,
             ]);
@@ -42,7 +42,7 @@ class PIDisableTest extends UnityWebPortalTestCase
         $this->assertNotEmpty($pi_group->getMemberUIDs());
         $this->assertTrue($pi_group->getOwner()->getFlag(UserFlag::QUALIFIED));
         try {
-            http_post(__DIR__ . "/../../webroot/panel/pi.php", ["form_type" => "disable"]);
+            $this->http_post(__DIR__ . "/../../webroot/panel/pi.php", ["form_type" => "disable"]);
             $this->assertFalse($pi_group->getOwner()->isPI());
             $this->assertTrue($pi_group->getIsDisabled());
             $this->assertEmpty($pi_group->getMemberUIDs());
@@ -64,10 +64,11 @@ class PIDisableTest extends UnityWebPortalTestCase
         $gid = $managed_groups[0];
         $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
         $this->assertFalse($group->getIsDisabled());
-        http_post(
+        $this->http_post(
             __DIR__ . "/../../webroot/panel/pi.php",
             ["form_type" => "disable"],
             ["gid" => $gid],
+            do_validate_messages: false,
         );
         $this->assertMessageExists(
             UnityHTTPDMessageLevel::ERROR,
@@ -91,7 +92,7 @@ class PIDisableTest extends UnityWebPortalTestCase
             $pi_group->approveUser($new_user);
             $this->assertTrue($new_user->getFlag(UserFlag::QUALIFIED));
             $this->switchUser("Admin");
-            http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
+            $this->http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
                 "form_type" => "disable",
                 "pi" => $pi_group->gid,
             ]);
@@ -117,7 +118,11 @@ class PIDisableTest extends UnityWebPortalTestCase
         try {
             $pi_group->newUserRequest($new_user);
             $pi_group->approveUser($new_user);
-            http_post(__DIR__ . "/../../webroot/panel/pi.php", ["form_type" => "disable"]);
+            $this->http_post(
+                __DIR__ . "/../../webroot/panel/pi.php",
+                ["form_type" => "disable"],
+                do_validate_messages: false,
+            );
             $this->assertMessageExists(
                 UnityHTTPDMessageLevel::ERROR,
                 "/Cannot Disable PI Group/",
@@ -163,14 +168,14 @@ class PIDisableTest extends UnityWebPortalTestCase
         $this->switchUser("Admin");
         $this->assertStringContainsString(
             $pi_group->gid,
-            http_get(__DIR__ . "/../../webroot/admin/pi-mgmt.php"),
+            $this->http_get(__DIR__ . "/../../webroot/admin/pi-mgmt.php"),
         );
         try {
             callPrivateMethod($pi_group, "setIsDisabled", false);
             $this->assertEquals(["FALSE"], $entry->getAttribute("isDisabled"));
             $this->assertStringContainsString(
                 $pi_group->gid,
-                http_get(__DIR__ . "/../../webroot/admin/pi-mgmt.php"),
+                $this->http_get(__DIR__ . "/../../webroot/admin/pi-mgmt.php"),
             );
         } finally {
             if ($entry->hasAttribute("isDisabled")) {

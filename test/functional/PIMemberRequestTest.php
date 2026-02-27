@@ -8,18 +8,22 @@ use UnityWebPortal\lib\UserFlag;
 
 class PIMemberRequestTest extends UnityWebPortalTestCase
 {
-    private function requestMembership(string $gid_or_mail)
+    private function requestMembership(string $gid_or_mail, bool $do_validate_messages = true)
     {
-        http_post(__DIR__ . "/../../webroot/panel/groups.php", [
-            "form_type" => "addPIform",
-            "pi" => $gid_or_mail,
-            "tos" => "agree",
-        ]);
+        $this->http_post(
+            __DIR__ . "/../../webroot/panel/groups.php",
+            [
+                "form_type" => "addPIform",
+                "pi" => $gid_or_mail,
+                "tos" => "agree",
+            ],
+            do_validate_messages: $do_validate_messages,
+        );
     }
 
     private function cancelRequest(string $gid)
     {
-        http_post(__DIR__ . "/../../webroot/panel/groups.php", [
+        $this->http_post(__DIR__ . "/../../webroot/panel/groups.php", [
             "form_type" => "cancelPIForm",
             "pi" => $gid,
         ]);
@@ -29,7 +33,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
     {
         global $USER;
         assert($USER->getPIGroup()->gid === $gid, "signed in user must be the group owner");
-        http_post(__DIR__ . "/../../webroot/panel/pi.php", [
+        $this->http_post(__DIR__ . "/../../webroot/panel/pi.php", [
             "form_type" => "userReq",
             "action" => "Approve",
             "uid" => $uid,
@@ -40,7 +44,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
     {
         $this->switchUser("Admin");
         try {
-            http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
+            $this->http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
                 "form_type" => "reqChild",
                 "action" => "Approve",
                 "pi" => $gid,
@@ -53,7 +57,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
 
     private function denyRequestByPI(string $uid)
     {
-        http_post(__DIR__ . "/../../webroot/panel/pi.php", [
+        $this->http_post(__DIR__ . "/../../webroot/panel/pi.php", [
             "form_type" => "userReq",
             "action" => "Deny",
             "uid" => $uid,
@@ -66,7 +70,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
         $gid = $USER->getPIGroup()->gid;
         $this->switchUser("Admin");
         try {
-            http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
+            $this->http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
                 "form_type" => "reqChild",
                 "action" => "Deny",
                 "pi" => $gid,
@@ -103,7 +107,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
         $this->switchUser("Blank");
         try {
             UnityHTTPD::clearMessages();
-            $this->requestMembership("asdlkjasldkj");
+            $this->requestMembership("asdlkjasldkj", do_validate_messages: false);
             $this->assertMessageExists(
                 UnityHTTPDMessageLevel::ERROR,
                 "/^This PI Doesn't Exist$/",
@@ -127,13 +131,12 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
         try {
             $this->requestMembership($pi_group->gid);
             $this->assertNumberRequests(1);
-            // $second_request_failed = false;
-            // try {
-            $this->requestMembership($pi_group->gid);
-            // } catch(Exception) {
-            //     $second_request_failed = true;
-            // }
-            // $this->assertTrue($second_request_failed);
+            $this->requestMembership($pi_group->gid, do_validate_messages: false);
+            $this->assertMessageExists(
+                UnityHTTPDMessageLevel::ERROR,
+                "/.*/",
+                "/already requested this/",
+            );
             $this->assertNumberRequests(1);
         } finally {
             if ($SQL->requestExists($USER->uid, $pi_group->gid)) {
@@ -151,13 +154,12 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
         $gid = $pi_group_gids[0];
         $this->assertNumberRequests(0);
         try {
-            // $request_failed = false;
-            // try {
-            $this->requestMembership($gid);
-            // } catch(Exception) {
-            //     $request_failed = true;
-            // }
-            // $this->assertTrue($request_failed);
+            $this->requestMembership($gid, do_validate_messages: false);
+            $this->assertMessageExists(
+                UnityHTTPDMessageLevel::ERROR,
+                "/.*/",
+                "/already in this PI group/",
+            );
             $this->assertNumberRequests(0);
         } finally {
             if ($SQL->requestExists($USER->uid, $gid)) {

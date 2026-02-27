@@ -1,29 +1,35 @@
 <?php
 
+use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use UnityWebPortal\lib\UnitySQL;
 use UnityWebPortal\lib\UserFlag;
+use UnityWebPortal\lib\UnityHTTPD;
 
 class PIBecomeRequestTest extends UnityWebPortalTestCase
 {
-    private function requestGroupCreation()
+    private function requestGroupCreation($do_validate_messages = true)
     {
-        http_post(__DIR__ . "/../../webroot/panel/account.php", [
-            "form_type" => "pi_request",
-            "tos" => "agree",
-            "account_policy" => "agree",
-        ]);
+        $this->http_post(
+            __DIR__ . "/../../webroot/panel/account.php",
+            [
+                "form_type" => "pi_request",
+                "tos" => "agree",
+                "account_policy" => "agree",
+            ],
+            do_validate_messages: $do_validate_messages,
+        );
     }
 
     private function cancelRequestGroupCreation()
     {
-        http_post(__DIR__ . "/../../webroot/panel/account.php", [
+        $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
             "form_type" => "cancel_pi_request",
         ]);
     }
 
     private function approveGroup($uid)
     {
-        http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
+        $this->http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
             "form_type" => "req",
             "action" => "Approve",
             "uid" => $uid,
@@ -36,27 +42,31 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
         $this->switchUser("Blank");
         $this->assertNumberPiBecomeRequests(0);
         try {
-            http_post(__DIR__ . "/../../webroot/panel/account.php", [
+            $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
                 "form_type" => "pi_request",
                 "tos" => "agree",
                 "account_policy" => "agree",
             ]);
             $this->assertNumberPiBecomeRequests(1);
-            http_post(__DIR__ . "/../../webroot/panel/account.php", [
+            $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
                 "form_type" => "cancel_pi_request",
             ]);
             $this->assertNumberPiBecomeRequests(0);
-            http_post(__DIR__ . "/../../webroot/panel/account.php", [
+            $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
                 "form_type" => "pi_request",
                 "tos" => "agree",
                 "account_policy" => "agree",
             ]);
             $this->assertNumberPiBecomeRequests(1);
-            http_post(__DIR__ . "/../../webroot/panel/account.php", [
-                "form_type" => "pi_request",
-                "tos" => "agree",
-                "account_policy" => "agree",
-            ]);
+            $this->http_post(
+                __DIR__ . "/../../webroot/panel/account.php",
+                [
+                    "form_type" => "pi_request",
+                    "tos" => "agree",
+                    "account_policy" => "agree",
+                ],
+                do_validate_messages: false,
+            );
             $this->assertNumberPiBecomeRequests(1);
         } finally {
             if ($SQL->requestExists($USER, UnitySQL::REQUEST_BECOME_PI)) {
@@ -74,13 +84,9 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
             $this->requestGroupCreation();
             $this->assertRequestedPIGroup(true);
 
-            // $second_request_failed = false;
-            // try {
-            $this->requestGroupCreation();
-            // } catch(Exception) {
-            //     $second_request_failed = true;
-            // }
-            // $this->assertTrue($second_request_failed);
+            $this->requestGroupCreation(do_validate_messages: false);
+            $this->assertMessageExists(UnityHTTPDMessageLevel::ERROR, "/.*/", "/already exists/");
+            UnityHTTPD::clearMessages();
             $this->assertRequestedPIGroup(true);
 
             $this->cancelRequestGroupCreation();
@@ -98,13 +104,9 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
             $this->assertTrue($pi_group->exists());
             $this->assertTrue($USER->getFlag(UserFlag::QUALIFIED));
 
-            // $third_request_failed = false;
-            // try {
-            $this->requestGroupCreation();
-            // } catch(Exception) {
-            //     $third_request_failed = true;
-            // }
-            // $this->assertTrue($third_request_failed);
+            $this->requestGroupCreation(do_validate_messages: false);
+            $this->assertMessageExists(UnityHTTPDMessageLevel::ERROR, "/.*/", "/Already a PI/");
+            UnityHTTPD::clearMessages();
             $this->assertRequestedPIGroup(false);
         } finally {
             ensurePIGroupDoesNotExist($pi_group->gid);
@@ -146,7 +148,7 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
         try {
             $this->assertTrue($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI));
             $this->switchUser("Admin");
-            http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
+            $this->http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
                 "form_type" => "req",
                 "action" => "Deny",
                 "uid" => $piGroup->getOwner()->uid,

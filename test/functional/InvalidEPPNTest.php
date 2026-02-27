@@ -29,7 +29,7 @@ class InvalidEPPNTest extends UnityWebPortalTestCase
             $_SERVER["eppn"] = $eppn;
             $_SERVER["givenName"] = "foo";
             $_SERVER["sn"] = "bar";
-            // can't use http_get because it does `require_once`
+            // can't use $this->http_get because it does `require_once`
             // won't use phpunit --process-isolation because when I try that argument all tests fail with a blank error message
             include __DIR__ . "/../../resources/init.php";
         } finally {

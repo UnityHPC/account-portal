@@ -49,11 +49,15 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
         $numKeysBefore = $this->getKeyCount();
         $this->assertEquals(0, $numKeysBefore);
         try {
-            http_post(__DIR__ . "/../../webroot/panel/account.php", [
-                "form_type" => "addKey",
-                "add_type" => "paste",
-                "key" => $key,
-            ]);
+            $this->http_post(
+                __DIR__ . "/../../webroot/panel/account.php",
+                [
+                    "form_type" => "addKey",
+                    "add_type" => "paste",
+                    "key" => $key,
+                ],
+                do_validate_messages: $expectedKeyAdded,
+            );
             $numKeysAfter = $this->getKeyCount();
             if ($expectedKeyAdded) {
                 $this->assertEquals(1, $numKeysAfter - $numKeysBefore);
@@ -78,10 +82,14 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
             fwrite($tmp, $key);
             $_FILES["keyfile"] = ["tmp_name" => $tmp_path];
             try {
-                http_post(__DIR__ . "/../../webroot/panel/account.php", [
-                    "form_type" => "addKey",
-                    "add_type" => "import",
-                ]);
+                $this->http_post(
+                    __DIR__ . "/../../webroot/panel/account.php",
+                    [
+                        "form_type" => "addKey",
+                        "add_type" => "import",
+                    ],
+                    do_validate_messages: $expectedKeyAdded,
+                );
                 $this->assertFalse(file_exists($tmp_path));
             } finally {
                 unset($_FILES["keyfile"]);
@@ -105,11 +113,15 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
         $numKeysBefore = $this->getKeyCount();
         $this->assertEquals(0, $numKeysBefore);
         try {
-            http_post(__DIR__ . "/../../webroot/panel/account.php", [
-                "form_type" => "addKey",
-                "add_type" => "generate",
-                "gen_key" => $key,
-            ]);
+            $this->http_post(
+                __DIR__ . "/../../webroot/panel/account.php",
+                [
+                    "form_type" => "addKey",
+                    "add_type" => "generate",
+                    "gen_key" => $key,
+                ],
+                do_validate_messages: $expectedKeyAdded,
+            );
             $numKeysAfter = $this->getKeyCount();
             if ($expectedKeyAdded) {
                 $this->assertEquals(1, $numKeysAfter - $numKeysBefore);
@@ -133,11 +145,15 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
         $GITHUB = $this->createMock(UnityGithub::class);
         $GITHUB->method("getSshPublicKeys")->willReturn($keys);
         try {
-            http_post(__DIR__ . "/../../webroot/panel/account.php", [
-                "form_type" => "addKey",
-                "add_type" => "github",
-                "gh_user" => "foobar",
-            ]);
+            $this->http_post(
+                __DIR__ . "/../../webroot/panel/account.php",
+                [
+                    "form_type" => "addKey",
+                    "add_type" => "github",
+                    "gh_user" => "foobar",
+                ],
+                do_validate_messages: $expectedKeysAdded > 0 && $expectedKeysAdded == count($keys),
+            );
             $numKeysAfter = $this->getKeyCount();
             $this->assertEquals($expectedKeysAdded, $numKeysAfter - $numKeysBefore);
         } finally {

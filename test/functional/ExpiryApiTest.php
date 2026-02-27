@@ -14,7 +14,7 @@ class ExpiryApiTest extends UnityWebPortalTestCase
             $this->assertEquals(CONFIG["expiry"]["disable_day"], 8);
             $expected_idlelock_date = "1970/01/06"; # january 1st + 1 day + idlelock_day = 4
             $expected_disable_date = "1970/01/10"; # january 1st + 1 day + disable_day = 8
-            $output_str = http_get(__DIR__ . "/../../webroot/lan/api/expiry.php", [
+            $output_str = $this->http_get(__DIR__ . "/../../webroot/lan/api/expiry.php", [
                 "uid" => $USER->uid,
             ]);
             $output_data = _json_decode($output_str, associative: true);
