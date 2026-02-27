@@ -53,7 +53,7 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
         $this->assertEquals(CONFIG["expiry"]["idlelock_day"], 4);
         $this->assertEquals(CONFIG["expiry"]["disable_day"], 8);
         try {
-            // null ////////////////////////////////////////////////////////////////////////////////
+            // very first login ////////////////////////////////////////////////////////////////////
             callPrivateMethod($SQL, "removeUserLastLogin", $USER->uid);
             session_write_close();
             $this->http_get(__DIR__ . "/../../resources/init.php");
