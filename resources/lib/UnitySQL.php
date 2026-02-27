@@ -163,7 +163,7 @@ class UnitySQL
         return $stmt->fetchAll();
     }
 
-    public function convertLastLoginToDaysIdle(?int $timestamp, ?int $now = null)
+    public function convertLastLoginToDaysIdle(?int $timestamp, ?int $now = null): int
     {
         if ($timestamp === null) {
             return 0;
