@@ -52,37 +52,20 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
         try {
             // null ////////////////////////////////////////////////////////////////////////////////
             callPrivateMethod($SQL, "removeUserLastLogin", $USER->uid);
-            session_destroy();
-            http_get(__DIR__ . "/../../resources/init.php");
+            session_write_close();
+            $this->http_get(__DIR__ . "/../../resources/init.php");
             $this->assertNumberOfMessages(0);
             UnityHTTPD::clearMessages();
             // 1 second before 1st warning /////////////////////////////////////////////////////////
-            $this->setLastLogin(days_ago: 1, seconds_offset: -1);
-            session_destroy();
-            http_get(__DIR__ . "/../../resources/init.php");
+            $this->setLastLogin(days_ago: 2, seconds_offset: -1);
+            session_write_close();
+            $this->http_get(__DIR__ . "/../../resources/init.php");
             $this->assertNumberOfMessages(0);
             UnityHTTPD::clearMessages();
-            // 1 ///////////////////////////////////////////////////////////////////////////////////
-            $this->setLastLogin(days_ago: 1);
-            session_destroy();
-            http_get(__DIR__ . "/../../resources/init.php");
-            $this->assertNumberOfMessages(0);
-            UnityHTTPD::clearMessages();
-            // 2 ///////////////////////////////////////////////////////////////////////////////////
+            // moment of 1st warning ///////////////////////////////////////////////////////////////
             $this->setLastLogin(days_ago: 2);
-            session_destroy();
-            http_get(__DIR__ . "/../../resources/init.php");
-            $this->assertMessageExists(
-                UnityHTTPDMessageLevel::SUCCESS,
-                "/Inactivity Timer Reset/",
-                "/.*/",
-            );
-            $this->assertNumberOfMessages(1);
-            UnityHTTPD::clearMessages();
-            // 3 ///////////////////////////////////////////////////////////////////////////////////
-            $this->setLastLogin(days_ago: 3);
-            session_destroy();
-            http_get(__DIR__ . "/../../resources/init.php");
+            session_write_close();
+            $this->http_get(__DIR__ . "/../../resources/init.php");
             $this->assertMessageExists(
                 UnityHTTPDMessageLevel::SUCCESS,
                 "/Inactivity Timer Reset/",
@@ -93,8 +76,8 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
             // idlelocked //////////////////////////////////////////////////////////////////////////
             $this->setLastLogin(days_ago: 4);
             $USER->setFlag(UserFlag::IDLELOCKED, true);
-            session_destroy();
-            http_get(__DIR__ . "/../../resources/init.php");
+            session_write_close();
+            $this->http_get(__DIR__ . "/../../resources/init.php");
             $this->assertMessageExists(
                 UnityHTTPDMessageLevel::SUCCESS,
                 "/Account Unlocked/",
@@ -105,8 +88,8 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
             // disabled ////////////////////////////////////////////////////////////////////////////
             $USER->setFlag(UserFlag::IDLELOCKED, true);
             $USER->disable();
-            session_destroy();
-            http_get(__DIR__ . "/../../webroot/panel/account.php", ignore_die: true);
+            session_write_close();
+            $this->http_get(__DIR__ . "/../../webroot/panel/account.php", ignore_die: true);
             $this->assertNumberOfMessages(0);
             UnityHTTPD::clearMessages();
         } finally {
