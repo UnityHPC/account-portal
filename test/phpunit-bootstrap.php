@@ -567,7 +567,11 @@ class UnityWebPortalTestCase extends TestCase
         $_SERVER["sn"] = $sn;
         include __DIR__ . "/../resources/autoload.php";
         if ($validate) {
+            try {
             $this->validateUser($nickname);
+            } catch (Exception $e) {
+                throw new \Exception("switchUser validation failed!", previous: $e);
+            }
         }
         ensure(!is_null($USER));
     }
