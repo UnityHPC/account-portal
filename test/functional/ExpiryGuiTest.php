@@ -40,7 +40,7 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
         );
     }
 
-    public function testInactivityTimerResetConfirmation()
+    public function testExpiryMessages()
     {
         global $SQL, $USER;
         $this->switchUser("Blank");
