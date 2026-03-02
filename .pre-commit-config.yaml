@@ -156,7 +156,7 @@ repos:
         exclude: |
           (?x)^(
               ^resources/lib/UnityHTTPD\.php$|
-              ^resources/init\.php$|
+              ^resources/templates/header\.php$|
           )$
       - id: assert-forbidden-used
         name: Assert forbidden() is used

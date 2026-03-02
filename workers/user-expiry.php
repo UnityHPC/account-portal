@@ -38,9 +38,7 @@ foreach ($SQL->getAllUserLastLogins() as $record) {
 
 $uid_to_idle_days = [];
 foreach ($uid_to_last_login as $uid => $last_login) {
-    $idle_seconds = $now - $last_login;
-    // round down, err on the side of caution
-    $uid_to_idle_days[$uid] = intdiv($idle_seconds, 60 * 60 * 24);
+    $uid_to_idle_days[$uid] = $SQL->convertLastLoginToDaysIdle($last_login, $now);
 }
 
 $pi_group_members = [];

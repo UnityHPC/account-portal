@@ -32,6 +32,9 @@ if (isset($SSO)) {
     ) {
         UnityHTTPD::redirect(getRelativeURL("panel/disabled_account.php"));
     }
+    if ($USER->getFlag(UserFlag::LOCKED)) {
+        UnityHTTPD::forbidden("locked", "Your account is locked.");
+    }
 }
 ?>
 
