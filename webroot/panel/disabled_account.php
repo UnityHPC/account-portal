@@ -32,12 +32,11 @@ $support_mail = CONFIG["mail"]["support"];
 <p>Please verify that the information below is correct before continuing:</p>
 <div>
     <strong>Name&nbsp;&nbsp;</strong>
-    <?php echo $SSO["firstname"] . " " . $SSO["lastname"]; ?>
+    <?php echo $USER->getFullname(); ?>
     <br>
     <strong>Email&nbsp;&nbsp;</strong>
-    <?php echo $SSO["mail"]; ?>
+    <?php echo $USER->getMail(); ?>
 </div>
-<p>Your Unity HPC username will be <strong><?php echo $SSO["user"]; ?></strong>.</p>
 <br>
 <form action="" method="POST">
     <?php echo $CSRFTokenHiddenFormInput; ?>
