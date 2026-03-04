@@ -4,7 +4,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class PageLoadTest extends UnityWebPortalTestCase
 {
-    public static function providerMisc()
+    public static function provider()
     {
         return [
             // normal page load
@@ -31,22 +31,15 @@ class PageLoadTest extends UnityWebPortalTestCase
         ];
     }
 
-    #[DataProvider("validUserForAllPages")]
-    public function testLoadPage($nickname, $path)
-    {
-        $this->switchUser($nickname);
-        $this->http_get($path);
-    }
-
-    #[DataProvider("providerMisc")]
-    public function testLoadPageAssertOutput($nickname, $path, $regex, $ignore_die = false)
+    #[DataProvider("provider")]
+    public function testLoadPage($nickname, $path, $regex, $ignore_die = false)
     {
         $this->switchUser($nickname);
         $output = $this->http_get(__DIR__ . "/../../webroot/" . $path, ignore_die: $ignore_die);
         $this->assertMatchesRegularExpression($regex, $output);
     }
 
-    #[DataProvider("providerAdmin")]
+    #[DataProvider("adminPages")]
     public function testLoadAdminPageNotAnAdmin($path)
     {
         $this->switchUser("Blank");
@@ -54,7 +47,7 @@ class PageLoadTest extends UnityWebPortalTestCase
         $this->assertMatchesRegularExpression("/You are not an admin\./", $output);
     }
 
-    #[DataProvider("phpFilesWithNormalHeaderRedirects")]
+    #[DataProvider("panelPagesWithNoSpecialRedirects")]
     public function testLoadPageNonexistentUser($path)
     {
         $this->switchUser("NonExistent");
@@ -62,7 +55,7 @@ class PageLoadTest extends UnityWebPortalTestCase
         $this->assertMatchesRegularExpression("/panel\/new_account\.php/", $output);
     }
 
-    #[DataProvider("phpFilesWithNormalHeaderRedirects")]
+    #[DataProvider("panelPagesWithNoSpecialRedirects")]
     public function testLoadPageDisabled($path)
     {
         $this->switchUser("Disabled");
@@ -70,7 +63,7 @@ class PageLoadTest extends UnityWebPortalTestCase
         $this->assertMatchesRegularExpression("/panel\/disabled_account\.php/", $output);
     }
 
-    #[DataProvider("phpFilesWithNormalHeaderRedirects")]
+    #[DataProvider("panelPagesWithNoSpecialRedirects")]
     public function testLoadPageLockedUser($path)
     {
         $this->switchUser("Locked");

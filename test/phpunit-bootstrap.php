@@ -675,10 +675,9 @@ class UnityWebPortalTestCase extends TestCase
         return TRegxDataProvider::list(...self::findPHPFiles(__DIR__ . "/../webroot/admin"));
     }
 
-    public static function validUserForAllPages()
+    public static function panelPagesWithNoSpecialRedirects()
     {
         $panel = __DIR__ . "/../webroot/panel";
-        $admin = __DIR__ . "/../webroot/admin";
         $excludePanelPages = array_map(fn($x) => "$panel/$x.php", [
             "pi",
             "new_account",
@@ -687,8 +686,19 @@ class UnityWebPortalTestCase extends TestCase
         $output = [];
         foreach (self::findPHPFiles($panel) as $page) {
             if (!in_array($page, $excludePanelPages)) {
-                array_push($output, ["Blank", $page]);
+                array_push($output, $page);
             }
+        }
+        return $output;
+    }
+
+    public static function validUserForAllPages()
+    {
+        $panel = __DIR__ . "/../webroot/panel";
+        $admin = __DIR__ . "/../webroot/admin";
+        $output = [];
+        foreach (self::panelPagesWithNoSpecialRedirects() as $page) {
+            array_push($output, ["Blank", $page]);
         }
         array_push($output, ["EmptyPIGroupOwner", "$panel/pi.php"]);
         array_push($output, ["NonExistent", "$panel/new_account.php"]);
