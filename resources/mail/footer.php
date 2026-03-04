@@ -5,6 +5,6 @@
     You are receiving this email because you have an account
     on the <?php echo getRelativeHyperlink("Unity HPC Platform", "/"); ?>.
     If you would like to stop receiving these emails,
-    you may request to close your account by replying to this email.
+    you may disable your account on the <?php echo getRelativeHyperlink("account settings page", "panel/account.php"); ?>.
   </span>
 </footer>
