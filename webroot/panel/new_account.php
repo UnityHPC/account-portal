@@ -8,9 +8,11 @@ if ($USER->exists()) {
     UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    UnityHTTPD::validatePostCSRFToken();
-    $USER->init($SSO["firstname"], $SSO["lastname"], $SSO["mail"], $SSO["org"]);
-    UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
+    if (UnityHTTPD::getPostData("form_type") === "register") {
+        UnityHTTPD::validatePostCSRFToken();
+        $USER->init($SSO["firstname"], $SSO["lastname"], $SSO["mail"], $SSO["org"]);
+        UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
+    }
 }
 require getTemplatePath("header.php");
 $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
@@ -29,6 +31,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 <br>
 <form action="" method="POST">
     <?php echo $CSRFTokenHiddenFormInput; ?>
+    <input type='hidden' name='form_type' value='register'>
     <input type='submit' value='Register'>
 </form>
 <?php require getTemplatePath("footer.php"); ?>

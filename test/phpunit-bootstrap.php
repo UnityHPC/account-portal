@@ -37,6 +37,7 @@ use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnitySQL;
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use PHPUnit\Framework\TestCase;
+use TRegx\PhpUnit\DataProviders\DataProvider as TRegxDataProvider;
 
 $_SERVER["HTTP_HOST"] = "phpunit"; // used for config override
 require_once __DIR__ . "/../resources/config.php";
@@ -644,6 +645,56 @@ class UnityWebPortalTestCase extends TestCase
         }
         if ($do_validate_messages) {
             $this->assertNoWarningErrorMessages();
+        }
+        return $output;
+    }
+
+    private static function findPHPFiles($path)
+    {
+        // if I do this recursively I get the ajax and modal files, which aren't appropriate
+        // for these tests, so instead I just list the directory
+        // $directory_iterator = new RecursiveDirectoryIterator($path);
+        // $iterator_iterator = new RecursiveIteratorIterator($directory_iterator);
+        // $regex_iterator = new RegexIterator(
+        //     $iterator_iterator,
+        //     '/^.+\.php$/i',
+        //     RecursiveRegexIterator::GET_MATCH
+        // );
+        // return array_keys(iterator_to_array($regex_iterator)));
+        $files = [];
+        foreach (new DirectoryIterator($path) as $file) {
+            if (str_ends_with($file->getFilename(), ".php")) {
+                array_push($files, join("/", [$path, $file->getFilename()]));
+            }
+        }
+        return $files;
+    }
+
+    public static function adminPages()
+    {
+        return TRegxDataProvider::list(...self::findPHPFiles(__DIR__ . "/../webroot/admin"));
+    }
+
+    public static function validUserForAllPages()
+    {
+        $panel = __DIR__ . "/../webroot/panel";
+        $admin = __DIR__ . "/../webroot/admin";
+        $excludePanelPages = array_map(fn($x) => "$panel/$x.php", [
+            "pi",
+            "new_account",
+            "disabled_account",
+        ]);
+        $output = [];
+        foreach (self::findPHPFiles($panel) as $page) {
+            if (!in_array($page, $excludePanelPages)) {
+                array_push($output, ["Blank", $page]);
+            }
+        }
+        array_push($output, ["EmptyPIGroupOwner", "$panel/pi.php"]);
+        array_push($output, ["NonExistent", "$panel/new_account.php"]);
+        array_push($output, ["Disabled", "$panel/disabled_account.php"]);
+        foreach (self::findPHPFiles($admin) as $page) {
+            array_push($output, ["Admin", $page]);
         }
         return $output;
     }

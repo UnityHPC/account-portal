@@ -9,7 +9,7 @@ if (!$USER->getFlag(UserFlag::DISABLED)) {
     UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (UnityHTTPD::getPostData("request_type") === "reEnable") {
+    if (UnityHTTPD::getPostData("form_type") === "reEnable") {
         UnityHTTPD::validatePostCSRFToken();
         $USER->reEnable();
         UnityHTTPD::messageSuccess("Account Re-Enabled", "");
