@@ -35,7 +35,7 @@ class PageLoadTest extends UnityWebPortalTestCase
     public function testLoadPage($nickname, $path)
     {
         $this->switchUser($nickname);
-        $this->http_get(__DIR__ . "/../../webroot/" . $path);
+        $this->http_get($path);
     }
 
     #[DataProvider("providerMisc")]
