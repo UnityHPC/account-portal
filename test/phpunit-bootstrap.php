@@ -37,6 +37,7 @@ use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnitySQL;
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use PHPUnit\Framework\TestCase;
+use TRegx\PhpUnit\DataProviders\DataProvider as TRegxDataProvider;
 
 $_SERVER["HTTP_HOST"] = "phpunit"; // used for config override
 require_once __DIR__ . "/../resources/config.php";
@@ -208,7 +209,7 @@ class UnityWebPortalTestCase extends TestCase
     private ?string $current_user_nickname = null;
     private array $nickname_to_latest_session_id = [];
     // FIXME these names are wrong
-    protected static array $UID2ATTRIBUTES = [
+    public static array $UID2ATTRIBUTES = [
         "user1_org1_test" => ["user1@org1.test", "foo", "bar", "user1@org1.test"],
         "user2_org1_test" => ["user2@org1.test", "foo", "bar", "user2@org1.test"],
         "user3_org1_test" => ["user3@org1.test", "foo", "bar", "user3@org1.test"],
@@ -234,7 +235,7 @@ class UnityWebPortalTestCase extends TestCase
             "user1+cs123_org1_test@org1.test",
         ],
     ];
-    protected static array $NICKNAME2UID = [
+    public static array $NICKNAME2UID = [
         "Admin" => "user1_org1_test",
         "Blank" => "user2_org1_test",
         "EmptyPIGroupOwner" => "user5_org2_test",
@@ -256,7 +257,7 @@ class UnityWebPortalTestCase extends TestCase
         "ImmortalNotPI" => "user13_org1_test",
     ];
 
-    private function validateUser(string $nickname)
+    public function validateUser(string $nickname)
     {
         global $USER, $SQL, $LDAP;
         if (!array_key_exists($nickname, self::$NICKNAME2UID)) {
@@ -644,6 +645,71 @@ class UnityWebPortalTestCase extends TestCase
         }
         if ($do_validate_messages) {
             $this->assertNoWarningErrorMessages();
+        }
+        return $output;
+    }
+
+    private static function findPHPFiles($path)
+    {
+        // if I do this recursively I get the ajax and modal files, which aren't appropriate
+        // for these tests, so instead I just list the directory
+        // $directory_iterator = new RecursiveDirectoryIterator($path);
+        // $iterator_iterator = new RecursiveIteratorIterator($directory_iterator);
+        // $regex_iterator = new RegexIterator(
+        //     $iterator_iterator,
+        //     '/^.+\.php$/i',
+        //     RecursiveRegexIterator::GET_MATCH
+        // );
+        // return array_keys(iterator_to_array($regex_iterator)));
+        $files = [];
+        foreach (new DirectoryIterator($path) as $file) {
+            if (str_ends_with($file->getFilename(), ".php")) {
+                array_push($files, join("/", [$path, $file->getFilename()]));
+            }
+        }
+        return $files;
+    }
+
+    public static function providerAdminPages()
+    {
+        return TRegxDataProvider::list(...self::findPHPFiles(__DIR__ . "/../webroot/admin"));
+    }
+
+    private static function panelPagesWithNoSpecialRedirects()
+    {
+        $panel = __DIR__ . "/../webroot/panel";
+        $excludePanelPages = array_map(fn($x) => "$panel/$x.php", [
+            "pi",
+            "new_account",
+            "disabled_account",
+        ]);
+        $output = [];
+        foreach (self::findPHPFiles($panel) as $page) {
+            if (!in_array($page, $excludePanelPages)) {
+                array_push($output, $page);
+            }
+        }
+        return $output;
+    }
+
+    public static function providerPanelPagesWithNoSpecialRedirects()
+    {
+        return TRegxDataProvider::list(...self::panelPagesWithNoSpecialRedirects());
+    }
+
+    public static function providerValidUserForAllPages()
+    {
+        $panel = __DIR__ . "/../webroot/panel";
+        $admin = __DIR__ . "/../webroot/admin";
+        $output = [];
+        foreach (self::panelPagesWithNoSpecialRedirects() as $page) {
+            array_push($output, ["Blank", $page]);
+        }
+        array_push($output, ["EmptyPIGroupOwner", "$panel/pi.php"]);
+        array_push($output, ["NonExistent", "$panel/new_account.php"]);
+        array_push($output, ["Disabled", "$panel/disabled_account.php"]);
+        foreach (self::findPHPFiles($admin) as $page) {
+            array_push($output, ["Admin", $page]);
         }
         return $output;
     }

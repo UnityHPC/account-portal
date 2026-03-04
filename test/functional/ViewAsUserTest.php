@@ -2,12 +2,15 @@
 
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use UnityWebPortal\lib\UnityHTTPD;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-// TODO use DataProvider
 class ViewAsUserTest extends UnityWebPortalTestCase
 {
-    public function _testViewAsUser(string $beforeNickname, string $afterNickname)
-    {
+    public function _testViewAsUser(
+        string $beforeNickname,
+        string $afterNickname,
+        string $phpfile = __DIR__ . "/../../webroot/panel/account.php",
+    ) {
         global $USER;
         $afterUid = self::$NICKNAME2UID[$afterNickname];
         $this->switchUser($beforeNickname);
@@ -25,10 +28,9 @@ class ViewAsUserTest extends UnityWebPortalTestCase
         $this->http_get(__DIR__ . "/../../resources/init.php");
         // now we should be new user
         $this->assertEquals($afterUid, $USER->uid);
+        $this->validateUser($afterNickname);
         // $this->assertTrue($_SESSION["user_exists"]);
-        $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
-            "form_type" => "clearView",
-        ]);
+        $this->http_post($phpfile, ["form_type" => "clearView"]);
         $this->assertArrayNotHasKey("viewUser", $_SESSION);
         // redirect means that php process dies and user's browser will initiate a new one
         // this makes `require_once autoload.php` run again and init.php changes $USER
@@ -38,9 +40,10 @@ class ViewAsUserTest extends UnityWebPortalTestCase
         $this->assertEquals($beforeUid, $USER->uid);
     }
 
-    public function testViewAsUser()
+    #[DataProvider("providerValidUserForAllPages")]
+    public function testViewAsUser($nickname, $phpfile)
     {
-        $this->_testViewAsUser("Admin", "Blank");
+        $this->_testViewAsUser("Admin", $nickname, $phpfile);
     }
 
     public function testViewAsNonExistentUser()

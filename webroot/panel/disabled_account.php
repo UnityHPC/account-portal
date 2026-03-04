@@ -9,10 +9,12 @@ if (!$USER->getFlag(UserFlag::DISABLED)) {
     UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    UnityHTTPD::validatePostCSRFToken();
-    $USER->reEnable();
-    UnityHTTPD::messageSuccess("Account Re-Enabled", "");
-    UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
+    if (UnityHTTPD::getPostData("form_type") === "reEnable") {
+        UnityHTTPD::validatePostCSRFToken();
+        $USER->reEnable();
+        UnityHTTPD::messageSuccess("Account Re-Enabled", "");
+        UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
+    }
 }
 require getTemplatePath("header.php");
 $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
@@ -30,15 +32,15 @@ $support_mail = CONFIG["mail"]["support"];
 <p>Please verify that the information below is correct before continuing:</p>
 <div>
     <strong>Name&nbsp;&nbsp;</strong>
-    <?php echo $SSO["firstname"] . " " . $SSO["lastname"]; ?>
+    <?php echo $USER->getFullname(); ?>
     <br>
     <strong>Email&nbsp;&nbsp;</strong>
-    <?php echo $SSO["mail"]; ?>
+    <?php echo $USER->getMail(); ?>
 </div>
-<p>Your Unity HPC username will be <strong><?php echo $SSO["user"]; ?></strong>.</p>
 <br>
 <form action="" method="POST">
     <?php echo $CSRFTokenHiddenFormInput; ?>
+    <input type='hidden' name='form_type' value='reEnable'>
     <input type='submit' value='Re-Enable Account'>
 </form>
 <?php require getTemplatePath("footer.php"); ?>
