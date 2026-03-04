@@ -3,7 +3,7 @@
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use UnityWebPortal\lib\UserFlag;
 
-class RegisterUserTest extends UnityWebPortalTestCase
+class ReEnableUserTest extends UnityWebPortalTestCase
 {
     private function reEnable()
     {
