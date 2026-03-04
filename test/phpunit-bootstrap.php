@@ -257,7 +257,7 @@ class UnityWebPortalTestCase extends TestCase
         "ImmortalNotPI" => "user13_org1_test",
     ];
 
-    private function validateUser(string $nickname)
+    protected function validateUser(string $nickname)
     {
         global $USER, $SQL, $LDAP;
         if (!array_key_exists($nickname, self::$NICKNAME2UID)) {
