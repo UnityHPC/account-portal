@@ -11,6 +11,7 @@ class PageLoadTest extends UnityWebPortalTestCase
             ["Admin", "admin/pi-mgmt.php", "/PI Management/"],
             ["Admin", "admin/user-mgmt.php", "/User Management/"],
             ["NonExistent", "panel/new_account.php", "/Register New Account/"],
+            ["Disabled", "panel/disabled_account.php", "/Disabled Account/"],
             ["Blank", "panel/account.php", "/Account Settings/"],
             ["Blank", "panel/groups.php", "/My Principal Investigators/"],
             ["EmptyPIGroupOwner", "panel/pi.php", "/My Users/"],
