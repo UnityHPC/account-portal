@@ -40,7 +40,7 @@ class ViewAsUserTest extends UnityWebPortalTestCase
         $this->assertEquals($beforeUid, $USER->uid);
     }
 
-    #[DataProvider("validUserForAllPages")]
+    #[DataProvider("providerValidUserForAllPages")]
     public function testViewAsUser($nickname, $phpfile)
     {
         $this->_testViewAsUser("Admin", $nickname, $phpfile);

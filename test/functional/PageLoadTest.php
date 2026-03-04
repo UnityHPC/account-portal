@@ -40,7 +40,7 @@ class PageLoadTest extends UnityWebPortalTestCase
         $this->assertMatchesRegularExpression($regex, $output);
     }
 
-    #[DataProvider("adminPages")]
+    #[DataProvider("providerAdminPages")]
     public function testLoadAdminPageNotAnAdmin($path)
     {
         $this->switchUser("Blank");
@@ -48,7 +48,7 @@ class PageLoadTest extends UnityWebPortalTestCase
         $this->assertMatchesRegularExpression("/You are not an admin\./", $output);
     }
 
-    #[DataProvider("panelPagesWithNoSpecialRedirects")]
+    #[DataProvider("providerPanelPagesWithNoSpecialRedirects")]
     public function testLoadPageNonexistentUser($path)
     {
         $this->switchUser("NonExistent");
@@ -56,7 +56,7 @@ class PageLoadTest extends UnityWebPortalTestCase
         $this->assertMatchesRegularExpression("/panel\/new_account\.php/", $output);
     }
 
-    #[DataProvider("panelPagesWithNoSpecialRedirects")]
+    #[DataProvider("providerPanelPagesWithNoSpecialRedirects")]
     public function testLoadPageDisabled($path)
     {
         $this->switchUser("Disabled");
@@ -64,7 +64,7 @@ class PageLoadTest extends UnityWebPortalTestCase
         $this->assertMatchesRegularExpression("/panel\/disabled_account\.php/", $output);
     }
 
-    #[DataProvider("panelPagesWithNoSpecialRedirects")]
+    #[DataProvider("providerPanelPagesWithNoSpecialRedirects")]
     public function testLoadPageLockedUser($path)
     {
         $this->switchUser("Locked");

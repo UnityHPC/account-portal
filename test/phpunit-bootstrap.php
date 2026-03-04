@@ -670,7 +670,7 @@ class UnityWebPortalTestCase extends TestCase
         return $files;
     }
 
-    public static function adminPages()
+    public static function providerAdminPages()
     {
         return TRegxDataProvider::list(...self::findPHPFiles(__DIR__ . "/../webroot/admin"));
     }
@@ -692,7 +692,12 @@ class UnityWebPortalTestCase extends TestCase
         return $output;
     }
 
-    public static function validUserForAllPages()
+    public static function providerPanelPagesWithNoSpecialRedirects()
+    {
+        return TRegxDataProvider::list(...self::panelPagesWithNoSpecialRedirects());
+    }
+
+    public static function providerValidUserForAllPages()
     {
         $panel = __DIR__ . "/../webroot/panel";
         $admin = __DIR__ . "/../webroot/admin";
