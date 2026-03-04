@@ -9,10 +9,12 @@ if (!$USER->getFlag(UserFlag::DISABLED)) {
     UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    UnityHTTPD::validatePostCSRFToken();
-    $USER->reEnable();
-    UnityHTTPD::messageSuccess("Account Re-Enabled", "");
-    UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
+    if (UnityHTTPD::getPostData("request_type") === "reEnable") {
+        UnityHTTPD::validatePostCSRFToken();
+        $USER->reEnable();
+        UnityHTTPD::messageSuccess("Account Re-Enabled", "");
+        UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
+    }
 }
 require getTemplatePath("header.php");
 $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
@@ -39,6 +41,7 @@ $support_mail = CONFIG["mail"]["support"];
 <br>
 <form action="" method="POST">
     <?php echo $CSRFTokenHiddenFormInput; ?>
+    <input type='hidden' name='form_type' value='reEnable'>
     <input type='submit' value='Re-Enable Account'>
 </form>
 <?php require getTemplatePath("footer.php"); ?>

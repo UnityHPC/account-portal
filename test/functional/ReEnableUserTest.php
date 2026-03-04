@@ -8,7 +8,7 @@ class RegisterUserTest extends UnityWebPortalTestCase
     private function reEnable()
     {
         $this->http_post(__DIR__ . "/../../webroot/panel/disabled_account.php", [
-            "eula" => "agree",
+            "form_type" => "reEnable",
         ]);
     }
 
