@@ -176,10 +176,9 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
 
     public function testIdlelockWarningSkipIfAlreadyIdlelocked()
     {
-        global $USER, $SQL;
-        $this->switchUser("IdleLocked");
-        // set last login to one day after epoch
-        callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, 1 * 24 * 60 * 60);
+        global $USER;
+        $this->switchUser("Blank");
+        $USER->setFlag(UserFlag::IDLELOCKED, true);
         // see deployment/overrides/phpunit/config/config.ini
         $this->assertContains(2, CONFIG["expiry"]["idlelock_warning_days"]);
         $this->assertGreaterThan(2, CONFIG["expiry"]["idlelock_day"]);
