@@ -38,6 +38,10 @@ For details on the changes in each release, see [the Releases page](https://gith
   - the `[ldap]user_flag_groups[immortal]` open must also be defined
 - the `[site]account_policy_url` option has been renamed to `[site]pi_qualification_docs_url`
 - the `[site]account_expiration_policy_url` option must be defined
+- the SQL trigger for `audit_log` to update `user_last_logins` should be removed:
+  ```sql
+  drop trigger update_last_logins;
+  ```
 
 ### 1.5 -> 1.6
 

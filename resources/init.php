@@ -84,6 +84,7 @@ if (isset($_SERVER["REMOTE_USER"])) {
 
     $days_idle = $SQL->convertLastLoginToDaysIdle($SQL->getUserLastLogin($USER->uid));
     $SQL->addLog("user_login", $OPERATOR->uid);
+    $SQL->updateUserLastLogin($OPERATOR->uid);
 
     $USER->updateIsQualified(); // in case manual changes have been made to PI groups
 
