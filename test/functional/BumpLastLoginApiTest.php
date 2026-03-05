@@ -16,7 +16,7 @@ class BumpLastLoginApiTest extends UnityWebPortalTestCase
             $this->http_post(
                 __DIR__ . "/../../webroot/lan/api/bump-last-login.php",
                 [],
-                query_parameters: ["uid" => $USER->uid],
+                query_params: ["uid" => $USER->uid],
                 bearer_token: "phpunit_api_key",
             );
             $new_timestamp_year = date("Y", $SQL->getUserLastLogin($USER->uid));

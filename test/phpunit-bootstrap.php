@@ -559,7 +559,7 @@ class UnityWebPortalTestCase extends TestCase
     function http_post(
         string $phpfile,
         array $post_data,
-        array $query_parameters = [],
+        array $query_params = [],
         bool $do_generate_csrf_token = true,
         bool $do_validate_messages = true,
         ?string $bearer_token = null,
@@ -588,7 +588,7 @@ class UnityWebPortalTestCase extends TestCase
             $post_data["csrf_token"] = CSRFToken::generate();
         }
         $_POST = $post_data;
-        $_GET = $query_parameters;
+        $_GET = $query_params;
         ob_start();
         try {
             $post_did_redirect_or_die = false;
