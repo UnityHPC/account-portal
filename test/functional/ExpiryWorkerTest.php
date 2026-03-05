@@ -172,12 +172,16 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
     {
         global $USER;
         $this->switchUser("Blank");
-        $USER->setFlag(UserFlag::IDLELOCKED, true);
-        // see deployment/overrides/phpunit/config/config.ini
-        $this->assertContains(2, CONFIG["expiry"]["idlelock_warning_days"]);
-        $this->assertGreaterThan(2, CONFIG["expiry"]["idlelock_day"]);
-        $output = $this->runExpiryWorker(idle_days: 2);
-        $this->assertEquals("", $output);
+        try {
+            $USER->setFlag(UserFlag::IDLELOCKED, true);
+            // see deployment/overrides/phpunit/config/config.ini
+            $this->assertContains(2, CONFIG["expiry"]["idlelock_warning_days"]);
+            $this->assertGreaterThan(2, CONFIG["expiry"]["idlelock_day"]);
+            $output = $this->runExpiryWorker(idle_days: 2);
+            $this->assertEquals("", $output);
+        } finally {
+            $USER->setFlag(UserFlag::IDLELOCKED, false);
+        }
     }
 
     public function testWarningUserPassedOver()
