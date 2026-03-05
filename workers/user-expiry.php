@@ -173,10 +173,10 @@ foreach ($uid_to_idle_days as $uid => $day) {
     if (!$user->exists()) {
         continue;
     }
-    if (in_array($day, $idlelock_warning_days)) {
+    if (in_array($day, $idlelock_warning_days) && !in_array($uid, $initially_idlelocked_users)) {
         idleLockWarnUser($user, $day);
     }
-    if (in_array($day, $disable_warning_days)) {
+    if (in_array($day, $disable_warning_days) && !in_array($uid, $initially_disabled_users)) {
         disableWarnUser($user, $day);
     }
     if ($day === $idlelock_day) {
