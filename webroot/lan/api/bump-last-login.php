@@ -9,6 +9,5 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 }
 UnityHTTPD::validateAPIKey();
 $uid = UnityHTTPD::getQueryParameter("uid");
-// please remove this ugly hack https://github.com/UnityHPC/account-portal/pull/593
-$SQL->addLog("user_login", $uid);
+$SQL->updateUserLastLogin($uid);
 UnityHTTPD::die();
