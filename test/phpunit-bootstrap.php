@@ -562,7 +562,7 @@ class UnityWebPortalTestCase extends TestCase
         array $query_parameters = [],
         bool $do_generate_csrf_token = true,
         bool $do_validate_messages = true,
-        string $bearer_token = "",
+        ?string $bearer_token = null,
     ): string {
         global $LDAP,
             $SQL,
@@ -581,7 +581,9 @@ class UnityWebPortalTestCase extends TestCase
         $_SERVER["REQUEST_METHOD"] = "POST";
         $_SERVER["PHP_SELF"] = _preg_replace("/.*webroot\//", "/", $phpfile);
         $_SERVER["REQUEST_URI"] = _preg_replace("/.*webroot\//", "/", $phpfile); // Slightly imprecise because it doesn't include get parameters
-        $_SERVER["HTTP_AUTHORIZATION"] = "Bearer $bearer_token";
+        if ($bearer_token !== null) {
+            $_SERVER["HTTP_AUTHORIZATION"] = "Bearer $bearer_token";
+        }
         if (!array_key_exists("csrf_token", $post_data) && $do_generate_csrf_token) {
             $post_data["csrf_token"] = CSRFToken::generate();
         }
@@ -613,7 +615,7 @@ class UnityWebPortalTestCase extends TestCase
         string $phpfile,
         array $query_params = [],
         bool $ignore_die = false,
-        string $bearer_token = "",
+        ?string $bearer_token = null,
         $do_validate_messages = true,
     ): string {
         global $LDAP,
@@ -633,7 +635,9 @@ class UnityWebPortalTestCase extends TestCase
         $_SERVER["REQUEST_METHOD"] = "GET";
         $_SERVER["PHP_SELF"] = _preg_replace("/.*webroot\//", "/", $phpfile);
         $_SERVER["REQUEST_URI"] = _preg_replace("/.*webroot\//", "/", $phpfile); // Slightly imprecise because it doesn't include get parameters
-        $_SERVER["HTTP_AUTHORIZATION"] = "Bearer $bearer_token";
+        if ($bearer_token !== null) {
+            $_SERVER["HTTP_AUTHORIZATION"] = "Bearer $bearer_token";
+        }
         $_GET = $query_params;
         ob_start();
         try {
