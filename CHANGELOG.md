@@ -44,6 +44,8 @@ For details on the changes in each release, see [the Releases page](https://gith
   drop trigger update_last_logins;
   ```
 - `[api]keys` can now be specified in the config file
+- `ServerName` must be specified in apache site if not already
+- `UseCanonicalName` must be set to `On` in apache site
 
 ### 1.5 -> 1.6
 
