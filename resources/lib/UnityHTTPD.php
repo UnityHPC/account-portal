@@ -91,7 +91,7 @@ class UnityHTTPD
             }
             // text may not be shown in the webpage in an obvious way, so make a popup
             self::alert(implode(" -- ", [$title, ...$body_lines]));
-            echo sprintf("<h1>%s</h1><p>%s</p>", $title, implode("<br>", $body_lines));
+            echo sprintf("<h1>%s</h1>\n<p>\n%s\n</p>\n", $title, implode("<br>\n", $body_lines));
             // display_errors should not be enabled in production
             if (
                 !is_null($error) &&
@@ -287,8 +287,10 @@ class UnityHTTPD
     // after I disable alerts, if I quit and reopen my browser, the alerts come back
     public static function alert(string $message): void
     {
-        // jsonEncode escapes quotes
-        echo "<script type='text/javascript'>alert(" . \_json_encode($message) . ");</script>";
+        echo sprintf(
+            "<script type='text/javascript'>\nalert('%s');\n</script>\n",
+            htmlspecialchars($message),
+        );
     }
 
     private static function ensureSessionMessagesSanity(): void
