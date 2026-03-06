@@ -34,6 +34,7 @@ For details on the changes in each release, see [the Releases page](https://gith
 - a new location `/lan` needs to be configured in your webserver
   - authorization: only IP addresses in your local area network should be allowed
   - authentication: none
+  - `CGIPassAuth On`
 - a new LDAP posixGroup needs to be created for "immortal" users, who are exempt from automatic account expiration
   - the `[ldap]user_flag_groups[immortal]` open must also be defined
 - the `[site]account_policy_url` option has been renamed to `[site]pi_qualification_docs_url`
@@ -42,6 +43,9 @@ For details on the changes in each release, see [the Releases page](https://gith
   ```sql
   drop trigger update_last_logins;
   ```
+- `[api]keys` can now be specified in the config file
+- `ServerName` must be specified in apache site if not already
+- `UseCanonicalName` must be set to `On` in apache site
 
 ### 1.5 -> 1.6
 
@@ -74,7 +78,7 @@ Now, LDAP entries are created immediately for every user, so this is no longer n
 - Create LDAP entries for all existing requests
   ```php
   use UnityWebPortal\lib\UnityUser;
-  $_SERVER["HTTP_HOST"] = "worker"; // see deployment/overrides/worker/
+  $_SERVER["SERVER_NAME"] = "worker"; // see deployment/overrides/worker/
   $_SERVER["REMOTE_ADDR"] = "127.0.0.1";
   require_once __DIR__ . "/../resources/autoload.php";
   foreach ($SQL->getAllRequests() as $request) {

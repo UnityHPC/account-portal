@@ -1,9 +1,9 @@
 <?php
-if (!array_key_exists("HTTP_HOST", $_SERVER)) {
-    if (getenv("HTTP_HOST")) {
-        $_SERVER["HTTP_HOST"] = getenv("HTTP_HOST");
+if (!array_key_exists("SERVER_NAME", $_SERVER)) {
+    if (getenv("SERVER_NAME")) {
+        $_SERVER["SERVER_NAME"] = getenv("SERVER_NAME");
     } else {
-        $_SERVER["HTTP_HOST"] = "worker"; // see deployment/overrides/worker
+        $_SERVER["SERVER_NAME"] = "worker"; // see deployment/overrides/worker
     }
 }
 if (!array_key_exists("REMOTE_ADDR", $_SERVER)) {
