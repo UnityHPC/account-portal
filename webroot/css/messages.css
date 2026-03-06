@@ -24,6 +24,10 @@
     margin: 0;
 }
 
+.message p {
+    white-space: pre-line;
+}
+
 .message.debug {
     color: #856404;
     background-color: #fff3cd;
