@@ -427,7 +427,10 @@ class UnityHTTPD
         if (!str_starts_with($authorization, "Bearer ")) {
             self::badRequest("HTTP_AUTHORIZATION is not Bearer", "invalid HTTP_AUTHORIZATION");
         }
-        $key = substr($authorization, strlen("Bearer "));
+        $key = trim(substr($authorization, strlen("Bearer ")));
+        if ($key === "") {
+            self::forbidden("empty API key", "forbidden");
+        }
         if (!in_array($key, CONFIG["api"]["keys"])) {
             self::forbidden("API key not found in config", "forbidden");
         }
