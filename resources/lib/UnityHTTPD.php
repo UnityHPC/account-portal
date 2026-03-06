@@ -69,14 +69,17 @@ class UnityHTTPD
     ): never {
         $errorid = uniqid();
         $title = htmlspecialchars($user_message_title);
-        $body_lines = [
-            htmlspecialchars($user_message_body),
-            "For assistance, contact a Unity admin at " . CONFIG["mail"]["support"],
-            "Error ID: $errorid",
-        ];
+        if (trim($user_message_body) !== "") {
+            $body_lines = explode($user_message_body, "\n");
+        } else {
+            $body_lines = [];
+        }
+        $support = CONFIG["mail"]["support"];
+        array_push($body_lines, "For assistance, contact a Unity admin at $support.");
+        array_push($body_lines, "Error ID: $errorid");
         self::errorLog($log_title, $log_message, data: $data, error: $error, errorid: $errorid);
         if (($_SERVER["REQUEST_METHOD"] ?? "") == "POST") {
-            self::messageError($title, implode("\n", $body_lines));
+            self::messageError($title, trim(implode("\n", $body_lines)));
             self::redirect();
         } else {
             if (!headers_sent()) {
