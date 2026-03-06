@@ -70,7 +70,7 @@ class UnityHTTPD
         $errorid = uniqid();
         $title = htmlspecialchars($user_message_title);
         if (trim($user_message_body) !== "") {
-            $body_lines = explode("\n", $user_message_body);
+            $body_lines = explode("\n", htmlspecialchars($user_message_body));
         } else {
             $body_lines = [];
         }
