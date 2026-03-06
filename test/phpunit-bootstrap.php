@@ -39,7 +39,7 @@ use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use PHPUnit\Framework\TestCase;
 use TRegx\PhpUnit\DataProviders\DataProvider as TRegxDataProvider;
 
-$_SERVER["HTTP_HOST"] = "phpunit"; // used for config override
+$_SERVER["SERVER_NAME"] = "phpunit"; // used for config override
 require_once __DIR__ . "/../resources/config.php";
 
 global $HTTP_HEADER_TEST_INPUTS;
@@ -82,7 +82,7 @@ function executeWorker(
 ): array {
     global $LDAP;
     $command = sprintf(
-        "HTTP_HOST=phpunit %s %s %s 2>&1",
+        "SERVER_NAME=phpunit %s %s %s 2>&1",
         escapeshellarg(PHP_BINARY),
         escapeshellarg(__DIR__ . "/../workers/" . $basename),
         $args,
@@ -513,7 +513,7 @@ class UnityWebPortalTestCase extends TestCase
         // session_start will be called on the first post()
         $_SERVER["REMOTE_USER"] = $eppn;
         $_SERVER["REMOTE_ADDR"] = "127.0.0.1";
-        $_SERVER["HTTP_HOST"] = "phpunit"; // used for config override
+        $_SERVER["SERVER_NAME"] = "phpunit"; // used for config override
         $_SERVER["eppn"] = $eppn;
         $_SERVER["givenName"] = $given_name;
         $_SERVER["sn"] = $sn;

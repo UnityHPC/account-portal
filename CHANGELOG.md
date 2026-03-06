@@ -76,7 +76,7 @@ Now, LDAP entries are created immediately for every user, so this is no longer n
 - Create LDAP entries for all existing requests
   ```php
   use UnityWebPortal\lib\UnityUser;
-  $_SERVER["HTTP_HOST"] = "worker"; // see deployment/overrides/worker/
+  $_SERVER["SERVER_NAME"] = "worker"; // see deployment/overrides/worker/
   $_SERVER["REMOTE_ADDR"] = "127.0.0.1";
   require_once __DIR__ . "/../resources/autoload.php";
   foreach ($SQL->getAllRequests() as $request) {
