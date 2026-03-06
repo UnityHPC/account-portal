@@ -71,7 +71,7 @@ class UnityHTTPD
         $errorid = uniqid();
         $title = htmlspecialchars($user_message_title);
         if (trim($user_message_body) !== "") {
-            $body_lines = explode("\n", htmlspecialchars($user_message_body));
+            $body_lines = explode("\n", $user_message_body);
         } else {
             $body_lines = [];
         }
@@ -83,7 +83,7 @@ class UnityHTTPD
             ($_SERVER["REQUEST_METHOD"] ?? "") == "POST" &&
             !str_starts_with($_SERVER["REQUEST_URI"], "/lan/api/")
         ) {
-            self::messageError($title, trim(implode("\n", $body_lines)));
+            self::messageError($title, implode("\n", $body_lines));
             self::redirect();
         } else {
             if (!headers_sent()) {
@@ -91,7 +91,11 @@ class UnityHTTPD
             }
             // text may not be shown in the webpage in an obvious way, so make a popup
             self::alert(implode(" -- ", [$title, ...$body_lines]));
-            echo sprintf("<h1>%s</h1>\n<p>\n%s\n</p>\n", $title, implode("<br>\n", $body_lines));
+            echo sprintf(
+                "<h1>%s</h1>\n<p>\n%s\n</p>\n",
+                $title,
+                nl2br(htmlspecialchars(implode("\n", $body_lines))),
+            );
             // display_errors should not be enabled in production
             if (
                 !is_null($error) &&
