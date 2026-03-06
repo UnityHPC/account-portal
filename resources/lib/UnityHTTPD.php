@@ -53,7 +53,7 @@ class UnityHTTPD
 
     /*
     generates a unique error ID, writes to error log, and then:
-        if the user is doing an HTTP POST and the current page is not an API endpoint:
+        if the user is doing an HTTP POST:
             registers a message in the user's session and issues a redirect to display that message
         else:
             prints an HTML message to stdout, sets an HTTP response code, and dies
