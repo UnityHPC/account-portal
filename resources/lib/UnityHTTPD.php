@@ -69,7 +69,7 @@ class UnityHTTPD
         mixed $data = null,
     ): never {
         $errorid = uniqid();
-        $title = htmlspecialchars($user_message_title);
+        $title = trim($user_message_title);
         if (trim($user_message_body) !== "") {
             $body_lines = explode("\n", trim($user_message_body));
         } else {
@@ -93,7 +93,7 @@ class UnityHTTPD
             self::alert(implode(" -- ", [$title, ...$body_lines]));
             echo sprintf(
                 "<h1>%s</h1>\n<p>\n%s\n</p>\n",
-                $title,
+                nl2br(htmlspecialchars($title)),
                 nl2br(htmlspecialchars(implode("\n", $body_lines))),
             );
             // display_errors should not be enabled in production
