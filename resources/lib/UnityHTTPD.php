@@ -69,32 +69,26 @@ class UnityHTTPD
         mixed $data = null,
     ): never {
         $errorid = uniqid();
-        $suffix = sprintf(
-            "For assistance, contact a Unity admin at %s. Error ID: %s.",
-            CONFIG["mail"]["support"],
-            $errorid,
-        );
-        $user_message_title = htmlspecialchars($user_message_title);
-        $user_message_body = htmlspecialchars($user_message_body);
-        if (strlen($user_message_body) === 0) {
-            $user_message_body = $suffix;
-        } else {
-            $user_message_body .= " $suffix";
-        }
+        $title = htmlspecialchars($user_message_title);
+        $body_lines = [
+            htmlspecialchars($user_message_body),
+            "For assistance, contact a Unity admin at " . CONFIG["mail"]["support"],
+            "Error ID: $errorid",
+        ];
         self::errorLog($log_title, $log_message, data: $data, error: $error, errorid: $errorid);
         if (
             ($_SERVER["REQUEST_METHOD"] ?? "") == "POST" &&
             !str_starts_with($_SERVER["REQUEST_URI"], "/lan/api/")
         ) {
-            self::messageError($user_message_title, $user_message_body);
+            self::messageError($title, implode("\n", $body_lines));
             self::redirect();
         } else {
             if (!headers_sent()) {
                 http_response_code($http_response_code);
             }
             // text may not be shown in the webpage in an obvious way, so make a popup
-            self::alert("$user_message_title -- $user_message_body");
-            echo "<h1>$user_message_title</h1><p>$user_message_body</p>";
+            self::alert(implode(" -- ", [$title, ...$body_lines]));
+            echo sprintf("<h1>%s</h1><p>%s</p>", $title, implode("<br>", $body_lines));
             // display_errors should not be enabled in production
             if (
                 !is_null($error) &&
