@@ -101,10 +101,7 @@ cd ./tools/docker-dev
 tab 2:
 
 ```
-$ container="$(docker container ls | grep web | awk '{print $1}')"
-$ docker exec -it "$container" bash
-> cd /var/www/unity-web
-> ./vendor/bin/phpunit /path/to/tests
+docker exec -it "$(docker container ls | grep web | awk '{print $1}')" bash -c 'cd /var/www/unity-web-portal && ./vendor/bin/phpunit /path/to/test'
 ```
 
 For `/path/to/tests/`, you usually want `./test/functional/` but you can select a specific file to save time when troubleshooting specific tests.
