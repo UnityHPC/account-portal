@@ -116,6 +116,7 @@ function idleLockWarnUser(UnityUser $user, int $day)
     $expiration_date = date("Y/m/d", $last_login + $idlelock_day * 24 * 60 * 60);
     $is_final_warning = $day === $final_idlelock_warning_day;
     sendMail($user->getMail(), "user_expiry_idlelock_warning", [
+        "user" => $user->uid,
         "idle_days" => $idle_days,
         "expiration_date" => $expiration_date,
         "is_final_warning" => $is_final_warning,
@@ -141,6 +142,7 @@ function disableWarnUser(UnityUser $user, int $day)
     $pi_group_gid = UnityGroup::ownerUID2GID($user->uid);
     $pi_group_member_uids = $pi_group_members[$pi_group_gid] ?? [];
     $mail_template_data = [
+        "user" => $user->uid,
         "idle_days" => $idle_days,
         "expiration_date" => $expiration_date,
         "is_final_warning" => $is_final_warning,
