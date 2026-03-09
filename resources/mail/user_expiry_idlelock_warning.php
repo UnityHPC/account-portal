@@ -13,8 +13,8 @@ echo "
     Your Unity account, $USER, is due for credential verification.
     To maintain an active Unity account, you must verify your institutional credentials on a biannual basis
     due to security requirements. To keep your account active, please log in to the $portal_hyperlink before $expiration_date.
-    Upon expiration, you will lose access to Unity HPC Platform services until you reset the inactivity
-    timer by logging in to the $portal_hyperlink. For more information, see our $policy_hyperlink.
+    Upon expiration, you will lose access to Unity HPC Platform services until you log in to the $portal_hyperlink.
+    For more information, see our $policy_hyperlink.
 
     Currently, the Unity account portal is the only way to verify credentials.
     To maintain an active account, all that's needed is logging in to the portal, you don't need to run jobs or otherwise interact with Unity.
