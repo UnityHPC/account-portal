@@ -10,7 +10,7 @@ $portal_hyperlink = getRelativeHyperlink("account portal");
 $policy_hyperlink = formatHyperlink("account policy", CONFIG["site"]["account_expiration_policy_url"]);
 
 echo "
-    Your Unity account, $USER, is due for credential verification.
+    Your Unity account, {$data['user']}, is due for credential verification.
     To maintain an active Unity account, you must verify your institutional credentials on a biannual basis
     due to security requirements. To keep your account active, please log in to the $portal_hyperlink before $expiration_date.
     Upon expiration, you will lose access to Unity HPC Platform services until you log in to the $portal_hyperlink.
