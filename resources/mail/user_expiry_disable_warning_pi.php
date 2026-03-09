@@ -11,13 +11,18 @@ $policy_hyperlink = formatHyperlink("account policy", CONFIG["site"]["account_ex
 $pi_group_gid = $data["pi_group_gid"];
 
 echo "
-    Your account and PI group are scheduled to be disabled on $expiration_date because you have been idle for too long.
-    Upon expiration, your files and your PI group's files will be permanently deleted,
-    you will lose access to Unity HPC Platform services,
-    and your group members also may lose access unless they are a member of some other group.
-    If you don't wish for this to happen,
-    reset the inactivity timer by simply logging in to the $portal_hyperlink.
+    Your account, {$data['user']}, and PI group, $pi_group_gid, are scheduled to be disabled on $expiration_date because your credential verification has lapsed.
+    To maintain an active Unity account, you must verify your institutional credentials on a biannual basis
+    due to security requirements. To keep your account active, please log in to the $portal_hyperlink before $expiration_date.
+    Upon expiration, you will lose access to Unity HPC Platform services until you log in to the $portal_hyperlink.
     For more information, see our $policy_hyperlink.
+
+    Currently, the Unity account portal is the only way to verify credentials.
+    To maintain an active account, all that's needed is logging in to the portal, you don't need to run jobs or otherwise interact with Unity.
+    You can check your status by running unity-account-expiry-status from the Unity command line, or by logging in to the $portal_hyperlink.
+
+    Additionally, please use this opportunity to verify all users under your PI group are current students or collaborators by
+    visiting the \"My Users\" tab in the $portal_hyperlink.
 ";
 if ($is_final_warning) {
     echo "This is the final warning.\n";
