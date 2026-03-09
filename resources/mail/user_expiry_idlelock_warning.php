@@ -17,7 +17,7 @@ echo "
 
     Currently, the Unity account portal is the only way to verify credentials. 
     To maintain an active account, all that's needed is logging in to the portal, you don't need to run jobs or otherwise interact with Unity.
-    To see your current status, you can run unity-account-expiry-status from the Unity command line, or by logging in to the $portal_hyperlink.
+    You can check your status by running unity-account-expiry-status from the Unity command line, or by logging in to the $portal_hyperlink.
 
     If you are a PI on Unity, please use this opportunity to verify all users under your PI group are current students or collaborators by 
     visiting the \"My Users\" tab in the $portal_hyperlink. 
