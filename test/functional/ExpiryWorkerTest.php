@@ -24,7 +24,7 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
         bool $is_final,
     ) {
         $fmt =
-            '/^sending %s email to "%s" with data \{"idle_days":%s,"expiration_date":"[\d\/]+","is_final_warning":%s(,"pi_group_gid":"[^"]+")?\}$/';
+            '/^sending %s email to "%s" with data \{"user":"[^"]+","idle_days":%s,"expiration_date":"[\d\/]+","is_final_warning":%s(,"pi_group_gid":"[^"]+")?\}$/';
         $regex = sprintf($fmt, $template, $mail, $day, $is_final ? "true" : "false");
         $this->assertMatchesRegularExpression($regex, $output);
     }
@@ -235,6 +235,7 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
                     "user_expiry_disable_warning_pi",
                     '"' . $owner->getMail() . '"',
                     _json_encode([
+                        "user" => $owner->uid,
                         "idle_days" => 7,
                         "expiration_date" => "1970/01/10",
                         "is_final_warning" => true,
@@ -243,6 +244,7 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
                     "user_expiry_disable_warning_member",
                     '["' . $member->getMail() . '"]',
                     _json_encode([
+                        "user" => $owner->uid,
                         "idle_days" => 7,
                         "expiration_date" => "1970/01/10",
                         "is_final_warning" => true,
