@@ -40,7 +40,7 @@ For details on the changes in each release, see [the Releases page](https://gith
 - the `[site]account_expiration_policy_url` option must be defined
 - the SQL trigger for `audit_log` to update `user_last_logins` should be removed:
   ```sql
-  drop trigger update_last_logins;
+  drop trigger update_last_login;
   ```
 
 ### 1.5 -> 1.6
