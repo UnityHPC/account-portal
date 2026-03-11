@@ -22,6 +22,9 @@ deployment/**/*
 !deployment/overrides/course-creator/
 !deployment/overrides/course-creator/config/
 !deployment/overrides/course-creator/config/config.ini
+!deployment/overrides/account-portal-docker-web/
+!deployment/overrides/account-portal-docker-web/config/
+!deployment/overrides/account-portal-docker-web/config/config.ini
 !deployment/config/
 !deployment/config/README.md
 !deployment/mail_overrides/

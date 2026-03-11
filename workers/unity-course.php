@@ -1,6 +1,6 @@
 #!/usr/bin/env php
 <?php
-$_SERVER["HTTP_HOST"] = "course-creator"; // see deployment/overrides/course-creator
+$_SERVER["SERVER_NAME"] = "course-creator"; // see deployment/overrides/course-creator
 include __DIR__ . "/init.php";
 use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UnityOrg;

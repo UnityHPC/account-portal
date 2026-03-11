@@ -11,10 +11,10 @@ class UnityConfig
     {
         $CONFIG = _parse_ini_file($def_config_loc . "/config.ini.default", true, INI_SCANNER_TYPED);
         $CONFIG = self::pullConfig($CONFIG, $deploy_loc);
-        if (array_key_exists("HTTP_HOST", $_SERVER)) {
-            $cur_url = $_SERVER["HTTP_HOST"];
-            self::assertHttpHostValid($cur_url);
-            $url_override_path = $deploy_loc . "/overrides/" . $cur_url;
+        if (array_key_exists("SERVER_NAME", $_SERVER)) {
+            $server_name = $_SERVER["SERVER_NAME"];
+            self::validateServerName($server_name);
+            $url_override_path = $deploy_loc . "/overrides/" . $server_name;
             if (is_dir($url_override_path)) {
                 $CONFIG = self::pullConfig($CONFIG, $url_override_path);
             }
@@ -126,10 +126,10 @@ class UnityConfig
         }
     }
 
-    private static function assertHttpHostValid(string $host): void
+    private static function validateServerName(string $server_name): void
     {
-        if (!_preg_match("/^[a-zA-Z0-9._:-]+$/", $host)) {
-            throw new \Exception("HTTP_HOST '$host' contains invalid characters!");
+        if (!_preg_match("/^[a-zA-Z0-9._:-]+$/", $server_name)) {
+            throw new \Exception("SERVER_NAME '$server_name' contains invalid characters!");
         }
     }
 }
