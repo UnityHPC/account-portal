@@ -4,7 +4,7 @@ namespace UnityWebPortal\lib;
 
 use PHPMailer\PHPMailer\PHPMailer;
 
-class UnityMailerException extends Exception {}
+class UnityMailerException extends \Exception {}
 
 /**
  * This is a class that uses PHPmailer to send emails based on templates
