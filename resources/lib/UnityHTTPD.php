@@ -68,29 +68,30 @@ class UnityHTTPD
         mixed $data = null,
     ): never {
         $errorid = uniqid();
-        $suffix = sprintf(
-            "For assistance, contact a Unity admin at %s. Error ID: %s.",
-            CONFIG["mail"]["support"],
-            $errorid,
-        );
-        $user_message_title = htmlspecialchars($user_message_title);
-        $user_message_body = htmlspecialchars($user_message_body);
-        if (strlen($user_message_body) === 0) {
-            $user_message_body = $suffix;
+        $title = trim($user_message_title);
+        if (trim($user_message_body) !== "") {
+            $body_lines = explode("\n", trim($user_message_body));
         } else {
-            $user_message_body .= " $suffix";
+            $body_lines = [];
         }
+        $support = CONFIG["mail"]["support"];
+        array_push($body_lines, "For assistance, contact a Unity admin at $support.");
+        array_push($body_lines, "Error ID: $errorid");
         self::errorLog($log_title, $log_message, data: $data, error: $error, errorid: $errorid);
         if (($_SERVER["REQUEST_METHOD"] ?? "") == "POST") {
-            self::messageError($user_message_title, $user_message_body);
+            self::messageError($title, implode("\n", $body_lines));
             self::redirect();
         } else {
             if (!headers_sent()) {
                 http_response_code($http_response_code);
             }
             // text may not be shown in the webpage in an obvious way, so make a popup
-            self::alert("$user_message_title -- $user_message_body");
-            echo "<h1>$user_message_title</h1><p>$user_message_body</p>";
+            self::alert(implode(" -- ", [$title, ...$body_lines]));
+            echo sprintf(
+                "<h1>%s</h1>\n<p>\n%s\n</p>\n",
+                nl2br(htmlspecialchars($title)),
+                nl2br(htmlspecialchars(implode("\n", $body_lines))),
+            );
             // display_errors should not be enabled in production
             if (
                 !is_null($error) &&
@@ -288,8 +289,10 @@ class UnityHTTPD
     // after I disable alerts, if I quit and reopen my browser, the alerts come back
     public static function alert(string $message): void
     {
-        // jsonEncode escapes quotes
-        echo "<script type='text/javascript'>alert(" . \_json_encode($message) . ");</script>";
+        echo sprintf(
+            "<script type='text/javascript'>\nalert('%s');\n</script>\n",
+            htmlspecialchars($message),
+        );
     }
 
     private static function ensureSessionMessagesSanity(): void
