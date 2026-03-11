@@ -67,6 +67,8 @@ See the Docker Compose environment (`tools/docker-dev/`) for an (unsafe for prod
    - `httpd` Authorization
      - Restricted access to `webroot/admin/`
      - Global access (with valid authentication) to `webroot/`
+     - IP-based access (no authentication) to `lan/`
+      - any IP address in your local area network should be authorized
      - No access anywhere else
 1. Authorization for your other services based on user flag groups
    - in order to access your services, a user should be in the `qualified` group and should not be in the `locked`, `idlelocked`, or `disabled` groups
