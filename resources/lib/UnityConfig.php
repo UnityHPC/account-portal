@@ -151,10 +151,6 @@ class UnityConfig
         foreach ($options as $option) {
             if ($x === $option) {
                 return;
-            } else {
-                var_dump($x);
-                echo "is not equal to...\n";
-                var_dump($option);
             }
         }
         throw new InvalidConfigurationException(
