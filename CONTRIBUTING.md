@@ -167,3 +167,26 @@ private function requestGroupCreation()
 `http_post` is defined in `phpunit-bootstrap.php`.
 
 It is fine to use the PHP API when making assertions and doing cleanup.
+
+### Testing Config Override
+
+The `phpunit` tooling relies on a `phpunit` config override, so just by running the integration tests you already have a basic sanity check of this functionality.
+In order to check that the config override feature is working with Apache's `ServerName`/`ServerAlias`, you must add some entries to the `/etc/hosts` file on your machine:
+
+```
+127.0.0.1 account-portal-docker-web account-portal-docker-web-green
+```
+
+To confirm that this is working:
+
+```console
+$ nc -zv account-portal-docker-web 8000
+Connection to account-portal-docker-web port 8000 [tcp/irdmi] succeeded!
+$ nc -zv account-portal-docker-web-green 8000
+Connection to account-portal-docker-web-green port 8000 [tcp/irdmi] succeeded!
+```
+
+Now, you should be able to observe with your web browser that `http://account-portal-docker-web:8000` uses the colors from `config.ini.default` and `http://account-portal-docker-web-green:8000` uses a green color scheme.
+
+Note: it is possible to configure your web browser to ignore your local machine's DNS resolver and rely entirely on a 3rd party.
+In Firefox, I found the section "enable DNS over HTTPS using" and set it to "Off: Use your default DNS resolveer".
