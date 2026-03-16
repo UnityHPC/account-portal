@@ -22,9 +22,9 @@ deployment/**/*
 !deployment/overrides/course-creator/
 !deployment/overrides/course-creator/config/
 !deployment/overrides/course-creator/config/config.ini
-!deployment/overrides/account-portal-docker-web/
-!deployment/overrides/account-portal-docker-web/config/
-!deployment/overrides/account-portal-docker-web/config/config.ini
+!deployment/overrides/account-portal-docker-web:8000/
+!deployment/overrides/account-portal-docker-web:8000/config/
+!deployment/overrides/account-portal-docker-web:8000/config/config.ini
 !deployment/overrides/account-portal-docker-web-green:8000/
 !deployment/overrides/account-portal-docker-web-green:8000/config/
 !deployment/overrides/account-portal-docker-web-green:8000/config/config.ini
