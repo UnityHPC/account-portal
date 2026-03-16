@@ -428,6 +428,7 @@ class UnityHTTPD
     {
         $authorization = $_SERVER["HTTP_AUTHORIZATION"] ?? "";
         if (!str_starts_with($authorization, "Bearer ")) {
+            // this can happen when you don't enable apache CGIPassAuth
             self::badRequest("HTTP_AUTHORIZATION is not Bearer", "invalid HTTP_AUTHORIZATION");
         }
         $key = trim(substr($authorization, strlen("Bearer ")));
