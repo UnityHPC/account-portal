@@ -42,6 +42,7 @@ For details on the changes in each release, see [the Releases page](https://gith
   ```sql
   drop trigger update_last_login;
   ```
+- the `[smtp]ssl_verify` option has changed from `"true"/"false"` to `true/false`
 
 ### 1.5 -> 1.6
 
