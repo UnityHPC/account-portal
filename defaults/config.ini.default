@@ -130,3 +130,6 @@ disable_warning_days[] = 360
 disable_warning_days[] = 380
 disable_warning_days[] = 399
 disable_day = 400
+
+[api]
+; keys[] = "INSERT_KEY_HERE_AND_UNCOMMENT"

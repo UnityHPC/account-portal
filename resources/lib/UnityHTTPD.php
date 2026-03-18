@@ -81,7 +81,10 @@ class UnityHTTPD
             $user_message_body .= " $suffix";
         }
         self::errorLog($log_title, $log_message, data: $data, error: $error, errorid: $errorid);
-        if (($_SERVER["REQUEST_METHOD"] ?? "") == "POST") {
+        if (
+            ($_SERVER["REQUEST_METHOD"] ?? "") == "POST" &&
+            !str_starts_with($_SERVER["REQUEST_URI"], "/lan/api/")
+        ) {
             self::messageError($user_message_title, $user_message_body);
             self::redirect();
         } else {
@@ -419,5 +422,21 @@ class UnityHTTPD
     {
         $token = htmlspecialchars(CSRFToken::generate());
         return "<input type='hidden' name='csrf_token' value='$token'>";
+    }
+
+    public static function validateAPIKey(): void
+    {
+        $authorization = $_SERVER["HTTP_AUTHORIZATION"] ?? "";
+        if (!str_starts_with($authorization, "Bearer ")) {
+            // this can happen when you don't enable apache CGIPassAuth
+            self::badRequest("HTTP_AUTHORIZATION is not Bearer", "invalid HTTP_AUTHORIZATION");
+        }
+        $key = trim(substr($authorization, strlen("Bearer ")));
+        if ($key === "") {
+            self::forbidden("empty API key", "forbidden");
+        }
+        if (!in_array($key, CONFIG["api"]["keys"])) {
+            self::forbidden("API key not found in config", "forbidden");
+        }
     }
 }
