@@ -138,7 +138,6 @@ class UnityHTTPD
         }
         $output["REMOTE_USER"] = $_SERVER["REMOTE_USER"] ?? null;
         $output["REMOTE_ADDR"] = $_SERVER["REMOTE_ADDR"] ?? null;
-        $output["_REQUEST"] = $_REQUEST;
         if (!is_null($errorid)) {
             $output["errorid"] = $errorid;
         }
