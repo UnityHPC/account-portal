@@ -34,7 +34,13 @@ See the Docker Compose environment (`tools/docker-dev/`) for an (unsafe for prod
 
 1. OpenLDAP server
    - Structure should be similar to `tools/docker-dev/identity/bootstrap.ldif` <!-- TODO separate OUs from entries -->
-   - Also see `tools/docker-dev/identity/{config,ssh}.ldif`
+   - Also see `tools/docker-dev/identity/config.ldif`
+   - Schemas should be imported:
+       - `cosine`
+       - `nis`
+       - `inetorgperson` 
+       - `tools/docker-dev/identity/ssh.ldif`
+       - `tools/docker-dev/identity/account-portal-schema.ldif`
    - recommended openldap modules/overlays:
      - `unique`: prevent UIDNumber, GIDNumber conflicts
      - `pw-sha2`: allow the use of sha2 password hashing algorithms for bind
