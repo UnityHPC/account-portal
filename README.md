@@ -38,7 +38,7 @@ See the Docker Compose environment (`tools/docker-dev/`) for an (unsafe for prod
    - Schemas should be imported:
        - `cosine`
        - `nis`
-       - `inetorgperson` 
+       - `inetorgperson`
        - `tools/docker-dev/identity/ssh.ldif`
        - `tools/docker-dev/identity/account-portal-schema.ldif`
    - recommended openldap modules/overlays:
