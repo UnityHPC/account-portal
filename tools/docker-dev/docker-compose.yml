@@ -6,8 +6,8 @@ services:
     hostname: identity
     build: identity
     ports:
-      - "8010:80"
-      - "389:389"
+      - "127.0.0.1:8010:80"
+      - "127.0.0.1:389:389"
     healthcheck:
       test:
         [
@@ -19,8 +19,8 @@ services:
     hostname: sql
     build: sql
     ports:
-      - "8020:80"
-      - "3306:3306"
+      - "127.0.0.1:8020:80"
+      - "127.0.0.1:3306:3306"
     healthcheck:
       test:
         [
@@ -32,12 +32,12 @@ services:
     hostname: smtp
     image: schickling/mailcatcher
     ports:
-      - "8030:1080"
+      - "127.0.0.1:8030:1080"
   web:
     hostname: web
     build: web
     ports:
-      - "8000:80"
+      - "127.0.0.1:8000:80"
     volumes:
       - ../../:/var/www/unity-web-portal
     depends_on:
