@@ -29,9 +29,11 @@ page in our documentation for next steps.
 <?php case UserFlag::DISABLED: ?>
 <?php $this->Subject = "User Disabled"; ?>
 <p>Hello,</p>
-<p>Your account on the Unity HPC Platform has been disabled.</p>
-<p>You should no longer be able to access Unity HPC Platform services.</p>
-<p>This can happen as a result of the <?php echo $policy_hyperlink ?>.</p>
+<p>
+    Your account on the Unity HPC Platform has been disabled.
+    You should no longer be able to access Unity HPC Platform services.
+    This can happen as a result of the <?php echo $policy_hyperlink ?>.
+</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 <?php break; ?>
 
@@ -39,8 +41,10 @@ page in our documentation for next steps.
 <?php case UserFlag::LOCKED: ?>
 <?php $this->Subject = "User Locked"; ?>
 <p>Hello,</p>
-<p>Your account on the Unity HPC Platform has been locked.</p>
-<p>You should no longer be able to access Unity HPC Platform services.</p>
+<p>
+    Your account on the Unity HPC Platform has been locked.
+    You should no longer be able to access Unity HPC Platform services.
+</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 <?php break; ?>
 
@@ -48,10 +52,12 @@ page in our documentation for next steps.
 <?php case UserFlag::IDLELOCKED: ?>
 <?php $this->Subject = "User Locked"; ?>
 <p>Hello,</p>
-<p>Your account on the Unity HPC Platform has been locked due to inactivity.</p>
-<p>You should no longer be able to access Unity HPC Platform services.</p>
-<p>To unlock your account, simply log in to the <?php echo $portal_hyperlink ?>.</p>
-<p>See the <?php echo $policy_hyperlink ?> for more information.</p>
+<p>
+    Your account on the Unity HPC Platform has been locked due to inactivity.
+    You should no longer be able to access Unity HPC Platform services.
+    To unlock your account, simply log in to the <?php echo $portal_hyperlink ?>.
+    See the <?php echo $policy_hyperlink ?> for more information.
+</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 <?php break; ?>
 
