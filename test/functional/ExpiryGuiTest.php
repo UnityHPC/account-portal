@@ -121,7 +121,7 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
             callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, strtotime("-8 days"));
             $this->assertIdleDays(8);
             $USER->setFlag(UserFlag::IDLELOCKED, true);
-            $USER->disable();
+            $USER->disable("phpunit");
             session_write_close();
             $this->http_get(__DIR__ . "/../../resources/init.php");
             $this->assertNumberOfMessages(0);

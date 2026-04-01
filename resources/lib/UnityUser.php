@@ -399,10 +399,10 @@ class UnityUser
     }
 
     public function disable(
+        string $why,
         bool $send_mail = true,
         bool $send_mail_pi_group_owner = true,
         bool $send_mail_admin = true,
-        string $why = "(no reason given)",
     ): void {
         $pi_group = $this->getPIGroup();
         if ($pi_group->exists() && !$pi_group->getIsDisabled()) {

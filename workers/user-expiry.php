@@ -103,7 +103,16 @@ function disableUser(UnityUser $user)
     global $args;
     echo "disabling user '$user->uid'\n";
     if (!$args["dry-run"]) {
-        $user->disable(send_mail_pi_group_owner: false, why: "the user was expired automatically");
+        $user->disable(
+            sprintf(
+                "the user was expired automatically according to the %s",
+                formatHyperlink(
+                    "account expiration policy",
+                    CONFIG["site"]["account_expiration_policy_url"],
+                ),
+            ),
+            send_mail_pi_group_owner: false,
+        );
     }
 }
 
