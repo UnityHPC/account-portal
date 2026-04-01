@@ -11,12 +11,6 @@ case UserFlag::QUALIFIED: ?>
 <p>
     Your account on the Unity HPC Platform, "<?php echo $uid ?>", has been qualified.
     You should now be able to access Unity HPC Platform services.
-    Your account details are below:
-</p>
-<p>
-<strong>Username</strong> <?php echo $data["user"]; ?>
-<br>
-<strong>Organization</strong> <?php echo $data["org"]; ?>
 </p>
 <p>
 See the
