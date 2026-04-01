@@ -1,5 +1,9 @@
-<?php use UnityWebPortal\lib\UserFlag; ?>
-<?php switch ($data["flag"]):
+<?php
+use UnityWebPortal\lib\UserFlag;
+$portal_hyperlink = getRelativeHyperlink("account portal");
+$policy_hyperlink = formatHyperlink("account expiration policy", CONFIG["site"]["account_expiration_policy_url"]);
+switch ($data["flag"]):
+////////////////////////////////////////////////////////////////////////////////////////////////////
 case UserFlag::QUALIFIED: ?>
 <?php $this->Subject = "User Qualified"; ?>
 <p>Hello,</p>
@@ -26,6 +30,8 @@ page in our documentation for next steps.
 <?php $this->Subject = "User Disabled"; ?>
 <p>Hello,</p>
 <p>Your account on the Unity HPC Platform has been disabled.</p>
+<p>You should no longer be able to access Unity HPC Platform services.</p>
+<p>This can happen as a result of the <?php echo $policy_hyperlink ?></p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 <?php break; ?>
 
@@ -34,6 +40,7 @@ page in our documentation for next steps.
 <?php $this->Subject = "User Locked"; ?>
 <p>Hello,</p>
 <p>Your account on the Unity HPC Platform has been locked.</p>
+<p>You should no longer be able to access Unity HPC Platform services.</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 <?php break; ?>
 
@@ -42,6 +49,9 @@ page in our documentation for next steps.
 <?php $this->Subject = "User Locked"; ?>
 <p>Hello,</p>
 <p>Your account on the Unity HPC Platform has been locked due to inactivity.</p>
+<p>You should no longer be able to access Unity HPC Platform services.</p>
+<p>To unlock your account, simply log in to the <?php echo $portal_hyperlink ?>.</p>
+<p>See the <?php echo $policy_hyperlink ?> for more information.</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 <?php break; ?>
 

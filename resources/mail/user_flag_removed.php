@@ -1,5 +1,7 @@
-<?php use UnityWebPortal\lib\UserFlag; ?>
-<?php switch ($data["flag"]):
+<?php
+use UnityWebPortal\lib\UserFlag;
+switch ($data["flag"]):
+////////////////////////////////////////////////////////////////////////////////////////////////////
 case UserFlag::QUALIFIED: ?>
 <?php $this->Subject = "User Disqualified"; ?>
 <p>Hello,</p>
@@ -16,6 +18,7 @@ case UserFlag::QUALIFIED: ?>
 <?php $this->Subject = "User Re-Enabled"; ?>
 <p>Hello,</p>
 <p>Your account on the Unity HPC Platform has been re-enabled.</p>
+<p>You should now be able to access Unity HPC Platform services.</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 <?php break; ?>
 
@@ -24,6 +27,7 @@ case UserFlag::QUALIFIED: ?>
 <?php $this->Subject = "User Unlocked"; ?>
 <p>Hello,</p>
 <p>Your account on the Unity HPC Platform has been unlocked.</p>
+<p>You should now be able to access Unity HPC Platform services.</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 <?php break; ?>
 
@@ -32,6 +36,7 @@ case UserFlag::QUALIFIED: ?>
 <?php $this->Subject = "User Unlocked"; ?>
 <p>Hello,</p>
 <p>Your account on the Unity HPC Platform has been unlocked.</p>
+<p>You should now be able to access Unity HPC Platform services.</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 <?php break; ?>
 
