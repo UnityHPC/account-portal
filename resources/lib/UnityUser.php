@@ -388,13 +388,11 @@ class UnityUser
 
     public function updateIsQualified(bool $send_mail = true): void
     {
-        $num_associated_pi_groups = count($this->getPIGroupGIDs());
         $this->setFlag(
             UserFlag::QUALIFIED,
-            $num_associated_pi_groups !== 0,
+            count($this->getPIGroupGIDs()) !== 0,
             doSendMail: $send_mail,
             doSendMailAdmin: false,
-            why: "user is associated with $num_associated_pi_groups PI groups",
         );
     }
 
