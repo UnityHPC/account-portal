@@ -1,5 +1,8 @@
-<?php use UnityWebPortal\lib\UserFlag; ?>
-<?php switch ($data["flag"]):
+<?php
+use UnityWebPortal\lib\UserFlag;
+$why = $data["why"];
+switch ($data["flag"]):
+////////////////////////////////////////////////////////////////////////////////////////////////////
 case UserFlag::QUALIFIED: ?>
 <?php $this->Subject = "User Qualified"; ?>
 <p>Hello,</p>
@@ -11,6 +14,7 @@ case UserFlag::QUALIFIED: ?>
 <?php $this->Subject = "User Disabled"; ?>
 <p>Hello,</p>
 <p>User "<?php echo $data["user"] ?>" has been disabled. </p>
+<p>This has happened because <?php echo $why ?>.</p>
 <?php break; ?>
 
 <?php /////////////////////////////////////////////////////////////////////////////////////////// ?>

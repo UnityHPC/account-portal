@@ -97,6 +97,7 @@ class UnityUser
         bool $newValue,
         bool $doSendMail = true,
         bool $doSendMailAdmin = true,
+        string $why = "(no reason given)",
     ): void {
         $oldValue = $this->getFlag($flag);
         if ($oldValue == $newValue) {
@@ -112,12 +113,14 @@ class UnityUser
                 $this->MAILER->sendMail($this->getMail(), "user_flag_added", [
                     "user" => $this->uid,
                     "flag" => $flag,
+                    "why" => $why,
                 ]);
             }
             if ($doSendMailAdmin) {
                 $this->MAILER->sendMail("admin", "user_flag_added_admin", [
                     "user" => $this->uid,
                     "flag" => $flag,
+                    "why" => $why,
                 ]);
             }
         } else {
@@ -126,12 +129,14 @@ class UnityUser
                 $this->MAILER->sendMail($this->getMail(), "user_flag_removed", [
                     "user" => $this->uid,
                     "flag" => $flag,
+                    "why" => $why,
                 ]);
             }
             if ($doSendMailAdmin) {
                 $this->MAILER->sendMail("admin", "user_flag_removed_admin", [
                     "user" => $this->uid,
                     "flag" => $flag,
+                    "why" => $why,
                 ]);
             }
         }
@@ -383,11 +388,13 @@ class UnityUser
 
     public function updateIsQualified(bool $send_mail = true): void
     {
+        $num_associated_pi_groups = count($this->getPIGroupGIDs());
         $this->setFlag(
             UserFlag::QUALIFIED,
-            count($this->getPIGroupGIDs()) !== 0,
+            $num_associated_pi_groups !== 0,
             doSendMail: $send_mail,
             doSendMailAdmin: false,
+            why: "user is associated with $num_associated_pi_groups PI groups",
         );
     }
 
@@ -395,6 +402,7 @@ class UnityUser
         bool $send_mail = true,
         bool $send_mail_pi_group_owner = true,
         bool $send_mail_admin = true,
+        string $why = "(no reason given)",
     ): void {
         $pi_group = $this->getPIGroup();
         if ($pi_group->exists() && !$pi_group->getIsDisabled()) {
@@ -410,6 +418,7 @@ class UnityUser
             true,
             doSendMail: $send_mail,
             doSendMailAdmin: $send_mail_admin,
+            why: $why,
         );
     }
 

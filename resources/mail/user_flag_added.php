@@ -3,6 +3,7 @@ use UnityWebPortal\lib\UserFlag;
 $portal_hyperlink = getRelativeHyperlink("account portal");
 $policy_hyperlink = formatHyperlink("account expiration policy", CONFIG["site"]["account_expiration_policy_url"]);
 $uid = $data["user"];
+$why = $data["why"];
 switch ($data["flag"]):
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 case UserFlag::QUALIFIED: ?>
@@ -26,6 +27,7 @@ page in our documentation for next steps.
 <p>Hello,</p>
 <p>
     Your account on the Unity HPC Platform, "<?php echo $uid ?>", has been disabled.
+    This has happened because <?php echo $why ?>.
     You should no longer be able to access Unity HPC Platform services.
     This can happen as a result of the <?php echo $policy_hyperlink ?>.
 </p>
