@@ -111,14 +111,12 @@ class UnityUser
             if ($doSendMail) {
                 $this->MAILER->sendMail($this->getMail(), "user_flag_added", [
                     "user" => $this->uid,
-                    "org" => $this->getOrg(),
                     "flag" => $flag,
                 ]);
             }
             if ($doSendMailAdmin) {
                 $this->MAILER->sendMail("admin", "user_flag_added_admin", [
                     "user" => $this->uid,
-                    "org" => $this->getOrg(),
                     "flag" => $flag,
                 ]);
             }
@@ -127,14 +125,12 @@ class UnityUser
             if ($doSendMail) {
                 $this->MAILER->sendMail($this->getMail(), "user_flag_removed", [
                     "user" => $this->uid,
-                    "org" => $this->getOrg(),
                     "flag" => $flag,
                 ]);
             }
             if ($doSendMailAdmin) {
                 $this->MAILER->sendMail("admin", "user_flag_removed_admin", [
                     "user" => $this->uid,
-                    "org" => $this->getOrg(),
                     "flag" => $flag,
                 ]);
             }
