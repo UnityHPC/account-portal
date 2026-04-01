@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         case "remUserChild":
             $form_user = $getUserFromPost();
             $parent = new UnityGroup($_POST["pi"], $LDAP, $SQL, $MAILER, $WEBHOOK);
-            $parent->removeUser($form_user, "user was removed by a Unity administrator");
+            $parent->removeUser($form_user, "you were removed by a Unity administrator", "the user was removed by a Unity administrator");
             break;
         case "disable":
             $group = new UnityGroup(UnityHTTPD::getPostData("pi"), $LDAP, $SQL, $MAILER, $WEBHOOK);

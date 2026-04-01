@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         case "remUser":
             $form_user = $getUserFromPost();
             // remove user button clicked
-            $group->removeUser($form_user, "user was removed by the group owner");
+            $group->removeUser($form_user, "you were removed by the group owner", "the user was removed by the group owner");
             UnityHTTPD::messageSuccess("User Removed", "");
             // group manager removed themself
             if ($USER->uid === $form_user->uid) {

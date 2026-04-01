@@ -102,15 +102,14 @@ function disableUser(UnityUser $user)
 {
     global $args;
     echo "disabling user '$user->uid'\n";
+    $policy = formatHyperlink(
+        "account expiration policy",
+        CONFIG["site"]["account_expiration_policy_url"],
+    );
     if (!$args["dry-run"]) {
         $user->disable(
-            sprintf(
-                "the user was expired automatically according to the %s",
-                formatHyperlink(
-                    "account expiration policy",
-                    CONFIG["site"]["account_expiration_policy_url"],
-                ),
-            ),
+            "you were expired automatically according to the $policy",
+            "the user was expired automatically according to the $policy",
             send_mail_pi_group_owner: false,
         );
     }

@@ -243,8 +243,12 @@ class UnityGroup extends PosixGroup
         }
     }
 
-    public function removeUser(UnityUser $new_user, string $why, bool $send_mail = true): void
-    {
+    public function removeUser(
+        UnityUser $new_user,
+        string $why_2nd_person,
+        string $why_3rd_person,
+        bool $send_mail = true,
+    ): void {
         if (!$this->memberUIDExists($new_user->uid)) {
             return;
         }
@@ -259,7 +263,7 @@ class UnityGroup extends PosixGroup
         if ($send_mail) {
             $this->MAILER->sendMail($new_user->getMail(), "group_user_removed", [
                 "group" => $this->gid,
-                "why" => $why,
+                "why" => $why_2nd_person,
             ]);
             $this->MAILER->sendMail(
                 $this->getOwnerMailAndPlusAddressedManagerMails(),
@@ -270,7 +274,7 @@ class UnityGroup extends PosixGroup
                     "name" => $new_user->getFullName(),
                     "email" => $new_user->getMail(),
                     "org" => $new_user->getOrg(),
-                    "why" => $why,
+                    "why" => $why_3rd_person,
                 ],
             );
         }

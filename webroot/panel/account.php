@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             if ($USER->getFlag(UserFlag::DISABLED)) {
                 UnityHTTPD::badRequest("user is already disabled", "");
             }
-            $USER->disable("the user disabled themself");
+            $USER->disable("you disabled yourself", "the user disabled themself");
             UnityHTTPD::messageSuccess("Account Disabled", "");
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */

@@ -38,7 +38,7 @@ class WorkerRemoveUsersFromGroupTest extends UnityWebPortalTestCase
         } finally {
             foreach ($uids as $uid) {
                 $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
-                $pi_group->removeUser($user, "phpunit");
+                $pi_group->removeUser($user, "phpunit", "phpunit");
             }
             unlink($remove_uids_file_path);
         }
