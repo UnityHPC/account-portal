@@ -28,7 +28,7 @@ class WorkerUpdateQualifiedUsersGroupTest extends UnityWebPortalTestCase
             $this->assertTrue($user->getFlag(UserFlag::QUALIFIED));
         } finally {
             if ($pi_group->memberUIDExists($user->uid)) {
-                $pi_group->removeUser($user);
+                $pi_group->removeUser($user, "phpunit");
             }
             $this->assertFalse($user->getFlag(UserFlag::QUALIFIED));
         }

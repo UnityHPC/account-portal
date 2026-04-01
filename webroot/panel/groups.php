@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 break; /** @phpstan-ignore deadCode.unreachable */
             case "removePIForm":
                 $pi_account = $getPIGroupFromPost();
-                $pi_account->removeUser($USER);
+                $pi_account->removeUser($USER, "user removed themself from the group");
                 UnityHTTPD::redirect();
                 break; /** @phpstan-ignore deadCode.unreachable */
             case "cancelPIForm":

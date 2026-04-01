@@ -7,6 +7,7 @@ $this->Subject = "Group Member Removed"; ?>
 <p>
 A user has been removed from your PI group,
 '<?php echo $data["group"]; ?>'.
+This has happened because <?php echo $data['why'] ?>.
 The details of the removed user are below:
 </p>
 

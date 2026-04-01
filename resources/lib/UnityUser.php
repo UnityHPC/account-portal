@@ -410,7 +410,7 @@ class UnityUser
         }
         foreach ($this->LDAP->getNonDisabledPIGroupGIDsWithMemberUID($this->uid) as $gid) {
             $group = new UnityGroup($gid, $this->LDAP, $this->SQL, $this->MAILER, $this->WEBHOOK);
-            $group->removeUser($this, $send_mail_pi_group_owner);
+            $group->removeUser($this, $why, send_mail: $send_mail_pi_group_owner);
         }
         $this->entry->removeAttribute("sshPublicKey");
         $this->setFlag(

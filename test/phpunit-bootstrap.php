@@ -169,7 +169,7 @@ function ensureUserNotInPIGroup(UnityGroup $pi_group)
 {
     global $USER;
     if ($pi_group->memberUIDExists($USER->uid)) {
-        $pi_group->removeUser($USER);
+        $pi_group->removeUser($USER, "phpunit");
         ensure(!$pi_group->memberUIDExists($USER->uid));
     }
 }

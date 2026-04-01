@@ -26,7 +26,7 @@ try {
             print "Skipping '$uid' who doesn't appear to be in '$gid'\n";
             continue;
         }
-        $group->removeUser($user);
+        $group->removeUser($user, "user was removed by a Unity administrator");
     }
 } finally {
     _fclose($handle);
