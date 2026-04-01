@@ -6,7 +6,7 @@
 <p>Hello,</p>
 
 <p>
-A user from your PI group '{{ group }}' has been idle-locked.
+A user from your PI group '{{ group }}' has been has been locked due to a lapse in credential verification.
 Their details are below:
 </p>
 
@@ -22,7 +22,14 @@ Their details are below:
 
 <p>
     This user is expiring according to our {{ policy_hyperlink|raw }}.
-    They have lost acces to Unity HPC Platform services until they reset the inactivity timer by logging in to the {{ portal_hyperlink|raw }}.
+    They have lost access to Unity HPC Platform services until they reset the inactivity timer by logging in to the {{ portal_hyperlink|raw }}.
+</p>
+
+<p>
+    To maintain an active Unity account, users must verify your institutional credentials on a biannual basis due to security requirements.
+    Not all forms of activity prove good standing, so only certain actions (like logging into the {{ portal_hyperlink|raw }}) reset the 'inactivity timer'.
+    In this first phase of account expiration, all data is preserved, but without intervention data may eventually be lost.
+    For more information, see our {{ policy_hyperlink|raw }}.
 </p>
 
 <p>
