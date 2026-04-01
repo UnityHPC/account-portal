@@ -31,7 +31,7 @@ page in our documentation for next steps.
 <p>Hello,</p>
 <p>Your account on the Unity HPC Platform has been disabled.</p>
 <p>You should no longer be able to access Unity HPC Platform services.</p>
-<p>This can happen as a result of the <?php echo $policy_hyperlink ?></p>
+<p>This can happen as a result of the <?php echo $policy_hyperlink ?>.</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 <?php break; ?>
 
