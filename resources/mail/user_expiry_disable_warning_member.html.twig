@@ -14,8 +14,8 @@ you won't be able to access files under directories owned by {{ pi_group_gid }}.
 <p>
 Currently, the Unity account portal is the only way to verify credentials.
 To maintain an active account, all that's needed is logging in to the portal. A PI doesn't need to run jobs or otherwise interact with Unity.
-If you believe {{ pi_group_gid }}, should remain active, please remind your PI to verify their credentials at {{ portal_hyperlink }}.
-For more information, see our {{ policy_hyperlink }}.
+If you believe {{ pi_group_gid }}, should remain active, please remind your PI to verify their credentials at {{ portal_hyperlink | raw }}.
+For more information, see our {{ policy_hyperlink | raw }}.
 </p>
 {% if is_final_warning %}
 <p>This is the final warning.\n</p>

@@ -1,6 +1,6 @@
 
-{% set portal_hyperlink = getRelativeHyperlink("account portal") %}
-{% set policy_hyperlink = formatHyperlink("account expiration policy", CONFIG["site"]["account_expiration_policy_url"]) %}
+{% set portal_hyperlink = getRelativeHyperlink("account portal") | raw %}
+{% set policy_hyperlink = formatHyperlink("account expiration policy", CONFIG["site"]["account_expiration_policy_url"]) | raw %}
 
 {% if flag == constant('UnityWebPortal\\lib\\UserFlag::QUALIFIED') %}
 {% do setSubject("User Qualified") %}
@@ -22,7 +22,7 @@
 <p>
     Your account on the Unity HPC Platform, "{{ user }}", has been disabled.
     You should no longer be able to access Unity HPC Platform services.
-    This can happen as a result of the {{ policy_hyperlink }}.
+    This can happen as a result of the {{ policy_hyperlink | raw }}.
 </p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 
@@ -41,8 +41,8 @@
 <p>
     Your account on the Unity HPC Platform, "{{ user }}", has been locked due to inactivity.
     You should no longer be able to access Unity HPC Platform services.
-    To unlock your account, simply log in to the {{ portal_hyperlink }}.
-    See the {{ policy_hyperlink }} for more information.
+    To unlock your account, simply log in to the {{ portal_hyperlink | raw }}.
+    See the {{ policy_hyperlink | raw }} for more information.
 </p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 

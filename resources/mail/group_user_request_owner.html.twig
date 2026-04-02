@@ -19,5 +19,5 @@ The details of the user are below:
 </p>
 
 <p>You can approve or deny this user on the
-    {{ getRelativeHyperlink("my users", "panel/pi.php?gid=" ~ group) }} page</p>
+    {{ getRelativeHyperlink("my users", "panel/pi.php?gid=" ~ group) | raw }} page</p>
 {% include 'footer.html.twig' %}
