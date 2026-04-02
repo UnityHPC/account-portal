@@ -4,6 +4,7 @@ namespace UnityWebPortal\lib;
 
 use PHPMailer\PHPMailer\PHPMailer;
 use Exception;
+use Twig\TwigFunction;
 
 class UnityMailerException extends Exception {}
 
@@ -12,9 +13,6 @@ class UnityMailerException extends Exception {}
  */
 class UnityMailer extends PHPMailer
 {
-    private string $content_dir = __DIR__ . "/../mail"; // location of all email templates
-    private string $override_dir = __DIR__ . "/../../deployment/mail";
-
     private string $MSG_SENDER_EMAIL;
     private string $MSG_SENDER_NAME;
     private string $MSG_SUPPORT_EMAIL;
@@ -23,6 +21,9 @@ class UnityMailer extends PHPMailer
     private string $MSG_ADMIN_NAME;
     private string $MSG_PI_APPROVAL_EMAIL;
     private string $MSG_PI_APPROVAL_NAME;
+
+    private \Twig\Loader\FilesystemLoader $loader;
+    private \Twig\Environment $twig;
 
     public function __construct()
     {
@@ -76,6 +77,22 @@ class UnityMailer extends PHPMailer
                 ],
             ];
         }
+
+        $this->loader = new \Twig\Loader\FilesystemLoader([
+            __DIR__ . "/../../deployment/mail",
+            __DIR__ . "/../mail",
+        ]);
+        $this->twig = new \Twig\Environment($this->loader, ["strict_variables" => true]);
+        $functions = [
+            new TwigFunction("setSubject", fn($x) => ($this->Subject = $x)),
+            new TwigFunction("getRelativeHyperlink", getRelativeHyperlink(...)),
+            new TwigFunction("formatHyperlink", formatHyperlink(...)),
+            new TwigFunction("throw", fn($x) => throw new Exception($x)),
+        ];
+        foreach ($functions as $function) {
+            $this->twig->addFunction($function);
+        }
+        $this->twig->addGlobal("CONFIG", CONFIG);
     }
 
     /**
@@ -84,26 +101,11 @@ class UnityMailer extends PHPMailer
      */
     public function sendMail(string|array $recipients, string $template, ?array $data = null): void
     {
+        $data ??= [];
         $this->setFrom($this->MSG_SENDER_EMAIL, $this->MSG_SENDER_NAME);
         $this->addReplyTo($this->MSG_SUPPORT_EMAIL, $this->MSG_SUPPORT_NAME);
 
-        $template_filename = $template . ".php";
-        if (file_exists($this->override_dir . "/" . $template_filename)) {
-            $template_path = $this->override_dir . "/" . $template_filename;
-        } else {
-            $template_path = $this->content_dir . "/" . $template_filename;
-        }
-
-        if (file_exists($this->override_dir . "/footer.php")) {
-            $footer_template_path = $this->override_dir . "/footer.php";
-        } else {
-            $footer_template_path = $this->content_dir . "/footer.php";
-        }
-
-        ob_start();
-        include $template_path;
-        include $footer_template_path;
-        $mes_html = _ob_get_clean();
+        $mes_html = $this->twig->render("$template.html.twig", $data);
         $this->msgHTML($mes_html);
 
         if ($recipients == "admin") {

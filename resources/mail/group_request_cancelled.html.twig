@@ -1,4 +1,4 @@
-<?php
-$this->Subject = "PI Request Cancelled: '" . $data["uid"] . "'"; ?>
+{% do setSubject("PI Request Cancelled: '" ~ uid ~ "'") %}
 <p>Hello,</p>
-<p>The user '<?php echo $data["uid"]; ?>' has cancelled their request to become a PI.</p>
+<p>The user '{{ uid }}' has cancelled their request to become a PI.</p>
+{{ include('footer.html.twig') }}

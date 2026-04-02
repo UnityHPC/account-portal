@@ -1,47 +1,35 @@
-<?php use UnityWebPortal\lib\UserFlag; ?>
-<?php switch ($data["flag"]):
-case UserFlag::QUALIFIED: ?>
-<?php $this->Subject = "User Disqualified"; ?>
-<p>Hello,</p>
-<p>User "<?php echo $data["user"] ?>" has been disqualified. </p>
-<?php break; ?>
 
-<?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
-<?php case UserFlag::DISABLED: ?>
-<?php $this->Subject = "User Re-Enabled"; ?>
+{% if flag == constant('UnityWebPortal\\lib\\UserFlag::QUALIFIED') %}
+{% do setSubject('User Disqualified') %}
 <p>Hello,</p>
-<p>User "<?php echo $data["user"] ?>" has been re-enabled. </p>
-<?php break; ?>
+<p>User "{{ user }}" has been disqualified. </p>
 
-<?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
-<?php case UserFlag::LOCKED: ?>
-<?php $this->Subject = "User Unlocked"; ?>
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::DISABLED') %}
+{% do setSubject('User Re-Enabled') %}
 <p>Hello,</p>
-<p>User "<?php echo $data["user"] ?>" has been unlocked. </p>
-<?php break; ?>
+<p>User "{{ user }}" has been re-enabled. </p>
 
-<?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
-<?php case UserFlag::IDLELOCKED: ?>
-<?php $this->Subject = "User Idle Unlocked"; ?>
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::LOCKED') %}
+{% do setSubject('User Unlocked') %}
 <p>Hello,</p>
-<p>User "<?php echo $data["user"] ?>" has been idle unlocked. </p>
-<?php break; ?>
+<p>User "{{ user }}" has been unlocked. </p>
 
-<?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
-<?php case UserFlag::ADMIN: ?>
-<?php $this->Subject = "User Demoted"; ?>
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::IDLELOCKED') %}
+{% do setSubject('User Idle Unlocked') %}
 <p>Hello,</p>
-<p>User "<?php echo $data["user"] ?>" has been demoted from admin. </p>
-<?php break; ?>
+<p>User "{{ user }}" has been idle unlocked. </p>
 
-<?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
-<?php case UserFlag::IMMORTAL: ?>
-<?php $this->Subject = "User Mortalized"; ?>
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::ADMIN') %}
+{% do setSubject('User Demoted') %}
 <p>Hello,</p>
-<p>User "<?php echo $data["user"] ?>" has been made mortal (no longer exempt from expiry). </p>
-<?php break; ?>
+<p>User "{{ user }}" has been demoted from admin. </p>
 
-<?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
-<?php default: ?>
-<?php throw new \Exception("unknown flag: " . $data["flag"]); ?>
-<?php endswitch; ?>
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::IMMORTAL') %}
+{% do setSubject('User Mortalized') %}
+<p>Hello,</p>
+<p>User "{{ user }}" has been made mortal (no longer exempt from expiry). </p>
+
+{% else %}
+{% do throw('unknown flag: ' ~ flag) %}
+{% endif %}
+{{ include('footer.html.twig') }}
