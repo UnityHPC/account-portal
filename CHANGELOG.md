@@ -4,6 +4,9 @@ For details on the changes in each release, see [the Releases page](https://gith
 
 ## Version-specific update instructions:
 
+### 1.7 -> 1.8
+- the [webhook] section of the config file can be removed
+
 ### 1.6 -> 1.7
 
 - the `update-qualified-users-group.php` worker should be executed
