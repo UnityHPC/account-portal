@@ -15,21 +15,14 @@ class UnityGroup extends PosixGroup
     private UnityLDAP $LDAP;
     private UnitySQL $SQL;
     private UnityMailer $MAILER;
-    private UnityWebhook $WEBHOOK;
 
-    public function __construct(
-        string $gid,
-        UnityLDAP $LDAP,
-        UnitySQL $SQL,
-        UnityMailer $MAILER,
-        UnityWebhook $WEBHOOK,
-    ) {
+    public function __construct(string $gid, UnityLDAP $LDAP, UnitySQL $SQL, UnityMailer $MAILER)
+    {
         parent::__construct($LDAP->getPIGroupEntry(trim($gid)));
         $this->gid = $gid;
         $this->LDAP = $LDAP;
         $this->SQL = $SQL;
         $this->MAILER = $MAILER;
-        $this->WEBHOOK = $WEBHOOK;
     }
 
     public function __toString(): string
@@ -52,7 +45,6 @@ class UnityGroup extends PosixGroup
         $this->SQL->addRequest($this->getOwner()->uid, UnitySQL::REQUEST_BECOME_PI);
         if ($send_mail) {
             $this->MAILER->sendMail($this->getOwner()->getMail(), "group_request");
-            $this->WEBHOOK->sendWebhook("group_request_admin", $context);
             if ($send_mail_to_admins) {
                 $this->MAILER->sendMail("admin", "group_request_admin", $context);
             }
@@ -89,7 +81,7 @@ class UnityGroup extends PosixGroup
         // updateIsQualified() makes one LDAP query for each member
         // if user is no longer in any PI group, disqualify them
         foreach ($memberuids as $uid) {
-            $user = new UnityUser($uid, $this->LDAP, $this->SQL, $this->MAILER, $this->WEBHOOK);
+            $user = new UnityUser($uid, $this->LDAP, $this->SQL, $this->MAILER);
             $user->updateIsQualified($send_mail);
         }
     }
@@ -311,13 +303,7 @@ class UnityGroup extends PosixGroup
         $requests = $this->SQL->getRequests($this->gid);
         $out = [];
         foreach ($requests as $request) {
-            $user = new UnityUser(
-                $request["uid"],
-                $this->LDAP,
-                $this->SQL,
-                $this->MAILER,
-                $this->WEBHOOK,
-            );
+            $user = new UnityUser($request["uid"], $this->LDAP, $this->SQL, $this->MAILER);
             array_push($out, [$user, $request["timestamp"]]);
         }
         return $out;
@@ -329,13 +315,7 @@ class UnityGroup extends PosixGroup
         $members = $this->getMemberUIDs();
         $out = [];
         foreach ($members as $member) {
-            $user_obj = new UnityUser(
-                $member,
-                $this->LDAP,
-                $this->SQL,
-                $this->MAILER,
-                $this->WEBHOOK,
-            );
+            $user_obj = new UnityUser($member, $this->LDAP, $this->SQL, $this->MAILER);
             array_push($out, $user_obj);
         }
         return $out;
@@ -380,7 +360,6 @@ class UnityGroup extends PosixGroup
             $this->LDAP,
             $this->SQL,
             $this->MAILER,
-            $this->WEBHOOK,
         );
     }
 
@@ -449,7 +428,7 @@ class UnityGroup extends PosixGroup
 
     public function addManagerUID(string $uid): void
     {
-        $new_manager = new UnityUser($uid, $this->LDAP, $this->SQL, $this->MAILER, $this->WEBHOOK);
+        $new_manager = new UnityUser($uid, $this->LDAP, $this->SQL, $this->MAILER);
         if (!$new_manager->exists()) {
             throw new EntryNotFoundException("user '$uid' does not exist!");
         }
@@ -499,13 +478,7 @@ class UnityGroup extends PosixGroup
     {
         $mails = [$this->getOwner()->getMail()];
         foreach ($this->getManagerUIDs() as $manager_uid) {
-            $manager = new UnityUser(
-                $manager_uid,
-                $this->LDAP,
-                $this->SQL,
-                $this->MAILER,
-                $this->WEBHOOK,
-            );
+            $manager = new UnityUser($manager_uid, $this->LDAP, $this->SQL, $this->MAILER);
             array_push($mails, $this->addPlusAddressToMail($manager->getMail()));
         }
         $mails = array_unique($mails);

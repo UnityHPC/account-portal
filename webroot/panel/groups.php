@@ -6,9 +6,9 @@ use UnityWebPortal\lib\UnityGroup;
 use UnityWebPortal\lib\UnityHTTPD;
 
 $getPIGroupFromPost = function () {
-    global $LDAP, $SQL, $MAILER, $WEBHOOK;
+    global $LDAP, $SQL, $MAILER;
     $gid = UnityHTTPD::getPostData("pi");
-    $pi_group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+    $pi_group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
     if (!$pi_group->exists()) {
         UnityHTTPD::messageError("This PI Doesn't Exist", $gid);
         UnityHTTPD::redirect();
@@ -113,7 +113,6 @@ if (count($req_filtered) > 0) {
             $LDAP,
             $SQL,
             $MAILER,
-            $WEBHOOK
         );
         $requested_owner = $requested_account->getOwner();
         $full_name = $requested_owner->getFirstname() . " " . $requested_owner->getLastname();
@@ -173,7 +172,7 @@ echo "
         <tbody>
 ";
 foreach ($PIGroupGIDs as $gid) {
-    $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+    $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
     $owner = $group->getOwner();
     $full_name = $owner->getFirstname() . " " . $owner->getLastname();
     if ($USER->uid == $owner->uid) {

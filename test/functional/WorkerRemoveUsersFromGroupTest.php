@@ -6,7 +6,7 @@ class WorkerRemoveUsersFromGroupTest extends UnityWebPortalTestCase
 {
     public function testRemoveUsersFromGroup()
     {
-        global $USER, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("EmptyPIGroupOwner");
         $pi = $USER;
         $pi_group = $USER->getPIGroup();
@@ -21,7 +21,7 @@ class WorkerRemoveUsersFromGroupTest extends UnityWebPortalTestCase
         $remove_uids_file_path = getPathFromFileHandle($remove_uids_file);
         try {
             foreach ($uids as $uid) {
-                $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+                $user = new UnityUser($uid, $LDAP, $SQL, $MAILER);
                 $pi_group->newUserRequest($user, false);
                 $pi_group->approveUser($user, false);
             }
@@ -37,7 +37,7 @@ class WorkerRemoveUsersFromGroupTest extends UnityWebPortalTestCase
             $this->assertEqualsCanonicalizing($expected_new_uids, $pi_group->getMemberUIDs());
         } finally {
             foreach ($uids as $uid) {
-                $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+                $user = new UnityUser($uid, $LDAP, $SQL, $MAILER);
                 $pi_group->removeUser($user);
             }
             unlink($remove_uids_file_path);

@@ -30,12 +30,12 @@ $manager_uid = trim(
 );
 $org_gid = cn2org($cn);
 
-$manager = new UnityUser($manager_uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+$manager = new UnityUser($manager_uid, $LDAP, $SQL, $MAILER);
 if (!$manager->exists()) {
     _die("no such user: '$manager_uid'", 1);
 }
 
-$course_user = new UnityUser($cn, $LDAP, $SQL, $MAILER, $WEBHOOK);
+$course_user = new UnityUser($cn, $LDAP, $SQL, $MAILER);
 if ($course_user->exists()) {
     $course_user_dn = $LDAP->getUserEntry($cn)->getDN();
     _die("course user already exists: '$course_user_dn'", 1);

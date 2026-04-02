@@ -25,7 +25,7 @@ class RegisterUserTest extends UnityWebPortalTestCase
     #[DataProvider("provider")]
     public function testRegisterUserAndCreateOrg($nickname, $expected_uid_gid)
     {
-        global $USER, $SSO, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        global $USER, $SSO, $LDAP, $SQL, $MAILER;
         $this->switchUser($nickname);
         $uid = $USER->uid;
         $org_gid = $SSO["org"];

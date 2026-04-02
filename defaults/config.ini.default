@@ -117,9 +117,6 @@ pi_approve = "piapproval@unitywebportal.test"  ; Only PI approval messages will 
 pi_approve_name = "Unity PI Approval"
 send_pimesg_to_admins = false
 
-[webhook] ; webhook to send messages to admins
-url = "https://hooks.slack.com/services/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"
-
 [expiry]
 idlelock_warning_days[] = 180
 idlelock_warning_days[] = 200

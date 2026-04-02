@@ -7,7 +7,7 @@ use UnityWebPortal\lib\UnityHTTPD;
 use UnityWebPortal\lib\UnityGroup;
 
 if (($gid = $_GET["gid"] ?? null) !== null) {
-    $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+    $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
     $user_is_owner = false;
     if (!$group->exists()) {
         UnityHTTPD::badRequest("no such group: '$gid'", "This group does not exist.");
@@ -28,8 +28,8 @@ if ($group->getIsDisabled()) {
 }
 
 $getUserFromPost = function () {
-    global $LDAP, $SQL, $MAILER, $WEBHOOK;
-    return new UnityUser(UnityHTTPD::getPostData("uid"), $LDAP, $SQL, $MAILER, $WEBHOOK);
+    global $LDAP, $SQL, $MAILER;
+    return new UnityUser(UnityHTTPD::getPostData("uid"), $LDAP, $SQL, $MAILER);
 };
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

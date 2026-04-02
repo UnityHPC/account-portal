@@ -6,7 +6,7 @@ class WorkerUpdateQualifiedUsersGroupTest extends UnityWebPortalTestCase
 {
     public function testQualifyUser()
     {
-        global $USER, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("EmptyPIGroupOwner");
         $pi_group = $USER->getPIGroup();
         $this->switchUser("Blank");
@@ -36,7 +36,7 @@ class WorkerUpdateQualifiedUsersGroupTest extends UnityWebPortalTestCase
 
     public function testDisqualifyUser()
     {
-        global $USER, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("Blank");
         $expectedOutput = [
             "added" => [],
@@ -61,7 +61,7 @@ class WorkerUpdateQualifiedUsersGroupTest extends UnityWebPortalTestCase
 
     public function testIgnoreNonNativeUser()
     {
-        global $USER, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("Blank");
         $expectedOutput = [
             "added" => [],

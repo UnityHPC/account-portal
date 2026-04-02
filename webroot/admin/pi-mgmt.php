@@ -13,8 +13,8 @@ if (!$USER->getFlag(UserFlag::ADMIN)) {
 }
 
 $getUserFromPost = function () {
-    global $LDAP, $SQL, $MAILER, $WEBHOOK;
-    return new UnityUser(UnityHTTPD::getPostData("uid"), $LDAP, $SQL, $MAILER, $WEBHOOK);
+    global $LDAP, $SQL, $MAILER;
+    return new UnityUser(UnityHTTPD::getPostData("uid"), $LDAP, $SQL, $MAILER);
 };
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             break;
         case "reqChild":
             $form_user = $getUserFromPost();
-            $parent_group = new UnityGroup($_POST["pi"], $LDAP, $SQL, $MAILER, $WEBHOOK);
+            $parent_group = new UnityGroup($_POST["pi"], $LDAP, $SQL, $MAILER);
             if ($_POST["action"] == "Approve") {
                 $parent_group->approveUser($form_user);
             } elseif ($_POST["action"] == "Deny") {
@@ -41,11 +41,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             break;
         case "remUserChild":
             $form_user = $getUserFromPost();
-            $parent = new UnityGroup($_POST["pi"], $LDAP, $SQL, $MAILER, $WEBHOOK);
+            $parent = new UnityGroup($_POST["pi"], $LDAP, $SQL, $MAILER);
             $parent->removeUser($form_user);
             break;
         case "disable":
-            $group = new UnityGroup(UnityHTTPD::getPostData("pi"), $LDAP, $SQL, $MAILER, $WEBHOOK);
+            $group = new UnityGroup(UnityHTTPD::getPostData("pi"), $LDAP, $SQL, $MAILER);
             if ($group->getIsDisabled()) {
                 UnityHTTPD::messageError("Cannot Disable PI Group", "Group is already disabled");
                 UnityHTTPD::redirect();
@@ -82,7 +82,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 
     foreach ($requests as $request) {
         $uid = $request["uid"];
-        $request_user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+        $request_user = new UnityUser($uid, $LDAP, $SQL, $MAILER);
         $name = $request_user->getFullname();
         $email = $request_user->getMail();
         echo "<tr>";
