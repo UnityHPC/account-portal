@@ -30,7 +30,6 @@ repos:
               resources/lib/phpopenldaper/.*|
               vendor/.*|
               resources/templates/.*|
-              resources/mail/.*|
               resources/config\.php|
               webroot/.*|
           )$
@@ -42,13 +41,7 @@ repos:
         files: |
           (?x)^(
               resources/templates/.*\.php|
-              resources/mail/.*|
               webroot/.*\.php|
-          )$
-        # the user_flag_* templates use funky syntax and the formatter ruins them
-        exclude: |
-          (?x)^(
-              resources/mail/user_flag_.*\.php|
           )$
       - id: php-cs-fixer
         name: PHP CS Fixer
@@ -102,7 +95,6 @@ repos:
               resources/lib/phpopenldaper/.*|
               vendor/.*|
               resources/templates/.*|
-              resources/mail/.*|
               resources/config\.php|
               webroot/.*|
           )$
@@ -114,13 +106,7 @@ repos:
         files: |
           (?x)^(
               resources/templates/.*\.php|
-              resources/mail/.*\.php|
               webroot/.*\.php|
-          )$
-        # the user_flag_* templates use funky syntax and the formatter ruins them
-        exclude: |
-          (?x)^(
-              resources/mail/user_flag_.*\.php|
           )$
       - id: php-l
         name: php -l
