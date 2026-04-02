@@ -34,6 +34,8 @@ deployment/**/*
 !deployment/mail_overrides/README.md
 !deployment/templates_overrides/
 !deployment/templates_overrides/README.md
+!deployment/mail/
+!deployment/mail/.gitkeep
 
 .phpunit.result.cache
 .php-cs-fixer.cache
