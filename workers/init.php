@@ -16,6 +16,10 @@ if (!array_key_exists("REMOTE_ADDR", $_SERVER)) {
 
 require_once __DIR__ . "/../resources/autoload.php";
 
+// resources/init.php defines these when $SSO is defined but it won't in this case
+$_SESSION["OPERATOR"] = "worker:{$argv[0]}";
+$_SESSION["OPERATOR_IP"] = $_SERVER["REMOTE_ADDR"];
+
 // UnityHTTPD::die() makes no output by default
 // builtin die() makes a return code of 0, we may want nonzero
 function _die(string $msg, int $exit_code)
