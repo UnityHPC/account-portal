@@ -79,7 +79,7 @@ class UnityMailer extends PHPMailer
         }
 
         $this->loader = new \Twig\Loader\FilesystemLoader([
-            __DIR__ . "/../../deployment/mail",
+            __DIR__ . "/../../deployment/mail_overrides",
             __DIR__ . "/../mail",
         ]);
         $this->twig = new \Twig\Environment($this->loader, ["strict_variables" => true]);
