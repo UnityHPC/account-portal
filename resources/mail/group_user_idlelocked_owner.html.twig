@@ -1,7 +1,7 @@
-{% do setSubject("Group Member Idle-Locked") %}
-{% set portal_hyperlink = getRelativeHyperlink("account portal") %}
-{% set policy_hyperlink = formatHyperlink("account policy", CONFIG["site"]["account_expiration_policy_url"]) %}
-{% set pi_hyperlink = getRelativeHyperlink("group management page", "panel/pi.php") %}
+{% do setSubject('Group Member Idle-Locked') %}
+{% set portal_hyperlink = getRelativeHyperlink('account portal') %}
+{% set policy_hyperlink = formatHyperlink('account policy', CONFIG['site']['account_expiration_policy_url']) %}
+{% set pi_hyperlink = getRelativeHyperlink('group management page', 'panel/pi.php') %}
 
 <p>Hello,</p>
 
@@ -21,12 +21,12 @@ Their details are below:
 </p>
 
 <p>
-    This user is expiring according to our {{ policy_hyperlink | raw }}.
-    They have lost acces to Unity HPC Platform services until they reset the inactivity timer by logging in to the {{ portal_hyperlink | raw }}.
+    This user is expiring according to our {{ policy_hyperlink|raw }}.
+    They have lost acces to Unity HPC Platform services until they reset the inactivity timer by logging in to the {{ portal_hyperlink|raw }}.
 </p>
 
 <p>
     If this user is no longer actively participating in your group using Unity HPC Platform services,
-    you might consider removing them from your group in the {{ pi_hyperlink | raw }}.
+    you might consider removing them from your group in the {{ pi_hyperlink|raw }}.
 </p>
-{% include 'footer.html.twig' %}
+{{ include('footer.html.twig') }}

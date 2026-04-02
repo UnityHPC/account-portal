@@ -1,4 +1,4 @@
-{% do setSubject("PI Group Request") %}
+{% do setSubject('PI Group Request') %}
 
 <p>Hello,</p>
 
@@ -16,7 +16,7 @@
 
 <p>
 You can approve this account
-{{ getRelativeHyperlink("here", "admin/pi-mgmt.php") | raw }}
+{{ getRelativeHyperlink('here', 'admin/pi-mgmt.php')|raw }}
 .
 </p>
-{% include 'footer.html.twig' %}
+{{ include('footer.html.twig') }}

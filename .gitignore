@@ -39,6 +39,7 @@ deployment/**/*
 
 .phpunit.result.cache
 .php-cs-fixer.cache
+.twig-cs-fixer.cache
 
 node_modules
 # copied from node_modules using the copy-files-from-to NPM package

@@ -12,7 +12,8 @@
         "squizlabs/php_codesniffer": "*",
         "phpstan/phpstan": "^2.1",
         "rawr/phpunit-data-provider": "^3.3",
-        "friendsofphp/php-cs-fixer": "^3.92"
+        "friendsofphp/php-cs-fixer": "^3.92",
+        "vincentlanglet/twig-cs-fixer": "^3.14"
     },
     "config": {
         "platform": {

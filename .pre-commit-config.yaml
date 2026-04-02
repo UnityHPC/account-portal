@@ -49,6 +49,12 @@ repos:
         language: system
         files: \.php$
         pass_filenames: false
+      - id: twig-cs-fixer
+        name: Twig CS Fixer
+        entry: ./vendor/bin/twig-cs-fixer fix
+        language: system
+        files: \.twig$
+        pass_filenames: true
 
   # linters (work required) ########################################################################
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -108,6 +114,12 @@ repos:
               resources/templates/.*\.php|
               webroot/.*\.php|
           )$
+      - id: twig-cs-fixer
+        name: Twig CS Fixer
+        entry: ./vendor/bin/twig-cs-fixer lint
+        language: system
+        files: \.twig$
+        pass_filenames: true
       - id: php-l
         name: php -l
         entry: php

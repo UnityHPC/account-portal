@@ -1,10 +1,10 @@
-{% do setSubject("Login Shell Updated") %}
+{% do setSubject('Login Shell Updated') %}
 
 <p>Hello,</p>
 
 <p>You have updated your login shell on the Unity HPC Platform to {{ new_shell }}.
 You can view the login shell settings on the
-{{ getRelativeHyperlink("account settings", "panel/account.php") | raw }} page</p>
+{{ getRelativeHyperlink('account settings', 'panel/account.php')|raw }} page</p>
 
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
-{% include 'footer.html.twig' %}
+{{ include('footer.html.twig') }}

@@ -1,6 +1,6 @@
 
 {% if flag == constant('UnityWebPortal\\lib\\UserFlag::QUALIFIED') %}
-{% do setSubject("User Disqualified") %}
+{% do setSubject('User Disqualified') %}
 <p>Hello,</p>
 <p>
     Your account on the Unity HPC Platform, "{{ user }}" has been disqualified.
@@ -10,7 +10,7 @@
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 
 {% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::DISABLED') %}
-{% do setSubject("User Re-Enabled") %}
+{% do setSubject('User Re-Enabled') %}
 <p>Hello,</p>
 <p>
     Your account on the Unity HPC Platform, "{{ user }}" has been re-enabled.
@@ -19,7 +19,7 @@
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 
 {% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::LOCKED') %}
-{% do setSubject("User Unlocked") %}
+{% do setSubject('User Unlocked') %}
 <p>Hello,</p>
 <p>
     Your account on the Unity HPC Platform, "{{ user }}" has been unlocked.
@@ -28,7 +28,7 @@
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 
 {% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::IDLELOCKED') %}
-{% do setSubject("User Unlocked") %}
+{% do setSubject('User Unlocked') %}
 <p>Hello,</p>
 <p>
     Your account on the Unity HPC Platform, "{{ user }}" has been unlocked.
@@ -37,18 +37,18 @@
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 
 {% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::ADMIN') %}
-{% do setSubject("User Demoted") %}
+{% do setSubject('User Demoted') %}
 <p>Hello,</p>
 <p>Your account on the Unity HPC Platform, "{{ user }}" has been demoted from admin.</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 
 {% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::IMMORTAL') %}
-{% do setSubject("User Mortalized") %}
+{% do setSubject('User Mortalized') %}
 <p>Hello,</p>
 <p>Your account on the Unity HPC Platform, "{{ user }}" has been made mortal (no longer exempt frome expiry).</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 
 {% else %}
-{% do throw("unknown flag: " ~ flag) %}
+{% do throw('unknown flag: ' ~ flag) %}
 {% endif %}
-{% include 'footer.html.twig' %}
+{{ include('footer.html.twig') }}

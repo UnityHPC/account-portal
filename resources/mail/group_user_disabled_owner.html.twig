@@ -1,5 +1,5 @@
-{% do setSubject("Group Member Disabled, Removed") %}
-{% set policy_hyperlink = formatHyperlink("account policy", CONFIG["site"]["account_expiration_policy_url"]) %}
+{% do setSubject('Group Member Disabled, Removed') %}
+{% set policy_hyperlink = formatHyperlink('account policy', CONFIG['site']['account_expiration_policy_url']) %}
 
 <p>Hello,</p>
 
@@ -19,6 +19,6 @@ Their details are below:
 </p>
 
 <p>
-    This user has expired according to our {{ policy_hyperlink | raw }}.
+    This user has expired according to our {{ policy_hyperlink|raw }}.
 </p>
-{% include 'footer.html.twig' %}
+{{ include('footer.html.twig') }}
