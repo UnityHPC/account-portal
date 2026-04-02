@@ -4,6 +4,9 @@ For details on the changes in each release, see [the Releases page](https://gith
 
 ## Version-specific update instructions:
 
+### 1.7 -> 1.8
+- the [webhook] section of the config file can be removed
+
 ### 1.6 -> 1.7
 
 - the `update-qualified-users-group.php` worker should be executed
@@ -80,7 +83,7 @@ Now, LDAP entries are created immediately for every user, so this is no longer n
   $_SERVER["REMOTE_ADDR"] = "127.0.0.1";
   require_once __DIR__ . "/../resources/autoload.php";
   foreach ($SQL->getAllRequests() as $request) {
-    $user = new UnityUser($request["uid"], $LDAP, $SQL, $MAILER, $WEBHOOK);
+    $user = new UnityUser($request["uid"], $LDAP, $SQL, $MAILER);
     if (!$user->exists()) {
       echo "creating user: " . jsonEncode($request) . "\n";
       $user->init(

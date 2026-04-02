@@ -13,7 +13,7 @@ if (!$USER->getFlag(UserFlag::ADMIN)) {
 }
 
 $gid = UnityHTTPD::getQueryParameter("gid");
-$group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+$group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
 $members = $group->getGroupMembersAttributes(["gecos", "mail"]);
 $requests = $group->getRequests();
 

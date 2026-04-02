@@ -41,7 +41,7 @@ class PIRemoveUserTest extends UnityWebPortalTestCase
     #[DataProvider("provider")]
     public function testRemoveUser($methodName)
     {
-        global $USER, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("NormalPI");
         $pi = $USER;
         $piUid = $USER->uid;
@@ -52,7 +52,7 @@ class PIRemoveUserTest extends UnityWebPortalTestCase
         $memberToDelete = null;
         foreach ($memberUIDs as $uid) {
             if ($uid != $piUid) {
-                $memberToDelete = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+                $memberToDelete = new UnityUser($uid, $LDAP, $SQL, $MAILER);
                 break;
             }
         }
@@ -75,7 +75,7 @@ class PIRemoveUserTest extends UnityWebPortalTestCase
     #[DataProvider("provider")]
     public function testRemovePIFromTheirOwnGroup($methodName)
     {
-        global $USER, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("NormalPI");
         $pi = $USER;
         $piGroup = $USER->getPIGroup();
@@ -115,12 +115,12 @@ class PIRemoveUserTest extends UnityWebPortalTestCase
 
     public function testManagerRemovesThemselfRedirectsToGroups()
     {
-        global $USER, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("CourseGroupManager");
         $managed_groups = $LDAP->getNonDisabledPIGroupGIDsWithManagerUID($USER->uid);
         $this->assertNotEmpty($managed_groups);
         $gid = $managed_groups[0];
-        $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+        $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
         try {
             $output = $this->http_post(
                 __DIR__ . "/../../webroot/panel/pi.php",

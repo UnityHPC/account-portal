@@ -13,7 +13,6 @@ require_once __DIR__ . "/../resources/lib/UnityMailer.php";
 require_once __DIR__ . "/../resources/lib/UnitySSO.php";
 require_once __DIR__ . "/../resources/lib/UnityHTTPD.php";
 require_once __DIR__ . "/../resources/lib/UnityConfig.php";
-require_once __DIR__ . "/../resources/lib/UnityWebhook.php";
 require_once __DIR__ . "/../resources/lib/UnityGithub.php";
 require_once __DIR__ . "/../resources/lib/utils.php";
 require_once __DIR__ . "/../resources/lib/CSRFToken.php";
@@ -176,13 +175,13 @@ function ensureUserNotInPIGroup(UnityGroup $pi_group)
 
 function ensurePIGroupDoesNotExist(string $gid)
 {
-    global $LDAP, $SQL, $MAILER, $WEBHOOK;
+    global $LDAP, $SQL, $MAILER;
     $pi_group_entry = $LDAP->getPIGroupEntry($gid);
     if ($pi_group_entry->exists()) {
         $member_uids_before = $pi_group_entry->getAttribute("memberuid");
         $pi_group_entry->removeAttribute("memberuid");
         foreach ($member_uids_before as $uid) {
-            $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+            $user = new UnityUser($uid, $LDAP, $SQL, $MAILER);
             $user->updateIsQualified();
         }
         $pi_group_entry->delete();
@@ -479,16 +478,7 @@ class UnityWebPortalTestCase extends TestCase
         bool $reuse_last_session = true,
         bool $validate = true,
     ): void {
-        global $LDAP,
-            $SQL,
-            $MAILER,
-            $WEBHOOK,
-            $GITHUB,
-            $SITE,
-            $SSO,
-            $USER,
-            $LOC_HEADER,
-            $LOC_FOOTER;
+        global $LDAP, $SQL, $MAILER, $GITHUB, $SITE, $SSO, $USER, $LOC_HEADER, $LOC_FOOTER;
         if (!array_key_exists($nickname, self::$NICKNAME2UID)) {
             throw new ArrayKeyException($nickname);
         }
@@ -564,16 +554,7 @@ class UnityWebPortalTestCase extends TestCase
         bool $do_validate_messages = true,
         ?string $bearer_token = null,
     ): string {
-        global $LDAP,
-            $SQL,
-            $MAILER,
-            $WEBHOOK,
-            $GITHUB,
-            $SITE,
-            $SSO,
-            $USER,
-            $LOC_HEADER,
-            $LOC_FOOTER;
+        global $LDAP, $SQL, $MAILER, $GITHUB, $SITE, $SSO, $USER, $LOC_HEADER, $LOC_FOOTER;
         if ($do_validate_messages) {
             $this->assertNoWarningErrorMessages();
         }
@@ -618,16 +599,7 @@ class UnityWebPortalTestCase extends TestCase
         ?string $bearer_token = null,
         $do_validate_messages = true,
     ): string {
-        global $LDAP,
-            $SQL,
-            $MAILER,
-            $WEBHOOK,
-            $GITHUB,
-            $SITE,
-            $SSO,
-            $USER,
-            $LOC_HEADER,
-            $LOC_FOOTER;
+        global $LDAP, $SQL, $MAILER, $GITHUB, $SITE, $SSO, $USER, $LOC_HEADER, $LOC_FOOTER;
         if ($do_validate_messages) {
             $this->assertNoWarningErrorMessages();
         }

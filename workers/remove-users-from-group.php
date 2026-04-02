@@ -13,7 +13,7 @@ $args = $cli->parse($argv, true);
 
 $gid = $args->getArg("gid");
 $filename = $args->getArg("users-file-path");
-$group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+$group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
 if (!$group->exists()) {
     _die("No such group '$gid'\n", 1);
 }
@@ -21,7 +21,7 @@ $handle = _fopen($filename, "r");
 try {
     while (($line = fgets($handle)) !== false) {
         $uid = trim($line);
-        $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+        $user = new UnityUser($uid, $LDAP, $SQL, $MAILER);
         if (!$group->memberUIDExists($user->uid)) {
             print "Skipping '$uid' who doesn't appear to be in '$gid'\n";
             continue;

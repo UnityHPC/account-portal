@@ -193,7 +193,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
     #[DataProvider("providerApprove")]
     public function testApproveMember($methodName)
     {
-        global $USER, $SSO, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        global $USER, $SSO, $LDAP, $SQL, $MAILER;
         $this->switchUser("EmptyPIGroupOwner");
         $pi_uid = $USER->uid;
         $pi_group = $USER->getPIGroup();
@@ -229,7 +229,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
     #[DataProvider("providerDeny")]
     public function testDenyRequest(string $methodName)
     {
-        global $USER, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("Blank");
         $requestedUser = $USER;
         $this->switchUser("EmptyPIGroupOwner");

@@ -57,12 +57,12 @@ class PIDisableTest extends UnityWebPortalTestCase
 
     public function testDisableGroupByManager()
     {
-        global $USER, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("CourseGroupManager");
         $managed_groups = $LDAP->getNonDisabledPIGroupGIDsWithManagerUID($USER->uid);
         $this->assertNotEmpty($managed_groups);
         $gid = $managed_groups[0];
-        $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+        $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
         $this->assertFalse($group->getIsDisabled());
         $this->http_post(
             __DIR__ . "/../../webroot/panel/pi.php",

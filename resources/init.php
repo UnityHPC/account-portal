@@ -11,7 +11,6 @@ use UnityWebPortal\lib\UnityMailer;
 use UnityWebPortal\lib\UnitySQL;
 use UnityWebPortal\lib\UnitySSO;
 use UnityWebPortal\lib\UnityUser;
-use UnityWebPortal\lib\UnityWebhook;
 use UnityWebPortal\lib\UnityGithub;
 use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnityHTTPD;
@@ -32,7 +31,6 @@ if (isset($GLOBALS["ldapconn"])) {
 }
 $SQL = new UnitySQL();
 $MAILER = new UnityMailer();
-$WEBHOOK = new UnityWebhook();
 $GITHUB = new UnityGithub();
 
 session_start();
@@ -67,14 +65,14 @@ if (isset($_SERVER["REMOTE_USER"])) {
     $SSO = UnitySSO::getSSO();
     $_SESSION["SSO"] = $SSO;
 
-    $OPERATOR = new UnityUser($SSO["user"], $LDAP, $SQL, $MAILER, $WEBHOOK);
+    $OPERATOR = new UnityUser($SSO["user"], $LDAP, $SQL, $MAILER);
     $_SESSION["is_admin"] = $OPERATOR->getFlag(UserFlag::ADMIN);
 
     $_SESSION["OPERATOR"] = $SSO["user"];
     $_SESSION["OPERATOR_IP"] = $_SERVER["REMOTE_ADDR"];
 
     if (isset($_SESSION["viewUser"]) && $_SESSION["is_admin"]) {
-        $USER = new UnityUser($_SESSION["viewUser"], $LDAP, $SQL, $MAILER, $WEBHOOK);
+        $USER = new UnityUser($_SESSION["viewUser"], $LDAP, $SQL, $MAILER);
     } else {
         $USER = $OPERATOR;
     }

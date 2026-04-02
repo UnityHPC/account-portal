@@ -75,9 +75,9 @@ function sendMail(array|string $recipients, string $template, ?array $data = nul
 
 function sendUserExpiryNoticeToPIGroupOwners(string $template, UnityUser $user)
 {
-    global $LDAP, $SQL, $MAILER, $WEBHOOK;
+    global $LDAP, $SQL, $MAILER;
     foreach ($LDAP->getNonDisabledPIGroupGIDsWithMemberUID($user->uid) as $gid) {
-        $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+        $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
         sendMail($group->getOwnerMailAndPlusAddressedManagerMails(), $template, [
             "group" => $gid,
             "user" => $user->uid,
@@ -133,8 +133,7 @@ function disableWarnUser(UnityUser $user, int $day)
         $final_disable_warning_day,
         $LDAP,
         $SQL,
-        $MAILER,
-        $WEBHOOK;
+        $MAILER;
     $last_login = $uid_to_last_login[$user->uid];
     $idle_days = $uid_to_idle_days[$user->uid];
     $expiration_date = date("Y/m/d", $last_login + $disable_day * 24 * 60 * 60);
@@ -156,7 +155,7 @@ function disableWarnUser(UnityUser $user, int $day)
         if (count($pi_group_member_uids) > 1) {
             $members = [];
             foreach ($pi_group_member_uids as $member_uid) {
-                $member = new UnityUser($member_uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+                $member = new UnityUser($member_uid, $LDAP, $SQL, $MAILER);
                 if ($member != $owner) {
                     array_push($members, $member);
                 }
@@ -171,7 +170,7 @@ foreach ($uid_to_idle_days as $uid => $day) {
     if (in_array($uid, $immortal_users)) {
         continue;
     }
-    $user = new UnityUser($uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+    $user = new UnityUser($uid, $LDAP, $SQL, $MAILER);
     if (!$user->exists()) {
         continue;
     }

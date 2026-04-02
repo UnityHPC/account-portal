@@ -9,7 +9,7 @@ include __DIR__ . "/init.php";
 use UnityWebPortal\lib\UnityGroup;
 
 $today = time();
-$accounts = $LDAP->getAllNonDisabledPIGroups($SQL, $MAILER, $WEBHOOK);
+$accounts = $LDAP->getAllNonDisabledPIGroups($SQL, $MAILER);
 foreach ($accounts as $pi_group) {
     $pi_user = $pi_group->getOwner();
     $requests = $pi_group->getRequests();

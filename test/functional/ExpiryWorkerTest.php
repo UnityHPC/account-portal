@@ -263,13 +263,13 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
 
     public function testGroupOwnerManagersNotified()
     {
-        global $USER, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("EmptyPIGroupOwner");
         $owner = $USER;
         $pi_group = $USER->getPIGroup();
         $this->assertEmpty($pi_group->getManagerUIDs());
         $manager_uid = self::$NICKNAME2UID["Admin"];
-        $manager = new UnityUser($manager_uid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+        $manager = new UnityUser($manager_uid, $LDAP, $SQL, $MAILER);
         $this->switchUser("Blank");
         $member = $USER;
         try {

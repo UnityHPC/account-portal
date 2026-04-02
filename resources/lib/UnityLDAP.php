@@ -214,11 +214,8 @@ class UnityLDAP extends LDAPConn
     }
 
     /** @return UnityGroup[] */
-    public function getAllNonDisabledPIGroups(
-        UnitySQL $UnitySQL,
-        UnityMailer $UnityMailer,
-        UnityWebhook $UnityWebhook,
-    ) {
+    public function getAllNonDisabledPIGroups(UnitySQL $UnitySQL, UnityMailer $UnityMailer)
+    {
         $out = [];
         $pi_groups_attributes = $this->pi_groupOU->getChildrenArrayStrict(
             attributes: ["cn"],
@@ -226,10 +223,7 @@ class UnityLDAP extends LDAPConn
             filter: self::$NON_DISABLED_FILTER,
         );
         foreach ($pi_groups_attributes as $attributes) {
-            array_push(
-                $out,
-                new UnityGroup($attributes["cn"][0], $this, $UnitySQL, $UnityMailer, $UnityWebhook),
-            );
+            array_push($out, new UnityGroup($attributes["cn"][0], $this, $UnitySQL, $UnityMailer));
         }
         return $out;
     }

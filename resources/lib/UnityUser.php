@@ -15,15 +15,9 @@ class UnityUser
     private UnityLDAP $LDAP;
     private UnitySQL $SQL;
     private UnityMailer $MAILER;
-    private UnityWebhook $WEBHOOK;
 
-    public function __construct(
-        string $uid,
-        UnityLDAP $LDAP,
-        UnitySQL $SQL,
-        UnityMailer $MAILER,
-        UnityWebhook $WEBHOOK,
-    ) {
+    public function __construct(string $uid, UnityLDAP $LDAP, UnitySQL $SQL, UnityMailer $MAILER)
+    {
         $uid = trim($uid);
         $this->uid = $uid;
         $this->entry = $LDAP->getUserEntry($uid);
@@ -31,7 +25,6 @@ class UnityUser
         $this->LDAP = $LDAP;
         $this->SQL = $SQL;
         $this->MAILER = $MAILER;
-        $this->WEBHOOK = $WEBHOOK;
     }
 
     public function equals(UnityUser $other_user): bool
@@ -355,7 +348,6 @@ class UnityUser
             $this->LDAP,
             $this->SQL,
             $this->MAILER,
-            $this->WEBHOOK,
         );
     }
 
@@ -401,7 +393,7 @@ class UnityUser
             $pi_group->disable($send_mail);
         }
         foreach ($this->LDAP->getNonDisabledPIGroupGIDsWithMemberUID($this->uid) as $gid) {
-            $group = new UnityGroup($gid, $this->LDAP, $this->SQL, $this->MAILER, $this->WEBHOOK);
+            $group = new UnityGroup($gid, $this->LDAP, $this->SQL, $this->MAILER);
             $group->removeUser($this, $send_mail_pi_group_owner);
         }
         $this->entry->removeAttribute("sshPublicKey");

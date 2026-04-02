@@ -6,12 +6,12 @@ class LeaveGroupTest extends UnityWebPortalTestCase
 {
     public function testLeaveGroupDisqualified()
     {
-        global $USER, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("Normal");
         $pi_gids = $USER->getPIGroupGIDs();
         $this->assertEquals(1, count($pi_gids));
         $gid = $pi_gids[0];
-        $pi_group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+        $pi_group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
         $this->assertTrue($pi_group->memberUIDExists($USER->uid));
         $this->assertTrue($USER->getFlag(UserFlag::QUALIFIED));
         try {
@@ -36,12 +36,12 @@ class LeaveGroupTest extends UnityWebPortalTestCase
     // they log in
     public function testRemovedFromGroupManuallyDisqualifiedOnLogin()
     {
-        global $USER, $LDAP, $SQL, $MAILER, $WEBHOOK;
+        global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("Normal");
         $pi_gids = $USER->getPIGroupGIDs();
         $this->assertEquals(1, count($pi_gids));
         $gid = $pi_gids[0];
-        $pi_group = new UnityGroup($gid, $LDAP, $SQL, $MAILER, $WEBHOOK);
+        $pi_group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
         $this->assertTrue($pi_group->memberUIDExists($USER->uid));
         $this->assertTrue($USER->getFlag(UserFlag::QUALIFIED));
         try {
