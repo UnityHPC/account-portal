@@ -1,0 +1,22 @@
+{% do setSubject("PI Group Request") %}
+
+<p>Hello,</p>
+
+<p>A user has requested a PI account. User details are below:</p>
+
+<p>
+    <strong>Username</strong> {{ user }}
+    <br>
+    <strong>Organization</strong> {{ org }}
+    <br>
+    <strong>Name</strong> {{ name }}
+    <br>
+    <strong>Email</strong> {{ email }}
+</p>
+
+<p>
+You can approve this account
+{{ getRelativeHyperlink("here", "admin/pi-mgmt.php") }}
+.
+</p>
+{% include 'footer.html.twig' %}

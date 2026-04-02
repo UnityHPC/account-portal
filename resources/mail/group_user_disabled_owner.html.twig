@@ -1,0 +1,24 @@
+{% do setSubject("Group Member Disabled, Removed") %}
+{% set policy_hyperlink = formatHyperlink("account policy", CONFIG["site"]["account_expiration_policy_url"]) %}
+
+<p>Hello,</p>
+
+<p>
+A user from your PI group '{{ group }}' has been disabled and removed.
+Their details are below:
+</p>
+
+<p>
+<strong>Username</strong> {{ user }}
+<br>
+<strong>Organization</strong> {{ org }}
+<br>
+<strong>Name</strong> {{ name }}
+<br>
+<strong>Email</strong> {{ email }}
+</p>
+
+<p>
+    This user has expired according to our {{ policy_hyperlink }}.
+</p>
+{% include 'footer.html.twig' %}

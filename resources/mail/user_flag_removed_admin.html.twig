@@ -1,0 +1,35 @@
+
+{% if flag == constant('UnityWebPortal\\lib\\UserFlag::QUALIFIED') %}
+{% do setSubject("User Disqualified") %}
+<p>Hello,</p>
+<p>User "{{ user }}" has been disqualified. </p>
+
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::DISABLED') %}
+{% do setSubject("User Re-Enabled") %}
+<p>Hello,</p>
+<p>User "{{ user }}" has been re-enabled. </p>
+
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::LOCKED') %}
+{% do setSubject("User Unlocked") %}
+<p>Hello,</p>
+<p>User "{{ user }}" has been unlocked. </p>
+
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::IDLELOCKED') %}
+{% do setSubject("User Idle Unlocked") %}
+<p>Hello,</p>
+<p>User "{{ user }}" has been idle unlocked. </p>
+
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::ADMIN') %}
+{% do setSubject("User Demoted") %}
+<p>Hello,</p>
+<p>User "{{ user }}" has been demoted from admin. </p>
+
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::IMMORTAL') %}
+{% do setSubject("User Mortalized") %}
+<p>Hello,</p>
+<p>User "{{ user }}" has been made mortal (no longer exempt from expiry). </p>
+
+{% else %}
+{% throw new \Exception("unknown flag: " ~ flag) %}
+{% endif %}
+{% include 'footer.html.twig' %}

@@ -1,0 +1,32 @@
+{% do setSubject("Group Member Idle-Locked") %}
+{% set portal_hyperlink = getRelativeHyperlink("account portal") %}
+{% set policy_hyperlink = formatHyperlink("account policy", CONFIG["site"]["account_expiration_policy_url"]) %}
+{% set pi_hyperlink = getRelativeHyperlink("group management page", "panel/pi.php") %}
+
+<p>Hello,</p>
+
+<p>
+A user from your PI group '{{ group }}' has been idle-locked.
+Their details are below:
+</p>
+
+<p>
+<strong>Username</strong> {{ user }}
+<br>
+<strong>Organization</strong> {{ org }}
+<br>
+<strong>Name</strong> {{ name }}
+<br>
+<strong>Email</strong> {{ email }}
+</p>
+
+<p>
+    This user is expiring according to our {{ policy_hyperlink }}.
+    They have lost acces to Unity HPC Platform services until they reset the inactivity timer by logging in to the {{ portal_hyperlink }}.
+</p>
+
+<p>
+    If this user is no longer actively participating in your group using Unity HPC Platform services,
+    you might consider removing them from your group in the {{ pi_hyperlink }}.
+</p>
+{% include 'footer.html.twig' %}

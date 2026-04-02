@@ -1,6 +1,4 @@
-<?php
-
-$this->Subject = "PI Account Denied"; ?>
+{% do setSubject("PI Account Denied") %}
 
 <p>Hello,</p>
 
@@ -15,3 +13,4 @@ $this->Subject = "PI Account Denied"; ?>
 </ul>
 
 <p>Feel free to reply to this email with any questions!</p>
+{% include 'footer.html.twig' %}

@@ -1,0 +1,22 @@
+{% do setSubject("Group Member Removed") %}
+
+<p>Hello,</p>
+
+<p>
+A user has been removed from your PI group,
+'{{ group }}'.
+The details of the removed user are below:
+</p>
+
+<p>
+<strong>Username</strong> {{ user }}
+<br>
+<strong>Organization</strong> {{ org }}
+<br>
+<strong>Name</strong> {{ name }}
+<br>
+<strong>Email</strong> {{ email }}
+</p>
+
+<p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
+{% include 'footer.html.twig' %}

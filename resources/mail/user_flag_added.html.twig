@@ -1,0 +1,64 @@
+
+{% set portal_hyperlink = getRelativeHyperlink("account portal") %}
+{% set policy_hyperlink = formatHyperlink("account expiration policy", CONFIG["site"]["account_expiration_policy_url"]) %}
+
+{% if flag == constant('UnityWebPortal\\lib\\UserFlag::QUALIFIED') %}
+{% do setSubject("User Qualified") %}
+<p>Hello,</p>
+<p>
+    Your account on the Unity HPC Platform, "{{ user }}", has been qualified.
+    You should now be able to access Unity HPC Platform services.
+</p>
+<p>
+    See the
+    <a href="{{ CONFIG["site"]["getting_started_url"] }}">Getting Started</a>
+    page in our documentation for next steps.
+</p>
+<p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
+
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::DISABLED') %}
+{% do setSubject("User Disabled") %}
+<p>Hello,</p>
+<p>
+    Your account on the Unity HPC Platform, "{{ user }}", has been disabled.
+    You should no longer be able to access Unity HPC Platform services.
+    This can happen as a result of the {{ policy_hyperlink }}.
+</p>
+<p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
+
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::LOCKED') %}
+{% do setSubject("User Locked") %}
+<p>Hello,</p>
+<p>
+    Your account on the Unity HPC Platform, "{{ user }}", has been locked.
+    You should no longer be able to access Unity HPC Platform services.
+</p>
+<p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
+
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::IDLELOCKED') %}
+{% do setSubject("User Locked") %}
+<p>Hello,</p>
+<p>
+    Your account on the Unity HPC Platform, "{{ user }}", has been locked due to inactivity.
+    You should no longer be able to access Unity HPC Platform services.
+    To unlock your account, simply log in to the {{ portal_hyperlink }}.
+    See the {{ policy_hyperlink }} for more information.
+</p>
+<p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
+
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::ADMIN') %}
+{% do setSubject("User Promoted") %}
+<p>Hello,</p>
+<p>Your account on the Unity HPC Platform, "{{ user }}", has been promoted to admin.</p>
+<p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
+
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::IMMORTAL') %}
+{% do setSubject("User Immortalized") %}
+<p>Hello,</p>
+<p>Your account on the Unity HPC Platform, "{{ user }}", has been made immortal (exempt from expiry).</p>
+<p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
+
+{% else %}
+{% throw new \Exception("unknown flag: " ~ flag) %}
+{% endif %}
+{% include 'footer.html.twig' %}

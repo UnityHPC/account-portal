@@ -1,0 +1,23 @@
+{% do setSubject("Group Member Request") %}
+
+<p>Hello,</p>
+
+<p>
+A user has requested to join your PI group,
+'{{ group }}'.
+The details of the user are below:
+</p>
+
+<p>
+<strong>Username</strong> {{ user }}
+<br>
+<strong>Organization</strong> {{ org }}
+<br>
+<strong>Name</strong> {{ name }}
+<br>
+<strong>Email</strong> {{ email }}
+</p>
+
+<p>You can approve or deny this user on the
+    {{ getRelativeHyperlink("my users", "panel/pi.php?gid=" ~ group) }} page</p>
+{% include 'footer.html.twig' %}

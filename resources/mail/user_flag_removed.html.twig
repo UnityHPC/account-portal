@@ -1,0 +1,54 @@
+
+{% if flag == constant('UnityWebPortal\\lib\\UserFlag::QUALIFIED') %}
+{% do setSubject("User Disqualified") %}
+<p>Hello,</p>
+<p>
+    Your account on the Unity HPC Platform, "{{ user }}" has been disqualified.
+    You should no longer be able to access Unity HPC Platform services.
+</p>
+<p>In order to be qualified, you must be a PI or be a member of at least one PI group.</p>
+<p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
+
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::DISABLED') %}
+{% do setSubject("User Re-Enabled") %}
+<p>Hello,</p>
+<p>
+    Your account on the Unity HPC Platform, "{{ user }}" has been re-enabled.
+    You should now be able to access Unity HPC Platform services.
+</p>
+<p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
+
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::LOCKED') %}
+{% do setSubject("User Unlocked") %}
+<p>Hello,</p>
+<p>
+    Your account on the Unity HPC Platform, "{{ user }}" has been unlocked.
+    You should now be able to access Unity HPC Platform services.
+</p>
+<p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
+
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::IDLELOCKED') %}
+{% do setSubject("User Unlocked") %}
+<p>Hello,</p>
+<p>
+    Your account on the Unity HPC Platform, "{{ user }}" has been unlocked.
+    You should now be able to access Unity HPC Platform services.
+</p>
+<p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
+
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::ADMIN') %}
+{% do setSubject("User Demoted") %}
+<p>Hello,</p>
+<p>Your account on the Unity HPC Platform, "{{ user }}" has been demoted from admin.</p>
+<p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
+
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::IMMORTAL') %}
+{% do setSubject("User Mortalized") %}
+<p>Hello,</p>
+<p>Your account on the Unity HPC Platform, "{{ user }}" has been made mortal (no longer exempt frome expiry).</p>
+<p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
+
+{% else %}
+{% throw new \Exception("unknown flag: " ~ flag) %}
+{% endif %}
+{% include 'footer.html.twig' %}
