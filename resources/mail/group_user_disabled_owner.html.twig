@@ -1,26 +1,24 @@
-<?php
-
-$this->Subject = "Group Member Disabled, Removed";
-$policy_hyperlink = formatHyperlink("account policy", CONFIG["site"]["account_expiration_policy_url"]);
-?>
+{% do setSubject('Group Member Disabled, Removed') %}
+{% set policy_hyperlink = formatHyperlink('account policy', CONFIG['site']['account_expiration_policy_url']) %}
 
 <p>Hello,</p>
 
 <p>
-A user from your PI group '<?php echo $data["group"]; ?>' has been disabled and removed.
+A user from your PI group '{{ group }}' has been disabled and removed.
 Their details are below:
 </p>
 
 <p>
-<strong>Username</strong> <?php echo $data["user"]; ?>
+<strong>Username</strong> {{ user }}
 <br>
-<strong>Organization</strong> <?php echo $data["org"]; ?>
+<strong>Organization</strong> {{ org }}
 <br>
-<strong>Name</strong> <?php echo $data["name"]; ?>
+<strong>Name</strong> {{ name }}
 <br>
-<strong>Email</strong> <?php echo $data["email"]; ?>
+<strong>Email</strong> {{ email }}
 </p>
 
 <p>
-    This user has expired according to our <?php echo $policy_hyperlink; ?>.
+    This user has expired according to our {{ policy_hyperlink|raw }}.
 </p>
+{{ include('footer.html.twig') }}

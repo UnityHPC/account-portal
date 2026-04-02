@@ -1,78 +1,64 @@
-<?php
-use UnityWebPortal\lib\UserFlag;
-$portal_hyperlink = getRelativeHyperlink("account portal");
-$policy_hyperlink = formatHyperlink("account expiration policy", CONFIG["site"]["account_expiration_policy_url"]);
-$uid = $data["user"];
-switch ($data["flag"]):
-////////////////////////////////////////////////////////////////////////////////////////////////////
-case UserFlag::QUALIFIED: ?>
-<?php $this->Subject = "User Qualified"; ?>
+
+{% set portal_hyperlink = getRelativeHyperlink('account portal') %}
+{% set policy_hyperlink = formatHyperlink('account expiration policy', CONFIG['site']['account_expiration_policy_url']) %}
+
+{% if flag == constant('UnityWebPortal\\lib\\UserFlag::QUALIFIED') %}
+{% do setSubject('User Qualified') %}
 <p>Hello,</p>
 <p>
-    Your account on the Unity HPC Platform, "<?php echo $uid ?>", has been qualified.
+    Your account on the Unity HPC Platform, "{{ user }}", has been qualified.
     You should now be able to access Unity HPC Platform services.
 </p>
 <p>
-See the
-<a href="<?php echo CONFIG["site"]["getting_started_url"]; ?>">Getting Started</a>
-page in our documentation for next steps.
+    See the
+    <a href="{{ CONFIG['site']['getting_started_url'] }}">Getting Started</a>
+    page in our documentation for next steps.
 </p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
-<?php break; ?>
 
-<?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
-<?php case UserFlag::DISABLED: ?>
-<?php $this->Subject = "User Disabled"; ?>
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::DISABLED') %}
+{% do setSubject('User Disabled') %}
 <p>Hello,</p>
 <p>
-    Your account on the Unity HPC Platform, "<?php echo $uid ?>", has been disabled.
+    Your account on the Unity HPC Platform, "{{ user }}", has been disabled.
     You should no longer be able to access Unity HPC Platform services.
-    This can happen as a result of the <?php echo $policy_hyperlink ?>.
+    This can happen as a result of the {{ policy_hyperlink|raw }}.
 </p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
-<?php break; ?>
 
-<?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
-<?php case UserFlag::LOCKED: ?>
-<?php $this->Subject = "User Locked"; ?>
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::LOCKED') %}
+{% do setSubject('User Locked') %}
 <p>Hello,</p>
 <p>
-    Your account on the Unity HPC Platform, "<?php echo $uid ?>", has been locked.
+    Your account on the Unity HPC Platform, "{{ user }}", has been locked.
     You should no longer be able to access Unity HPC Platform services.
 </p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
-<?php break; ?>
 
-<?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
-<?php case UserFlag::IDLELOCKED: ?>
-<?php $this->Subject = "User Locked"; ?>
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::IDLELOCKED') %}
+{% do setSubject('User Locked') %}
 <p>Hello,</p>
 <p>
-    Your account on the Unity HPC Platform, "<?php echo $uid ?>", has been locked due to inactivity.
+    Your account on the Unity HPC Platform, "{{ user }}", has been locked due to inactivity.
     You should no longer be able to access Unity HPC Platform services.
-    To unlock your account, simply log in to the <?php echo $portal_hyperlink ?>.
-    See the <?php echo $policy_hyperlink ?> for more information.
+    To unlock your account, simply log in to the {{ portal_hyperlink|raw }}.
+    See the {{ policy_hyperlink|raw }} for more information.
 </p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
-<?php break; ?>
 
-<?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
-<?php case UserFlag::ADMIN: ?>
-<?php $this->Subject = "User Promoted"; ?>
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::ADMIN') %}
+{% do setSubject('User Promoted') %}
 <p>Hello,</p>
-<p>Your account on the Unity HPC Platform, "<?php echo $uid ?>", has been promoted to admin.</p>
+<p>Your account on the Unity HPC Platform, "{{ user }}", has been promoted to admin.</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
-<?php break; ?>
 
-<?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
-<?php case UserFlag::IMMORTAL: ?>
-<?php $this->Subject = "User Immortalized"; ?>
+{% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::IMMORTAL') %}
+{% do setSubject('User Immortalized') %}
 <p>Hello,</p>
-<p>Your account on the Unity HPC Platform, "<?php echo $uid ?>", has been made immortal (exempt from expiry).</p>
+<p>Your account on the Unity HPC Platform, "{{ user }}", has been made immortal (exempt from expiry).</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
-<?php break; ?>
 
-<?php /////////////////////////////////////////////////////////////////////////////////////////// ?>
-<?php default: ?>
-<?php throw new \Exception("unknown flag: " . $data["flag"]); ?>
-<?php endswitch; ?>
+{% else %}
+{% do throw('unknown flag: ' ~ flag) %}
+{% endif %}
+{{ include('footer.html.twig') }}

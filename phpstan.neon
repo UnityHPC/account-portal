@@ -32,12 +32,6 @@ parameters:
         - '#Cannot access offset \S+ on \S+\|false#'
       paths:
         - test
-    # $this, $data comes from UnityMailer
-    - messages:
-        - '#Variable \$this might not be defined.#'
-        - '#Variable \$data might not be defined.#'
-      paths:
-        - 'resources/mail/*'
     # assertTrue(true) makes phpunit shut up about tests doing no assertions
     - messages:
         - '#Call to method PHPUnit\\Framework\\Assert::assertTrue\(\) with true will always evaluate to true.#'

@@ -30,7 +30,6 @@ repos:
               resources/lib/phpopenldaper/.*|
               vendor/.*|
               resources/templates/.*|
-              resources/mail/.*|
               resources/config\.php|
               webroot/.*|
           )$
@@ -42,13 +41,7 @@ repos:
         files: |
           (?x)^(
               resources/templates/.*\.php|
-              resources/mail/.*|
               webroot/.*\.php|
-          )$
-        # the user_flag_* templates use funky syntax and the formatter ruins them
-        exclude: |
-          (?x)^(
-              resources/mail/user_flag_.*\.php|
           )$
       - id: php-cs-fixer
         name: PHP CS Fixer
@@ -56,6 +49,12 @@ repos:
         language: system
         files: \.php$
         pass_filenames: false
+      - id: twig-cs-fixer
+        name: Twig CS Fixer
+        entry: ./vendor/bin/twig-cs-fixer fix
+        language: system
+        files: \.twig$
+        pass_filenames: true
 
   # linters (work required) ########################################################################
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -102,7 +101,6 @@ repos:
               resources/lib/phpopenldaper/.*|
               vendor/.*|
               resources/templates/.*|
-              resources/mail/.*|
               resources/config\.php|
               webroot/.*|
           )$
@@ -114,14 +112,14 @@ repos:
         files: |
           (?x)^(
               resources/templates/.*\.php|
-              resources/mail/.*\.php|
               webroot/.*\.php|
           )$
-        # the user_flag_* templates use funky syntax and the formatter ruins them
-        exclude: |
-          (?x)^(
-              resources/mail/user_flag_.*\.php|
-          )$
+      - id: twig-cs-fixer
+        name: Twig CS Fixer
+        entry: ./vendor/bin/twig-cs-fixer lint
+        language: system
+        files: \.twig$
+        pass_filenames: true
       - id: php-l
         name: php -l
         entry: php
