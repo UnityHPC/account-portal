@@ -1,7 +1,7 @@
 <p>Hello,</p>
 
 {% do setSubject("Account Expiration Warning") %}
-
+{% set portal_hyperlink = getRelativeHyperlink("account portal") %}
 {% set policy_hyperlink = formatHyperlink("account policy", CONFIG["site"]["account_expiration_policy_url"]) %}
 
 <p>

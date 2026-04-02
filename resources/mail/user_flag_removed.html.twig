@@ -49,6 +49,6 @@
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 
 {% else %}
-{% throw new \Exception("unknown flag: " ~ flag) %}
+{% do throw("unknown flag: " ~ flag) %}
 {% endif %}
 {% include 'footer.html.twig' %}

@@ -30,6 +30,6 @@
 <p>User "{{ user }}" has been made mortal (no longer exempt from expiry). </p>
 
 {% else %}
-{% throw new \Exception("unknown flag: " ~ flag) %}
+{% do throw("unknown flag: " ~ flag) %}
 {% endif %}
 {% include 'footer.html.twig' %}
