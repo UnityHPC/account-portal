@@ -6,6 +6,7 @@ For details on the changes in each release, see [the Releases page](https://gith
 
 ### 1.7 -> 1.8
 - the [webhook] section of the config file can be removed
+- all mail templates are no longer PHP files, now they are `.html.twig`
 
 ### 1.6 -> 1.7
 
