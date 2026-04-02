@@ -1,6 +1,6 @@
 
-{% set portal_hyperlink = getRelativeHyperlink("account portal") | raw %}
-{% set policy_hyperlink = formatHyperlink("account expiration policy", CONFIG["site"]["account_expiration_policy_url"]) | raw %}
+{% set portal_hyperlink = getRelativeHyperlink("account portal") %}
+{% set policy_hyperlink = formatHyperlink("account expiration policy", CONFIG["site"]["account_expiration_policy_url"]) %}
 
 {% if flag == constant('UnityWebPortal\\lib\\UserFlag::QUALIFIED') %}
 {% do setSubject("User Qualified") %}

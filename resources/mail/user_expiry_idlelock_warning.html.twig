@@ -1,8 +1,8 @@
 <p>Hello,</p>
 
 {% do setSubject("Unity HPC Account Expiration Warning") %}
-{% set portal_hyperlink = getRelativeHyperlink("account portal") | raw %}
-{% set policy_hyperlink = formatHyperlink("account policy", CONFIG["site"]["account_expiration_policy_url"]) | raw %}
+{% set portal_hyperlink = getRelativeHyperlink("account portal") %}
+{% set policy_hyperlink = formatHyperlink("account policy", CONFIG["site"]["account_expiration_policy_url"]) %}
 
 <p>
 Your Unity account, {{ user }}, is due for credential verification.

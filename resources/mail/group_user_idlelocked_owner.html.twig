@@ -1,7 +1,7 @@
 {% do setSubject("Group Member Idle-Locked") %}
-{% set portal_hyperlink = getRelativeHyperlink("account portal") | raw %}
-{% set policy_hyperlink = formatHyperlink("account policy", CONFIG["site"]["account_expiration_policy_url"]) | raw %}
-{% set pi_hyperlink = getRelativeHyperlink("group management page", "panel/pi.php") | raw %}
+{% set portal_hyperlink = getRelativeHyperlink("account portal") %}
+{% set policy_hyperlink = formatHyperlink("account policy", CONFIG["site"]["account_expiration_policy_url"]) %}
+{% set pi_hyperlink = getRelativeHyperlink("group management page", "panel/pi.php") %}
 
 <p>Hello,</p>
 
