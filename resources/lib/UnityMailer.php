@@ -93,6 +93,26 @@ class UnityMailer extends PHPMailer
         $this->twig->addGlobal("CONFIG", CONFIG);
     }
 
+    private function resetMessageState(): void
+    {
+        $this->clearAllRecipients();
+        $this->clearAttachments();
+        $this->clearCustomHeaders();
+        $this->CharSet = self::CHARSET_ISO88591;
+        $this->ContentType = self::CONTENT_TYPE_PLAINTEXT;
+        $this->Encoding = self::ENCODING_8BIT;
+        $this->From = "";
+        $this->FromName = "";
+        $this->Sender = "";
+        $this->Subject = "";
+        $this->Body = "";
+        $this->AltBody = "";
+        $this->Ical = "";
+        $this->ConfirmReadingTo = "";
+        $this->MessageID = "";
+        $this->MessageDate = "";
+    }
+
     /**
      * @param string|string[] $recipients
      * @param ?mixed[] $data
@@ -119,8 +139,10 @@ class UnityMailer extends PHPMailer
                 $this->addAddress($recipients);
             }
         }
-
-        parent::send();
-        $this->clearAllRecipients();
+        try {
+            parent::send();
+        } finally {
+            $this->resetMessageState();
+        }
     }
 }
