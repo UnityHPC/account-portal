@@ -32,7 +32,7 @@ class UnityMailer
         $this->MSG_PI_APPROVAL_NAME = CONFIG["mail"]["pi_approve_name"];
     }
 
-    public function constructPHPMailer(): PHPMailer
+    private function constructPHPMailer(): PHPMailer
     {
         $mailer = new PHPMailer(exceptions: true);
         $mailer->isSMTP();
@@ -79,7 +79,7 @@ class UnityMailer
         return $mailer;
     }
 
-    public function constructTwigEnvironment(): \Twig\Environment
+    private function constructTwigEnvironment(): \Twig\Environment
     {
         $loader = new \Twig\Loader\FilesystemLoader([
             __DIR__ . "/../../deployment/mail_overrides",
