@@ -85,6 +85,7 @@ class UnityMailer extends PHPMailer
             new TwigFunction("getRelativeHyperlink", getRelativeHyperlink(...)),
             new TwigFunction("formatHyperlink", formatHyperlink(...)),
             new TwigFunction("uniqid", uniqid(...)),
+            new TwigFunction("errorLog", UnityHTTPD::errorLog(...)),
         ];
         foreach ($functions as $function) {
             $this->twig->addFunction($function);
