@@ -3,7 +3,7 @@
 {% set policy_hyperlink = formatHyperlink('account expiration policy', CONFIG['site']['account_expiration_policy_url']) %}
 
 {% if flag == constant('UnityWebPortal\\lib\\UserFlag::QUALIFIED') %}
-{% do setSubject('User Qualified') %}
+{% do setSubject('Unity Account Qualified') %}
 <p>Hello,</p>
 <p>
     Your account on the Unity HPC Platform, "{{ user }}", has been qualified.
@@ -17,7 +17,7 @@
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 
 {% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::DISABLED') %}
-{% do setSubject('User Disabled') %}
+{% do setSubject('Unity Account Disabled') %}
 <p>Hello,</p>
 <p>
     Your account on the Unity HPC Platform, "{{ user }}", has been disabled.
@@ -27,7 +27,7 @@
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 
 {% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::LOCKED') %}
-{% do setSubject('User Locked') %}
+{% do setSubject('Unity Account Locked') %}
 <p>Hello,</p>
 <p>
     Your account on the Unity HPC Platform, "{{ user }}", has been locked.
@@ -36,7 +36,7 @@
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 
 {% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::IDLELOCKED') %}
-{% do setSubject('User Locked') %}
+{% do setSubject('Unity Account Locked') %}
 <p>Hello,</p>
 <p>
     Your account on the Unity HPC Platform, "{{ user }}", has been locked due to inactivity.
@@ -47,13 +47,13 @@
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 
 {% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::ADMIN') %}
-{% do setSubject('User Promoted') %}
+{% do setSubject('Unity Account Promoted') %}
 <p>Hello,</p>
 <p>Your account on the Unity HPC Platform, "{{ user }}", has been promoted to admin.</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 
 {% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::IMMORTAL') %}
-{% do setSubject('User Immortalized') %}
+{% do setSubject('Unity Account Immortalized') %}
 <p>Hello,</p>
 <p>Your account on the Unity HPC Platform, "{{ user }}", has been made immortal (exempt from expiry).</p>
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
