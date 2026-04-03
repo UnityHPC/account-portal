@@ -109,7 +109,6 @@ class UnityHTTPD
         }
     }
 
-    // $data must be JSON serializable
     public static function errorLog(
         string $title,
         string $message,
@@ -127,7 +126,7 @@ class UnityHTTPD
                 \_json_encode($data);
                 $output["data"] = $data;
             } catch (\JsonException $e) {
-                $output["data"] = "data could not be JSON encoded: " . $e->getMessage();
+                $output["data"] = var_export($data, true);
             }
         }
         if (!is_null($error)) {
