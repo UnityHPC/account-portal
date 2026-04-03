@@ -30,6 +30,13 @@
 <p>User "{{ user }}" has been made immortal (exempt from expiry). </p>
 
 {% else %}
-{% do throw('unknown flag: ' ~ flag) %}
+{% do setSubject('User Modified') %}
+{% set mod_id = uniqid() %}
+{% do errorLog('warning', 'unknown flag', errorid: mod_id, data: flag) %}
+<p>Hello,</p>
+<p>Your account on the Unity HPC Platform , "{{ user }}", has been modified.</p>
+<p>Modification ID: {{ mod_id }}</p>
+<p>Please reply to this email and provide the modification ID for more information.</p>
+
 {% endif %}
 {{ include('footer.html.twig') }}
