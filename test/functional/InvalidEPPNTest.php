@@ -18,7 +18,7 @@ class InvalidEPPNTest extends UnityWebPortalTestCase
         $original_sso = $SSO;
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_write_close();
-            session_id(getCorrelationID());
+            session_id(getRandomString());
         }
         if (!$is_valid) {
             $this->expectException(SSOException::class);

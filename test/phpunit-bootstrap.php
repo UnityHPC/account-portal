@@ -492,7 +492,7 @@ class UnityWebPortalTestCase extends TestCase
         }
         $previous_session_id = $this->nickname_to_latest_session_id[$nickname] ?? null;
         if (!$reuse_last_session || !$previous_session_id) {
-            $session_id = str_replace(["_", "@", "."], "-", getCorrelationID($eppn . "_"));
+            $session_id = str_replace(["_", "@", "."], "-", getRandomString($eppn . "_"));
             $this->nickname_to_latest_session_id[$nickname] = $session_id;
             session_id($session_id);
         } else {

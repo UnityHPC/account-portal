@@ -194,7 +194,7 @@ function getTemplatePath(string $basename): string
     return $template_path;
 }
 
-function getCorrelationID(): string
+function getRandomString(): string
 {
     return bin2hex(random_bytes(5));
 }
