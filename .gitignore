@@ -28,6 +28,7 @@ deployment/**/*
 !deployment/overrides/account-portal-docker-web-green:8000/
 !deployment/overrides/account-portal-docker-web-green:8000/config/
 !deployment/overrides/account-portal-docker-web-green:8000/config/config.ini
+!deployment/overrides/README.md
 !deployment/config/
 !deployment/config/README.md
 !deployment/mail_overrides/
