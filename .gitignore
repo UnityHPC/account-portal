@@ -13,6 +13,9 @@ vendor
 # don't track site configs
 deployment/**/*
 !deployment/overrides/
+!deployment/overrides/worker/
+!deployment/overrides/worker/config/
+!deployment/overrides/worker/config/config.ini
 !deployment/overrides/course-creator/
 !deployment/overrides/course-creator/config/
 !deployment/overrides/course-creator/config/config.ini
