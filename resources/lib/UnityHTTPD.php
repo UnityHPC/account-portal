@@ -68,11 +68,11 @@ class UnityHTTPD
         int $http_response_code = 200,
         mixed $data = null,
     ): never {
-        $errorid = uniqid();
+        $correlation_id = uniqid();
         $suffix = sprintf(
             "For assistance, contact a Unity admin at %s. Error ID: %s.",
             CONFIG["mail"]["support"],
-            $errorid,
+            $correlation_id,
         );
         $user_message_title = htmlspecialchars($user_message_title);
         $user_message_body = htmlspecialchars($user_message_body);
@@ -81,7 +81,13 @@ class UnityHTTPD
         } else {
             $user_message_body .= " $suffix";
         }
-        self::errorLog($log_title, $log_message, data: $data, error: $error, errorid: $errorid);
+        self::errorLog(
+            $log_title,
+            $log_message,
+            data: $data,
+            error: $error,
+            correlation_id: $correlation_id,
+        );
         if (
             ($_SERVER["REQUEST_METHOD"] ?? "") == "POST" &&
             !str_starts_with($_SERVER["REQUEST_URI"], "/lan/api/")
@@ -113,7 +119,7 @@ class UnityHTTPD
     public static function errorLog(
         string $title,
         string $message,
-        ?string $errorid = null,
+        ?string $correlation_id = null,
         ?\Throwable $error = null,
         mixed $data = null,
     ): void {
@@ -138,8 +144,8 @@ class UnityHTTPD
         }
         $output["REMOTE_USER"] = $_SERVER["REMOTE_USER"] ?? null;
         $output["REMOTE_ADDR"] = $_SERVER["REMOTE_ADDR"] ?? null;
-        if (!is_null($errorid)) {
-            $output["errorid"] = $errorid;
+        if (!is_null($correlation_id)) {
+            $output["correlation_id"] = $correlation_id;
         }
         error_log("$title: " . \_json_encode($output));
     }
@@ -408,11 +414,11 @@ class UnityHTTPD
     {
         $token = self::getPostData("csrf_token");
         if (!CSRFToken::validate($token)) {
-            $errorid = uniqid();
-            self::errorLog("csrf failed to validate", "", errorid: $errorid);
+            $id = uniqid();
+            self::errorLog("csrf failed to validate", "", correlation_id: $id);
             self::messageError(
                 "Invalid Session Token",
-                "This can happen if you leave your browser open for too long. Error ID: $errorid",
+                "This can happen if you leave your browser open for too long. Error ID: $id",
             );
             self::redirect();
         }
