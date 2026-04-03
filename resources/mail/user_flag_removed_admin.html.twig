@@ -34,7 +34,7 @@
 {% set mod_id = uniqid() %}
 {% do errorLog('warning', 'unknown flag', errorid: mod_id, data: flag) %}
 <p>Hello,</p>
-<p>The user, "{{ user }}", has been modified.</p>
+<p>The user "{{ user }}" has been modified.</p>
 <p>Modification ID: {{ mod_id }}</p>
 <p>For more information, search the error log for this modification ID.</p>
 
