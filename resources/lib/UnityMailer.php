@@ -104,12 +104,12 @@ class UnityMailer
      */
     public function sendMail(string|array $recipients, string $template, ?array $data = null): void
     {
-        $data ??= [];
         $mailer = $this->constructPHPMailer();
 
         $twig = $this->constructTwigEnvironment();
         $twig->addFunction(new TwigFunction("setSubject", fn($x) => ($mailer->Subject = $x)));
 
+        $data ??= [];
         $mailer->setFrom($this->MSG_SENDER_EMAIL, $this->MSG_SENDER_NAME);
         $mailer->addReplyTo($this->MSG_SUPPORT_EMAIL, $this->MSG_SUPPORT_NAME);
 
