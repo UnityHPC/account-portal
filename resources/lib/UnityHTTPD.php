@@ -68,7 +68,7 @@ class UnityHTTPD
         int $http_response_code = 200,
         mixed $data = null,
     ): never {
-        $correlation_id = uniqid();
+        $correlation_id = getCorrelationID();
         $suffix = sprintf(
             "For assistance, contact a Unity admin at %s. Error ID: %s.",
             CONFIG["mail"]["support"],
@@ -414,7 +414,7 @@ class UnityHTTPD
     {
         $token = self::getPostData("csrf_token");
         if (!CSRFToken::validate($token)) {
-            $id = uniqid();
+            $id = getCorrelationID();
             self::errorLog("csrf failed to validate", "", correlation_id: $id);
             self::messageError(
                 "Invalid Session Token",

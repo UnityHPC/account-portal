@@ -194,6 +194,14 @@ function getTemplatePath(string $basename): string
     return $template_path;
 }
 
+function getCorrelationID(): string
+{
+    return bin2hex(random_bytes(5));
+}
+
+// wrappers for PHP builtin functions
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * @param-out int $count
  * @throws Exception

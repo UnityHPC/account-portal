@@ -9,7 +9,7 @@ class CSRFTokenTest extends TestCase
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_write_close();
         }
-        session_id(uniqid());
+        session_id(getCorrelationID());
         session_start();
         $_SESSION["csrf_tokens"] = [];
     }
@@ -18,7 +18,7 @@ class CSRFTokenTest extends TestCase
     {
         CSRFToken::clear();
         session_write_close();
-        session_id(uniqid());
+        session_id(getCorrelationID());
     }
 
     public function testGenerateCreatesToken(): void
