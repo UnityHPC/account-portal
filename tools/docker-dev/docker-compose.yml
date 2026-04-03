@@ -40,7 +40,9 @@ services:
       - "127.0.0.1:8000:80"
     volumes:
       - ../../:/var/www/unity-web-portal
-      - ../../test/deployment/overrides:/var/www/unity-web-portal/deployment/overrides
+      - ../../test/deployment/overrides/account-portal-docker-web-green:8000:/var/www/unity-web-portal/deployment/overrides/account-portal-docker-web-green:8000
+      - ../../test/deployment/overrides/account-portal-docker-web:8000:/var/www/unity-web-portal/deployment/overrides/account-portal-docker-web:8000
+      - ../../test/deployment/overrides/phpunit:/var/www/unity-web-portal/deployment/overrides/phpunit
     depends_on:
       identity:
         condition: service_healthy
