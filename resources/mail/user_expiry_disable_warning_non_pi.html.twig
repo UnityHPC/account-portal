@@ -6,19 +6,14 @@
 
 <p>
 Your Unity account, {{ user }}, is scheduled to be disabled on {{ expiration_date }} due to lapsed credential verification.
-To maintain an active Unity account, you must verify your institutional credentials on a biannual basis
-due to security requirements. To keep your account active, please log in to the {{ portal_hyperlink|raw }} before {{ expiration_date }}.
-Upon expiration, you will lose access to Unity HPC Platform services until you log in to the {{ portal_hyperlink|raw }}.
+If you do not log in to the {{ portal_hyperlink|raw }} before {{ expiration_date }}, you will lose access to Unity HPC Platform services.
+You can check your status by running `unity-account-expiry-status` from the Unity command line.
+</p>
+<p>
+To maintain an active Unity account, users must verify your institutional credentials on a biannual basis due to security requirements.
+Not all forms of activity prove good standing, so only certain actions (like logging into the {{ portal_hyperlink|raw }}) reset the 'inactivity timer'.
+In this first phase of account expiration, all data is preserved, but without intervention data may eventually be lost.
 For more information, see our {{ policy_hyperlink|raw }}.
-</p>
-<p>
-Currently, the Unity account portal is the only way to verify credentials.
-To maintain an active account, all that's needed is logging in to the portal, you don't need to run jobs or otherwise interact with Unity.
-You can check your status by running unity-account-expiry-status from the Unity command line, or by logging in to the {{ portal_hyperlink|raw }}.
-</p>
-<p>
-If you are a PI on Unity, please use this opportunity to verify all users under your PI group are current students or collaborators by
-visiting the "My Users" tab in the {{ portal_hyperlink|raw }}.
 </p>
 {% if is_final_warning %}
 <p>This is the final warning.\n</p>

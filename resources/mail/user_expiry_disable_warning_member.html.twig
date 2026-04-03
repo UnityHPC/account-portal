@@ -6,15 +6,14 @@
 
 <p>
 The PI group {{ pi_group_gid }} is scheduled to be disabled on {{ expiration_date }} because the group owner's credential verification has lapsed.
-To maintain an active Unity account, all users must verify their institutional credentials on a biannual basis
-due to security requirements.
 Upon expiration, you will lose access to Unity HPC Platform services unless you are a member of another PI group. Additionally,
 you won't be able to access files under directories owned by {{ pi_group_gid }}.
+If you believe this group should remain active, please remind your PI to verify their credentials by logging into the {{ portal_hyperlink|raw }}.
 </p>
 <p>
-Currently, the Unity account portal is the only way to verify credentials.
-To maintain an active account, all that's needed is logging in to the portal. A PI doesn't need to run jobs or otherwise interact with Unity.
-If you believe {{ pi_group_gid }}, should remain active, please remind your PI to verify their credentials at {{ portal_hyperlink|raw }}.
+To maintain an active Unity account, users must verify your institutional credentials on a biannual basis due to security requirements.
+Not all forms of activity prove good standing, so only certain actions (like logging into the {{ portal_hyperlink|raw }}) reset the 'inactivity timer'.
+In this first phase of account expiration, all data is preserved, but without intervention data may eventually be lost.
 For more information, see our {{ policy_hyperlink|raw }}.
 </p>
 {% if is_final_warning %}

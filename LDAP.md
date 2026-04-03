@@ -37,8 +37,6 @@ Terminology:
   - a user who is not automatically idlelocked or disabled
 - **disabled user**:
   - a user that we pretend does not exist
-  - TODO user can disable their account in the GUI
-  - TODO if a user is inactive for too long, they expire and become disabled
   - `sshpublickey` attribute should be empty
   - your other services should block this group for authorization
   - if you have any integrations (ex: creating home directories), they should take care to ignore these users
