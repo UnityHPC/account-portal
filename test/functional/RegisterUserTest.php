@@ -8,9 +8,9 @@ class RegisterUserTest extends UnityWebPortalTestCase
     {
         return [
             // defaults/config.ini.default: ldap.offset_UIDGID=1000000
-            // test/custom_user_mappings/test.csv has reservations for 1000000-1000004
+            // test/deployment/custom_user_mappings/test.csv has reservations for 1000000-1000004
             ["NonExistent", 1000005],
-            // test/custom_user_mappings/test.csv: {user2001: 555}
+            // test/deployment/custom_user_mappings/test.csv: {user2001: 555}
             ["CustomMapped555", 555],
         ];
     }
