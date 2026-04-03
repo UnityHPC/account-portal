@@ -49,7 +49,7 @@
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 
 {% else %}
-{% do setSubject('User Modified') %}
+{% do setSubject('Unity Account Modified') %}
 {% set mod_id = uniqid() %}
 {% do errorLog('warning', 'unknown flag', errorid: mod_id, data: flag) %}
 <p>Hello,</p>
