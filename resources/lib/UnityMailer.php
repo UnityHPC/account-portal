@@ -20,9 +20,6 @@ class UnityMailer
     private string $MSG_PI_APPROVAL_EMAIL;
     private string $MSG_PI_APPROVAL_NAME;
 
-    private \Twig\Loader\FilesystemLoader $loader;
-    private \Twig\Environment $twig;
-
     public function __construct()
     {
         $this->MSG_SENDER_EMAIL = CONFIG["mail"]["sender"];
@@ -33,21 +30,6 @@ class UnityMailer
         $this->MSG_ADMIN_NAME = CONFIG["mail"]["admin_name"];
         $this->MSG_PI_APPROVAL_EMAIL = CONFIG["mail"]["pi_approve"];
         $this->MSG_PI_APPROVAL_NAME = CONFIG["mail"]["pi_approve_name"];
-        $this->loader = new \Twig\Loader\FilesystemLoader([
-            __DIR__ . "/../../deployment/mail_overrides",
-            __DIR__ . "/../mail",
-        ]);
-        $this->twig = new \Twig\Environment($this->loader, ["strict_variables" => true]);
-        $functions = [
-            new TwigFunction("setSubject", fn($x) => ($this->Subject = $x)),
-            new TwigFunction("getRelativeHyperlink", getRelativeHyperlink(...)),
-            new TwigFunction("formatHyperlink", formatHyperlink(...)),
-            new TwigFunction("throw", fn($x) => throw new Exception($x)),
-        ];
-        foreach ($functions as $function) {
-            $this->twig->addFunction($function);
-        }
-        $this->twig->addGlobal("CONFIG", CONFIG);
     }
 
     public function constructPHPMailer(): PHPMailer
@@ -97,6 +79,25 @@ class UnityMailer
         return $mailer;
     }
 
+    public function constructTwigEnvironment(): \Twig\Environment
+    {
+        $loader = new \Twig\Loader\FilesystemLoader([
+            __DIR__ . "/../../deployment/mail_overrides",
+            __DIR__ . "/../mail",
+        ]);
+        $twig = new \Twig\Environment($loader, ["strict_variables" => true]);
+        $functions = [
+            new TwigFunction("getRelativeHyperlink", getRelativeHyperlink(...)),
+            new TwigFunction("formatHyperlink", formatHyperlink(...)),
+            new TwigFunction("throw", fn($x) => throw new Exception($x)),
+        ];
+        foreach ($functions as $function) {
+            $twig->addFunction($function);
+        }
+        $twig->addGlobal("CONFIG", CONFIG);
+        return $twig;
+    }
+
     /**
      * @param string|string[] $recipients
      * @param ?mixed[] $data
@@ -105,10 +106,14 @@ class UnityMailer
     {
         $data ??= [];
         $mailer = $this->constructPHPMailer();
+
+        $twig = $this->constructTwigEnvironment();
+        $twig->addFunction(new TwigFunction("setSubject", fn($x) => ($mailer->Subject = $x)));
+
         $mailer->setFrom($this->MSG_SENDER_EMAIL, $this->MSG_SENDER_NAME);
         $mailer->addReplyTo($this->MSG_SUPPORT_EMAIL, $this->MSG_SUPPORT_NAME);
 
-        $mes_html = $this->twig->render("$template.html.twig", $data);
+        $mes_html = $twig->render("$template.html.twig", $data);
         $mailer->msgHTML($mes_html);
 
         if ($recipients == "admin") {
