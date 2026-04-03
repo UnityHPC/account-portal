@@ -194,9 +194,9 @@ function getTemplatePath(string $basename): string
     return $template_path;
 }
 
-function getRandomString(): string
+function getRandomString(string $prefix = ""): string
 {
-    return bin2hex(random_bytes(5));
+    return $prefix . bin2hex(random_bytes(5));
 }
 
 // wrappers for PHP builtin functions
