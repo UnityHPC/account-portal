@@ -6,8 +6,6 @@ use PHPMailer\PHPMailer\PHPMailer;
 use Exception;
 use Twig\TwigFunction;
 
-class UnityMailerException extends Exception {}
-
 /**
  * This is a class that uses PHPmailer to send emails based on templates
  */
@@ -27,7 +25,7 @@ class UnityMailer extends PHPMailer
 
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct(exceptions: true);
         $this->isSMTP();
 
         $this->MSG_SENDER_EMAIL = CONFIG["mail"]["sender"];
@@ -122,10 +120,7 @@ class UnityMailer extends PHPMailer
             }
         }
 
-        $output = parent::send();
-        if ($output === false) {
-            throw new UnityMailerException($this->ErrorInfo);
-        }
+        parent::send();
         $this->clearAllRecipients();
     }
 }
