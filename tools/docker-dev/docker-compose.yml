@@ -40,6 +40,7 @@ services:
       - "127.0.0.1:8000:80"
     volumes:
       - ../../:/var/www/unity-web-portal
+      - ../../test/deployment/overrides:/var/www/unity-web-portal/deployment/overrides
     depends_on:
       identity:
         condition: service_healthy
