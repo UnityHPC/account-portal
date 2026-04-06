@@ -49,12 +49,12 @@ class UnityUser
     ): void {
         $ldapGroupEntry = $this->getUserGroupEntry();
         $id = $this->LDAP->getNextUIDGIDNumber($this->uid);
-        \ensure(!$ldapGroupEntry->exists());
+        assert(!$ldapGroupEntry->exists());
         $ldapGroupEntry->create([
             "objectclass" => ["posixGroup", "top"],
             "gidnumber" => strval($id),
         ]);
-        \ensure(!$this->entry->exists());
+        assert(!$this->entry->exists());
         $this->entry->create([
             "objectclass" => UnityLDAP::POSIX_ACCOUNT_CLASS,
             "uid" => $this->uid,
@@ -249,7 +249,7 @@ class UnityUser
      */
     private function setSSHKeys(array $keys, bool $send_mail = true): void
     {
-        \ensure($this->entry->exists());
+        assert($this->entry->exists());
         $this->entry->setAttribute("sshpublickey", $keys);
         $this->SQL->addLog("sshkey_modify", $this->uid);
         if ($send_mail) {
@@ -298,7 +298,7 @@ class UnityUser
         if (empty($shell)) {
             throw new Exception("login shell must not be empty!");
         }
-        \ensure($this->entry->exists());
+        assert($this->entry->exists());
         $this->entry->setAttribute("loginshell", $shell);
         $this->SQL->addLog("loginshell_changed", $this->uid);
         if ($send_mail) {
@@ -319,7 +319,7 @@ class UnityUser
 
     public function setHomeDir(string $home): void
     {
-        \ensure($this->entry->exists());
+        assert($this->entry->exists());
         $this->entry->setAttribute("homedirectory", $home);
         $this->SQL->addLog("homedir_changed", $this->uid);
     }

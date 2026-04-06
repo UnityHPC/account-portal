@@ -1,22 +1,10 @@
 <?php
 
-use UnityWebPortal\lib\exceptions\EnsureException;
 use UnityWebPortal\lib\exceptions\EncodingUnknownException;
 use UnityWebPortal\lib\exceptions\EncodingConversionException;
 use phpseclib3\Crypt\PublicKeyLoader;
 use phpseclib3\Exception\NoKeyLoadedException;
 use UnityWebPortal\lib\exceptions\CurlException;
-
-/**
- * like assert() but not subject to zend.assertions config
- * @throws EnsureException
- */
-function ensure(bool $condition, ?string $message = null): void
-{
-    if (!$condition) {
-        throw new EnsureException($message ?? "ensure condition is false");
-    }
-}
 
 /**
  * key must take the form "KEY_TYPE KEY_DATA OPTIONAL_COMMENT"

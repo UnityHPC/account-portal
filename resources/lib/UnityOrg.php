@@ -21,7 +21,7 @@ class UnityOrg extends PosixGroup
 
     public function init(): void
     {
-        \ensure(!$this->entry->exists());
+        assert(!$this->entry->exists());
         $nextGID = $this->LDAP->getNextOrgGIDNumber();
         $this->entry->create([
             "objectclass" => ["posixGroup", "top"],

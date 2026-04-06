@@ -21,7 +21,6 @@ require_once __DIR__ . "/../resources/lib/exceptions/SSOException.php";
 require_once __DIR__ . "/../resources/lib/exceptions/ArrayKeyException.php";
 require_once __DIR__ . "/../resources/lib/exceptions/CurlException.php";
 require_once __DIR__ . "/../resources/lib/exceptions/EntryNotFoundException.php";
-require_once __DIR__ . "/../resources/lib/exceptions/EnsureException.php";
 require_once __DIR__ . "/../resources/lib/exceptions/EncodingUnknownException.php";
 require_once __DIR__ . "/../resources/lib/exceptions/EncodingConversionException.php";
 require_once __DIR__ . "/../resources/lib/exceptions/UnityHTTPDMessageNotFoundException.php";
@@ -169,7 +168,7 @@ function ensureUserNotInPIGroup(UnityGroup $pi_group)
     global $USER;
     if ($pi_group->memberUIDExists($USER->uid)) {
         $pi_group->removeUser($USER);
-        ensure(!$pi_group->memberUIDExists($USER->uid));
+        assert(!$pi_group->memberUIDExists($USER->uid));
     }
 }
 
@@ -515,7 +514,7 @@ class UnityWebPortalTestCase extends TestCase
                 throw new \Exception("switchUser validation failed!", previous: $e);
             }
         }
-        ensure(!is_null($USER));
+        assert(!is_null($USER));
     }
 
     function switchBackUser(bool $validate = false)
@@ -579,7 +578,7 @@ class UnityWebPortalTestCase extends TestCase
                 $post_did_redirect_or_die = true;
             }
             // https://en.wikipedia.org/wiki/Post/Redirect/Get
-            ensure($post_did_redirect_or_die, "post did not redirect or die!");
+            assert($post_did_redirect_or_die, "post did not redirect or die!");
         } finally {
             $output = _ob_get_clean();
             unset($_POST);
