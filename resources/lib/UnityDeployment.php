@@ -71,6 +71,9 @@ class UnityDeployment
     /** @param mixed[] $CONFIG */
     private static function validateConfig(array $CONFIG): void
     {
+        if (ini_get("zend.assertions") !== "1") {
+            throw new InvalidConfigurationException("zend.assertions must be set to 1");
+        }
         try {
             self::validateExpiryConfig($CONFIG);
             self::validateSmtpConfig($CONFIG);
