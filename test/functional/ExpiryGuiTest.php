@@ -65,6 +65,7 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
             $this->assertIdleDays(1);
             session_write_close();
             $this->http_get(__DIR__ . "/../../resources/init.php");
+            // note: once in a blue moon this will fail, just run it again
             $this->assertNumberOfMessages(0);
             UnityHTTPD::clearMessages();
             // moment of 1st warning ///////////////////////////////////////////////////////////////
