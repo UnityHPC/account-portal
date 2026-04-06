@@ -80,7 +80,7 @@ class UnityDeployment
         try {
             self::validateExpiryConfig($CONFIG);
             self::validateSmtpConfig($CONFIG);
-        } catch (AssertionError $e) {
+        } catch (\Throwable $e) {
             throw new InvalidConfigurationException($e->getMessage());
         }
     }
