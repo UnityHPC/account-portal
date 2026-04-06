@@ -5,6 +5,7 @@ use UnityWebPortal\lib\exceptions\EncodingConversionException;
 use phpseclib3\Crypt\PublicKeyLoader;
 use phpseclib3\Exception\NoKeyLoadedException;
 use UnityWebPortal\lib\exceptions\CurlException;
+use UnityWebPortal\lib\UnityDeployment;
 
 /**
  * key must take the form "KEY_TYPE KEY_DATA OPTIONAL_COMMENT"
@@ -174,12 +175,7 @@ function shortenString(
 
 function getTemplatePath(string $basename): string
 {
-    $template_path = __DIR__ . "/../templates/$basename";
-    $override_path = __DIR__ . "/../../deployment/templates_overrides/$basename";
-    if (file_exists($override_path)) {
-        return $override_path;
-    }
-    return $template_path;
+    return UnityDeployment::getTemplatePath($basename);
 }
 
 /**

@@ -2,23 +2,24 @@
 
 namespace UnityWebPortal\lib;
 
+use AssertionError;
 use UnityWebPortal\lib\exceptions\InvalidConfigurationException;
 
-class UnityConfig
+class UnityDeployment
 {
     /** @return mixed[] */
-    public static function getConfig(string $def_config_loc, string $deploy_loc): array
+    public static function getConfig(): array
     {
-        $CONFIG = _parse_ini_file($def_config_loc . "/config.ini.default", true, INI_SCANNER_TYPED);
-        $CONFIG = self::pullConfig($CONFIG, $deploy_loc);
-        if (array_key_exists("HTTP_HOST", $_SERVER)) {
-            $cur_url = $_SERVER["HTTP_HOST"];
-            self::assertHttpHostValid($cur_url);
-            $url_override_path = $deploy_loc . "/overrides/" . $cur_url;
-            if (is_dir($url_override_path)) {
-                $CONFIG = self::pullConfig($CONFIG, $url_override_path);
-            }
+        $CONFIG = [];
+        $deployment = __DIR__ . "/../../deployment/";
+        $CONFIG = self::pullConfig($CONFIG, "$deployment/config.base.ini");
+        $CONFIG = self::pullConfig($CONFIG, "$deployment/config.ini");
+        $host = $_SERVER["HTTP_HOST"] ?? null;
+        if ($host !== null) {
+            self::assertHttpHostValid($host);
+            $CONFIG = self::pullConfig($CONFIG, "$deployment/domain_overrides/$host/config.ini");
         }
+        self::validateConfig($CONFIG);
         return $CONFIG;
     }
 
@@ -28,7 +29,7 @@ class UnityConfig
      */
     private static function pullConfig(array $CONFIG, string $loc): array
     {
-        $file_loc = $loc . "/config/config.ini";
+        $file_loc = $loc;
         if (file_exists($file_loc)) {
             $override = _parse_ini_file($file_loc, true, INI_SCANNER_TYPED);
             foreach ($override as $key1 => $val1) {
@@ -70,7 +71,7 @@ class UnityConfig
     }
 
     /** @param mixed[] $CONFIG */
-    public static function validateConfig(array $CONFIG): void
+    private static function validateConfig(array $CONFIG): void
     {
         $idlelock_warning_days = $CONFIG["expiry"]["idlelock_warning_days"];
         $idlelock_day = $CONFIG["expiry"]["idlelock_day"];
@@ -130,6 +131,89 @@ class UnityConfig
     {
         if (!_preg_match("/^[a-zA-Z0-9._:-]+$/", $host)) {
             throw new \Exception("HTTP_HOST '$host' contains invalid characters!");
+        }
+    }
+
+    public static function getTemplatePath(string $basename): string
+    {
+        $deployment = __DIR__ . "/../../deployment/";
+        if (($host = $_SERVER["HTTP_HOST"] ?? null) !== null) {
+            $domain_override_template = "$deployment/domain_overrides/$host/templates/$basename";
+            if (file_exists($domain_override_template)) {
+                return $domain_override_template;
+            }
+        }
+        $deployment_template = "$deployment/templates/$basename";
+        if (file_exists($deployment_template)) {
+            return $deployment_template;
+        }
+        $output = __DIR__ . "/../templates/$basename";
+        if (file_exists($output)) {
+            return $output;
+        } else {
+            throw new \Exception("no such template: '$basename'");
+        }
+    }
+
+    /** @return string[] */
+    public static function getMailDirs(): array
+    {
+        $output = [];
+        $deployment = __DIR__ . "/../../deployment/";
+        if (($host = $_SERVER["HTTP_HOST"] ?? null) !== null) {
+            $domain_override_templates_dir = "$deployment/domain_overrides/$host/mail/";
+            if (file_exists($domain_override_templates_dir)) {
+                array_push($output, $domain_override_templates_dir);
+            }
+        }
+        if (is_dir("$deployment/mail/")) {
+            array_push($output, "$deployment/mail/");
+        }
+        array_push($output, __DIR__ . "/../mail/");
+        return $output;
+    }
+
+    /** @return array<string, int> */
+    public static function getCustomIDMappings(): array
+    {
+        $output = [];
+        $dir = new \DirectoryIterator(self::getCustomIDMappingsDirPath());
+        foreach ($dir as $fileinfo) {
+            $filename = $fileinfo->getFilename();
+            if ($fileinfo->isDot()) {
+                continue;
+            }
+            if ($fileinfo->getExtension() !== "csv") {
+                UnityHTTPD::errorLog("warning", "ID map file $filename ignored, extension != .csv");
+                continue;
+            }
+            $i = 1;
+            $handle = _fopen($fileinfo->getPathname(), "r");
+            try {
+                while (($row = fgetcsv($handle, separator: ",")) !== false) {
+                    try {
+                        assert(count($row) === 2);
+                        assert(is_string($row[1]));
+                    } catch (AssertionError $e) {
+                        throw new \Exception("bad ID mapping $filename row $i", previous: $e);
+                    }
+                    $output[$row[0]] = digits2int($row[1]);
+                    $i++;
+                }
+            } finally {
+                _fclose($handle);
+            }
+        }
+        return $output;
+    }
+
+    private static function getCustomIDMappingsDirPath(): string
+    {
+        $output = __DIR__ . "/../../" . CONFIG["ldap"]["custom_user_mappings_dir"];
+        if (is_dir($output)) {
+            return $output;
+        } else {
+            throw new \Exception("custom_user_mappings directory '$output' is not a directory");
         }
     }
 }

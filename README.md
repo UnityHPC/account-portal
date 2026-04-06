@@ -91,8 +91,8 @@ See the Docker Compose environment (`tools/docker-dev/`) for an (unsafe for prod
 1. If using custom UIDNumber/GIDNumber mappings, create `deployment/custom_user_mappings/*.csv`
    - The 1st column is UID, the 2nd column is both UIDNumber and GIDNumber
 1. Add logos to `webroot/assets/footer_logos/`
-1. Copy emails from `resources/mail` to `deployment/mail_overrides` and edit them if you wish
-1. Copy pages from `resources/templates` to `deployment/templates_overrides` and edit them if you wish
+1. Copy emails from `resources/mail` to `deployment/mail` and edit them if you wish
+1. Copy pages from `resources/templates` to `deployment/templates` and edit them if you wish
 
 ## Integration
 
@@ -129,8 +129,8 @@ cp --preserve=all "$prod/deployment/config/config.ini" ./deployment/config/confi
 rsync -a "$prod/deployment/custom_user_mappings/" ./deployment/custom_user_mappings/
 rsync -a "$prod/deployment/overrides/" ./deployment/overrides/
 rsync -a "$prod/webroot/assets/footer_logos/" ./footer_logos/
-rsync -a "$prod/deployment/mail_overrides/" ./deployment/mail_overrides/
-rsync -a "$prod/deployment/templates_overrides/" ./deployment/templates_overrides/
+rsync -a "$prod/deployment/mail/" ./deployment/mail/
+rsync -a "$prod/deployment/templates/" ./deployment/templates/
 rm "$prod" && ln -s "$PWD" "$prod"
 ```
 
