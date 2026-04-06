@@ -2,7 +2,6 @@
 
 namespace UnityWebPortal\lib;
 
-use RuntimeException;
 use UnityWebPortal\lib\exceptions\EntryNotFoundException;
 use PHPOpenLDAPer\LDAPConn;
 use PHPOpenLDAPer\LDAPEntry;
@@ -135,41 +134,29 @@ class UnityLDAP extends LDAPConn
             if ($fileinfo->isDot() || $filename == "README.md") {
                 continue;
             }
-            if ($fileinfo->getExtension() == "csv") {
-                $handle = _fopen($fileinfo->getPathname(), "r");
-                try {
-                    while (($row = fgetcsv($handle, null, ",")) !== false) {
-                        array_push($output, $row);
+            if ($fileinfo->getExtension() !== "csv") {
+                UnityHTTPD::errorLog("warning", "ID map file $filename ignored, extension != .csv");
+                continue;
+            }
+            $i = 1;
+            $handle = _fopen($fileinfo->getPathname(), "r");
+            try {
+                while (($row = fgetcsv($handle, separator: ",")) !== false) {
+                    try {
+                        assert(count($row) === 2);
+                        assert(is_string($row[1]));
+                        assert(ctype_digit($row[1]));
+                    } catch (\AssertionError $e) {
+                        throw new \Exception("bad ID mapping $filename row $i", previous: $e);
                     }
-                } finally {
-                    _fclose($handle);
+                    $output[$row[0]] = digits2int($row[1]);
+                    $i++;
                 }
-            } else {
-                UnityHTTPD::errorLog(
-                    "warning",
-                    "custom ID mapping file '$filename' ignored, extension != .csv",
-                );
+            } finally {
+                _fclose($handle);
             }
         }
-        $output_map = [];
-        foreach ($output as $i => $row) {
-            $num_columns = count($row);
-            if ($num_columns !== 2) {
-                throw new \Exception(
-                    sprintf(
-                        "custom user mapping %s has %s columns, expected 2 columns",
-                        _json_encode($row),
-                        $num_columns,
-                    ),
-                );
-            }
-            [$uid, $uidNumber_str] = $row;
-            if ($uidNumber_str === null) {
-                throw new RuntimeException("uidNumber_str is null");
-            }
-            $output_map[$uid] = digits2int($uidNumber_str);
-        }
-        return $output_map;
+        return $output;
     }
 
     /** @return int[] */
