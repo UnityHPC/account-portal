@@ -34,8 +34,6 @@ class UnityLDAP extends LDAPConn
     // isDisabled unset or set to "FALSE"
     private static string $NON_DISABLED_FILTER = "(|(!(isDisabled=*))(isDisabled=FALSE))";
 
-    private string $custom_mappings_path =
-        __DIR__ . "/../../" . CONFIG["ldap"]["custom_user_mappings_dir"];
     private string $def_user_shell = CONFIG["ldap"]["def_user_shell"];
     private int $offset_UIDGID = CONFIG["ldap"]["offset_UIDGID"];
     private int $offset_PIGID = CONFIG["ldap"]["offset_PIGID"];
@@ -74,7 +72,7 @@ class UnityLDAP extends LDAPConn
     public function getNextUIDGIDNumber(string $uid): int
     {
         $IDNumsInUse = array_merge($this->getAllUIDNumbersInUse(), $this->getAllGIDNumbersInUse());
-        $customIDMappings = $this->getCustomIDMappings();
+        $customIDMappings = UnityDeployment::getCustomIDMappings();
         $customMappedID = $customIDMappings[$uid] ?? null;
         if (!is_null($customMappedID) && !in_array($customMappedID, $IDNumsInUse)) {
             return $customMappedID;
@@ -95,7 +93,10 @@ class UnityLDAP extends LDAPConn
     {
         return $this->getNextIDNumber(
             $this->offset_PIGID,
-            array_merge($this->getAllGIDNumbersInUse(), array_values($this->getCustomIDMappings())),
+            array_merge(
+                $this->getAllGIDNumbersInUse(),
+                array_values(UnityDeployment::getCustomIDMappings()),
+            ),
         );
     }
 
@@ -103,7 +104,10 @@ class UnityLDAP extends LDAPConn
     {
         return $this->getNextIDNumber(
             $this->offset_ORGGID,
-            array_merge($this->getAllGIDNumbersInUse(), array_values($this->getCustomIDMappings())),
+            array_merge(
+                $this->getAllGIDNumbersInUse(),
+                array_values(UnityDeployment::getCustomIDMappings()),
+            ),
         );
     }
 
@@ -122,41 +126,6 @@ class UnityLDAP extends LDAPConn
             $new_id++;
         }
         return $new_id;
-    }
-
-    /** @return array<string, int> */
-    private function getCustomIDMappings(): array
-    {
-        $output = [];
-        $dir = new \DirectoryIterator($this->custom_mappings_path);
-        foreach ($dir as $fileinfo) {
-            $filename = $fileinfo->getFilename();
-            if ($fileinfo->isDot() || $filename == "README.md") {
-                continue;
-            }
-            if ($fileinfo->getExtension() !== "csv") {
-                UnityHTTPD::errorLog("warning", "ID map file $filename ignored, extension != .csv");
-                continue;
-            }
-            $i = 1;
-            $handle = _fopen($fileinfo->getPathname(), "r");
-            try {
-                while (($row = fgetcsv($handle, separator: ",")) !== false) {
-                    try {
-                        assert(count($row) === 2);
-                        assert(is_string($row[1]));
-                        assert(ctype_digit($row[1]));
-                    } catch (\AssertionError $e) {
-                        throw new \Exception("bad ID mapping $filename row $i", previous: $e);
-                    }
-                    $output[$row[0]] = digits2int($row[1]);
-                    $i++;
-                }
-            } finally {
-                _fclose($handle);
-            }
-        }
-        return $output;
     }
 
     /** @return int[] */

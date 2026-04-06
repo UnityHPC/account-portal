@@ -40,17 +40,17 @@ services:
       - "127.0.0.1:8000:80"
     volumes:
       - ../../:/var/www/unity-web-portal
-      - ../../test/deployment/overrides/phpunit:/var/www/unity-web-portal/deployment/overrides/phpunit
+      - ../../test/deployment/domain_overrides/phpunit:/var/www/unity-web-portal/deployment/domain_overrides/phpunit
       # docker doesn't like how these paths have colons in them
       # https://github.com/docker/compose/issues/12553#issuecomment-2656090965
       - type: bind
-        source: ../../test/deployment/overrides/account-portal-docker-web-green:8000
-        target: /var/www/unity-web-portal/deployment/overrides/account-portal-docker-web-green:8000
+        source: ../../test/deployment/domain_overrides/account-portal-docker-web-green:8000
+        target: /var/www/unity-web-portal/deployment/domain_overrides/account-portal-docker-web-green:8000
         bind:
           create_host_path: false
       - type: bind
-        source: ../../test/deployment/overrides/account-portal-docker-web:8000
-        target: /var/www/unity-web-portal/deployment/overrides/account-portal-docker-web:8000
+        source: ../../test/deployment/domain_overrides/account-portal-docker-web:8000
+        target: /var/www/unity-web-portal/deployment/domain_overrides/account-portal-docker-web:8000
         bind:
           create_host_path: false
     depends_on:

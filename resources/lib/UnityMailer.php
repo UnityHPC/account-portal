@@ -78,10 +78,7 @@ class UnityMailer extends PHPMailer
             ];
         }
 
-        $this->loader = new \Twig\Loader\FilesystemLoader([
-            __DIR__ . "/../../deployment/mail_overrides",
-            __DIR__ . "/../mail",
-        ]);
+        $this->loader = new \Twig\Loader\FilesystemLoader(UnityDeployment::getMailDirs());
         $this->twig = new \Twig\Environment($this->loader, ["strict_variables" => true]);
         $functions = [
             new TwigFunction("setSubject", fn($x) => ($this->Subject = $x)),
