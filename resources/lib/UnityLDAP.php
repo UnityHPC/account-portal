@@ -87,7 +87,7 @@ class UnityLDAP extends LDAPConn
         }
         return $this->getNextIDNumber(
             $this->offset_UIDGID,
-            array_merge($IDNumsInUse, array_values($this->getCustomIDMappings())),
+            array_merge($IDNumsInUse, array_values($customIDMappings)),
         );
     }
 
