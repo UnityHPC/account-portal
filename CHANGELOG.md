@@ -10,7 +10,7 @@ For details on the changes in each release, see [the Releases page](https://gith
 - the `mail_overrides` directory has been renamed to `mail`
 - the `templates_overrides` directory has been renamed to `templates`
 - the `overrides` directory has been renamed to `domain_overrides`
-- the `[smtp]ssl_verify` option has changed from `"true"/"false"` to `true/false`
+- the `ssl_verify` and `port` options in the `smtp` config section should have quotes removed
 
 ### 1.6 -> 1.7
 

@@ -117,7 +117,7 @@ class UnityDeployment
     private static function validateSmtpConfig(array $CONFIG): void
     {
         self::assertStringNotEmpty($CONFIG["smtp"]["host"], '$CONFIG["smtp"]["host"]');
-        self::assertStringNotEmpty($CONFIG["smtp"]["port"], '$CONFIG["smtp"]["port"]');
+        self::assertIsInt($CONFIG["smtp"]["port"], '$CONFIG["smtp"]["port"]');
         self::assertOneOf($CONFIG["smtp"]["security"], '$CONFIG["smtp"]["security"]', [
             "",
             "tls",
@@ -140,6 +140,11 @@ class UnityDeployment
     private static function assertIsBool(mixed $x, string $name): void
     {
         assert(is_bool($x), "$name must be a boolean");
+    }
+
+    private static function assertIsInt(mixed $x, string $name): void
+    {
+        assert(is_int($x), "$name must be a boolean");
     }
 
     /** @param mixed[] $options */
