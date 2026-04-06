@@ -11,8 +11,6 @@
 - Empty lines should be used sparingly.
 - No code should call `die()` or `exit()`, instead `UnityHTTPD::die()`.
   - This will avoid the premature death of our automated testing processes.
-- No code should call `assert()`, instead `\ensure()`.
-  - This will enforce conditions even in production.
 - No code should fail quietly, instead exceptions should be thrown. PHP builtin functions that fail quietly (ex: `json_encode`) should be replaced with a wrapper in `resources/utils.php`. See `test/assert-utils-used.bash` for a list of wrappers.
 - `UnityHTTPD`'s user-facing error functionality (ex: `badRequest`) should only be called from `webroot/**/*.php`.
   `resources/**/*.php` should throw exceptions instead.

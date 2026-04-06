@@ -114,7 +114,7 @@ class UnityGroup extends PosixGroup
     {
         $uid = $this->getOwner()->uid;
         $request = $this->SQL->getRequest($uid, UnitySQL::REQUEST_BECOME_PI);
-        \ensure($this->getOwner()->exists());
+        assert($this->getOwner()->exists());
         if (!$this->entry->exists()) {
             $this->init();
         } elseif ($this->getIsDisabled()) {
@@ -182,7 +182,7 @@ class UnityGroup extends PosixGroup
     public function approveUser(UnityUser $new_user, bool $send_mail = true): void
     {
         $request = $this->SQL->getRequest($new_user->uid, $this->gid);
-        \ensure($new_user->exists());
+        assert($new_user->exists());
         $this->addMemberUID($new_user->uid);
         $this->SQL->removeRequest($new_user->uid, $this->gid);
         $this->SQL->addLog(
@@ -337,7 +337,7 @@ class UnityGroup extends PosixGroup
     private function init(): void
     {
         $owner = $this->getOwner();
-        \ensure(!$this->entry->exists());
+        assert(!$this->entry->exists());
         $nextGID = $this->LDAP->getNextPIGIDNumber();
         $this->entry->create([
             "objectclass" => ["piGroup", "posixGroup", "top"],
@@ -467,7 +467,7 @@ class UnityGroup extends PosixGroup
     {
         $owner = $this->getOwner();
         $suffix = "_" . $owner->getOrg();
-        ensure(str_ends_with($owner->uid, $suffix));
+        assert(str_ends_with($owner->uid, $suffix));
         $short_name = substr($owner->uid, 0, -1 * strlen($suffix));
         $parts = explode("@", $mail, 2);
         return sprintf("%s+%s@%s", $parts[0], $short_name, $parts[1]);

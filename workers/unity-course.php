@@ -10,7 +10,7 @@ function cn2org($cn)
 {
     $matches = [];
     _preg_match("/.*_([^_]+_[^_]+)$/", $cn, $matches);
-    ensure(count($matches) == 2, "failed to extract org from cn: '$cn'");
+    assert(count($matches) == 2, "failed to extract org from cn: '$cn'");
     return $matches[1];
 }
 

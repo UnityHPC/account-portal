@@ -6,7 +6,6 @@ if [[ $# -lt 1 ]]; then
 fi
 
 declare -A utils=(
-    ["assert"]="ensure"
     ["json_encode"]="_json_encode"
     ["json_decode"]="_json_decode"
     ["mb_detect_encoding"]="_mb_detect_encoding"
