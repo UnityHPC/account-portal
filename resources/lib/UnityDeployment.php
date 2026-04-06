@@ -50,8 +50,10 @@ class UnityDeployment
     }
 
     /** @param mixed[] $x */
-    private static function assertArrayIsMonotonicallyIncreasing(array $x, string $name): void
-    {
+    private static function assertArrayIsOneOrMoreMonotonicallyIncreasingIntegers(
+        array $x,
+        string $name,
+    ): void {
         self::assertArrayNotEmpty($x, $name);
         self::assertAllValuesAreInts($x, $name);
         if (count($x) === 1) {
@@ -84,11 +86,11 @@ class UnityDeployment
         $idlelock_day = $CONFIG["expiry"]["idlelock_day"];
         $disable_warning_days = $CONFIG["expiry"]["disable_warning_days"];
         $disable_day = $CONFIG["expiry"]["disable_day"];
-        self::assertArrayIsMonotonicallyIncreasing(
+        self::assertArrayIsOneOrMoreMonotonicallyIncreasingIntegers(
             $idlelock_warning_days,
             '$CONFIG["expiry"]["idlelock_warning_days"]',
         );
-        self::assertArrayIsMonotonicallyIncreasing(
+        self::assertArrayIsOneOrMoreMonotonicallyIncreasingIntegers(
             $disable_warning_days,
             '$CONFIG["expiry"]["disable_warning_days"]',
         );
