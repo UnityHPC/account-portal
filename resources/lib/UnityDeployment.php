@@ -80,18 +80,18 @@ class UnityDeployment
     /** @param mixed[] $CONFIG */
     private static function validateExpiryConfig(array $CONFIG): void
     {
-        self::assertArrayIsMonotonicallyIncreasing(
-            $CONFIG["expiry"]["idlelock_warning_days"],
-            '$CONFIG["expiry"]["idlelock_warning_days"]',
-        );
-        self::assertArrayIsMonotonicallyIncreasing(
-            $CONFIG["expiry"]["disable_warning_days"],
-            '$CONFIG["expiry"]["disable_warning_days"]',
-        );
         $idlelock_warning_days = $CONFIG["expiry"]["idlelock_warning_days"];
         $idlelock_day = $CONFIG["expiry"]["idlelock_day"];
         $disable_warning_days = $CONFIG["expiry"]["disable_warning_days"];
         $disable_day = $CONFIG["expiry"]["disable_day"];
+        self::assertArrayIsMonotonicallyIncreasing(
+            $idlelock_warning_days,
+            '$CONFIG["expiry"]["idlelock_warning_days"]',
+        );
+        self::assertArrayIsMonotonicallyIncreasing(
+            $disable_warning_days,
+            '$CONFIG["expiry"]["disable_warning_days"]',
+        );
         $final_disable_warning_day = _array_last($disable_warning_days);
         $final_idlelock_warning_day = _array_last($idlelock_warning_days);
         assert(
