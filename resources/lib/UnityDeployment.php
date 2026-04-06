@@ -42,20 +42,18 @@ class UnityDeployment
     }
 
     /** @param mixed[] $x */
-    private static function validateAllValuesAreInts(array $x, string $name): void
+    private static function assertAllValuesAreInts(array $x, string $name): void
     {
         foreach ($x as $value) {
-            if (!is_int($value)) {
-                throw new InvalidConfigurationException("all values of $name must be integers");
-            }
+            assert(is_int($value), "all values of $name must be integers");
         }
     }
 
     /** @param mixed[] $x */
-    private static function validateArrayIsMonotonicallyIncreasing(array $x, string $name): void
+    private static function assertArrayIsMonotonicallyIncreasing(array $x, string $name): void
     {
-        self::validateArrayNotEmpty($x, $name);
-        self::validateAllValuesAreInts($x, $name);
+        self::assertArrayNotEmpty($x, $name);
+        self::assertAllValuesAreInts($x, $name);
         if (count($x) === 1) {
             return;
         }
@@ -63,9 +61,7 @@ class UnityDeployment
         $last_value = array_shift($remaining_values);
         while (count($remaining_values)) {
             $this_value = array_shift($remaining_values);
-            if ($this_value < $last_value) {
-                throw new InvalidConfigurationException("$name must be monotonically increasing");
-            }
+            assert($this_value >= $last_value, "$name must be monotonically increasing");
             $last_value = $this_value;
         }
     }
@@ -73,18 +69,22 @@ class UnityDeployment
     /** @param mixed[] $CONFIG */
     private static function validateConfig(array $CONFIG): void
     {
-        self::validateExpiryConfig($CONFIG);
-        self::validateSmtpConfig($CONFIG);
+        try {
+            self::validateExpiryConfig($CONFIG);
+            self::validateSmtpConfig($CONFIG);
+        } catch (AssertionError $e) {
+            throw new InvalidConfigurationException(previous: $e);
+        }
     }
 
     /** @param mixed[] $CONFIG */
     private static function validateExpiryConfig(array $CONFIG): void
     {
-        self::validateArrayIsMonotonicallyIncreasing(
+        self::assertArrayIsMonotonicallyIncreasing(
             $CONFIG["expiry"]["idlelock_warning_days"],
             '$CONFIG["expiry"]["idlelock_warning_days"]',
         );
-        self::validateArrayIsMonotonicallyIncreasing(
+        self::assertArrayIsMonotonicallyIncreasing(
             $CONFIG["expiry"]["disable_warning_days"],
             '$CONFIG["expiry"]["disable_warning_days"]',
         );
@@ -94,67 +94,51 @@ class UnityDeployment
         $disable_day = $CONFIG["expiry"]["disable_day"];
         $final_disable_warning_day = _array_last($disable_warning_days);
         $final_idlelock_warning_day = _array_last($idlelock_warning_days);
-        if ($disable_day <= $final_disable_warning_day) {
-            throw new InvalidConfigurationException(
-                "disable day must be greater than the last disable warning day",
-            );
-        }
-        if ($idlelock_day <= $final_idlelock_warning_day) {
-            throw new InvalidConfigurationException(
-                "idlelock day must be greater than the last idlelock warning day",
-            );
-        }
-        if ($disable_day <= $idlelock_day) {
-            throw new InvalidConfigurationException(
-                "disable day must be greater than idlelock day",
-            );
-        }
+        assert(
+            $disable_day > $final_disable_warning_day,
+            "disable day must be greater than the last disable warning day",
+        );
+        assert(
+            $idlelock_day > $final_idlelock_warning_day,
+            "idlelock day must be greater than the last idlelock warning day",
+        );
+        assert($disable_day > $idlelock_day, "disable day must be greater than idlelock day");
     }
 
     /** @param mixed[] $CONFIG */
     private static function validateSmtpConfig(array $CONFIG): void
     {
-        self::validateStringNotEmpty($CONFIG["smtp"]["host"], '$CONFIG["smtp"]["host"]');
-        self::validateStringNotEmpty($CONFIG["smtp"]["port"], '$CONFIG["smtp"]["port"]');
-        self::validateOneOf($CONFIG["smtp"]["security"], '$CONFIG["smtp"]["security"]', [
+        self::assertStringNotEmpty($CONFIG["smtp"]["host"], '$CONFIG["smtp"]["host"]');
+        self::assertStringNotEmpty($CONFIG["smtp"]["port"], '$CONFIG["smtp"]["port"]');
+        self::assertOneOf($CONFIG["smtp"]["security"], '$CONFIG["smtp"]["security"]', [
             "",
             "tls",
             "ssl",
         ]);
-        self::validateIsBool($CONFIG["smtp"]["ssl_verify"], '$CONFIG["smtp"]["ssl_verify"]');
+        self::assertIsBool($CONFIG["smtp"]["ssl_verify"], '$CONFIG["smtp"]["ssl_verify"]');
     }
 
     /** @param mixed[] $x */
-    private static function validateArrayNotEmpty(array $x, string $name): void
+    private static function assertArrayNotEmpty(array $x, string $name): void
     {
-        if (count($x) === 0) {
-            throw new InvalidConfigurationException("$name must not be empty");
-        }
+        assert(count($x) > 0, "$name must not be empty");
     }
 
-    private static function validateStringNotEmpty(string $x, string $name): void
+    private static function assertStringNotEmpty(string $x, string $name): void
     {
-        if (empty($x)) {
-            throw new InvalidConfigurationException("$name must not be empty");
-        }
+        assert(!empty($x), "$name must not be empty");
     }
 
-    private static function validateIsBool(mixed $x, string $name): void
+    private static function assertIsBool(mixed $x, string $name): void
     {
-        if (!is_bool($x)) {
-            throw new InvalidConfigurationException("$name must be a boolean");
-        }
+        assert(is_bool($x), "$name must be a boolean");
     }
 
     /** @param mixed[] $options */
-    private static function validateOneOf(string $x, string $name, array $options): void
+    private static function assertOneOf(string $x, string $name, array $options): void
     {
-        foreach ($options as $option) {
-            if ($x === $option) {
-                return;
-            }
-        }
-        throw new InvalidConfigurationException(
+        assert(
+            in_array($x, $options, true),
             sprintf("%s must be one of %s", $name, _json_encode($options)),
         );
     }
