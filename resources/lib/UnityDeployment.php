@@ -198,6 +198,7 @@ class UnityDeployment
                     try {
                         assert(count($row) === 2);
                         assert(is_string($row[1]));
+                        assert(ctype_digit($row[1]));
                     } catch (AssertionError $e) {
                         throw new \Exception("bad ID mapping $filename row $i", previous: $e);
                     }
