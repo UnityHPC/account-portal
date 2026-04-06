@@ -177,7 +177,11 @@ class UnityDeployment
     public static function getCustomIDMappings(): array
     {
         $output = [];
-        $dir = new \DirectoryIterator(self::getCustomIDMappingsDirPath());
+        $dir_path = __DIR__ . "/../../" . CONFIG["ldap"]["custom_user_mappings_dir"];
+        if (!is_dir($dir_path)) {
+            throw new \Exception("custom_user_mappings directory '$dir_path' is not a directory");
+        }
+        $dir = new \DirectoryIterator($dir_path);
         foreach ($dir as $fileinfo) {
             $filename = $fileinfo->getFilename();
             if ($fileinfo->isDot()) {
@@ -205,15 +209,5 @@ class UnityDeployment
             }
         }
         return $output;
-    }
-
-    private static function getCustomIDMappingsDirPath(): string
-    {
-        $output = __DIR__ . "/../../" . CONFIG["ldap"]["custom_user_mappings_dir"];
-        if (is_dir($output)) {
-            return $output;
-        } else {
-            throw new \Exception("custom_user_mappings directory '$output' is not a directory");
-        }
     }
 }
