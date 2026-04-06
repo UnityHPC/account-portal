@@ -72,10 +72,10 @@ class UnityConfig
     /** @param mixed[] $CONFIG */
     public static function validateConfig(array $CONFIG): void
     {
-        $idlelock_warning_days = CONFIG["expiry"]["idlelock_warning_days"];
-        $idlelock_day = CONFIG["expiry"]["idlelock_day"];
-        $disable_warning_days = CONFIG["expiry"]["disable_warning_days"];
-        $disable_day = CONFIG["expiry"]["disable_day"];
+        $idlelock_warning_days = $CONFIG["expiry"]["idlelock_warning_days"];
+        $idlelock_day = $CONFIG["expiry"]["idlelock_day"];
+        $disable_warning_days = $CONFIG["expiry"]["disable_warning_days"];
+        $disable_day = $CONFIG["expiry"]["disable_day"];
         if (count($idlelock_warning_days) === 0) {
             throw new InvalidConfigurationException(
                 '$CONFIG["expiry"]["idlelock_warning_days"] must not be empty!',
