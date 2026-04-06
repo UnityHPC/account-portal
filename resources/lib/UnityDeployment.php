@@ -74,6 +74,9 @@ class UnityDeployment
         if (ini_get("zend.assertions") !== "1") {
             throw new InvalidConfigurationException("zend.assertions must be set to 1");
         }
+        if (ini_get("assert.exception") !== "1") {
+            throw new InvalidConfigurationException("assert.exception must be set to 1");
+        }
         try {
             self::validateExpiryConfig($CONFIG);
             self::validateSmtpConfig($CONFIG);
