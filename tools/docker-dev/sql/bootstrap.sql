@@ -34,7 +34,7 @@ CREATE TABLE `audit_log` (
   `operator` varchar(128) NOT NULL,
   `operator_ip` varchar(15) NOT NULL,
   `action_type` varchar(768) NOT NULL,
-  `recipient` varchar(128) NOT NULL
+  `recipient` varchar(768) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------

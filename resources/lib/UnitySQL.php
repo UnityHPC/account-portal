@@ -15,6 +15,7 @@ class UnitySQL
     private const string TABLE_USER_LAST_LOGINS = "user_last_logins";
     // FIXME this string should be changed to something more intuitive, requires production change
     public const string REQUEST_BECOME_PI = "admin";
+    private const int TABLE_AUDIT_LOG_RECIPIENT_MAX_STR_LEN = 768;
 
     private PDO $conn;
 
@@ -143,6 +144,10 @@ class UnitySQL
 
     public function addLog(string $action_type, string $recipient): void
     {
+        if (strlen($recipient) > self::TABLE_AUDIT_LOG_RECIPIENT_MAX_STR_LEN) {
+            UnityHTTPD::errorLog("warning", "audit log recipient truncated", data: $recipient);
+            $recipient = substr($recipient, 0, self::TABLE_AUDIT_LOG_RECIPIENT_MAX_STR_LEN);
+        }
         $table = self::TABLE_AUDIT_LOG;
         $stmt = $this->conn->prepare(
             "INSERT INTO $table (operator, operator_ip, action_type, recipient)

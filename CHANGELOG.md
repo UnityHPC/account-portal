@@ -10,6 +10,7 @@ For details on the changes in each release, see [the Releases page](https://gith
 - the `mail_overrides` directory has been renamed to `mail`
 - the `templates_overrides` directory has been renamed to `templates`
 - the `overrides` directory has been renamed to `domain_overrides`
+- the size of the `recipient` column in the `audit_log` SQL table should be increased from 128 to 768
 
 ### 1.6 -> 1.7
 
