@@ -244,6 +244,16 @@ function _preg_match(
     return $output;
 }
 
+/** @return list<list<int|string>|string> */
+function _preg_split(string $pattern, string $subject, int $limit = -1, int $flags = 0): array
+{
+    $output = preg_split($pattern, $subject, limit: $limit, flags: $flags);
+    if (is_bool($output)) {
+        throw new Exception("preg_split returned bool!");
+    }
+    return $output;
+}
+
 /**
  * @return mixed[]
  * @throws Exception
