@@ -377,6 +377,7 @@ echo "</form></div>";
     }
 
     .delete-key-button {
+        display: flex; /* using flex inside button allows the X image to be centered */
         align-items: center;
         justify-content: center;
         width: 32px;
@@ -385,12 +386,9 @@ echo "</form></div>";
     }
 
     .delete-key-span {
-        display: inline-block;
         width: 16px;
         height: 16px;
         background-color: white;
-        mask-repeat: no-repeat;
-        mask-position: center;
         mask-size: contain;
     }
 </style>
