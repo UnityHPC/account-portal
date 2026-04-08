@@ -152,4 +152,24 @@ class UtilsTest extends UnityWebPortalTestCase
     {
         $this->assertEquals(shortenString(...$input_args), $expected_output);
     }
+
+    public static function getSSHKeyInfoProvider()
+    {
+        return [
+            [
+                "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLeHpW10CCamJtXNXJui49WM07wRnQbQTbQ2MSvF4j8vBpBuAbjiEp14qERLDs3FoWdpbiUwL9mZq6PmUSxaTnk= simon",
+                "256 SHA256:Z2QFHGXOzouw35V/rrjTim+WYxs0e+QZY9rnd0DSBuo simon (ecdsa-sha2-nistp256)",
+            ],
+            [
+                "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLeHpW10CCamJtXNXJui49WM07wRnQbQTbQ2MSvF4j8vBpBuAbjiEp14qERLDs3FoWdpbiUwL9mZq6PmUSxaTnk=",
+                "256 SHA256:Z2QFHGXOzouw35V/rrjTim+WYxs0e+QZY9rnd0DSBuo (ecdsa-sha2-nistp256)",
+            ],
+        ];
+    }
+
+    #[DataProvider("getSSHKeyInfoProvider")]
+    public function testGetSSHKeyInfo(string $key, string $expected)
+    {
+        $this->assertEquals($expected, getSSHKeyInfo($key));
+    }
 }
