@@ -55,12 +55,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     continue;
                 }
                 $key_info = getSSHKeyInfo($key);
-                $description = "type={$key_info['type']} sha256_fingerprint={$key_info['fingerprint']}";
                 $keyWasAdded = $USER->addSSHKey($key);
                 if ($keyWasAdded) {
-                    UnityHTTPD::messageSuccess("SSH Key Added", $description);
+                    UnityHTTPD::messageSuccess("SSH Key Added", $key_info);
                 } else {
-                    UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $description);
+                    UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $key_info);
                 }
             }
             UnityHTTPD::redirect();
@@ -74,8 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 UnityHTTPD::redirect();
             }
             $key_info = getSSHKeyInfo($key);
-            $description = "type={$key_info['type']} sha256_fingerprint={$key_info['fingerprint']}";
-            UnityHTTPD::messageSuccess("SSH Key Removed", $description);
+            UnityHTTPD::messageSuccess("SSH Key Removed", $key_info);
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "loginshell":
