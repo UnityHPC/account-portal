@@ -131,6 +131,7 @@ rsync -a "$prod/deployment/overrides/" ./deployment/overrides/
 rsync -a "$prod/webroot/assets/footer_logos/" ./footer_logos/
 rsync -a "$prod/deployment/mail/" ./deployment/mail/
 rsync -a "$prod/deployment/templates/" ./deployment/templates/
+"$new/workers/configtest.php"
 rm "$prod" && ln -s "$PWD" "$prod"
 ```
 
