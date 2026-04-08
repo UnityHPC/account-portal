@@ -252,6 +252,8 @@ class UnityUser
             return false;
         }
         $this->setSSHKeys(array_merge($this->getSSHKeys(), [$key]), $send_mail);
+        $key_info = getSSHKeyInfo($key);
+        $this->SQL->addLog("sshkey_added", _json_encode(["uid" => $this->uid, "key" => $key_info]));
         return true;
     }
 
@@ -269,6 +271,11 @@ class UnityUser
         }
         $keys_after = array_values($keys_after); // reindex
         $this->setSSHKeys($keys_after, $send_mail);
+        $key_info = getSSHKeyInfo($key);
+        $this->SQL->addLog(
+            "sshkey_removed",
+            _json_encode(["uid" => $this->uid, "key" => $key_info]),
+        );
     }
 
     /**
@@ -281,7 +288,6 @@ class UnityUser
         // do not use $this->setAttribute because it writes too much data to audit log
         // TODO use fingerprints?
         $this->entry->setAttribute("sshpublickey", $keys);
-        $this->SQL->addLog("sshkey_modify", $this->uid);
         if ($send_mail) {
             $this->MAILER->sendMail($this->getMail(), "user_sshkey", [
                 "keys" => $this->getSSHKeys(),
