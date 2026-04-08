@@ -17,7 +17,6 @@ function tokenizeSSHKey(string $key): array
     $matches = [];
     try {
         _preg_match("/^(\S+)\s+(\S+)\s*(\S?.*?)$/", $key, $matches);
-        assert(is_string($matches[0]) && is_string($matches[1]) && is_string($matches[2]));
         return [$matches[1], $matches[2], $matches[3]];
     } catch (\Throwable $e) {
         throw new \ValueError("invalid SSH key: $key", previous: $e);
