@@ -245,9 +245,10 @@ if (count($sshPubKeys) == 0) {
 }
 
 foreach ($sshPubKeys as $key) {
-    echo
-    "<div class='key-box'>
-        <textarea spellcheck='false' readonly aria-label='key box'>$key</textarea>
+    $key_info = getSSHKeyInfo($key);
+    echo"
+        <div class='ssh-key'>
+            <span>$key_info</span>
         <form
             action=''
             onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
@@ -257,9 +258,12 @@ foreach ($sshPubKeys as $key) {
             $CSRFTokenHiddenFormInput
             <input type='hidden' name='delKey' value='$key' />
             <input type='hidden' name='form_type' value='delKey' />
-            <input type='submit' value='&times;' />
+                <button type='submit' class='iconBtn delete-key-button' aria-label='Delete Key'>
+                    <span class='delete-key-span icon-x' aria-hidden='true'></span>
+                </button>
         </form>
-    </div>";
+        </div>
+    ";
 }
 
 echo "
@@ -354,31 +358,36 @@ echo "</form></div>";
 </script>
 
 <style>
-    .key-box {
-        position: relative;
-        width: auto;
-        height: auto;
-        max-width: 700px;
+    .ssh-key {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
     }
 
-    .key-box input[type=submit] {
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        padding: 5px;
-        width: 32px;
-        border-radius: 0 3px 3px 0;
-        font-size: 20pt;
-        margin: 0;
-    }
-
-    .key-box textarea {
+    .ssh-key > span {
+        display: inline-block;
         word-wrap: break-word;
         word-break: break-all;
-        width: calc(100% - 44px);
-        border-radius: 3px 0 0 3px;
         font-family: monospace;
+    }
+
+    .delete-key-button {
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+    }
+
+    .delete-key-span {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        background-color: white;
+        mask-repeat: no-repeat;
+        mask-position: center;
+        mask-size: contain;
     }
 </style>
 
