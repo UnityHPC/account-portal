@@ -1,5 +1,6 @@
 <?php
 
+use UnityWebPortal\lib\UnityUserDisabledReason;
 use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnityHTTPD;
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
@@ -122,7 +123,7 @@ class ExpiryGuiTest extends UnityWebPortalTestCase
             callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, strtotime("-8 days"));
             $this->assertIdleDays(8);
             $USER->setFlag(UserFlag::IDLELOCKED, true);
-            $USER->disable();
+            $USER->disable(UnityUserDisabledReason::DisabledSelf);
             session_write_close();
             $this->http_get(__DIR__ . "/../../resources/init.php");
             $this->assertNumberOfMessages(0);

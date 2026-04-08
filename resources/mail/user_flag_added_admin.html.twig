@@ -8,6 +8,13 @@
 {% do setSubject('User Disabled') %}
 <p>Hello,</p>
 <p>User "{{ user }}" has been disabled. </p>
+{% if why == constant('UnityWebPortal\\lib\\UnityUserDisabledReason::DisabledSelf') %}
+<p>The user disabled themself.</p>
+{% elseif why == constant('UnityWebPortal\\lib\\UnityUserDisabledReason::Expired') %}
+<p>The user expired.</p>
+{% else %}
+{% do errorLog('warning', 'unexpected disabled reason', data: why) %}
+{% endif %}
 
 {% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::LOCKED') %}
 {% do setSubject('User Locked') %}

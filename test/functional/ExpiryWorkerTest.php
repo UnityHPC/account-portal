@@ -309,25 +309,7 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
             $disable_day = CONFIG["expiry"]["disable_day"];
             $this->assertEquals(8, $disable_day);
             $output = $this->runExpiryWorker(idle_days: 8);
-            $this->assertEquals(
-                sprintf(
-                    "disabling user '%s'\nsending %s email to %s with data %s",
-                    $member->uid,
-                    "group_user_disabled_owner",
-                    _json_encode([
-                        $pi_group->addPlusAddressToMail($manager->getMail()),
-                        $owner->getMail(),
-                    ]),
-                    _json_encode([
-                        "group" => $pi_group->gid,
-                        "user" => $member->uid,
-                        "org" => $member->getOrg(),
-                        "name" => $member->getFullname(),
-                        "email" => $member->getMail(),
-                    ]),
-                ),
-                $output,
-            );
+            $this->assertEquals("disabling user '$member->uid'", $output);
         } finally {
             if ($pi_group->memberUIDExists($member->uid)) {
                 $pi_group->removeMemberUID($member->uid);

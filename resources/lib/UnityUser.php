@@ -6,6 +6,12 @@ use PHPOpenLDAPer\LDAPEntry;
 use Exception;
 use UnityWebPortal\lib\exceptions\ArrayKeyException;
 
+enum UnityUserDisabledReason: string
+{
+    case DisabledSelf = "DisabledSelf";
+    case Expired = "Expired";
+}
+
 class UnityUser
 {
     private const HOME_DIR = "/home/";
@@ -90,6 +96,7 @@ class UnityUser
         bool $newValue,
         bool $doSendMail = true,
         bool $doSendMailAdmin = true,
+        mixed $why = null,
     ): void {
         $oldValue = $this->getFlag($flag);
         if ($oldValue == $newValue) {
@@ -105,12 +112,14 @@ class UnityUser
                 $this->MAILER->sendMail($this->getMail(), "user_flag_added", [
                     "user" => $this->uid,
                     "flag" => $flag,
+                    "why" => $why,
                 ]);
             }
             if ($doSendMailAdmin) {
                 $this->MAILER->sendMail("admin", "user_flag_added_admin", [
                     "user" => $this->uid,
                     "flag" => $flag,
+                    "why" => $why,
                 ]);
             }
         } else {
@@ -119,12 +128,14 @@ class UnityUser
                 $this->MAILER->sendMail($this->getMail(), "user_flag_removed", [
                     "user" => $this->uid,
                     "flag" => $flag,
+                    "why" => $why,
                 ]);
             }
             if ($doSendMailAdmin) {
                 $this->MAILER->sendMail("admin", "user_flag_removed_admin", [
                     "user" => $this->uid,
                     "flag" => $flag,
+                    "why" => $why,
                 ]);
             }
         }
@@ -384,6 +395,7 @@ class UnityUser
     }
 
     public function disable(
+        UnityUserDisabledReason $why,
         bool $send_mail = true,
         bool $send_mail_pi_group_owner = true,
         bool $send_mail_admin = true,
@@ -394,7 +406,7 @@ class UnityUser
         }
         foreach ($this->LDAP->getNonDisabledPIGroupGIDsWithMemberUID($this->uid) as $gid) {
             $group = new UnityGroup($gid, $this->LDAP, $this->SQL, $this->MAILER);
-            $group->removeUser($this, $send_mail_pi_group_owner);
+            $group->removeUser($this, $why, send_mail: $send_mail_pi_group_owner);
         }
         $this->entry->removeAttribute("sshPublicKey");
         $this->setFlag(
@@ -402,6 +414,7 @@ class UnityUser
             true,
             doSendMail: $send_mail,
             doSendMailAdmin: $send_mail_admin,
+            why: $why,
         );
     }
 

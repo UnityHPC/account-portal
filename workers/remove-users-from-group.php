@@ -2,6 +2,7 @@
 <?php
 include __DIR__ . "/init.php";
 use Garden\Cli\Cli;
+use UnityWebPortal\lib\UnityGroupUserRemovedReason;
 use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UnityGroup;
 
@@ -26,7 +27,7 @@ try {
             print "Skipping '$uid' who doesn't appear to be in '$gid'\n";
             continue;
         }
-        $group->removeUser($user);
+        $group->removeUser($user, UnityGroupUserRemovedReason::RemovedByAdmin);
     }
 } finally {
     _fclose($handle);

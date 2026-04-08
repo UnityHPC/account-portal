@@ -2,6 +2,7 @@
 
 require_once __DIR__ . "/../../resources/autoload.php";
 
+use UnityWebPortal\lib\UnityGroupUserRemovedReason;
 use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UnityHTTPD;
 use UnityWebPortal\lib\UnityGroup;
@@ -52,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         case "remUser":
             $form_user = $getUserFromPost();
             // remove user button clicked
-            $group->removeUser($form_user);
+            $group->removeUser($form_user, UnityGroupUserRemovedReason::RemovedByOwner);
             UnityHTTPD::messageSuccess("User Removed", "");
             // group manager removed themself
             if ($USER->uid === $form_user->uid) {

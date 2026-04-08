@@ -2,6 +2,7 @@
 
 require_once __DIR__ . "/../../resources/autoload.php";
 
+use UnityWebPortal\lib\UnityGroupUserRemovedReason;
 use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UnityGroup;
 use UnityWebPortal\lib\UnityHTTPD;
@@ -42,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         case "remUserChild":
             $form_user = $getUserFromPost();
             $parent = new UnityGroup($_POST["pi"], $LDAP, $SQL, $MAILER);
-            $parent->removeUser($form_user);
+            $parent->removeUser($form_user, UnityGroupUserRemovedReason::RemovedByAdmin);
             break;
         case "disable":
             $group = new UnityGroup(UnityHTTPD::getPostData("pi"), $LDAP, $SQL, $MAILER);

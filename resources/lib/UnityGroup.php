@@ -5,6 +5,13 @@ namespace UnityWebPortal\lib;
 use Exception;
 use UnityWebPortal\lib\exceptions\EntryNotFoundException;
 
+enum UnityGroupUserRemovedReason: string
+{
+    case RemovedByAdmin = "RemovedByAdmin";
+    case RemovedByOwner = "RemovedByOwner";
+    case RemovedSelf = "RemovedSelf";
+}
+
 /**
  * Class that represents a single PI group in the Unity HPC Platform.
  */
@@ -235,8 +242,11 @@ class UnityGroup extends PosixGroup
         }
     }
 
-    public function removeUser(UnityUser $new_user, bool $send_mail = true): void
-    {
+    public function removeUser(
+        UnityUser $new_user,
+        UnityGroupUserRemovedReason|UnityUserDisabledReason $why,
+        bool $send_mail = true,
+    ): void {
         if (!$this->memberUIDExists($new_user->uid)) {
             return;
         }
@@ -251,6 +261,7 @@ class UnityGroup extends PosixGroup
         if ($send_mail) {
             $this->MAILER->sendMail($new_user->getMail(), "group_user_removed", [
                 "group" => $this->gid,
+                "why" => $why,
             ]);
             $this->MAILER->sendMail(
                 $this->getOwnerMailAndPlusAddressedManagerMails(),
@@ -261,6 +272,7 @@ class UnityGroup extends PosixGroup
                     "name" => $new_user->getFullName(),
                     "email" => $new_user->getMail(),
                     "org" => $new_user->getOrg(),
+                    "why" => $why,
                 ],
             );
         }

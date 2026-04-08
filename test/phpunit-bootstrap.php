@@ -36,6 +36,7 @@ use UnityWebPortal\lib\UnitySQL;
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use PHPUnit\Framework\TestCase;
 use TRegx\PhpUnit\DataProviders\DataProvider as TRegxDataProvider;
+use UnityWebPortal\lib\UnityGroupUserRemovedReason;
 
 $_SERVER["HTTP_HOST"] = "phpunit"; // used for config override
 require_once __DIR__ . "/../resources/config.php";
@@ -167,7 +168,7 @@ function ensureUserNotInPIGroup(UnityGroup $pi_group)
 {
     global $USER;
     if ($pi_group->memberUIDExists($USER->uid)) {
-        $pi_group->removeUser($USER);
+        $pi_group->removeUser($USER, UnityGroupUserRemovedReason::RemovedSelf);
         assert(!$pi_group->memberUIDExists($USER->uid));
     }
 }

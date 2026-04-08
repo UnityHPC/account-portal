@@ -1,6 +1,7 @@
 <?php
 
 use UnityWebPortal\lib\UserFlag;
+use UnityWebPortal\lib\UnityGroupUserRemovedReason;
 
 class WorkerUpdateQualifiedUsersGroupTest extends UnityWebPortalTestCase
 {
@@ -28,7 +29,7 @@ class WorkerUpdateQualifiedUsersGroupTest extends UnityWebPortalTestCase
             $this->assertTrue($user->getFlag(UserFlag::QUALIFIED));
         } finally {
             if ($pi_group->memberUIDExists($user->uid)) {
-                $pi_group->removeUser($user);
+                $pi_group->removeUser($user, UnityGroupUserRemovedReason::RemovedSelf);
             }
             $this->assertFalse($user->getFlag(UserFlag::QUALIFIED));
         }
