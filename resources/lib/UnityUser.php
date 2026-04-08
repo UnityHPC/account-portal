@@ -130,6 +130,26 @@ class UnityUser
         }
     }
 
+    private function setAttribute(string $attribute_name, mixed $attribute_value): void
+    {
+        assert($this->entry->exists());
+        $before = $this->entry->getAttribute($attribute_name);
+        $after = (array) $attribute_value;
+        if ($before === $after) {
+            return;
+        }
+        $this->entry->setAttribute($attribute_name, $attribute_value);
+        $this->SQL->addLog(
+            "attribute_changed",
+            _json_encode([
+                "uid" => $this->uid,
+                "attribute" => $attribute_name,
+                "before" => $before,
+                "after" => $attribute_value,
+            ]),
+        );
+    }
+
     /**
      * Returns the ldap group entry corresponding to the user
      */
@@ -145,7 +165,7 @@ class UnityUser
 
     public function setOrg(string $org): void
     {
-        $this->entry->setAttribute("o", $org);
+        $this->setAttribute("o", $org);
     }
 
     public function getOrg(): string
@@ -159,8 +179,7 @@ class UnityUser
      */
     public function setFirstname(string $firstname): void
     {
-        $this->entry->setAttribute("givenname", $firstname);
-        $this->SQL->addLog("firstname_changed", $this->uid);
+        $this->setAttribute("givenName", $firstname);
     }
 
     /**
@@ -177,8 +196,7 @@ class UnityUser
      */
     public function setLastname(string $lastname): void
     {
-        $this->entry->setAttribute("sn", $lastname);
-        $this->SQL->addLog("lastname_changed", $this->uid);
+        $this->setAttribute("sn", $lastname);
     }
 
     /**
@@ -201,8 +219,7 @@ class UnityUser
      */
     public function setMail(string $email): void
     {
-        $this->entry->setAttribute("mail", $email);
-        $this->SQL->addLog("email_changed", $this->uid);
+        $this->setAttribute("mail", $email);
     }
 
     /**
@@ -250,6 +267,8 @@ class UnityUser
     private function setSSHKeys(array $keys, bool $send_mail = true): void
     {
         assert($this->entry->exists());
+        // do not use $this->setAttribute because it writes too much data to audit log
+        // TODO use fingerprints?
         $this->entry->setAttribute("sshpublickey", $keys);
         $this->SQL->addLog("sshkey_modify", $this->uid);
         if ($send_mail) {
@@ -266,7 +285,7 @@ class UnityUser
     public function getSSHKeys(): array
     {
         $this->entry->ensureExists();
-        $result = $this->entry->getAttribute("sshpublickey");
+        $result = $this->entry->getAttribute("sshPublicKey");
         return $result;
     }
 
@@ -298,9 +317,7 @@ class UnityUser
         if (empty($shell)) {
             throw new Exception("login shell must not be empty!");
         }
-        assert($this->entry->exists());
-        $this->entry->setAttribute("loginshell", $shell);
-        $this->SQL->addLog("loginshell_changed", $this->uid);
+        $this->setAttribute("loginShell", $shell);
         if ($send_mail) {
             $this->MAILER->sendMail($this->getMail(), "user_loginshell", [
                 "new_shell" => $this->getLoginShell(),
@@ -319,9 +336,7 @@ class UnityUser
 
     public function setHomeDir(string $home): void
     {
-        assert($this->entry->exists());
-        $this->entry->setAttribute("homedirectory", $home);
-        $this->SQL->addLog("homedir_changed", $this->uid);
+        $this->setAttribute("homeDirectory", $home);
     }
 
     /**

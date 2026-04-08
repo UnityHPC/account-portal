@@ -86,7 +86,13 @@ if (isset($_SERVER["REMOTE_USER"])) {
 
     $USER->updateIsQualified(); // in case manual changes have been made to PI groups
 
-    if ($OPERATOR == $USER && !$USER->getFlag(UserFlag::DISABLED)) {
+    // $OPERATOR can be != $USER if an admin is logged in as another user
+    if ($USER->exists() && $OPERATOR == $USER && !$USER->getFlag(UserFlag::DISABLED)) {
+        // check if contact info sent by home institution has changed
+        $USER->setFirstname($SSO["firstname"]);
+        $USER->setLastname($SSO["lastname"]);
+        $USER->setMail($SSO["mail"]);
+        // remove idle-lock if exists
         if ($USER->getFlag(UserFlag::IDLELOCKED)) {
             $USER->setFlag(UserFlag::IDLELOCKED, false);
             UnityHTTPD::messageSuccess(
