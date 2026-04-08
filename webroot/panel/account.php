@@ -48,17 +48,18 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             }
             $keys = array_map("trim", $keys);
             foreach ($keys as $key) {
-                $fingerprint = "sha256 fingerprint: " . getSSHKeyFingerprint($key);
+                $key_info = getSSHKeyInfo($key);
+                $description = "type={$key_info['type']} sha256_fingerprint={$key_info['fingerprint']}";
                 [$is_valid, $explanation] = testValidSSHKey($key);
                 if (!$is_valid) {
-                    UnityHTTPD::messageError("SSH Key Not Added: $explanation", $fingerprint);
+                    UnityHTTPD::messageError("SSH Key Not Added: $explanation", $description);
                     continue;
                 }
                 $keyWasAdded = $USER->addSSHKey($key);
                 if ($keyWasAdded) {
-                    UnityHTTPD::messageSuccess("SSH Key Added", $fingerprint);
+                    UnityHTTPD::messageSuccess("SSH Key Added", $description);
                 } else {
-                    UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $fingerprint);
+                    UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $description);
                 }
             }
             UnityHTTPD::redirect();
@@ -71,8 +72,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 UnityHTTPD::messageError("Cannot Remove SSH Key", "Key not found");
                 UnityHTTPD::redirect();
             }
-            $fingerprint = "sha256 fingerprint: " . getSSHKeyFingerprint($key);
-            UnityHTTPD::messageSuccess("SSH Key Removed", $fingerprint);
+            $key_info = getSSHKeyInfo($key);
+            $description = "type={$key_info['type']} sha256_fingerprint={$key_info['fingerprint']}";
+            UnityHTTPD::messageSuccess("SSH Key Removed", $description);
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "loginshell":

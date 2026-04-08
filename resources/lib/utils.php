@@ -58,10 +58,13 @@ function testValidSSHKey(string $key): array
     }
 }
 
-function getSSHKeyFingerprint(string $key): string
+/** @return array{fingerprint: string, type: string} */
+function getSSHKeyInfo(string $key): array
 {
     $pubkey = PublicKeyLoader::loadPublicKey($key);
-    return $pubkey->getFingerprint("sha256");
+    $type = _preg_split("/\s+/", $key)[0];
+    $fingerprint = (string) $pubkey->getFingerprint("sha256");
+    return ["type" => $type, "fingerprint" => $fingerprint];
 }
 
 /**
