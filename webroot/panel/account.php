@@ -246,7 +246,14 @@ if (count($sshPubKeys) == 0) {
 
 echo "<table>\n";
 foreach ($sshPubKeys as $key) {
-    $key_info = getSSHKeyInfo($key);
+    try {
+        $key_info = htmlspecialchars(getSSHKeyInfo($key));
+    } catch (\Throwable $e) {
+        $errorid = uniqid();
+        UnityHTTPD::errorLog("error", "getSSHKeyInfo failed!", errorid: $errorid, error: $e, data: $key);
+        UnityHTTPD::messageError("Failed to Parse SSH Public Key", "correlation ID: $errorid");
+        continue;
+    }
     echo"
         <tr>
             <td><span class='ssh-key-info'>$key_info</span></td>
