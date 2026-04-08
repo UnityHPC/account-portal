@@ -62,8 +62,14 @@ function testValidSSHKey(string $key): array
 function getSSHKeyInfo(string $key): string
 {
     $pubkey = PublicKeyLoader::loadPublicKey($key);
-    /** @phpstan-ignore-next-line https://github.com/phpseclib/phpseclib/issues/2134 */
+    // phpseclib maintainer does not wish to include `getLength()` in the public key interface
+    // https://github.com/phpseclib/phpseclib/issues/2134
+    // > For RSA and EC that's the length of the modulo. For DSA an array is returned
+    /** @phpstan-ignore-next-line */
     $length = $pubkey->getLength();
+    if (is_array($length)) {
+        throw new Exception("unsupported key type, getLength() returned an array");
+    }
     $chunks = _preg_split("/\s+/", $key);
     $type = $chunks[0];
     $comment = implode(" ", array_slice($chunks, 2));
