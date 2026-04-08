@@ -43,9 +43,9 @@ class UpdateContactInfoTest extends UnityWebPortalTestCase
             $_SERVER["mail"] = "new mail";
             session_write_close();
             $this->http_get(__DIR__ . "/../../resources/init.php");
-            $this->assertNotEquals("new first name", $before[0]);
-            $this->assertNotEquals("new last name", $before[1]);
-            $this->assertNotEquals("new mail", $before[2]);
+            $this->assertEquals($before[0], $USER->getFirstname());
+            $this->assertEquals($before[1], $USER->getLastname());
+            $this->assertEquals($before[2], $USER->getMail());
         } finally {
             $USER->setFirstname($before[0]);
             $USER->setLastname($before[1]);
