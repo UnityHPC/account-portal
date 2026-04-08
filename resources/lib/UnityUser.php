@@ -134,7 +134,8 @@ class UnityUser
     {
         assert($this->entry->exists());
         $before = $this->entry->getAttribute($attribute_name);
-        if ($before === $attribute_value) {
+        $after = (array) $attribute_value;
+        if ($before === $after) {
             return;
         }
         $this->entry->setAttribute($attribute_name, $attribute_value);
