@@ -58,12 +58,18 @@ function testValidSSHKey(string $key): array
     }
 }
 
+/** @return string {key_length_bits} SHA256:{key_fingerprint} {optional_key_comment} ({key_type}) */
 function getSSHKeyInfo(string $key): string
 {
     $pubkey = PublicKeyLoader::loadPublicKey($key);
-    $type = _preg_split("/\s+/", $key)[0];
+    /** @phpstan-ignore-next-line https://github.com/phpseclib/phpseclib/issues/2134 */
+    $length = $pubkey->getLength();
+    $chunks = _preg_split("/\s+/", $key);
+    $type = $chunks[0];
+    $comment = implode(" ", array_slice($chunks, 2));
     $fingerprint = (string) $pubkey->getFingerprint("sha256");
-    return "$type sha256:$fingerprint";
+    // format copied from openssl: https://superuser.com/a/1634883
+    return "$length SHA256:$fingerprint $comment ($type)";
 }
 
 /**
