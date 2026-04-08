@@ -48,13 +48,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             }
             $keys = array_map("trim", $keys);
             foreach ($keys as $key) {
-                $key_info = getSSHKeyInfo($key);
-                $description = "type={$key_info['type']} sha256_fingerprint={$key_info['fingerprint']}";
                 [$is_valid, $explanation] = testValidSSHKey($key);
                 if (!$is_valid) {
-                    UnityHTTPD::messageError("SSH Key Not Added: $explanation", $description);
+                    $keyShort = shortenString($key, 10, 30);
+                    UnityHTTPD::messageError("SSH Key Not Added: $explanation", $keyShort);
                     continue;
                 }
+                $key_info = getSSHKeyInfo($key);
+                $description = "type={$key_info['type']} sha256_fingerprint={$key_info['fingerprint']}";
                 $keyWasAdded = $USER->addSSHKey($key);
                 if ($keyWasAdded) {
                     UnityHTTPD::messageSuccess("SSH Key Added", $description);
