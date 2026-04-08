@@ -137,15 +137,15 @@ echo "
     <h2>Account Details</h2>
     <table>
         <tr>
-            <td>Username</th>
+            <td>Username</td>
             <td><code>$uid</code></td>
         </tr>
         <tr>
-            <td>Organization</th>
+            <td>Organization</td>
             <td><code>$org</code></td>
         </tr>
         <tr>
-            <td>Email</th>
+            <td>Email</td>
             <td><code>$mail</code></td>
         </tr>
     </table>
@@ -244,27 +244,31 @@ if (count($sshPubKeys) == 0) {
     echo "<p>You do not have any SSH public keys, press the button below to add one.</p>";
 }
 
+echo "<table>\n";
 foreach ($sshPubKeys as $key) {
     $key_info = getSSHKeyInfo($key);
     echo"
-        <div class='ssh-key'>
-            <span>$key_info</span>
-        <form
-            action=''
-            onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
-            method='POST'
-            aria-label='delete key'
-        >
-            $CSRFTokenHiddenFormInput
-            <input type='hidden' name='delKey' value='$key' />
-            <input type='hidden' name='form_type' value='delKey' />
-                <button type='submit' class='iconBtn delete-key-button' aria-label='Delete Key'>
-                    <span class='delete-key-span icon-x' aria-hidden='true'></span>
-                </button>
-        </form>
-        </div>
+        <tr>
+            <td><span class='ssh-key-info'>$key_info</span></td>
+            <td>
+                <form
+                    action=''
+                    onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
+                    method='POST'
+                    aria-label='delete key'
+                >
+                    $CSRFTokenHiddenFormInput
+                    <input type='hidden' name='delKey' value='$key' />
+                    <input type='hidden' name='form_type' value='delKey' />
+                        <button type='submit' class='iconBtn delete-key-button' aria-label='Delete Key'>
+                            <span class='delete-key-span icon-x' aria-hidden='true'></span>
+                        </button>
+                </form>
+            </td>
+        </tr>
     ";
 }
+echo "</table>\n";
 
 echo "
     <button type='button' class='plusBtn btnAddKey'><span>&#43;</span></button>
@@ -358,14 +362,7 @@ echo "</form></div>";
 </script>
 
 <style>
-    .ssh-key {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-    }
-
-    .ssh-key > span {
+    .ssh-key-info {
         display: inline-block;
         word-wrap: break-word;
         word-break: break-all;
