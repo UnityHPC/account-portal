@@ -58,6 +58,12 @@ function testValidSSHKey(string $key): array
     }
 }
 
+function getSSHKeyFingerprint(string $key): string
+{
+    $pubkey = PublicKeyLoader::loadPublicKey($key);
+    return $pubkey->getFingerprint("sha256");
+}
+
 /**
  * @param int<1,max> $depth
  * @throws \JsonException
