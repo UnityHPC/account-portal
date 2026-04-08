@@ -91,19 +91,22 @@ class UtilsTest extends UnityWebPortalTestCase
         $this->assertEquals($expected, $is_valid);
     }
 
-    public static function sshKeyCommentProvider()
+    public static function tokenizeSSHKeyProvider()
     {
         return [
-            ["foo bar", "foo bar"],
-            ["foo bar baz", "foo bar"],
-            ["foo bar baz baz bam", "foo bar"],
+            ["foo bar", ["foo", "bar", ""]],
+            ["foo  bar", ["foo", "bar", ""]],
+            ["foo bar baz", ["foo", "bar", "baz"]],
+            ["foo bar  baz", ["foo", "bar", "baz"]],
+            ["foo bar baz baz bam", ["foo", "bar", "baz baz bam"]],
+            ["foo bar baz  baz bam", ["foo", "bar", "baz  baz bam"]],
         ];
     }
 
-    #[DataProvider("sshKeyCommentProvider")]
-    public function testRemoveSSHKeyOptionalCommentSuffix(string $input, string $expected_output)
+    #[DataProvider("tokenizeSSHKeyProvider")]
+    public function testTokenizeSSHKey(string $input, array $expected_output)
     {
-        $this->assertEquals(removeSSHKeyOptionalCommentSuffix($input), $expected_output);
+        $this->assertEquals($expected_output, tokenizeSSHKey($input));
     }
 
     public static function URLComponentProvider()

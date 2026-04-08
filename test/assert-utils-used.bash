@@ -13,7 +13,6 @@ declare -A utils=(
     ["intval"]="str2int"
     ["preg_replace"]="_preg_replace"
     ["preg_match"]="_preg_match"
-    ["preg_split"]="_preg_split"
     ["parse_ini_file"]="_parse_ini_file"
     ["fopen"]="_fopen"
     ["fclose"]="_fclose"

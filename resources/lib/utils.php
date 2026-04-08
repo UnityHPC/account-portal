@@ -10,15 +10,24 @@ use UnityWebPortal\lib\UnityDeployment;
 /**
  * key must take the form "KEY_TYPE KEY_DATA OPTIONAL_COMMENT"
  * @throws ValueError
+ * @return list{string, string, string} [key_type key_base64 optional_comment_suffix]
  */
-function removeSSHKeyOptionalCommentSuffix(string $key): string
+function tokenizeSSHKey(string $key): array
 {
     $matches = [];
-    if (preg_match("/^(\S+ \S+)/", $key, $matches)) {
-        return $matches[1];
-    } else {
-        throw new \ValueError("invalid SSH key: $key");
+    try {
+        _preg_match("/^(\S+)\s+(\S+)\s*(\S?.*?)$/", $key, $matches);
+        assert(is_string($matches[0]) && is_string($matches[1]) && is_string($matches[2]));
+        return [$matches[1], $matches[2], $matches[3]];
+    } catch (\Throwable $e) {
+        throw new \ValueError("invalid SSH key: $key", previous: $e);
     }
+}
+
+function removeSSHKeyOptionalCommentSuffix(string $key): string
+{
+    $tokenized = tokenizeSSHKey($key);
+    return "{$tokenized[0]} {$tokenized[1]}";
 }
 
 /**
@@ -70,12 +79,14 @@ function getSSHKeyInfo(string $key): string
     if (is_array($length)) {
         throw new Exception("unsupported key type, getLength() returned an array");
     }
-    $chunks = _preg_split("/\s+/", $key);
-    $type = $chunks[0];
-    $comment = implode(" ", array_slice($chunks, 2));
+    [$type, $_, $comment] = tokenizeSSHKey($key);
     $fingerprint = (string) $pubkey->getFingerprint("sha256");
     // format copied from openssl: https://superuser.com/a/1634883
-    return "$length SHA256:$fingerprint $comment ($type)";
+    if ($comment !== "") {
+        return "$length SHA256:$fingerprint $comment ($type)";
+    } else {
+        return "$length SHA256:$fingerprint ($type)";
+    }
 }
 
 /**
@@ -256,24 +267,6 @@ function _preg_match(
     }
     $matches = $clean_matches;
     return $output;
-}
-
-/** @return string[] */
-function _preg_split(string $pattern, string $subject, int $limit = -1, int $flags = 0): array
-{
-    $output_dirty = preg_split($pattern, $subject, limit: $limit, flags: $flags);
-    if (is_bool($output_dirty)) {
-        throw new Exception("preg_split returned bool!");
-    }
-    $output_clean = [];
-    foreach ($output_dirty as $i => $item) {
-        if (is_array($item)) {
-            throw new Exception("preg_split return value index $i is an array, not string!");
-        } else {
-            array_push($output_clean, $item);
-        }
-    }
-    return $output_clean;
 }
 
 /**
