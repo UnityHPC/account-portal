@@ -244,14 +244,22 @@ function _preg_match(
     return $output;
 }
 
-/** @return list<list<int|string>|string> */
+/** @return string[] */
 function _preg_split(string $pattern, string $subject, int $limit = -1, int $flags = 0): array
 {
-    $output = preg_split($pattern, $subject, limit: $limit, flags: $flags);
-    if (is_bool($output)) {
+    $output_dirty = preg_split($pattern, $subject, limit: $limit, flags: $flags);
+    if (is_bool($output_dirty)) {
         throw new Exception("preg_split returned bool!");
     }
-    return $output;
+    $output_clean = [];
+    foreach ($output_dirty as $i => $item) {
+        if (is_array($item)) {
+            throw new Exception("preg_split return value index $i is an array, not string!");
+        } else {
+            array_push($output_clean, $item);
+        }
+    }
+    return $output_clean;
 }
 
 /**
