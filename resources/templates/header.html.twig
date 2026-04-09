@@ -1,142 +1,94 @@
-<?php
-
-use UnityWebPortal\lib\UnityHTTPD;
-use UnityWebPortal\lib\UserFlag;
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // another page should have already validated and we can't validate the same token twice
-    // UnityHTTPD::validatePostCSRFToken();
-    if (
-        ($_SESSION["is_admin"] ?? false) == true
-        && ($_POST["form_type"] ?? null) == "clearView"
-    ) {
-        unset($_SESSION["viewUser"]);
-        UnityHTTPD::redirect(getRelativeURL("admin/user-mgmt.php"));
-    }
-    // Webroot files need to handle their own POSTs before loading the header
-    // so that they can do UnityHTTPD::badRequest before anything else has been printed.
-    // They also must not redirect like standard PRG practice because this
-    // header also needs to handle POST data. So this header does the PRG redirect
-    // for all pages.
-    unset($_POST); // unset ensures that header must not come before POST handling
-    UnityHTTPD::redirect();
-}
-
-if (isset($SSO)) {
-    if (!$USER->exists() && !str_ends_with($_SERVER["PHP_SELF"], "/panel/new_account.php")) {
-        UnityHTTPD::redirect(getRelativeURL("panel/new_account.php"));
-    }
-    if (
-        $USER->getFlag(UserFlag::DISABLED) &&
-        !str_ends_with($_SERVER["PHP_SELF"], "/panel/disabled_account.php")
-    ) {
-        UnityHTTPD::redirect(getRelativeURL("panel/disabled_account.php"));
-    }
-    if ($USER->getFlag(UserFlag::LOCKED)) {
-        UnityHTTPD::forbidden("locked", "Your account is locked.");
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <?php
-    $scripts = [
-      "jquery.min", "global-early", "dataTables.min", "dataTables.responsive.min",
-      "dataTables.buttons.min", "dataTables.columnControl.min", "buttons.print.min",
-      "buttons.colVis.min", "buttons.html5.min",
-    ];
-    foreach ($scripts as $x) {
-        $url = getRelativeURL("js/$x.js?cache_bust_increment_me=" . CONFIG["upstream"]["version"]);
-        echo "<script src='$url'></script>";
-    }
-    ?>
+  {% set scripts = [
+    'jquery.min',
+    'global-early',
+    'dataTables.min',
+    'dataTables.responsive.min',
+    'dataTables.buttons.min',
+    'dataTables.columnControl.min',
+    'buttons.print.min',
+    'buttons.colVis.min',
+    'buttons.html5.min',
+  ] %}
+  {% for x in scripts %}
+    {% set url = getRelativeURL('js/' ~ x ~ '.js?cache_bust_increment_me=' ~ CONFIG['upstream']['version']) %}
+    <script src="{{ url }}"></script>
+  {% endfor %}
+
   <style>
-    <?php
-    // set global css variables from branding
-    echo ":root {";
-    foreach (CONFIG["colors"] as $var_name => $var_value) {
-        echo "--$var_name: $var_value;";
+    :root {
+    {% for var_name, var_value in CONFIG['colors'] %}
+      --{{ var_name }}: {{ var_value }};
+    {% endfor %}
     }
-    echo "}";
-    ?>
   </style>
 
-  <?php
-    $stylesheets = [
-      "global", "navbar", "modal", "messages", "responsive.dataTables.min",
-      "dataTables.dataTables.min", "columnControl.dataTables.min", "buttons.dataTables.min",
-    ];
-    foreach ($stylesheets as $x) {
-        $url = getRelativeURL("css/$x.css?cache_bust_increment_me=" . CONFIG["upstream"]["version"]);
-        echo "<link rel='stylesheet' type='text/css' href='$url' />";
-    }
-    ?>
+  {% set stylesheets = [
+    'global',
+    'navbar',
+    'modal',
+    'messages',
+    'responsive.dataTables.min',
+    'dataTables.dataTables.min',
+    'columnControl.dataTables.min',
+    'buttons.dataTables.min',
+  ] %}
+  {% for x in stylesheets %}
+    {% set url = getRelativeURL('css/' ~ x ~ '.css?cache_bust_increment_me=' ~ CONFIG['upstream']['version']) %}
+    <link rel="stylesheet" type="text/css" href="{{ url }}" />
+  {% endfor %}
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="<?php echo CONFIG["site"]["description"] ?>">
+  <meta name="description" content="{{ CONFIG['site']['description'] }}">
 
-  <title><?php echo CONFIG["site"]["name"]; ?></title>
+  <title>{{ CONFIG['site']['name'] }}</title>
 </head>
 
 <body>
 
    <header>
-     <img id="imgLogo" draggable=false
-     src="<?php echo getRelativeURL("assets", CONFIG["site"]["logo"]); ?>" alt="Unity Logo">
+     <img id="imgLogo" draggable="false"
+     src="{{ getRelativeURL('assets', CONFIG['site']['logo']) }}" alt="Unity Logo">
      <button class="hamburger vertical-align">
        <img
          draggable="false"
-         src="<?php echo getRelativeURL("assets/menu.png") ?>"
+         src="{{ getRelativeURL('assets/menu.png') }}"
          alt="Menu Button"
        >
      </button>
    </header>
 
   <nav class="mainNav">
-    <?php
-    // Public Items - Always Visible
-    echo getRelativeHyperlink("Home", "index.php") . "\n";
+    {{ getRelativeHyperlink('Home', 'index.php')|raw }}
 
-    $num_additional_items = count(CONFIG["menuitems"]["labels"]);
-    for ($i = 0; $i < $num_additional_items; $i++) {
-        echo "<a target='_blank' href='" . CONFIG["menuitems"]["links"][$i] . "'>" .
-        CONFIG["menuitems"]["labels"][$i] . "</a>\n";
-    }
+    {% for label in CONFIG['menuitems']['labels'] %}
+      <a target="_blank" href="{{ CONFIG['menuitems']['links'][loop.index0] }}">{{ label }}</a>
+    {% endfor %}
 
-    if (isset($_SESSION["user_exists"]) && $_SESSION["user_exists"]) {
-        echo "<hr class='navHR'>\n";
-        // Menu Items for Present Users
-        echo getRelativeHyperlink("Account Settings", "panel/account.php") . "\n";
-        echo getRelativeHyperlink("My PIs", "panel/groups.php") . "\n";
+    {% if _SESSION['user_exists'] ?? false %}
+      <hr class="navHR">
+      {{ getRelativeHyperlink('Account Settings', 'panel/account.php')|raw }}
+      {{ getRelativeHyperlink('My PIs', 'panel/groups.php')|raw }}
 
-        if (isset($_SESSION["is_pi"]) && $_SESSION["is_pi"]) {
-            // PI only pages
-            echo getRelativeHyperlink("My Users", "panel/pi.php") . "\n";
-        }
+      {% if _SESSION['is_pi'] ?? false %}
+        {{ getRelativeHyperlink('My Users', 'panel/pi.php')|raw }}
+      {% endif %}
 
-        // additional branding items
-        $num_additional_items = count(CONFIG["menuitems_secure"]["labels"]);
-        for ($i = 0; $i < $num_additional_items; $i++) {
-            echo "<a target='_blank' href='" . CONFIG["menuitems_secure"]["links"][$i] . "'>" .
-            CONFIG["menuitems_secure"]["labels"][$i] . "</a>\n";
-        }
+      {% for label in CONFIG['menuitems_secure']['labels'] %}
+        <a target="_blank" href="{{ CONFIG['menuitems_secure']['links'][loop.index0] }}">{{ label }}</a>
+      {% endfor %}
 
-        // admin pages
-        if (
-            isset($_SESSION["is_admin"]) && $_SESSION["is_admin"] && !isset($_SESSION["viewUser"])
-        ) {
-            echo "<hr class='navHR'>\n";
-            // Admin only pages
-            echo getRelativeHyperlink("User Management", "admin/user-mgmt.php") . "\n";
-            echo getRelativeHyperlink("PI Management", "admin/pi-mgmt.php") . "\n";
-        }
-    } else {
-        echo getRelativeHyperlink("Login / Request Account", "panel/account.php") . "\n";
-    }
-    ?>
+      {% if (_SESSION['is_admin'] ?? false) and ((_SESSION['viewUser'] ?? null) is null) %}
+        <hr class="navHR">
+        {{ getRelativeHyperlink('User Management', 'admin/user-mgmt.php')|raw }}
+        {{ getRelativeHyperlink('PI Management', 'admin/pi-mgmt.php')|raw }}
+      {% endif %}
+    {% else %}
+      {{ getRelativeHyperlink('Login / Request Account', 'panel/account.php')|raw }}
+    {% endif %}
   </nav>
 
   <div class="modalWrapper" style="display: none;">
@@ -149,57 +101,43 @@ if (isset($SSO)) {
     </div>
   </div>
   <script
-    src="<?php echo getRelativeURL("js/modal.js?cache_bust_increment_me=" . CONFIG["upstream"]["version"]) ?>"
+    src="{{ getRelativeURL('js/modal.js?cache_bust_increment_me=' ~ CONFIG['upstream']['version']) }}"
   ></script>
   <main>
 
-  <?php
-    echo "<div id='messages'>";
-    $messages = UnityHTTPD::getMessages();
-    if (count($messages) >= 3) {
-        echo "<button id='clear_all_messages_button'>Clear All Messages</button>";
-    }
-    foreach (array_reverse($messages) as [$title, $body, $level]) {
-        echo sprintf(
-            "
-              <div class='message %s'>
-                <h3>%s</h3>
-                <p>%s</p>
-                <button
-                  data-level='%s'
-                  data-title='%s'
-                  data-body='%s'
-                >
-                  ×
-                </button>
-              </div>
-            ",
-            htmlspecialchars($level->value),
-            htmlspecialchars($title),
-            htmlspecialchars($body),
-            base64_encode($level->value),
-            base64_encode($title),
-            base64_encode($body),
-        );
-    }
-    echo "</div>";
-    if (
-        isset($_SESSION["is_admin"])
-        && $_SESSION["is_admin"]
-        && isset($_SESSION["viewUser"])
-    ) {
-        $viewUser = $_SESSION["viewUser"];
-        $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
-        echo "
-          <div id='viewAsBar'>
-            <span>You are accessing the web portal as the user <strong>$viewUser</strong></span>
-            <form method='POST' action=''>
-              $CSRFTokenHiddenFormInput
-              <input type='hidden' name='form_type' value='clearView'>
-              <input type='hidden' name='uid' value='$viewUser'>
-              <input type='submit' value='Return to My User'>
-            </form>
-          </div>
-        ";
-    }
-    ?>
+  {% set message_list = messages|default([]) %}
+  <div id="messages">
+    {% if message_list|length >= 3 %}
+      <button id="clear_all_messages_button">Clear All Messages</button>
+    {% endif %}
+
+    {% for message in message_list|reverse %}
+      {% set title = message[0] %}
+      {% set body = message[1] %}
+      {% set level = message[2] %}
+      <div class="message {{ level.value|e }}">
+        <h3>{{ title }}</h3>
+        <p>{{ body }}</p>
+        <button
+          data-level="{{ level.value|url_encode }}"
+          data-title="{{ title|url_encode }}"
+          data-body="{{ body|url_encode }}"
+        >
+          ×
+        </button>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if (_SESSION['is_admin'] ?? false) and ((_SESSION['viewUser'] ?? null) is not null) %}
+    {% set viewUser = _SESSION['viewUser'] %}
+    <div id="viewAsBar">
+      <span>You are accessing the web portal as the user <strong>{{ viewUser }}</strong></span>
+      <form method="POST" action="">
+        {{ csrf_token_hidden_form_input|default('')|raw }}
+        <input type="hidden" name="form_type" value="clearView">
+        <input type="hidden" name="uid" value="{{ viewUser }}">
+        <input type="submit" value="Return to My User">
+      </form>
+    </div>
+  {% endif %}
