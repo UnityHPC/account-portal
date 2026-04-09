@@ -136,23 +136,32 @@ class UnityDeployment
 
     public static function getTemplatePath(string $basename): string
     {
-        $deployment = __DIR__ . "/../../deployment/";
-        if (($host = $_SERVER["HTTP_HOST"] ?? null) !== null) {
-            $domain_override_template = "$deployment/domain_overrides/$host/templates/$basename";
-            if (file_exists($domain_override_template)) {
-                return $domain_override_template;
+        $dirs = self::getTemplateDirs();
+        foreach ($dirs as $dir) {
+            $path = "$dir/$basename";
+            if (file_exists($path)) {
+                return $path;
             }
         }
-        $deployment_template = "$deployment/templates/$basename";
-        if (file_exists($deployment_template)) {
-            return $deployment_template;
+        throw new \Exception("no such template: '$basename'. searched in: " . _json_encode($dirs));
+    }
+
+    /** @return string[] */
+    public static function getTemplateDirs(): array
+    {
+        $output = [];
+        $deployment = __DIR__ . "/../../deployment/";
+        if (($host = $_SERVER["HTTP_HOST"] ?? null) !== null) {
+            $domain_override_templates_dir = "$deployment/domain_overrides/$host/templates/";
+            if (is_dir($domain_override_templates_dir)) {
+                array_push($output, $domain_override_templates_dir);
+            }
         }
-        $output = __DIR__ . "/../templates/$basename";
-        if (file_exists($output)) {
-            return $output;
-        } else {
-            throw new \Exception("no such template: '$basename'");
+        if (is_dir("$deployment/mail/")) {
+            array_push($output, "$deployment/templates/");
         }
+        array_push($output, __DIR__ . "/../templates/");
+        return $output;
     }
 
     /** @return string[] */
@@ -162,7 +171,7 @@ class UnityDeployment
         $deployment = __DIR__ . "/../../deployment/";
         if (($host = $_SERVER["HTTP_HOST"] ?? null) !== null) {
             $domain_override_templates_dir = "$deployment/domain_overrides/$host/mail/";
-            if (file_exists($domain_override_templates_dir)) {
+            if (is_dir($domain_override_templates_dir)) {
                 array_push($output, $domain_override_templates_dir);
             }
         }

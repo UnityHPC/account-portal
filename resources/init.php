@@ -14,6 +14,8 @@ use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UnityGithub;
 use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnityHTTPD;
+use UnityWebPortal\lib\UnityDeployment;
+use Twig\TwigFunction;
 
 if (CONFIG["site"]["enable_exception_handler"]) {
     set_exception_handler(["UnityWebPortal\lib\UnityHTTPD", "exceptionHandler"]);
@@ -107,3 +109,12 @@ if (isset($_SERVER["REMOTE_USER"])) {
         }
     }
 }
+
+$TWIG = new \Twig\Environment(
+    new \Twig\Loader\FilesystemLoader(UnityDeployment::getTemplateDirs()),
+    ["strict_variables" => true],
+);
+$TWIG->addFunction(new TwigFunction("getRelativeHyperlink", getRelativeHyperlink(...)));
+$TWIG->addFunction(new TwigFunction("formatHyperlink", formatHyperlink(...)));
+$TWIG->addFunction(new TwigFunction("errorLog", UnityHTTPD::errorLog(...)));
+$TWIG->addGlobal("CONFIG", CONFIG);
