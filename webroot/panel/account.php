@@ -77,6 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             break; /** @phpstan-ignore deadCode.unreachable */
         case "loginshell":
             $shell = UnityHTTPD::getPostData("shellSelect");
+            if (!in_array($shell, CONFIG["loginshell"]["shell"])) {
+                UnityHTTPD::badRequest("invalid login shell", "invalid login shell");
+            }
             $USER->setLoginShell($shell);
             UnityHTTPD::messageSuccess("Login Shell Changed", "");
             UnityHTTPD::redirect();
