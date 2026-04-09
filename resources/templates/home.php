@@ -1,3 +1,3 @@
 <?php
 
-echo $TWIG->render("home.html.twig", ["_SESSION" => $_SESSION]);
+echo $TWIG->render("home.html.twig", ["user_exists" => $_SESSION["user_exists"] ?? false]);

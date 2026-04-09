@@ -68,12 +68,12 @@
       <a target="_blank" href="{{ CONFIG['menuitems']['links'][loop.index0] }}">{{ label }}</a>
     {% endfor %}
 
-    {% if _SESSION['user_exists'] ?? false %}
+    {% if user_exists ?? false %}
       <hr class="navHR">
       {{ getRelativeHyperlink('Account Settings', 'panel/account.php')|raw }}
       {{ getRelativeHyperlink('My PIs', 'panel/groups.php')|raw }}
 
-      {% if _SESSION['is_pi'] ?? false %}
+      {% if is_pi ?? false %}
         {{ getRelativeHyperlink('My Users', 'panel/pi.php')|raw }}
       {% endif %}
 
@@ -81,7 +81,7 @@
         <a target="_blank" href="{{ CONFIG['menuitems_secure']['links'][loop.index0] }}">{{ label }}</a>
       {% endfor %}
 
-      {% if (_SESSION['is_admin'] ?? false) and ((_SESSION['viewUser'] ?? null) is null) %}
+      {% if (is_admin ?? false) and ((viewUser ?? null) is null) %}
         <hr class="navHR">
         {{ getRelativeHyperlink('User Management', 'admin/user-mgmt.php')|raw }}
         {{ getRelativeHyperlink('PI Management', 'admin/pi-mgmt.php')|raw }}
@@ -129,8 +129,8 @@
     {% endfor %}
   </div>
 
-  {% if (_SESSION['is_admin'] ?? false) and ((_SESSION['viewUser'] ?? null) is not null) %}
-    {% set viewUser = _SESSION['viewUser'] %}
+  {% if (is_admin ?? false) and ((viewUser ?? null) is not null) %}
+    {% set viewUser = viewUser %}
     <div id="viewAsBar">
       <span>You are accessing the web portal as the user <strong>{{ viewUser }}</strong></span>
       <form method="POST" action="">
