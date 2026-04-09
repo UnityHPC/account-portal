@@ -114,6 +114,7 @@ $TWIG = new \Twig\Environment(
     new \Twig\Loader\FilesystemLoader(UnityDeployment::getTemplateDirs()),
     ["strict_variables" => true],
 );
+$TWIG->addFunction(new TwigFunction("getRelativeURL", getRelativeURL(...)));
 $TWIG->addFunction(new TwigFunction("getRelativeHyperlink", getRelativeHyperlink(...)));
 $TWIG->addFunction(new TwigFunction("formatHyperlink", formatHyperlink(...)));
 $TWIG->addFunction(new TwigFunction("errorLog", UnityHTTPD::errorLog(...)));

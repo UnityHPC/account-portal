@@ -37,4 +37,4 @@ if (isset($SSO)) {
     }
 }
 
-echo $TWIG->render("header.html.twig");
+echo $TWIG->render("header.html.twig", ["_SESSION" => $_SESSION]);
