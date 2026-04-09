@@ -251,8 +251,7 @@ foreach ($sshPubKeys as $key) {
     } catch (\Throwable $e) {
         $errorid = uniqid();
         UnityHTTPD::errorLog("error", "getSSHKeyInfo failed!", errorid: $errorid, error: $e, data: $key);
-        UnityHTTPD::messageError("Failed to Parse SSH Public Key", "correlation ID: $errorid");
-        continue;
+        $key_info = "ERROR: Something went wrong while fetching your key. error ID: $errorid";
     }
     echo"
         <tr>
