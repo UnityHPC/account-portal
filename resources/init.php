@@ -6,6 +6,7 @@
 
 declare(strict_types=1);
 
+use UnityWebPortal\lib\UnityDeployment;
 use UnityWebPortal\lib\UnityLDAP;
 use UnityWebPortal\lib\UnityMailer;
 use UnityWebPortal\lib\UnitySQL;
@@ -14,6 +15,7 @@ use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UnityGithub;
 use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnityHTTPD;
+use Twig\TwigFunction;
 
 if (CONFIG["site"]["enable_exception_handler"]) {
     set_exception_handler(["UnityWebPortal\lib\UnityHTTPD", "exceptionHandler"]);
@@ -107,3 +109,7 @@ if (isset($_SERVER["REMOTE_USER"])) {
         }
     }
 }
+
+$TWIG_LOADER = new \Twig\Loader\FilesystemLoader(UnityDeployment::getTemplateDirs());
+$TWIG = new \Twig\Environment($TWIG_LOADER, ["strict_variables" => true]);
+$TWIG->addFunction(new TwigFunction("base64_encode", base64_encode(...)));

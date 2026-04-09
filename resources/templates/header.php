@@ -154,35 +154,6 @@ if (isset($SSO)) {
   <main>
 
   <?php
-    echo "<div id='messages'>";
-    $messages = UnityHTTPD::getMessages();
-    if (count($messages) >= 3) {
-        echo "<button id='clear_all_messages_button'>Clear All Messages</button>";
-    }
-    foreach (array_reverse($messages) as [$title, $body, $level]) {
-        echo sprintf(
-            "
-              <div class='message %s'>
-                <h3>%s</h3>
-                <p>%s</p>
-                <button
-                  data-level='%s'
-                  data-title='%s'
-                  data-body='%s'
-                >
-                  ×
-                </button>
-              </div>
-            ",
-            htmlspecialchars($level->value),
-            htmlspecialchars($title),
-            htmlspecialchars($body),
-            base64_encode($level->value),
-            base64_encode($title),
-            base64_encode($body),
-        );
-    }
-    echo "</div>";
     if (
         isset($_SESSION["is_admin"])
         && $_SESSION["is_admin"]

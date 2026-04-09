@@ -6,6 +6,9 @@ function hideClearAllMessagesButtonIfAllMessagesAlreadyCleared() {
 }
 
 $(document).ready(function () {
+    // #messages is added to the page as late as possible so that no messages are missed
+    // it's currently at the bottom of the HTML, move it to the top
+    $('#messages').prependTo($('main'));
     $('#messages').on('click', '.message button', function () {
         var button = $(this);
         var message = button.parent();
