@@ -121,4 +121,5 @@ $TWIG->addFunction(new TwigFunction("errorLog", UnityHTTPD::errorLog(...)));
 $TWIG->addFunction(
     new TwigFunction("getCSRFTokenHiddenFormInput", UnityHTTPD::getCSRFTokenHiddenFormInput(...)),
 );
+$TWIG->addFunction(new TwigFunction("base64_encode", base64_encode(...)));
 $TWIG->addGlobal("CONFIG", CONFIG);

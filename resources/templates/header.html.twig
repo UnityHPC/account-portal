@@ -119,9 +119,9 @@
         <h3>{{ title }}</h3>
         <p>{{ body }}</p>
         <button
-          data-level="{{ level.value|url_encode }}"
-          data-title="{{ title|url_encode }}"
-          data-body="{{ body|url_encode }}"
+          data-level="{{ base64_encode(level.value) }}"
+          data-title="{{ base64_encode(title) }}"
+          data-body="{{ base64_encode(body) }}"
         >
           ×
         </button>
