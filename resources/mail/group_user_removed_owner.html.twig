@@ -1,12 +1,31 @@
 {% do setSubject('Group Member Removed') %}
+{% set policy_hyperlink = formatHyperlink('account policy', CONFIG['site']['account_expiration_policy_url']) %}
 
 <p>Hello,</p>
 
 <p>
 A user has been removed from your PI group,
 '{{ group }}'.
-The details of the removed user are below:
 </p>
+
+{% if why == constant('UnityWebPortal\\lib\\UnityGroupUserRemovedReason::RemovedSelf') %}
+<p>The user removed themself from your group.</p>
+{% elseif why == constant('UnityWebPortal\\lib\\UnityGroupUserRemovedReason::RemovedByAdmin') %}
+<p>The user was removed by a Unity admin.</p>
+{% elseif why == constant('UnityWebPortal\\lib\\UnityGroupUserRemovedReason::RemovedByOwner') %}
+<!-- the owner just did this, they don't need to hear "you just did this" -->
+{% elseif why == constant('UnityWebPortal\\lib\\UnityUserDisabledReason::Expired') %}
+<p>
+    The user was removed automatically because their account was disabled due to a lapse in credential verification.
+    See the {{ policy_hyperlink|raw }} for more information.
+</p>
+{# this can't happen: a user can't disable their account while they are a member of any group #}
+{# {% elseif why == constant('UnityWebPortal\\lib\\UnityUserDisabledReason::DisabledSelf') %} #}
+{% else %}
+{% do errorLog('warning', 'unexpected removed-from-group reason', data: why) %}
+{% endif %}
+
+<p>The details of the removed user are below:</p>
 
 <p>
 <strong>Username</strong> {{ user }}

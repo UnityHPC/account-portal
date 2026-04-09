@@ -8,6 +8,7 @@ use UnityWebPortal\lib\exceptions\EncodingUnknownException;
 use UnityWebPortal\lib\exceptions\EncodingConversionException;
 use UnityWebPortal\lib\exceptions\ArrayKeyException;
 use UnityWebPortal\lib\UnitySQL;
+use UnityWebPortal\lib\UnityUserDisabledReason;
 
 $hasGroups = count($USER->getPIGroupGIDs()) > 0;
 
@@ -116,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             if ($USER->getFlag(UserFlag::DISABLED)) {
                 UnityHTTPD::badRequest("user is already disabled", "");
             }
-            $USER->disable();
+            $USER->disable(UnityUserDisabledReason::DisabledSelf);
             UnityHTTPD::messageSuccess("Account Disabled", "");
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */

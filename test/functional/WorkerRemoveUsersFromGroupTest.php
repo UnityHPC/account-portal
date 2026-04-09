@@ -1,5 +1,6 @@
 <?php
 
+use UnityWebPortal\lib\UnityGroupUserRemovedReason;
 use UnityWebPortal\lib\UnityUser;
 
 class WorkerRemoveUsersFromGroupTest extends UnityWebPortalTestCase
@@ -38,7 +39,7 @@ class WorkerRemoveUsersFromGroupTest extends UnityWebPortalTestCase
         } finally {
             foreach ($uids as $uid) {
                 $user = new UnityUser($uid, $LDAP, $SQL, $MAILER);
-                $pi_group->removeUser($user);
+                $pi_group->removeUser($user, UnityGroupUserRemovedReason::RemovedSelf);
             }
             unlink($remove_uids_file_path);
         }

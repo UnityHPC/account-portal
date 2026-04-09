@@ -1,5 +1,6 @@
 <?php
 
+use UnityWebPortal\lib\UnityUserDisabledReason;
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use UnityWebPortal\lib\UserFlag;
 
@@ -22,7 +23,7 @@ class ReEnableUserTest extends UnityWebPortalTestCase
             $this->assertMessageExists(UnityHTTPDMessageLevel::SUCCESS, "/Re-Enabled/", "/.*/");
             $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
         } finally {
-            $USER->setFlag(UserFlag::DISABLED, true);
+            $USER->disable(UnityUserDisabledReason::DisabledSelf);
         }
     }
 
@@ -38,7 +39,7 @@ class ReEnableUserTest extends UnityWebPortalTestCase
             $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
             $this->assertFalse($USER->isPI());
         } finally {
-            $USER->setFlag(UserFlag::DISABLED, true);
+            $USER->disable(UnityUserDisabledReason::DisabledSelf);
         }
     }
 }

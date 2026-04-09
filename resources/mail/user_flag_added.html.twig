@@ -22,8 +22,17 @@
 <p>
     Your account on the Unity HPC Platform, "{{ user }}", has been disabled.
     You should no longer be able to access Unity HPC Platform services.
-    This can happen as a result of the {{ policy_hyperlink|raw }}.
 </p>
+{% if why == constant('UnityWebPortal\\lib\\UnityUserDisabledReason::DisabledSelf') %}
+<!-- the user just did this, they don't need to hear "you just did this" -->
+{% elseif why == constant('UnityWebPortal\\lib\\UnityUserDisabledReason::Expired') %}
+<p>
+    Your account was expired due to a lapse in credential verification.
+    See the {{ policy_hyperlink|raw }} for more information.
+</p>
+{% else %}
+{% do errorLog('warning', 'unexpected disabled reason', data: why) %}
+{% endif %}
 <p>If you believe this to be a mistake, please reply to this email as soon as possible.</p>
 
 {% elseif flag == constant('UnityWebPortal\\lib\\UserFlag::LOCKED') %}
