@@ -2,7 +2,7 @@
 <p style="text-wrap: balance;">
     Welcome to the Unity HPC Platform Account Portal.
     Here you can manage your SSH keys, join and leave PI groups, manage your own PI group, and more.
-    {% if not (user_exists ?? false) %}
+    {% if not user_exists %}
         {% set hyperlink = getRelativeHyperlink('Log In', 'panel/account.php') %}
         Please {{ hyperlink|raw }} for more information.
     {% endif %}

@@ -68,12 +68,12 @@
       <a target="_blank" href="{{ CONFIG['menuitems']['links'][loop.index0] }}">{{ label }}</a>
     {% endfor %}
 
-    {% if user_exists ?? false %}
+    {% if user_exists %}
       <hr class="navHR">
       {{ getRelativeHyperlink('Account Settings', 'panel/account.php')|raw }}
       {{ getRelativeHyperlink('My PIs', 'panel/groups.php')|raw }}
 
-      {% if is_pi ?? false %}
+      {% if is_pi %}
         {{ getRelativeHyperlink('My Users', 'panel/pi.php')|raw }}
       {% endif %}
 
@@ -81,7 +81,7 @@
         <a target="_blank" href="{{ CONFIG['menuitems_secure']['links'][loop.index0] }}">{{ label }}</a>
       {% endfor %}
 
-      {% if (is_admin ?? false) and ((viewUser ?? null) is null) %}
+      {% if is_admin and ((viewUser ?? null) is null) %}
         <hr class="navHR">
         {{ getRelativeHyperlink('User Management', 'admin/user-mgmt.php')|raw }}
         {{ getRelativeHyperlink('PI Management', 'admin/pi-mgmt.php')|raw }}
@@ -129,7 +129,7 @@
     {% endfor %}
   </div>
 
-  {% if (is_admin ?? false) and ((viewUser ?? null) is not null) %}
+  {% if is_admin and ((viewUser ?? null) is not null) %}
     {% set viewUser = viewUser %}
     <div id="viewAsBar">
       <span>You are accessing the web portal as the user <strong>{{ viewUser }}</strong></span>
