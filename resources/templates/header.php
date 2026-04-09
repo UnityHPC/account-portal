@@ -6,7 +6,10 @@ use UnityWebPortal\lib\UserFlag;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // another page should have already validated and we can't validate the same token twice
     // UnityHTTPD::validatePostCSRFToken();
-    if (($_SESSION["is_admin"] ?? false) == true && ($_POST["form_type"] ?? null) == "clearView") {
+    if (
+        ($_SESSION["is_admin"] ?? false) == true
+        && ($_POST["form_type"] ?? null) == "clearView"
+    ) {
         unset($_SESSION["viewUser"]);
         UnityHTTPD::redirect(getRelativeURL("admin/user-mgmt.php"));
     }
