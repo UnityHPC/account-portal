@@ -37,6 +37,7 @@ if (isset($SSO)) {
     }
 }
 echo $TWIG->render("header.html.twig", [
+    "messages" => UnityHTTPD::getMessages(),
     "viewUser" => $_SESSION["viewUser"] ?? null,
     "user_exists" => $_SESSION["user_exists"] ?? false,
     "is_pi" => $_SESSION["is_pi"] ?? false,
