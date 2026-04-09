@@ -157,7 +157,7 @@ class UnityDeployment
                 array_push($output, $domain_override_templates_dir);
             }
         }
-        if (is_dir("$deployment/mail/")) {
+        if (is_dir("$deployment/templates/")) {
             array_push($output, "$deployment/templates/");
         }
         array_push($output, __DIR__ . "/../templates/");
