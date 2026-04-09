@@ -118,4 +118,7 @@ $TWIG->addFunction(new TwigFunction("getRelativeURL", getRelativeURL(...)));
 $TWIG->addFunction(new TwigFunction("getRelativeHyperlink", getRelativeHyperlink(...)));
 $TWIG->addFunction(new TwigFunction("formatHyperlink", formatHyperlink(...)));
 $TWIG->addFunction(new TwigFunction("errorLog", UnityHTTPD::errorLog(...)));
+$TWIG->addFunction(
+    new TwigFunction("getCSRFTokenHiddenFormInput", UnityHTTPD::getCSRFTokenHiddenFormInput(...)),
+);
 $TWIG->addGlobal("CONFIG", CONFIG);

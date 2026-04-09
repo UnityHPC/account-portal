@@ -81,7 +81,7 @@
         <a target="_blank" href="{{ CONFIG['menuitems_secure']['links'][loop.index0] }}">{{ label }}</a>
       {% endfor %}
 
-      {% if is_admin and ((viewUser ?? null) is null) %}
+      {% if is_admin and (viewUser is null) %}
         <hr class="navHR">
         {{ getRelativeHyperlink('User Management', 'admin/user-mgmt.php')|raw }}
         {{ getRelativeHyperlink('PI Management', 'admin/pi-mgmt.php')|raw }}
@@ -129,12 +129,11 @@
     {% endfor %}
   </div>
 
-  {% if is_admin and ((viewUser ?? null) is not null) %}
-    {% set viewUser = viewUser %}
+  {% if is_admin and (viewUser is not null) %}
     <div id="viewAsBar">
       <span>You are accessing the web portal as the user <strong>{{ viewUser }}</strong></span>
       <form method="POST" action="">
-        {{ csrf_token_hidden_form_input|default('')|raw }}
+        {{ getCSRFTokenHiddenFormInput()|raw }}
         <input type="hidden" name="form_type" value="clearView">
         <input type="hidden" name="uid" value="{{ viewUser }}">
         <input type="submit" value="Return to My User">
