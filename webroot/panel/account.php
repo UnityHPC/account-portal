@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "delKey":
-            $key = UnityHTTPD::getPostData("delKey");
+            $key = base64_decode(UnityHTTPD::getPostData("delKey"));
             try {
                 $USER->removeSSHKey($key);
             } catch (ArrayKeyException) {
@@ -244,9 +244,11 @@ if (count($sshPubKeys) == 0) {
 }
 
 foreach ($sshPubKeys as $key) {
+    $key_escaped = htmlspecialchars($key);
+    $key_b64 = base64_encode($key);
     echo
     "<div class='key-box'>
-        <textarea spellcheck='false' readonly aria-label='key box'>$key</textarea>
+        <textarea spellcheck='false' readonly aria-label='key box'>$key_escaped</textarea>
         <form
             action=''
             onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
@@ -254,7 +256,7 @@ foreach ($sshPubKeys as $key) {
             aria-label='delete key'
         >
             $CSRFTokenHiddenFormInput
-            <input type='hidden' name='delKey' value='$key' />
+            <input type='hidden' name='delKey' value='$key_b64' />
             <input type='hidden' name='form_type' value='delKey' />
             <input type='submit' value='&times;' />
         </form>
