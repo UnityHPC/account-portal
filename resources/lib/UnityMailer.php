@@ -21,6 +21,8 @@ class UnityMailer extends PHPMailer
     private string $MSG_ADMIN_NAME;
     private string $MSG_PI_APPROVAL_EMAIL;
     private string $MSG_PI_APPROVAL_NAME;
+    private string $MSG_RECIPIENT_OVERRIDE;
+    private string $MSG_RECIPIENT_OVERRIDE_NAME;
 
     private \Twig\Loader\FilesystemLoader $loader;
     private \Twig\Environment $twig;
@@ -38,6 +40,8 @@ class UnityMailer extends PHPMailer
         $this->MSG_ADMIN_NAME = CONFIG["mail"]["admin_name"];
         $this->MSG_PI_APPROVAL_EMAIL = CONFIG["mail"]["pi_approve"];
         $this->MSG_PI_APPROVAL_NAME = CONFIG["mail"]["pi_approve_name"];
+        $this->MSG_RECIPIENT_OVERRIDE = CONFIG["mail"]["recipient_override"] ?? "";
+        $this->MSG_RECIPIENT_OVERRIDE_NAME = CONFIG["mail"]["recipient_override_name"] ?? "";
         if (empty(CONFIG["smtp"]["host"])) {
             throw new Exception("SMTP server hostname not set");
         }
@@ -103,10 +107,18 @@ class UnityMailer extends PHPMailer
         $this->setFrom($this->MSG_SENDER_EMAIL, $this->MSG_SENDER_NAME);
         $this->addReplyTo($this->MSG_SUPPORT_EMAIL, $this->MSG_SUPPORT_NAME);
 
-        $mes_html = $this->twig->render("$template.html.twig", $data);
-        $this->msgHTML($mes_html);
+        $mes_html = "";
 
-        if ($recipients == "admin") {
+        if ($this->MSG_RECIPIENT_OVERRIDE !== "") {
+            $this->addBCC($this->MSG_RECIPIENT_OVERRIDE, $this->MSG_RECIPIENT_OVERRIDE_NAME);
+            $recipients_str = is_array($recipients) ? _json_encode($recipients) : $recipients;
+            $mes_html .= implode("\n", [
+                "<p>",
+                "This message has been diverted away from its original recipient(s):",
+                htmlspecialchars($recipients_str),
+                "</p>",
+            ]);
+        } elseif ($recipients == "admin") {
             $this->addBCC($this->MSG_ADMIN_EMAIL, $this->MSG_ADMIN_NAME);
         } elseif ($recipients == "pi_approve") {
             $this->addBCC($this->MSG_PI_APPROVAL_EMAIL, $this->MSG_PI_APPROVAL_NAME);
@@ -119,6 +131,9 @@ class UnityMailer extends PHPMailer
                 $this->addAddress($recipients);
             }
         }
+
+        $mes_html .= $this->twig->render("$template.html.twig", $data);
+        $this->msgHTML($mes_html);
 
         $output = parent::send();
         if ($output === false) {
