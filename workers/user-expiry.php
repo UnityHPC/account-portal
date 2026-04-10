@@ -95,7 +95,7 @@ function idleLockUser(UnityUser $user)
     echo "idle-locking user '$user->uid'\n";
     if (!$args["dry-run"]) {
         sendUserExpiryNoticeToPIGroupOwners("group_user_idlelocked_owner", $user);
-        $user->setFlag(UserFlag::IDLELOCKED, true, false);
+        $user->setFlag(UserFlag::IDLELOCKED, true, doSendMailAdmin: false);
     }
 }
 

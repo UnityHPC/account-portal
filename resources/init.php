@@ -94,7 +94,7 @@ if (isset($_SERVER["REMOTE_USER"])) {
         $USER->setMail($SSO["mail"]);
         // remove idle-lock if exists
         if ($USER->getFlag(UserFlag::IDLELOCKED)) {
-            $USER->setFlag(UserFlag::IDLELOCKED, false);
+            $USER->setFlag(UserFlag::IDLELOCKED, false, doSendMailAdmin: false);
             UnityHTTPD::messageSuccess(
                 "Account Unlocked",
                 "Your account was previously locked due to inactivity.",
