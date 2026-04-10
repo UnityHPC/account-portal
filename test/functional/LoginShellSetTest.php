@@ -1,50 +1,43 @@
 <?php
 
-use PHPUnit\Framework\Attributes\DataProvider;
+use UnityWebPortal\lib\UnityHTTPDMessageLevel;
+use UnityWebPortal\lib\UnityHTTPD;
 
 class LoginShellSetTest extends UnityWebPortalTestCase
 {
-    private static $_initialLoginShell;
-
-    public function setUp(): void
+    public function testSetLoginShell(): void
     {
         global $USER;
-        parent::setUp();
         $this->switchUser("Blank");
-        self::$_initialLoginShell = $USER->getLoginShell();
-    }
-
-    public function tearDown(): void
-    {
-        global $USER;
-        $USER->setLoginShell(self::$_initialLoginShell);
-    }
-
-    public static function getShells()
-    {
-        global $HTTP_HEADER_TEST_INPUTS;
-        return [["/bin/bash"]] +
-            array_map(function ($x) {
-                return [$x];
-            }, $HTTP_HEADER_TEST_INPUTS);
-    }
-
-    private function isShellValid(string $shell)
-    {
-        return mb_check_encoding($shell, "ASCII") && $shell == trim($shell) && !empty($shell);
-    }
-
-    #[DataProvider("getShells")]
-    public function testSetLoginShell(string $shell): void
-    {
-        global $USER;
-        if (!$this->isShellValid($shell)) {
-            $this->expectException("Exception");
+        $before = $USER->getLoginShell();
+        try {
+            $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
+                "form_type" => "loginshell",
+                "shellSelect" => "/bin/bash",
+            ]);
+            $this->assertEquals("/bin/bash", $USER->getLoginShell());
+            $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
+                "form_type" => "loginshell",
+                "shellSelect" => "/bin/zsh",
+            ]);
+            $this->assertEquals("/bin/zsh", $USER->getLoginShell());
+            UnityHTTPD::clearMessages();
+            $this->http_post(
+                __DIR__ . "/../../webroot/panel/account.php",
+                [
+                    "form_type" => "loginshell",
+                    "shellSelect" => "foobar",
+                ],
+                do_validate_messages: false,
+            );
+            $this->assertMessageExists(
+                UnityHTTPDMessageLevel::ERROR,
+                "/.*/",
+                "/invalid login shell/",
+            );
+            $this->assertEquals("/bin/zsh", $USER->getLoginShell());
+        } finally {
+            $USER->setLoginShell($before);
         }
-        $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
-            "form_type" => "loginshell",
-            "shellSelect" => $shell,
-        ]);
-        $this->assertEquals($shell, $USER->getLoginShell());
     }
 }
