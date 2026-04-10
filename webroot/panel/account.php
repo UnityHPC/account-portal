@@ -48,17 +48,18 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             }
             $keys = array_map("trim", $keys);
             foreach ($keys as $key) {
-                $keyShort = shortenString($key, 10, 30);
                 [$is_valid, $explanation] = testValidSSHKey($key);
                 if (!$is_valid) {
+                    $keyShort = shortenString($key, 10, 30);
                     UnityHTTPD::messageError("SSH Key Not Added: $explanation", $keyShort);
                     continue;
                 }
+                $key_info = getSSHKeyInfo($key);
                 $keyWasAdded = $USER->addSSHKey($key);
                 if ($keyWasAdded) {
-                    UnityHTTPD::messageSuccess("SSH Key Added", $keyShort);
+                    UnityHTTPD::messageSuccess("SSH Key Added", $key_info);
                 } else {
-                    UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $keyShort);
+                    UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $key_info);
                 }
             }
             UnityHTTPD::redirect();
@@ -71,8 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 UnityHTTPD::messageError("Cannot Remove SSH Key", "Key not found");
                 UnityHTTPD::redirect();
             }
-            $keyShort = shortenString($key, 10, 30);
-            UnityHTTPD::messageSuccess("SSH Key Removed", $keyShort);
+            $key_info = getSSHKeyInfo($key);
+            UnityHTTPD::messageSuccess("SSH Key Removed", $key_info);
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "loginshell":
@@ -136,15 +137,15 @@ echo "
     <h2>Account Details</h2>
     <table>
         <tr>
-            <td>Username</th>
+            <td>Username</td>
             <td><code>$uid</code></td>
         </tr>
         <tr>
-            <td>Organization</th>
+            <td>Organization</td>
             <td><code>$org</code></td>
         </tr>
         <tr>
-            <td>Email</th>
+            <td>Email</td>
             <td><code>$mail</code></td>
         </tr>
     </table>
@@ -243,23 +244,37 @@ if (count($sshPubKeys) == 0) {
     echo "<p>You do not have any SSH public keys, press the button below to add one.</p>";
 }
 
+echo "<table>\n";
 foreach ($sshPubKeys as $key) {
-    echo
-    "<div class='key-box'>
-        <textarea spellcheck='false' readonly aria-label='key box'>$key</textarea>
-        <form
-            action=''
-            onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
-            method='POST'
-            aria-label='delete key'
-        >
-            $CSRFTokenHiddenFormInput
-            <input type='hidden' name='delKey' value='$key' />
-            <input type='hidden' name='form_type' value='delKey' />
-            <input type='submit' value='&times;' />
-        </form>
-    </div>";
+    try {
+        $key_info = htmlspecialchars(getSSHKeyInfo($key));
+    } catch (\Throwable $e) {
+        $errorid = uniqid();
+        UnityHTTPD::errorLog("error", "getSSHKeyInfo failed!", errorid: $errorid, error: $e, data: $key);
+        $key_info = "ERROR: Something went wrong while fetching your key. error ID: $errorid";
+    }
+    echo"
+        <tr>
+            <td><span class='ssh-key-info'>$key_info</span></td>
+            <td>
+                <form
+                    action=''
+                    onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
+                    method='POST'
+                    aria-label='delete key'
+                >
+                    $CSRFTokenHiddenFormInput
+                    <input type='hidden' name='delKey' value='$key' />
+                    <input type='hidden' name='form_type' value='delKey' />
+                        <button type='submit' class='iconBtn delete-key-button' aria-label='Delete Key'>
+                            <span class='delete-key-span icon-x' aria-hidden='true'></span>
+                        </button>
+                </form>
+            </td>
+        </tr>
+    ";
 }
+echo "</table>\n";
 
 echo "
     <button type='button' class='plusBtn btnAddKey'><span>&#43;</span></button>
@@ -353,31 +368,27 @@ echo "</form></div>";
 </script>
 
 <style>
-    .key-box {
-        position: relative;
-        width: auto;
-        height: auto;
-        max-width: 700px;
-    }
-
-    .key-box input[type=submit] {
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        padding: 5px;
-        width: 32px;
-        border-radius: 0 3px 3px 0;
-        font-size: 20pt;
-        margin: 0;
-    }
-
-    .key-box textarea {
+    .ssh-key-info {
+        display: inline-block;
         word-wrap: break-word;
         word-break: break-all;
-        width: calc(100% - 44px);
-        border-radius: 3px 0 0 3px;
         font-family: monospace;
+    }
+
+    .delete-key-button {
+        display: flex; /* using flex inside button allows the X image to be centered */
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+    }
+
+    .delete-key-span {
+        width: 16px;
+        height: 16px;
+        background-color: white;
+        mask-size: contain;
     }
 </style>
 

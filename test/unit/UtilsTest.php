@@ -91,19 +91,22 @@ class UtilsTest extends UnityWebPortalTestCase
         $this->assertEquals($expected, $is_valid);
     }
 
-    public static function sshKeyCommentProvider()
+    public static function tokenizeSSHKeyProvider()
     {
         return [
-            ["foo bar", "foo bar"],
-            ["foo bar baz", "foo bar"],
-            ["foo bar baz baz bam", "foo bar"],
+            ["foo bar", ["foo", "bar", ""]],
+            ["foo  bar", ["foo", "bar", ""]],
+            ["foo bar baz", ["foo", "bar", "baz"]],
+            ["foo bar  baz", ["foo", "bar", "baz"]],
+            ["foo bar baz baz bam", ["foo", "bar", "baz baz bam"]],
+            ["foo bar baz  baz bam", ["foo", "bar", "baz  baz bam"]],
         ];
     }
 
-    #[DataProvider("sshKeyCommentProvider")]
-    public function testRemoveSSHKeyOptionalCommentSuffix(string $input, string $expected_output)
+    #[DataProvider("tokenizeSSHKeyProvider")]
+    public function testTokenizeSSHKey(string $input, array $expected_output)
     {
-        $this->assertEquals(removeSSHKeyOptionalCommentSuffix($input), $expected_output);
+        $this->assertEquals($expected_output, tokenizeSSHKey($input));
     }
 
     public static function URLComponentProvider()
@@ -148,5 +151,25 @@ class UtilsTest extends UnityWebPortalTestCase
     public function testShortenString(array $input_args, string $expected_output)
     {
         $this->assertEquals(shortenString(...$input_args), $expected_output);
+    }
+
+    public static function getSSHKeyInfoProvider()
+    {
+        return [
+            [
+                "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLeHpW10CCamJtXNXJui49WM07wRnQbQTbQ2MSvF4j8vBpBuAbjiEp14qERLDs3FoWdpbiUwL9mZq6PmUSxaTnk= simon",
+                "256 SHA256:Z2QFHGXOzouw35V/rrjTim+WYxs0e+QZY9rnd0DSBuo simon (ecdsa-sha2-nistp256)",
+            ],
+            [
+                "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLeHpW10CCamJtXNXJui49WM07wRnQbQTbQ2MSvF4j8vBpBuAbjiEp14qERLDs3FoWdpbiUwL9mZq6PmUSxaTnk=",
+                "256 SHA256:Z2QFHGXOzouw35V/rrjTim+WYxs0e+QZY9rnd0DSBuo (ecdsa-sha2-nistp256)",
+            ],
+        ];
+    }
+
+    #[DataProvider("getSSHKeyInfoProvider")]
+    public function testGetSSHKeyInfo(string $key, string $expected)
+    {
+        $this->assertEquals($expected, getSSHKeyInfo($key));
     }
 }

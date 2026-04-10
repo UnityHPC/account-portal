@@ -10,15 +10,23 @@ use UnityWebPortal\lib\UnityDeployment;
 /**
  * key must take the form "KEY_TYPE KEY_DATA OPTIONAL_COMMENT"
  * @throws ValueError
+ * @return list{string, string, string} [key_type key_base64 optional_comment_suffix]
  */
-function removeSSHKeyOptionalCommentSuffix(string $key): string
+function tokenizeSSHKey(string $key): array
 {
     $matches = [];
-    if (preg_match("/^(\S+ \S+)/", $key, $matches)) {
-        return $matches[1];
-    } else {
-        throw new \ValueError("invalid SSH key: $key");
+    try {
+        _preg_match("/^(\S+)\s+(\S+)\s*(\S?.*?)$/", $key, $matches);
+        return [$matches[1], $matches[2], $matches[3]];
+    } catch (\Throwable $e) {
+        throw new \ValueError("invalid SSH key: $key", previous: $e);
     }
+}
+
+function removeSSHKeyOptionalCommentSuffix(string $key): string
+{
+    $tokenized = tokenizeSSHKey($key);
+    return "{$tokenized[0]} {$tokenized[1]}";
 }
 
 /**
@@ -55,6 +63,28 @@ function testValidSSHKey(string $key): array
         // phpseclib internally catches any throwable to make NoKeyLoadedException,
         // so I am not comfortable sharing the exception message with the user
         return [false, "Invalid key"];
+    }
+}
+
+/** @return string {key_length_bits} SHA256:{key_fingerprint} {optional_key_comment} ({key_type}) */
+function getSSHKeyInfo(string $key): string
+{
+    $pubkey = PublicKeyLoader::loadPublicKey($key);
+    // phpseclib maintainer does not wish to include `getLength()` in the public key interface
+    // https://github.com/phpseclib/phpseclib/issues/2134
+    // > For RSA and EC that's the length of the modulo. For DSA an array is returned
+    /** @phpstan-ignore-next-line */
+    $length = $pubkey->getLength();
+    if (is_array($length)) {
+        throw new Exception("unsupported key type, getLength() returned an array");
+    }
+    [$type, $_, $comment] = tokenizeSSHKey($key);
+    $fingerprint = (string) $pubkey->getFingerprint("sha256");
+    // format copied from openssl: https://superuser.com/a/1634883
+    if ($comment !== "") {
+        return "$length SHA256:$fingerprint $comment ($type)";
+    } else {
+        return "$length SHA256:$fingerprint ($type)";
     }
 }
 
