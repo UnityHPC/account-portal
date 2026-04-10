@@ -1,11 +1,3 @@
-<h1>Welcome</h1>
-<p style="text-wrap: balance;">
-    Welcome to the Unity HPC Platform Account Portal.
-    Here you can manage your SSH keys, join and leave PI groups, manage your own PI group, and more.
-    <?php
-    if (!($_SESSION["user_exists"] ?? false)) {
-        $hyperlink = getRelativeHyperlink("Log In", "panel/account.php");
-        echo "Please $hyperlink for more information.";
-    }
-    ?>
-</p>
+<?php
+
+echo $TWIG->render("home.html.twig", ["user_exists" => $_SESSION["user_exists"] ?? false]);

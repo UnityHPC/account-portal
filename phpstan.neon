@@ -53,7 +53,7 @@ parameters:
         - test/functional/ExpiryGuiTest.php
     # init.php sets these when the user is logged in
     - messages:
-        - '#Variable \$(LDAP|SQL|MAILER|GITHUB|SSO|OPERATOR|USER|LOC_HEADER|LOC_FOOTER) might not be defined.#'
+        - '#Variable \$(LDAP|SQL|MAILER|GITHUB|SSO|OPERATOR|USER|LOC_HEADER|LOC_FOOTER|TWIG) might not be defined.#'
       paths:
         - '*'
     # this method is called using callPrivateMethod()
