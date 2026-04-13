@@ -22,7 +22,7 @@ class SSHKeyDeleteTest extends UnityWebPortalTestCase
             __DIR__ . "/../../webroot/panel/account.php",
             [
                 "form_type" => "delKey",
-                "delKey" => $key,
+                "delKey" => base64_encode($key),
             ],
             do_validate_messages: $do_validate_messages,
         );
