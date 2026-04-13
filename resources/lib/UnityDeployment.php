@@ -184,7 +184,8 @@ class UnityDeployment
         $dir = new \DirectoryIterator($dir_path);
         foreach ($dir as $fileinfo) {
             $filename = $fileinfo->getFilename();
-            if ($fileinfo->isDot()) {
+            # isDot — Determine if current DirectoryIterator item is '.' or '..'
+            if ($fileinfo->isDot() || $filename === ".gitinclude") {
                 continue;
             }
             if ($fileinfo->getExtension() !== "csv") {
