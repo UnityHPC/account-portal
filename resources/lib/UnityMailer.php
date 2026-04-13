@@ -111,11 +111,10 @@ class UnityMailer extends PHPMailer
 
         if ($this->MSG_RECIPIENT_OVERRIDE !== "") {
             $this->addBCC($this->MSG_RECIPIENT_OVERRIDE, $this->MSG_RECIPIENT_OVERRIDE_NAME);
-            $recipients_str = is_array($recipients) ? _json_encode($recipients) : $recipients;
             $mes_html .= implode("\n", [
                 "<p>",
                 "This message has been diverted away from its original recipient(s):",
-                htmlspecialchars($recipients_str),
+                htmlspecialchars(_json_encode($recipients)),
                 "</p>",
             ]);
         } elseif ($recipients == "admin") {
