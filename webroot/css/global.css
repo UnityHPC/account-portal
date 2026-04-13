@@ -319,3 +319,7 @@ div.searchWrapper > * {
 div.searchWrapper > *:hover {
   background: var(--light_panel_background);
 }
+
+.icon-x {
+  mask-image: url('/assets/x.svg');
+}

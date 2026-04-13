@@ -62,6 +62,7 @@ repos:
       - id: check-yaml
       - id: check-json
       - id: check-xml
+        exclude: webroot/assets/x.svg
       - id: check-added-large-files
       - id: check-executables-have-shebangs
 
