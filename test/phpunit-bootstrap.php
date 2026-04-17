@@ -478,7 +478,7 @@ class UnityWebPortalTestCase extends TestCase
         bool $reuse_last_session = true,
         bool $validate = true,
     ): void {
-        global $LDAP, $SQL, $MAILER, $GITHUB, $SITE, $SSO, $USER, $LOC_HEADER, $LOC_FOOTER;
+        global $LDAP, $SQL, $MAILER, $GITHUB, $SITE, $SSO, $USER, $LOC_HEADER, $LOC_FOOTER, $TWIG;
         if (!array_key_exists($nickname, self::$NICKNAME2UID)) {
             throw new ArrayKeyException($nickname);
         }
@@ -554,7 +554,7 @@ class UnityWebPortalTestCase extends TestCase
         bool $do_validate_messages = true,
         ?string $bearer_token = null,
     ): string {
-        global $LDAP, $SQL, $MAILER, $GITHUB, $SITE, $SSO, $USER, $LOC_HEADER, $LOC_FOOTER;
+        global $LDAP, $SQL, $MAILER, $GITHUB, $SITE, $SSO, $USER, $LOC_HEADER, $LOC_FOOTER, $TWIG;
         if ($do_validate_messages) {
             $this->assertNoWarningErrorMessages();
         }
@@ -599,7 +599,7 @@ class UnityWebPortalTestCase extends TestCase
         ?string $bearer_token = null,
         $do_validate_messages = true,
     ): string {
-        global $LDAP, $SQL, $MAILER, $GITHUB, $SITE, $SSO, $USER, $LOC_HEADER, $LOC_FOOTER;
+        global $LDAP, $SQL, $MAILER, $GITHUB, $SITE, $SSO, $USER, $LOC_HEADER, $LOC_FOOTER, $TWIG;
         if ($do_validate_messages) {
             $this->assertNoWarningErrorMessages();
         }

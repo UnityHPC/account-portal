@@ -267,7 +267,7 @@ foreach ($sshPubKeys as $key) {
 }
 
 echo "
-    <button type='button' class='plusBtn btnAddKey'><span>&#43;</span></button>
+    <button type='button' class='plusBtn btnAddKey' aria-label='Add SSH Key'><span>&#43;</span></button>
     <hr>
     <h2>Login Shell</h2>
     <form action='' method='POST'>
