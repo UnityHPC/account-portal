@@ -106,10 +106,13 @@
   <main>
 
   <div id="messages">
+    {% if messages|length > 0 %}
+      {# ensure heading rank is preserved for a11y #}
+      <h2 style="display: none">Notifications</h2>
+    {% endif %}
     {% if messages|length >= 3 %}
       <button id="clear_all_messages_button">Clear All Messages</button>
     {% endif %}
-
     {% for message in messages|reverse %}
       {% set title = message[0] %}
       {% set body = message[1] %}
