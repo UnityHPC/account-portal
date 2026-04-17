@@ -113,11 +113,13 @@
     {% if messages|length >= 3 %}
       <button id="clear_all_messages_button">Clear All Messages</button>
     {% endif %}
+    {% set level_enum = enum('UnityWebPortal\\lib\\UnityHTTPDMessageLevel') %}
     {% for message in messages|reverse %}
       {% set title = message[0] %}
       {% set body = message[1] %}
       {% set level = message[2] %}
-      <div class="message {{ level.value|e }}">
+      {% set msg_role = (level in [level_enum.WARNING, level_enum.ERROR]) ? 'alert' : 'status' %}
+      <div class="message {{ level.value|e }}" role="{{ msg_role }}">
         <h3>{{ title }}</h3>
         <p>{{ body }}</p>
         <button
