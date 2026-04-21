@@ -323,3 +323,7 @@ div.searchWrapper > *:hover {
 .icon-x {
   mask-image: url('/assets/x.svg');
 }
+
+.icon-magnifying-glass-plus {
+  mask-image: url('/assets/magnifying-glass-plus.svg');
+}

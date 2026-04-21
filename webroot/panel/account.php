@@ -270,10 +270,13 @@ foreach ($sshPubKeys as $key) {
                     $CSRFTokenHiddenFormInput
                     <input type='hidden' name='delKey' value='$key_b64' />
                     <input type='hidden' name='form_type' value='delKey' />
-                        <button type='submit' class='iconBtn delete-key-button' aria-label='Delete Key'>
-                            <span class='delete-key-span icon-x' aria-hidden='true'></span>
-                        </button>
+                    <button type='submit' class='delete-key-button' aria-label='Delete Key'>
+                        <span class='delete-key-span icon-x' aria-hidden='true'></span>
+                    </button>
                 </form>
+                <button class='show-key-button' aria-label='Show Key Contents'>
+                    <span class='show-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
+                </button>
             </td>
         </tr>
     ";
@@ -391,6 +394,22 @@ echo "</form></div>";
     .delete-key-span {
         width: 16px;
         height: 16px;
+        background-color: white;
+        mask-size: contain;
+    }
+
+    .show-key-button {
+        display: flex; /* using flex inside button allows the X image to be centered */
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+    }
+
+    .show-key-span {
+        width: 24px;
+        height: 24px;
         background-color: white;
         mask-size: contain;
     }
