@@ -280,7 +280,7 @@ foreach ($sshPubKeys as $key) {
                         <span class='delete-key-span icon-x' aria-hidden='true'></span>
                     </button>
                 </form>
-                <button class='show-key-button' aria-label='Show Key Contents'>
+                <button class='show-hide-key-button' aria-label='Show/Hide Key Contents'>
                     <span class='show-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
                 </button>
             </td>
@@ -403,36 +403,28 @@ echo "</form></div>";
         font-family: monospace;
     }
 
-    .delete-key-button {
+    .delete-key-button, .show-hide-key-button {
         display: flex; /* using flex inside button allows the X image to be centered */
         align-items: center;
         justify-content: center;
         width: 32px;
         height: 32px;
         padding: 0;
+    }
+
+    .delete-key-span, .show-hide-key-span {
+        background-color: white;
+        mask-size: contain;
     }
 
     .delete-key-span {
         width: 16px;
         height: 16px;
-        background-color: white;
-        mask-size: contain;
     }
 
-    .show-key-button {
-        display: flex; /* using flex inside button allows the X image to be centered */
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        padding: 0;
-    }
-
-    .show-key-span {
+    .show-hide-key-span {
         width: 24px;
         height: 24px;
-        background-color: white;
-        mask-size: contain;
     }
 </style>
 
