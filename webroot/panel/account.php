@@ -262,9 +262,6 @@ foreach ($sshPubKeys as $key) {
         <tr>
             <td>
                 <span class='ssh-key-info'>$key_info</span>
-                <div class='key-box'>
-                    <textarea spellcheck='false' readonly aria-label='key box'>$key_escaped</textarea>
-                </div>
             </td>
             <td>
                 <form
@@ -280,9 +277,16 @@ foreach ($sshPubKeys as $key) {
                         <span class='delete-key-span icon-x' aria-hidden='true'></span>
                     </button>
                 </form>
-                <button class='show-hide-key-button' aria-label='Show/Hide Key Contents'>
-                    <span class='show-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
+                <button type='button' class='show-hide-key-button' aria-label='Show/Hide Key Contents'>
+                    <span class='show-hide-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
                 </button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class='key-box' style='display: none;'>
+                    <textarea spellcheck='false' readonly aria-label='key box'>$key_escaped</textarea>
+                </div>
             </td>
         </tr>
     ";
@@ -363,6 +367,14 @@ echo "</form></div>";
         openModal("Add New Key", url);
     });
 
+    $(".show-hide-key-button").click(function() {
+        const keyBox = $(this).closest("tr").next("tr").find(".key-box");
+        const showKeyIcon = $(this).find(".show-hide-key-span");
+        keyBox.toggle();
+        showKeyIcon.toggleClass("icon-magnifying-glass-plus", !keyBox.is(":visible"));
+        showKeyIcon.toggleClass("icon-magnifying-glass-minus", keyBox.is(":visible"));
+    });
+
     $("#loginSelector option").each(function(i, e) {
         if ($(this).val() == ldapLoginShell) {
             $(this).prop("selected", true);
@@ -385,13 +397,11 @@ echo "</form></div>";
         position: relative;
         width: auto;
         height: auto;
-        max-width: 700px;
     }
 
     .key-box textarea {
         word-wrap: break-word;
         word-break: break-all;
-        width: calc(100% - 44px);
         border-radius: 3px 0 0 3px;
         font-family: monospace;
     }
