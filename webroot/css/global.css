@@ -121,10 +121,6 @@ form > * {
   display: block;
 }
 
-form > *:not(:first-child) {
-  margin-top: 5px;
-}
-
 input:focus,
 textarea:focus,
 select:focus {
@@ -322,4 +318,12 @@ div.searchWrapper > *:hover {
 
 .icon-x {
   mask-image: url('/assets/x.svg');
+}
+
+.icon-magnifying-glass-plus {
+  mask-image: url('/assets/magnifying-glass-plus.svg');
+}
+
+.icon-magnifying-glass-minus {
+  mask-image: url('/assets/magnifying-glass-minus.svg');
 }
