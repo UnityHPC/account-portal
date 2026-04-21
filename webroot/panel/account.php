@@ -249,6 +249,7 @@ if (count($sshPubKeys) == 0) {
 
 echo "<table>\n";
 foreach ($sshPubKeys as $key) {
+    $key_escaped = htmlspecialchars($key);
     try {
         $key_info = htmlspecialchars(getSSHKeyInfo($key));
     } catch (\Throwable $e) {
@@ -270,10 +271,22 @@ foreach ($sshPubKeys as $key) {
                     $CSRFTokenHiddenFormInput
                     <input type='hidden' name='delKey' value='$key_b64' />
                     <input type='hidden' name='form_type' value='delKey' />
-                        <button type='submit' class='iconBtn delete-key-button' aria-label='Delete Key'>
-                            <span class='delete-key-span icon-x' aria-hidden='true'></span>
-                        </button>
+                    <button type='submit' class='delete-key-button' aria-label='Delete Key'>
+                        <span class='delete-key-span icon-x' aria-hidden='true'></span>
+                    </button>
                 </form>
+            </td>
+            <td>
+                <button type='button' class='show-hide-key-button' aria-label='Show/Hide Key Contents'>
+                    <span class='show-hide-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class='key-box' style='display: none;'>
+                    <textarea spellcheck='false' readonly aria-label='key box'>$key_escaped</textarea>
+                </div>
             </td>
         </tr>
     ";
@@ -295,7 +308,7 @@ foreach (CONFIG["loginshell"]["shell"] as $shell) {
 
 echo "
       </select>
-      <br>
+      <br style='margin-top: 10px;'>
       <input id='submitLoginShell' type='submit' value='Set Login Shell' />
     </form>
     <hr>
@@ -354,6 +367,14 @@ echo "</form></div>";
         openModal("Add New Key", url);
     });
 
+    $(".show-hide-key-button").click(function() {
+        const keyBox = $(this).closest("tr").next("tr").find(".key-box");
+        const showKeyIcon = $(this).find(".show-hide-key-span");
+        keyBox.toggle();
+        showKeyIcon.toggleClass("icon-magnifying-glass-plus", !keyBox.is(":visible"));
+        showKeyIcon.toggleClass("icon-magnifying-glass-minus", keyBox.is(":visible"));
+    });
+
     $("#loginSelector option").each(function(i, e) {
         if ($(this).val() == ldapLoginShell) {
             $(this).prop("selected", true);
@@ -372,6 +393,19 @@ echo "</form></div>";
 </script>
 
 <style>
+    .key-box {
+        position: relative;
+        width: auto;
+        height: auto;
+    }
+
+    .key-box textarea {
+        word-wrap: break-word;
+        word-break: break-all;
+        border-radius: 3px 0 0 3px;
+        font-family: monospace;
+    }
+
     .ssh-key-info {
         display: inline-block;
         word-wrap: break-word;
@@ -379,7 +413,7 @@ echo "</form></div>";
         font-family: monospace;
     }
 
-    .delete-key-button {
+    .delete-key-button, .show-hide-key-button {
         display: flex; /* using flex inside button allows the X image to be centered */
         align-items: center;
         justify-content: center;
@@ -388,11 +422,19 @@ echo "</form></div>";
         padding: 0;
     }
 
+    .delete-key-span, .show-hide-key-span {
+        background-color: white;
+        mask-size: contain;
+    }
+
     .delete-key-span {
         width: 16px;
         height: 16px;
-        background-color: white;
-        mask-size: contain;
+    }
+
+    .show-hide-key-span {
+        width: 24px;
+        height: 24px;
     }
 </style>
 
