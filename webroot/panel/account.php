@@ -277,6 +277,8 @@ foreach ($sshPubKeys as $key) {
                         <span class='delete-key-span icon-x' aria-hidden='true'></span>
                     </button>
                 </form>
+            </td>
+            <td>
                 <button type='button' class='show-hide-key-button' aria-label='Show/Hide Key Contents'>
                     <span class='show-hide-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
                 </button>
