@@ -1,0 +1,36 @@
+</main>
+
+<footer>
+  <div id="footerLogos">
+    {% set footer_logos = CONFIG['footer']['logos'] %}
+    {% set footer_links = CONFIG['footer']['links'] %}
+    {% set footer_titles = CONFIG['footer']['title'] %}
+
+    {% for footer_logo in footer_logos %}
+      <a target="_blank" href="{{ footer_links[loop.index0] }}">
+        <img
+          src="{{ getRelativeURL('assets', footer_logo) }}"
+          draggable="false"
+          title="{{ footer_titles[loop.index0] }}"
+        >
+      </a>
+    {% endfor %}
+  </div>
+  <div class="footerBlock">
+    <span>
+        Unity Web Portal Version
+        <a target="_blank" href="{{ CONFIG['upstream']['repo'] }}">
+            {{ CONFIG['upstream']['version'] }}
+        </a>
+    </span>
+    &nbsp;|
+    <a href="{{ CONFIG['site']['terms_of_service_url'] }}">Terms of Service</a>
+  </div>
+</footer>
+
+</body>
+{% for x in ['global-late', 'messages'] %}
+  {% set url = getRelativeURL('js/' ~ x ~ '.js?cache_bust_increment_me=' ~ CONFIG['upstream']['version']) %}
+  <script src="{{ url }}"></script>
+{% endfor %}
+</html>
