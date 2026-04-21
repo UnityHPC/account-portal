@@ -249,6 +249,7 @@ if (count($sshPubKeys) == 0) {
 
 echo "<table>\n";
 foreach ($sshPubKeys as $key) {
+    $key_escaped = htmlspecialchars($key);
     try {
         $key_info = htmlspecialchars(getSSHKeyInfo($key));
     } catch (\Throwable $e) {
@@ -259,7 +260,12 @@ foreach ($sshPubKeys as $key) {
     $key_b64 = base64_encode($key);
     echo"
         <tr>
-            <td><span class='ssh-key-info'>$key_info</span></td>
+            <td>
+                <span class='ssh-key-info'>$key_info</span>
+                <div class='key-box'>
+                    <textarea spellcheck='false' readonly aria-label='key box'>$key_escaped</textarea>
+                </div>
+            </td>
             <td>
                 <form
                     action=''
@@ -375,6 +381,21 @@ echo "</form></div>";
 </script>
 
 <style>
+    .key-box {
+        position: relative;
+        width: auto;
+        height: auto;
+        max-width: 700px;
+    }
+
+    .key-box textarea {
+        word-wrap: break-word;
+        word-break: break-all;
+        width: calc(100% - 44px);
+        border-radius: 3px 0 0 3px;
+        font-family: monospace;
+    }
+
     .ssh-key-info {
         display: inline-block;
         word-wrap: break-word;
