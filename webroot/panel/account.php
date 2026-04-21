@@ -310,7 +310,7 @@ foreach (CONFIG["loginshell"]["shell"] as $shell) {
 
 echo "
       </select>
-      <br>
+      <br style='margin-top: 10px;'>
       <input id='submitLoginShell' type='submit' value='Set Login Shell' />
     </form>
     <hr>

@@ -121,10 +121,6 @@ form > * {
   display: block;
 }
 
-form > *:not(:first-child) {
-  margin-top: 5px;
-}
-
 input:focus,
 textarea:focus,
 select:focus {
