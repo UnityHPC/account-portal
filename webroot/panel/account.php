@@ -48,17 +48,18 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             }
             $keys = array_map("trim", $keys);
             foreach ($keys as $key) {
-                $keyShort = shortenString($key, 10, 30);
                 [$is_valid, $explanation] = testValidSSHKey($key);
                 if (!$is_valid) {
+                    $keyShort = shortenString($key, 10, 30);
                     UnityHTTPD::messageError("SSH Key Not Added: $explanation", $keyShort);
                     continue;
                 }
+                $key_info = getSSHKeyInfo($key);
                 $keyWasAdded = $USER->addSSHKey($key);
                 if ($keyWasAdded) {
-                    UnityHTTPD::messageSuccess("SSH Key Added", $keyShort);
+                    UnityHTTPD::messageSuccess("SSH Key Added", $key_info);
                 } else {
-                    UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $keyShort);
+                    UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $key_info);
                 }
             }
             UnityHTTPD::redirect();
@@ -71,8 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 UnityHTTPD::messageError("Cannot Remove SSH Key", "Key not found");
                 UnityHTTPD::redirect();
             }
-            $keyShort = shortenString($key, 10, 30);
-            UnityHTTPD::messageSuccess("SSH Key Removed", $keyShort);
+            $key_info = getSSHKeyInfo($key);
+            UnityHTTPD::messageSuccess("SSH Key Removed", $key_info);
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "loginshell":
@@ -139,15 +140,15 @@ echo "
     <h2>Account Details</h2>
     <table>
         <tr>
-            <td>Username</th>
+            <td>Username</td>
             <td><code>$uid</code></td>
         </tr>
         <tr>
-            <td>Organization</th>
+            <td>Organization</td>
             <td><code>$org</code></td>
         </tr>
         <tr>
-            <td>Email</th>
+            <td>Email</td>
             <td><code>$mail</code></td>
         </tr>
     </table>
@@ -246,25 +247,51 @@ if (count($sshPubKeys) == 0) {
     echo "<p>You do not have any SSH public keys, press the button below to add one.</p>";
 }
 
+echo "<table>\n";
 foreach ($sshPubKeys as $key) {
     $key_escaped = htmlspecialchars($key);
+    try {
+        $key_info = htmlspecialchars(getSSHKeyInfo($key));
+    } catch (\Throwable $e) {
+        $errorid = uniqid();
+        UnityHTTPD::errorLog("error", "getSSHKeyInfo failed!", errorid: $errorid, error: $e, data: $key);
+        $key_info = "ERROR: Something went wrong while fetching your key. error ID: $errorid";
+    }
     $key_b64 = base64_encode($key);
-    echo
-    "<div class='key-box'>
-        <textarea spellcheck='false' readonly aria-label='key box'>$key_escaped</textarea>
-        <form
-            action=''
-            onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
-            method='POST'
-            aria-label='delete key'
-        >
-            $CSRFTokenHiddenFormInput
-            <input type='hidden' name='delKey' value='$key_b64' />
-            <input type='hidden' name='form_type' value='delKey' />
-            <input type='submit' value='&times;' />
-        </form>
-    </div>";
+    echo"
+        <tr>
+            <td><span class='ssh-key-info'>$key_info</span></td>
+            <td>
+                <form
+                    action=''
+                    onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
+                    method='POST'
+                    aria-label='delete key'
+                >
+                    $CSRFTokenHiddenFormInput
+                    <input type='hidden' name='delKey' value='$key_b64' />
+                    <input type='hidden' name='form_type' value='delKey' />
+                    <button type='submit' class='delete-key-button' aria-label='Delete Key'>
+                        <span class='delete-key-span icon-x' aria-hidden='true'></span>
+                    </button>
+                </form>
+            </td>
+            <td>
+                <button type='button' class='show-hide-key-button' aria-label='Show/Hide Key Contents'>
+                    <span class='show-hide-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class='key-box' style='display: none;'>
+                    <textarea spellcheck='false' readonly aria-label='key box'>$key_escaped</textarea>
+                </div>
+            </td>
+        </tr>
+    ";
 }
+echo "</table>\n";
 
 echo "
     <button type='button' class='plusBtn btnAddKey' aria-label='Add SSH Key'><span>&#43;</span></button>
@@ -281,7 +308,7 @@ foreach (CONFIG["loginshell"]["shell"] as $shell) {
 
 echo "
       </select>
-      <br>
+      <br style='margin-top: 10px;'>
       <input id='submitLoginShell' type='submit' value='Set Login Shell' />
     </form>
     <hr>
@@ -340,6 +367,14 @@ echo "</form></div>";
         openModal("Add New Key", url);
     });
 
+    $(".show-hide-key-button").click(function() {
+        const keyBox = $(this).closest("tr").next("tr").find(".key-box");
+        const showKeyIcon = $(this).find(".show-hide-key-span");
+        keyBox.toggle();
+        showKeyIcon.toggleClass("icon-magnifying-glass-plus", !keyBox.is(":visible"));
+        showKeyIcon.toggleClass("icon-magnifying-glass-minus", keyBox.is(":visible"));
+    });
+
     $("#loginSelector option").each(function(i, e) {
         if ($(this).val() == ldapLoginShell) {
             $(this).prop("selected", true);
@@ -362,27 +397,44 @@ echo "</form></div>";
         position: relative;
         width: auto;
         height: auto;
-        max-width: 700px;
-    }
-
-    .key-box input[type=submit] {
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        padding: 5px;
-        width: 32px;
-        border-radius: 0 3px 3px 0;
-        font-size: 20pt;
-        margin: 0;
     }
 
     .key-box textarea {
         word-wrap: break-word;
         word-break: break-all;
-        width: calc(100% - 44px);
         border-radius: 3px 0 0 3px;
         font-family: monospace;
+    }
+
+    .ssh-key-info {
+        display: inline-block;
+        word-wrap: break-word;
+        word-break: break-all;
+        font-family: monospace;
+    }
+
+    .delete-key-button, .show-hide-key-button {
+        display: flex; /* using flex inside button allows the X image to be centered */
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+    }
+
+    .delete-key-span, .show-hide-key-span {
+        background-color: white;
+        mask-size: contain;
+    }
+
+    .delete-key-span {
+        width: 16px;
+        height: 16px;
+    }
+
+    .show-hide-key-span {
+        width: 24px;
+        height: 24px;
     }
 </style>
 
