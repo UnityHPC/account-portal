@@ -10,6 +10,13 @@
     }
   }
 
+  $("button.hamburger").on("keydown", function (e) {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+      e.preventDefault();
+      $("nav.mainNav").toggle();
+    }
+  });
+
   $("button.hamburger").on("click", function () {
     var mainNav = $("nav.mainNav");
     if (mainNav.is(":visible")) {
