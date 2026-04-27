@@ -52,7 +52,7 @@
    <header>
      <img id="imgLogo" draggable="false"
      src="{{ getRelativeURL('assets', CONFIG['site']['logo']) }}" alt="Unity Logo">
-     <button class="hamburger vertical-align">
+     <button class="hamburger vertical-align" aria-label="Open navigation" aria-controls="navigation">
        <img
          draggable="false"
          src="{{ getRelativeURL('assets/menu.png') }}"
@@ -61,7 +61,7 @@
      </button>
    </header>
 
-  <nav class="mainNav">
+  <nav class="mainNav" id="navigation" aria-label="navigation" role="menu">
     {{ getRelativeHyperlink('Home', 'index.php')|raw }}
 
     {% for label in CONFIG['menuitems']['labels'] %}

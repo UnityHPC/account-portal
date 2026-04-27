@@ -13,7 +13,18 @@
   $("button.hamburger").on("keydown", function (e) {
     if (e.key === 'Enter' || e.keyCode === 13) {
       e.preventDefault();
-      $("nav.mainNav").toggle();
+      var mainNav = $("nav.mainNav");
+      mainNav.toggle();
+      if (mainNav.is(":visible")) {
+        $("button.hamburger").attr("aria-expanded", "true");
+        setTimeout(() => {
+          mainNav.find('a').first().focus();
+        });
+      }
+      else {
+        $("button.hamburger").attr("aria-expanded", "false");
+        $("button.hamburger").focus();
+      }
     }
   });
 
