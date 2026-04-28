@@ -10,6 +10,7 @@
     'dataTables.buttons.min',
     'dataTables.columnControl.min',
     'dataTables.keyTable.min',
+    'keyTable.dataTables.min',
     'buttons.print.min',
     'buttons.colVis.min',
     'buttons.html5.min',
@@ -36,6 +37,7 @@
     'dataTables.dataTables.min',
     'columnControl.dataTables.min',
     'buttons.dataTables.min',
+    'keyTable.dataTables.min',
   ] %}
   {% for x in stylesheets %}
     {% set url = getRelativeURL('css/' ~ x ~ '.css?cache_bust_increment_me=' ~ CONFIG['upstream']['version']) %}

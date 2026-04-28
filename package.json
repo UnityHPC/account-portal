@@ -18,6 +18,10 @@
       "to": "webroot/js/jquery.min.js"
     },
     {
+      "from": "node_modules/datatables.net-keytable/js/dataTables.keyTable.min.js",
+      "to": "webroot/js/dataTables.keyTable.min.js"
+    },
+    {
       "from": "node_modules/datatables.net-keytable-dt/js/keyTable.dataTables.min.js",
       "to": "webroot/js/keyTable.dataTables.min.js"
     },
