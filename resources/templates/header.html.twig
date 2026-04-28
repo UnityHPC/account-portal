@@ -48,101 +48,99 @@
 </head>
 
 <body>
+  <header>
+    <img id="imgLogo" draggable="false"
+      src="{{ getRelativeURL('assets', CONFIG['site']['logo']) }}" alt="Unity Logo" />
+    <button class="hamburger vertical-align">
+      <img
+        draggable="false"
+        src="{{ getRelativeURL('assets/menu.png') }}"
+        alt="Menu Button"
+      />
+    </button>
 
-   <header>
-     <img id="imgLogo" draggable="false"
-     src="{{ getRelativeURL('assets', CONFIG['site']['logo']) }}" alt="Unity Logo">
-     <button class="hamburger vertical-align">
-       <img
-         draggable="false"
-         src="{{ getRelativeURL('assets/menu.png') }}"
-         alt="Menu Button"
-       >
-     </button>
+     <nav class="mainNav">
+       {{ getRelativeHyperlink('Home', 'index.php')|raw }}
+
+       {% for label in CONFIG['menuitems']['labels'] %}
+         <a target="_blank" href="{{ CONFIG['menuitems']['links'][loop.index0] }}">{{ label }}</a>
+       {% endfor %}
+
+       {% if user_exists %}
+         <hr class="navHR">
+         {{ getRelativeHyperlink('Account Settings', 'panel/account.php')|raw }}
+         {{ getRelativeHyperlink('My PIs', 'panel/groups.php')|raw }}
+
+         {% if is_pi %}
+           {{ getRelativeHyperlink('My Users', 'panel/pi.php')|raw }}
+         {% endif %}
+
+         {% for label in CONFIG['menuitems_secure']['labels'] %}
+           <a target="_blank" href="{{ CONFIG['menuitems_secure']['links'][loop.index0] }}">{{ label }}</a>
+         {% endfor %}
+
+         {% if is_admin and (viewUser is null) %}
+           <hr class="navHR">
+           {{ getRelativeHyperlink('User Management', 'admin/user-mgmt.php')|raw }}
+           {{ getRelativeHyperlink('PI Management', 'admin/pi-mgmt.php')|raw }}
+         {% endif %}
+       {% else %}
+         {{ getRelativeHyperlink('Login / Request Account', 'panel/account.php')|raw }}
+       {% endif %}
+     </nav>
+
+     <div class="modalWrapper" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+       <div class="modalContent">
+         <div class="modalTitleWrapper">
+           <span class="modalTitle"></span>
+           <button style="position: absolute; right: 10px; top: 10px;" class="btnClose"></button>
+         </div>
+         <div class="modalBody"></div>
+       </div>
+     </div>
+     <script
+       src="{{ getRelativeURL('js/modal.js?cache_bust_increment_me=' ~ CONFIG['upstream']['version']) }}"
+     ></script>
+
+     <div id="messages">
+       {% if messages|length > 0 %}
+         {# ensure heading rank is preserved for a11y #}
+         <h2 style="display: none">Notifications</h2>
+       {% endif %}
+       {% if messages|length >= 3 %}
+         <button id="clear_all_messages_button">Clear All Messages</button>
+       {% endif %}
+       {% set level_enum = enum('UnityWebPortal\\lib\\UnityHTTPDMessageLevel') %}
+       {% for message in messages|reverse %}
+         {% set title = message[0] %}
+         {% set body = message[1] %}
+         {% set level = message[2] %}
+         {% set msg_role = (level in [level_enum.WARNING, level_enum.ERROR]) ? 'alert' : 'status' %}
+         <div class="message {{ level.value|e }}" role="{{ msg_role }}">
+           <h3>{{ title }}</h3>
+           <p>{{ body }}</p>
+           <button
+             data-level="{{ base64_encode(level.value) }}"
+             data-title="{{ base64_encode(title) }}"
+             data-body="{{ base64_encode(body) }}"
+           aria-label="Dismiss this message"
+           >
+             ×
+           </button>
+         </div>
+       {% endfor %}
+     </div>
+
+     {% if is_admin and (viewUser is not null) %}
+       <div id="viewAsBar">
+         <span>You are accessing the web portal as the user <strong>{{ viewUser }}</strong></span>
+         <form method="POST" action="">
+           {{ getCSRFTokenHiddenFormInput()|raw }}
+           <input type="hidden" name="form_type" value="clearView">
+           <input type="hidden" name="uid" value="{{ viewUser }}">
+           <input type="submit" value="Return to My User">
+         </form>
+       </div>
+     {% endif %}
    </header>
-
-  <nav class="mainNav">
-    {{ getRelativeHyperlink('Home', 'index.php')|raw }}
-
-    {% for label in CONFIG['menuitems']['labels'] %}
-      <a target="_blank" href="{{ CONFIG['menuitems']['links'][loop.index0] }}">{{ label }}</a>
-    {% endfor %}
-
-    {% if user_exists %}
-      <hr class="navHR">
-      {{ getRelativeHyperlink('Account Settings', 'panel/account.php')|raw }}
-      {{ getRelativeHyperlink('My PIs', 'panel/groups.php')|raw }}
-
-      {% if is_pi %}
-        {{ getRelativeHyperlink('My Users', 'panel/pi.php')|raw }}
-      {% endif %}
-
-      {% for label in CONFIG['menuitems_secure']['labels'] %}
-        <a target="_blank" href="{{ CONFIG['menuitems_secure']['links'][loop.index0] }}">{{ label }}</a>
-      {% endfor %}
-
-      {% if is_admin and (viewUser is null) %}
-        <hr class="navHR">
-        {{ getRelativeHyperlink('User Management', 'admin/user-mgmt.php')|raw }}
-        {{ getRelativeHyperlink('PI Management', 'admin/pi-mgmt.php')|raw }}
-      {% endif %}
-    {% else %}
-      {{ getRelativeHyperlink('Login / Request Account', 'panel/account.php')|raw }}
-    {% endif %}
-  </nav>
-
-  <div class="modalWrapper" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modalContent">
-      <div class="modalTitleWrapper">
-        <span class="modalTitle"></span>
-        <button style="position: absolute; right: 10px; top: 10px;" class="btnClose"></button>
-      </div>
-      <div class="modalBody"></div>
-    </div>
-  </div>
-  <script
-    src="{{ getRelativeURL('js/modal.js?cache_bust_increment_me=' ~ CONFIG['upstream']['version']) }}"
-  ></script>
-
-  <div id="messages">
-    {% if messages|length > 0 %}
-      {# ensure heading rank is preserved for a11y #}
-      <h2 style="display: none">Notifications</h2>
-    {% endif %}
-    {% if messages|length >= 3 %}
-      <button id="clear_all_messages_button">Clear All Messages</button>
-    {% endif %}
-    {% set level_enum = enum('UnityWebPortal\\lib\\UnityHTTPDMessageLevel') %}
-    {% for message in messages|reverse %}
-      {% set title = message[0] %}
-      {% set body = message[1] %}
-      {% set level = message[2] %}
-      {% set msg_role = (level in [level_enum.WARNING, level_enum.ERROR]) ? 'alert' : 'status' %}
-      <div class="message {{ level.value|e }}" role="{{ msg_role }}">
-        <h3>{{ title }}</h3>
-        <p>{{ body }}</p>
-        <button
-          data-level="{{ base64_encode(level.value) }}"
-          data-title="{{ base64_encode(title) }}"
-          data-body="{{ base64_encode(body) }}"
-        aria-label="Dismiss this message"
-        >
-          ×
-        </button>
-      </div>
-    {% endfor %}
-  </div>
-
-  {% if is_admin and (viewUser is not null) %}
-    <div id="viewAsBar">
-      <span>You are accessing the web portal as the user <strong>{{ viewUser }}</strong></span>
-      <form method="POST" action="">
-        {{ getCSRFTokenHiddenFormInput()|raw }}
-        <input type="hidden" name="form_type" value="clearView">
-        <input type="hidden" name="uid" value="{{ viewUser }}">
-        <input type="submit" value="Return to My User">
-      </form>
-    </div>
-  {% endif %}
-
   <main>
