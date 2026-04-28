@@ -1,40 +1,32 @@
-div.modalWrapper {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+#modal::backdrop {
   background: rgba(0, 0, 0, 0.6);
-  z-index: 100;
 }
 
-div.modalContent {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+#modal {
   background: var(--light_background);
   padding: 15px;
   width: calc(100% - 30px);
   box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.4);
+  border-width: 1px;
+  border-style: solid;
   border-radius: 5px;
   max-width: 600px;
 }
 
-div.modalTitleWrapper {
+#modalTitleWrapper {
   overflow: hidden;
   display: inline-block;
 }
 
-span.modalTitle {
+#modalTitle {
   font-size: 13pt;
 }
 
-div.modalBody>* {
+#modalBody>* {
   margin: 0;
 }
 
-.btnClose {
+#modalCloseButton {
   width: 30px;
   height: 30px;
   padding: 0;
@@ -42,15 +34,6 @@ div.modalBody>* {
   font-size: 20pt;
 }
 
-.btnClose::before {
+#modalCloseButton::before {
   content: "\00d7";
-}
-
-.buttonList {
-  margin-top: 10px;
-}
-
-.buttonList > * {
-  display: inline-block;
-  margin-right: 10px;
 }

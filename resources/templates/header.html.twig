@@ -91,15 +91,13 @@
     {% endif %}
   </nav>
 
-  <div class="modalWrapper" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modalContent">
-      <div class="modalTitleWrapper">
-        <span class="modalTitle"></span>
-        <button style="position: absolute; right: 10px; top: 10px;" class="btnClose"></button>
-      </div>
-      <div class="modalBody"></div>
+  <dialog id="modal" aria-labelledby="modalTitle" autofocus>
+    <div id="modalTitleWrapper">
+      <span id="modalTitle"></span>
+      <button id="modalCloseButton" style="position: absolute; right: 10px; top: 10px;" aria-label="Close dialog"></button>
     </div>
-  </div>
+    <div id="modalBody"></div>
+  </dialog>
   <script
     src="{{ getRelativeURL('js/modal.js?cache_bust_increment_me=' ~ CONFIG['upstream']['version']) }}"
   ></script>
