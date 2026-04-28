@@ -1,14 +1,14 @@
 function openModal(title, link) {
     $("#modalTitle").text(title);
+    $("#modal")[0].showModal();
+    $("#modalBody").text("Loading...");
     $.ajax({
         url: link,
         success: function (result) {
             $("#modalBody").html(result);
-            $("#modal")[0].showModal();
         },
         error: function (result) {
-            $("#modalBody").html(result.responseText);
-            $("#modal")[0].showModal();
+            $("#modalBody").html(result);
         },
     });
 }
