@@ -8,7 +8,7 @@ function openModal(title, link) {
             $("#modalBody").html(result);
         },
         error: function (result) {
-            $("#modalBody").html(result);
+            $("#modalBody").html(result.responseText);
         },
     });
 }
