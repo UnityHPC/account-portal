@@ -219,7 +219,7 @@ echo "</table>";
 <button type='button' class='plusBtn btnAddPI'><span>&#43;</span></button>
 
 <style>
-    div.modalContent {
+    #modalContent {
         max-width: 300px;
     }
 </style>

@@ -1,20 +1,18 @@
 function openModal(title, link) {
-  $("span.modalTitle").html(title);
-  $.ajax({
-    url: link,
-    success: function (result) {
-      $("div.modalBody").html(result);
-    },
-    error: function (result) {
-      $("div.modalBody").html(result.responseText);
-    },
-  });
-
-  $("div.modalWrapper").fadeIn(100); // With Animation
-  //$("div.modalWrapper").show();
+    $("#modalTitle").html(title);
+    $.ajax({
+        url: link,
+        success: function (result) {
+            $("#modalBody").html(result);
+            $("#modal")[0].showModal();
+        },
+        error: function (result) {
+            $("#modalBody").html(result.responseText);
+            $("#modal")[0].showModal();
+        },
+    });
 }
 
 $("button.btnClose").click(function () {
-  //$("div.modalWrapper").fadeOut(50);  // With Animation
-  $("div.modalWrapper").hide();
+    $("#modal")[0].close();
 });
