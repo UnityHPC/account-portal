@@ -8,6 +8,7 @@
     "datatables.net-buttons-dt": "^3.2.6",
     "datatables.net-columncontrol-dt": "^1.2.0",
     "datatables.net-dt": "^2.3.6",
+    "datatables.net-keytable": "^2.12.2",
     "datatables.net-responsive-dt": "^3.0.7",
     "jquery": "^3.7.1"
   },
