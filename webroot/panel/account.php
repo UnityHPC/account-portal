@@ -248,7 +248,7 @@ if (count($sshPubKeys) == 0) {
 }
 
 echo "<table>\n";
-foreach ($sshPubKeys as $key) {
+foreach ($sshPubKeys as $i => $key) {
     $key_escaped = htmlspecialchars($key);
     try {
         $key_info = htmlspecialchars(getSSHKeyInfo($key));
@@ -271,21 +271,21 @@ foreach ($sshPubKeys as $key) {
                     $CSRFTokenHiddenFormInput
                     <input type='hidden' name='delKey' value='$key_b64' />
                     <input type='hidden' name='form_type' value='delKey' />
-                    <button type='submit' class='delete-key-button' aria-label='Delete Key'>
+                    <button type='submit' class='delete-key-button' aria-label='Delete Key #$i'>
                         <span class='delete-key-span icon-x' aria-hidden='true'></span>
                     </button>
                 </form>
             </td>
             <td>
-                <button type='button' class='show-hide-key-button' aria-label='Show/Hide Key Contents'>
+                <button type='button' class='show-hide-key-button' aria-label='Show/Hide Key #$i Contents'>
                     <span class='show-hide-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
                 </button>
             </td>
         </tr>
         <tr>
             <td>
-                <div class='key-box' style='display: none;'>
-                    <textarea spellcheck='false' readonly aria-label='key box'>$key_escaped</textarea>
+                <div class='key-box' aria-label='Key #$i Contents' style='display: none;'>
+                    <textarea spellcheck='false' readonly aria-hidden='true'>$key_escaped</textarea>
                 </div>
             </td>
         </tr>
