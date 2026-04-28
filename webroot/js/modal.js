@@ -13,6 +13,6 @@ function openModal(title, link) {
     });
 }
 
-$("button.btnClose").click(function () {
+$("#modalCloseButton").click(function () {
     $("#modal")[0].close();
 });

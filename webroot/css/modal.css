@@ -1,4 +1,4 @@
-::backdrop {
+#modal::backdrop {
   background: rgba(0, 0, 0, 0.6)
 }
 
@@ -26,7 +26,7 @@
   margin: 0;
 }
 
-.btnClose {
+#modalCloseButton {
   width: 30px;
   height: 30px;
   padding: 0;
@@ -34,15 +34,6 @@
   font-size: 20pt;
 }
 
-.btnClose::before {
+#modalCloseButton::before {
   content: "\00d7";
-}
-
-.buttonList {
-  margin-top: 10px;
-}
-
-.buttonList > * {
-  display: inline-block;
-  margin-right: 10px;
 }
