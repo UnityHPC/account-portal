@@ -18,8 +18,8 @@
       "to": "webroot/js/jquery.min.js"
     },
     {
-      "from": "node_modules/datatables.net-keytable/js/dataTables.keyTable.min.js",
-      "to": "webroot/js/dataTables.keyTable.min.js"
+      "from": "node_modules/datatables.net-keytable-dt/js/keyTable.dataTables.min.js",
+      "to": "webroot/js/keyTable.dataTables.min.js"
     },
     {
       "from": "node_modules/datatables.net-responsive/js/dataTables.responsive.min.js",
@@ -64,6 +64,10 @@
     {
       "from": "node_modules/datatables.net-buttons-dt/css/buttons.dataTables.min.css",
       "to": "webroot/css/buttons.dataTables.min.css"
+    },
+    {
+      "from": "node_modules/datatables.net-keytable-dt/css/keyTable.dataTables.min.css",
+      "to": "webroot/css/keyTable.dataTables.min.css"
     }
   ]
 }
