@@ -1,3 +1,7 @@
+::backdrop {
+  background: rgba(0, 0, 0, 0.6)
+}
+
 #modal {
   background: var(--light_background);
   padding: 15px;
