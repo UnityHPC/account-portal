@@ -20,8 +20,13 @@
     word-wrap: break-word;
 }
 
-.message h3 {
+.message-title {
     margin: 0;
+    /* below is copied from default style of <h3> */
+    font-size: 16pt;
+    font-weight: unset;
+    padding-bottom: 5px;
+    display: block;
 }
 
 .message.debug {

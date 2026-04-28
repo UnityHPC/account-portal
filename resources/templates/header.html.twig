@@ -102,11 +102,7 @@
   ></script>
   <main>
 
-  <div id="messages">
-    {% if messages|length > 0 %}
-      {# ensure heading rank is preserved for a11y #}
-      <h2 style="display: none">Notifications</h2>
-    {% endif %}
+  <div id="messages" role="list">
     {% if messages|length >= 3 %}
       <button id="clear_all_messages_button">Clear All Messages</button>
     {% endif %}
@@ -116,14 +112,14 @@
       {% set body = message[1] %}
       {% set level = message[2] %}
       {% set msg_role = (level in [level_enum.WARNING, level_enum.ERROR]) ? 'alert' : 'status' %}
-      <div class="message {{ level.value|e }}" role="{{ msg_role }}">
-        <h3>{{ title }}</h3>
-        <p>{{ body }}</p>
+      <div class="message {{ level.value|e }}" role="{{ msg_role }}" role="listitem">
+        <p class="message-title">{{ title }}</p>
+        <p class="message-body">{{ body }}</p>
         <button
           data-level="{{ base64_encode(level.value) }}"
           data-title="{{ base64_encode(title) }}"
           data-body="{{ base64_encode(body) }}"
-        aria-label="Dismiss this message"
+          aria-label="Dismiss this message"
         >
           ×
         </button>
