@@ -32,8 +32,10 @@
     var mainNav = $("nav.mainNav");
     if (mainNav.is(":visible")) {
       mainNav.fadeOut(100);
+      $("button.hamburger").attr("aria-expanded", "false");
     } else {
       mainNav.fadeIn(100);
+      $("button.hamburger").attr("aria-expanded", "true");
     }
   });
 
@@ -42,6 +44,7 @@
       !$(e.target).parent().hasClass("hamburger") &&
       $("button.hamburger").is(":visible")
     ) {
+      $("button.hamburger").attr("aria-expanded", "false");
       $("nav.mainNav").fadeOut(100);
     }
   });
