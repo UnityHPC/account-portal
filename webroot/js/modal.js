@@ -1,5 +1,5 @@
 function openModal(title, link) {
-    $("#modalTitle").html(title);
+    $("#modalTitle").text(title);
     $.ajax({
         url: link,
         success: function (result) {
