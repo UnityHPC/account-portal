@@ -103,6 +103,7 @@ $flags_to_display = array_filter(UserFlag::cases(), fn($x) => $x !== UserFlag::D
 <script>
 $(document).ready(() => {
     $('#user-table').DataTable({
+        keys: true,
         stateSave: true,
         responsive: true,
         columns: [

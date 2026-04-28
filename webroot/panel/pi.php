@@ -227,6 +227,7 @@ echo "</form></div>";
 <script>
     $(document).ready(() => {
         $('#users-table').DataTable({
+            keys: true,
             stateSave: true,
             responsive: true,
             columns: [

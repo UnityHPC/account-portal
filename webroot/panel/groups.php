@@ -233,6 +233,7 @@ echo "</table>";
 <script>
     $(document).ready(() => {
         $('#pi-table').DataTable({
+            keys: true,
             stateSave: true,
             responsive: true,
             columns: [
@@ -245,6 +246,7 @@ echo "</table>";
             layout: {topStart: {buttons: ['colvis']}}
         });
         $('#pi-request-table').DataTable({
+            keys: true,
             stateSave: true,
             responsive: true,
             columns: [
