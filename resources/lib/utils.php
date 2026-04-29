@@ -76,6 +76,7 @@ function sound_it_out(string $x): string
  * @throws Exception
  * @return array{0: string, 1: string}
  * 1st string: {key_length_bits} SHA256:{key_fingerprint} {optional_key_comment} ({key_type})
+ * format copied from openssl: https://superuser.com/a/1634883
  * 2nd string: sentence that can be read aloud using text-to-speech
  */
 function getSSHKeyInfo(string $key): array
@@ -93,7 +94,6 @@ function getSSHKeyInfo(string $key): array
     $fingerprint = (string) $pubkey->getFingerprint("sha256");
     if ($comment !== "") {
         return [
-            // format copied from openssl: https://superuser.com/a/1634883
             "$length SHA256:$fingerprint $comment ($type)",
             sprintf(
                 "comment %s, type %s, length %d, and sha 256 fingerprint beginning with %s",
