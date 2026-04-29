@@ -53,10 +53,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 if (!$is_valid) {
                     $keyShort = shortenString($key, 10, 30);
                     UnityHTTPD::message(
-                        "SSH Key Not Added: $explanation",
-                        $keyShort,
-                        UnityHTTPDMessageLevel::ERROR,
-                        body_screen_reader: sound_it_out($keyShort)
+                        level: UnityHTTPDMessageLevel::ERROR,
+                        title: "SSH Key Not Added: $explanation",
+                        body: $keyShort,
+                        body_screen_reader: "key contents: " . sound_it_out($keyShort),
                     );
                     continue;
                 }
@@ -64,10 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 $keyWasAdded = $USER->addSSHKey($key);
                 if ($keyWasAdded) {
                     UnityHTTPD::message(
-                        "SSH Key Added",
-                        $key_info,
-                        UnityHTTPDMessageLevel::SUCCESS,
-                        body_screen_reader: $key_info_sentence
+                        level: UnityHTTPDMessageLevel::SUCCESS,
+                        title: "SSH Key Added",
+                        body: $key_info,
+                        body_screen_reader: "key info: $key_info_sentence",
                     );
                 } else {
                     UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $key_info);
