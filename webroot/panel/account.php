@@ -283,8 +283,16 @@ foreach ($sshPubKeys as $i => $key) {
     echo"
         <tr aria-label='key #$i'>
             <td class='ssh-key-info'>
-                <span aria-hidden='true'>$key_info</span>
-                <span class='screen-reader-only'>$key_info_sr</span>
+                <details>
+                    <summary>
+                        <span aria-hidden='true'>$key_info</span>
+                        <span class='screen-reader-only'>$key_info_sr</span>
+                    </summary>
+                    <div class='key-box'>
+                        <textarea spellcheck='false' readonly aria-hidden='true'>$key_escaped</textarea>
+                        <textarea spellcheck='false' readonly class='screen-reader-only'>$key_contents_sr</textarea>
+                    </div>
+                </details>
             </td>
             <td>
                 <form
@@ -299,19 +307,6 @@ foreach ($sshPubKeys as $i => $key) {
                         <span class='delete-key-span icon-x' aria-hidden='true'></span>
                     </button>
                 </form>
-            </td>
-            <td>
-                <button type='button' class='show-hide-key-button' aria-label='Show/Hide Key #$i Contents'>
-                    <span class='show-hide-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
-                </button>
-            </td>
-        </tr>
-        <tr aria-label='Key #$i Contents'>
-            <td>
-                <div class='key-box' style='display: none;'>
-                    <textarea spellcheck='false' readonly aria-hidden='true'>$key_escaped</textarea>
-                    <textarea spellcheck='false' readonly class='screen-reader-only'>$key_contents_sr</textarea>
-                </div>
             </td>
         </tr>
     ";
@@ -396,8 +391,6 @@ echo "</form></div>";
         const keyBox = $(this).closest("tr").next("tr").find(".key-box");
         const showKeyIcon = $(this).find(".show-hide-key-span");
         keyBox.toggle();
-        showKeyIcon.toggleClass("icon-magnifying-glass-plus", !keyBox.is(":visible"));
-        showKeyIcon.toggleClass("icon-magnifying-glass-minus", keyBox.is(":visible"));
     });
 
     $("#loginSelector option").each(function(i, e) {
@@ -438,7 +431,7 @@ echo "</form></div>";
         font-family: monospace;
     }
 
-    .delete-key-button, .show-hide-key-button {
+    .delete-key-button{
         display: flex; /* using flex inside button allows the X image to be centered */
         align-items: center;
         justify-content: center;
@@ -447,7 +440,7 @@ echo "</form></div>";
         padding: 0;
     }
 
-    .delete-key-span, .show-hide-key-span {
+    .delete-key-span{
         background-color: white;
         mask-size: contain;
     }
@@ -455,11 +448,6 @@ echo "</form></div>";
     .delete-key-span {
         width: 16px;
         height: 16px;
-    }
-
-    .show-hide-key-span {
-        width: 24px;
-        height: 24px;
     }
 </style>
 
