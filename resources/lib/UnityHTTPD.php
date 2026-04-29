@@ -332,22 +332,18 @@ class UnityHTTPD
     {
         self::message($title, $body, UnityHTTPDMessageLevel::DEBUG);
     }
-
     public static function messageInfo(string $title, string $body): void
     {
         self::message($title, $body, UnityHTTPDMessageLevel::INFO);
     }
-
     public static function messageSuccess(string $title, string $body): void
     {
         self::message($title, $body, UnityHTTPDMessageLevel::SUCCESS);
     }
-
     public static function messageWarning(string $title, string $body): void
     {
         self::message($title, $body, UnityHTTPDMessageLevel::WARNING);
     }
-
     public static function messageError(string $title, string $body): void
     {
         self::message($title, $body, UnityHTTPDMessageLevel::ERROR);
