@@ -5,8 +5,10 @@
   function setNav() {
     if ($("button.hamburger").is(":visible")) {
       $("nav.mainNav").hide(); // Mobile View
+      $("button.hamburger").attr("aria-expanded", "false");
     } else {
       $("nav.mainNav").show(); // Desktop View
+      $("button.hamburger").attr("aria-expanded", "true");
     }
   }
 
