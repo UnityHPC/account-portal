@@ -263,7 +263,7 @@ if (count($sshPubKeys) == 0) {
     echo "<p>You do not have any SSH public keys, press the button below to add one.</p>";
 }
 
-echo "<table>\n";
+echo "<ul id='ssh-keys-list' style='list-style-type: none' role='list'>\n";
 foreach ($sshPubKeys as $i => $key) {
     $key_escaped = htmlspecialchars($key);
     try {
@@ -280,35 +280,31 @@ foreach ($sshPubKeys as $i => $key) {
     $key_info_sr = "SSH key #$i, " . $key_info_sentence;
     $key_contents_sr = "SSH key #$i, contents: " . sound_it_out($key_escaped);
     echo"
-        <tr aria-label='key #$i'>
-            <td class='ssh-key-info'>
-                <details>
-                    <summary>
-                        <span aria-hidden='true'>$key_info</span>
-                        <span class='screen-reader-only'>$key_info_sr</span>
-                    </summary>
-                    <textarea spellcheck='false' readonly aria-hidden='true'>$key_escaped</textarea>
-                    <textarea spellcheck='false' readonly class='screen-reader-only'>$key_contents_sr</textarea>
-                </details>
-            </td>
-            <td>
-                <form
-                    action=''
-                    onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
-                    method='POST'
-                >
-                    $CSRFTokenHiddenFormInput
-                    <input type='hidden' name='delKey' value='$key_b64' />
-                    <input type='hidden' name='form_type' value='delKey' />
-                    <button type='submit' class='delete-key-button' aria-label='Delete Key #$i'>
-                        <span class='delete-key-span icon-x' aria-hidden='true'></span>
-                    </button>
-                </form>
-            </td>
-        </tr>
+        <li aria-label='key #$i'>
+            <details class='ssh-key-info'>
+                <summary>
+                    <span aria-hidden='true'>$key_info</span>
+                    <span class='screen-reader-only'>$key_info_sr</span>
+                </summary>
+                <textarea spellcheck='false' readonly aria-hidden='true'>$key_escaped</textarea>
+                <textarea spellcheck='false' readonly class='screen-reader-only'>$key_contents_sr</textarea>
+            </details>
+            <form
+                action=''
+                onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
+                method='POST'
+            >
+                $CSRFTokenHiddenFormInput
+                <input type='hidden' name='delKey' value='$key_b64' />
+                <input type='hidden' name='form_type' value='delKey' />
+                <button type='submit' class='delete-key-button' aria-label='Delete Key #$i'>
+                    <span class='delete-key-span icon-x' aria-hidden='true'></span>
+                </button>
+            </form>
+        </li>
     ";
 }
-echo "</table>\n";
+echo "</ul>";
 
 echo "
     <button type='button' class='plusBtn btnAddKey' aria-label='Add SSH Key'><span>&#43;</span></button>
@@ -408,6 +404,10 @@ echo "</form></div>";
 </script>
 
 <style>
+    #ssh-keys-list {
+        padding-left: 0;
+    }
+
     .key-box {
         position: relative;
         width: auto;
