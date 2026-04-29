@@ -13,14 +13,10 @@
   }
 
   $("button.hamburger").on("click", function () {
-    var mainNav = $("nav.mainNav");
-    if (mainNav.is(":visible")) {
-      mainNav.toggle();
-      $("button.hamburger").attr("aria-expanded", "false");
-    } else {
-      mainNav.toggle();
-      $("button.hamburger").attr("aria-expanded", "true");
-    }
+    $("nav.mainNav").toggle();
+    var expanded_before = $("button.hamburger").attr("aria-expanded");
+    var expanded_after = expanded_before === "true" ? "false" : "true";
+    $("button.hamburger").attr("aria-expanded", expanded_after);
   });
 
   $("main").click(function (e) {
