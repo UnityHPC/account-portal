@@ -10,42 +10,24 @@
     }
   }
 
-  $("button.hamburger").on("keydown", function (e) {
-    if (e.key === 'Enter' || e.keyCode === 13) {
-      e.preventDefault();
-      var mainNav = $("nav.mainNav");
-      mainNav.toggle();
-      if (mainNav.is(":visible")) {
-        $("button.hamburger").attr("aria-expanded", "true");
-        setTimeout(() => {
-          mainNav.find('a').first().focus();
-        });
-      }
-      else {
-        $("button.hamburger").attr("aria-expanded", "false");
-        $("button.hamburger").focus();
-      }
-    }
-  });
-
   $("button.hamburger").on("click", function () {
     var mainNav = $("nav.mainNav");
     if (mainNav.is(":visible")) {
-      mainNav.fadeOut(100);
+      mainNav.toggle();
       $("button.hamburger").attr("aria-expanded", "false");
     } else {
-      mainNav.fadeIn(100);
+      mainNav.toggle();
       $("button.hamburger").attr("aria-expanded", "true");
     }
   });
 
-  $(window).click(function (e) {
+  $("main").click(function (e) {
     if (
       !$(e.target).parent().hasClass("hamburger") &&
       $("button.hamburger").is(":visible")
     ) {
       $("button.hamburger").attr("aria-expanded", "false");
-      $("nav.mainNav").fadeOut(100);
+      $("nav.mainNav").hide();
     }
   });
 
@@ -72,19 +54,6 @@
 
     if (url.indexOf(href) === 0) {
       $(this).addClass("active");
-    }
-  });
-
-  /**
-   * btnDropdown Click Events
-   */
-  $("div.btnDropdown > button").click(function () {
-    $("div.btnDropdown > div").toggle();
-  });
-
-  $(window).click(function (e) {
-    if (!e.target.matches("div.btnDropdown > button")) {
-      $("div.btnDropdown > div").hide();
     }
   });
 })();
