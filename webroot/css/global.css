@@ -309,14 +309,6 @@ div.searchWrapper > *:hover {
   mask-image: url('/assets/x.svg');
 }
 
-.icon-magnifying-glass-plus {
-  mask-image: url('/assets/magnifying-glass-plus.svg');
-}
-
-.icon-magnifying-glass-minus {
-  mask-image: url('/assets/magnifying-glass-minus.svg');
-}
-
 .screen-reader-only {
     position:absolute;
     left:-10000px;
