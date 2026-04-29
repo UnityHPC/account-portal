@@ -2,6 +2,7 @@
 
 require_once __DIR__ . "/../../resources/autoload.php";
 
+use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnityHTTPD;
 use UnityWebPortal\lib\exceptions\EncodingUnknownException;
@@ -51,15 +52,21 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 [$is_valid, $explanation] = testValidSSHKey($key);
                 if (!$is_valid) {
                     $keyShort = shortenString($key, 10, 30);
-                    UnityHTTPD::messageError("SSH Key Not Added: $explanation", $keyShort);
+                    UnityHTTPD::message(
+                        "SSH Key Not Added: $explanation",
+                        $keyShort,
+                        UnityHTTPDMessageLevel::ERROR,
+                        body_screen_reader: sound_it_out($keyShort)
+                    );
                     continue;
                 }
                 [$key_info, $key_info_sentence] = getSSHKeyInfo($key);
                 $keyWasAdded = $USER->addSSHKey($key);
                 if ($keyWasAdded) {
-                    UnityHTTPD::messageSuccess(
+                    UnityHTTPD::message(
                         "SSH Key Added",
                         $key_info,
+                        UnityHTTPDMessageLevel::SUCCESS,
                         body_screen_reader: $key_info_sentence
                     );
                 } else {
@@ -77,9 +84,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 UnityHTTPD::redirect();
             }
             [$key_info, $key_info_sentence] = getSSHKeyInfo($key);
-            UnityHTTPD::messageSuccess(
+            UnityHTTPD::message(
                 "SSH Key Removed",
                 $key_info,
+                UnityHTTPDMessageLevel::SUCCESS,
                 body_screen_reader: $key_info_sentence
             );
             UnityHTTPD::redirect();
@@ -270,13 +278,13 @@ foreach ($sshPubKeys as $i => $key) {
         $key_info_sentence = "ERROR: Something went wrong while fetching your key. error ID: " . sound_it_out($errorid);
     }
     $key_b64 = base64_encode($key);
-    $key_info_screen_reader = "SSH key #$i, " . $key_info_sentence;
-    $key_contents_screen_reader = "SSH key #$i, contents: " . sound_it_out($key_escaped);
+    $key_info_sr = "SSH key #$i, " . $key_info_sentence;
+    $key_contents_sr = "SSH key #$i, contents: " . sound_it_out($key_escaped);
     echo"
         <tr aria-label='key #$i'>
             <td class='ssh-key-info'>
                 <span aria-hidden='true'>$key_info</span>
-                <span class='screen-reader-only'>$key_info_screen_reader</span>
+                <span class='screen-reader-only'>$key_info_sr</span>
             </td>
             <td>
                 <form
@@ -302,7 +310,7 @@ foreach ($sshPubKeys as $i => $key) {
             <td>
                 <div class='key-box' style='display: none;'>
                     <textarea spellcheck='false' readonly aria-hidden='true'>$key_escaped</textarea>
-                    <textarea spellcheck='false' readonly class='screen-reader-only'>$key_contents_screen_reader</textarea>
+                    <textarea spellcheck='false' readonly class='screen-reader-only'>$key_contents_sr</textarea>
                 </div>
             </td>
         </tr>
