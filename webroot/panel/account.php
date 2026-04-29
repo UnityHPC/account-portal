@@ -288,10 +288,8 @@ foreach ($sshPubKeys as $i => $key) {
                         <span aria-hidden='true'>$key_info</span>
                         <span class='screen-reader-only'>$key_info_sr</span>
                     </summary>
-                    <div class='key-box'>
-                        <textarea spellcheck='false' readonly aria-hidden='true'>$key_escaped</textarea>
-                        <textarea spellcheck='false' readonly class='screen-reader-only'>$key_contents_sr</textarea>
-                    </div>
+                    <textarea spellcheck='false' readonly aria-hidden='true'>$key_escaped</textarea>
+                    <textarea spellcheck='false' readonly class='screen-reader-only'>$key_contents_sr</textarea>
                 </details>
             </td>
             <td>
@@ -417,7 +415,7 @@ echo "</form></div>";
         height: auto;
     }
 
-    .key-box textarea {
+    .ssh-key-info textarea {
         word-wrap: break-word;
         word-break: break-all;
         border-radius: 3px 0 0 3px;
