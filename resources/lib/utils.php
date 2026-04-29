@@ -96,7 +96,7 @@ function getSSHKeyInfo(string $key): array
         return [
             "$length SHA256:$fingerprint $comment ($type)",
             sprintf(
-                "comment %s, type %s, length %d, and sha 256 fingerprint beginning with %s",
+                "Comment: %s. Type: %s. Length: %d. SHA256 fingerprint beginning with %s.",
                 $comment,
                 sound_it_out($type),
                 $length,
@@ -107,7 +107,7 @@ function getSSHKeyInfo(string $key): array
         return [
             "$length SHA256:$fingerprint ($type)",
             sprintf(
-                "type %s, length %d, and sha 256 fingerprint beginning with %s",
+                "Type: %s. Length: %d. SHA256 fingerprint beginning with %s.",
                 sound_it_out($type),
                 $length,
                 sound_it_out(substr($fingerprint, 0, 8)),
