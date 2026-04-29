@@ -116,10 +116,16 @@
       {% set title = message[0] %}
       {% set body = message[1] %}
       {% set level = message[2] %}
+      {% set body_aria = message[3] ?? null %}
       {% set msg_role = (level in [level_enum.WARNING, level_enum.ERROR]) ? 'alert' : 'status' %}
       <div class="message {{ level.value|e }}" role="{{ msg_role }}">
         <h3>{{ title }}</h3>
-        <p>{{ body }}</p>
+        {% if body_aria is null %}
+          <p>{{ body }}</p>
+        {% else %}
+          <p aria-hidden='true'>{{ body }}</p>
+          <p class='screen-reader-only'>{{ body_aria }}</p>
+        {% endif %}
         <button
           data-level="{{ base64_encode(level.value) }}"
           data-title="{{ base64_encode(title) }}"

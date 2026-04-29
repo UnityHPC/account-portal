@@ -66,8 +66,19 @@ function testValidSSHKey(string $key): array
     }
 }
 
-/** @return string {key_length_bits} SHA256:{key_fingerprint} {optional_key_comment} ({key_type}) */
-function getSSHKeyInfo(string $key): string
+/** convert to uppercase and insert spaces so that text-to-speech will "sound out" each character */
+function sound_it_out(string $x): string
+{
+    return strtoupper(chunk_split($x, 1, " "));
+}
+
+/**
+ * @throws Exception
+ * @return array{0: string, 1: string}
+ * 1st string: {key_length_bits} SHA256:{key_fingerprint} {optional_key_comment} ({key_type})
+ * 2nd string: sentence that can be read aloud using text-to-speech
+ */
+function getSSHKeyInfo(string $key): array
 {
     $pubkey = PublicKeyLoader::loadPublicKey($key);
     // phpseclib maintainer does not wish to include `getLength()` in the public key interface
@@ -80,11 +91,28 @@ function getSSHKeyInfo(string $key): string
     }
     [$type, $_, $comment] = tokenizeSSHKey($key);
     $fingerprint = (string) $pubkey->getFingerprint("sha256");
-    // format copied from openssl: https://superuser.com/a/1634883
     if ($comment !== "") {
-        return "$length SHA256:$fingerprint $comment ($type)";
+        return [
+            // format copied from openssl: https://superuser.com/a/1634883
+            "$length SHA256:$fingerprint $comment ($type)",
+            sprintf(
+                "comment %s, type %s, length %d, and sha 256 fingerprint beginning with %s",
+                $comment,
+                sound_it_out($type),
+                $length,
+                sound_it_out(substr($fingerprint, 0, 8)),
+            ),
+        ];
     } else {
-        return "$length SHA256:$fingerprint ($type)";
+        return [
+            "$length SHA256:$fingerprint ($type)",
+            sprintf(
+                "type %s, length %d, and sha 256 fingerprint beginning with %s",
+                sound_it_out($type),
+                $length,
+                sound_it_out(substr($fingerprint, 0, 8)),
+            ),
+        ];
     }
 }
 

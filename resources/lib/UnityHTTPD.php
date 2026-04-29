@@ -318,31 +318,79 @@ class UnityHTTPD
         }
     }
 
-    public static function message(string $title, string $body, UnityHTTPDMessageLevel $level): void
-    {
+    public static function message(
+        string $title,
+        string $body,
+        UnityHTTPDMessageLevel $level,
+        ?string $body_screen_reader = null,
+    ): void {
         self::ensureSessionMessagesSanity();
-        array_push($_SESSION["messages"], [$title, $body, $level]);
+        array_push($_SESSION["messages"], [$title, $body, $level, $body_screen_reader]);
     }
 
-    public static function messageDebug(string $title, string $body): void
-    {
-        self::message($title, $body, UnityHTTPDMessageLevel::DEBUG);
+    public static function messageDebug(
+        string $title,
+        string $body,
+        ?string $body_screen_reader = null,
+    ): void {
+        self::message(
+            $title,
+            $body,
+            UnityHTTPDMessageLevel::DEBUG,
+            body_screen_reader: $body_screen_reader,
+        );
     }
-    public static function messageInfo(string $title, string $body): void
-    {
-        self::message($title, $body, UnityHTTPDMessageLevel::INFO);
+
+    public static function messageInfo(
+        string $title,
+        string $body,
+        ?string $body_screen_reader = null,
+    ): void {
+        self::message(
+            $title,
+            $body,
+            UnityHTTPDMessageLevel::INFO,
+            body_screen_reader: $body_screen_reader,
+        );
     }
-    public static function messageSuccess(string $title, string $body): void
-    {
-        self::message($title, $body, UnityHTTPDMessageLevel::SUCCESS);
+
+    public static function messageSuccess(
+        string $title,
+        string $body,
+        ?string $body_screen_reader = null,
+    ): void {
+        self::message(
+            $title,
+            $body,
+            UnityHTTPDMessageLevel::SUCCESS,
+            body_screen_reader: $body_screen_reader,
+        );
     }
-    public static function messageWarning(string $title, string $body): void
-    {
-        self::message($title, $body, UnityHTTPDMessageLevel::WARNING);
+
+    public static function messageWarning(
+        string $title,
+        string $body,
+        ?string $body_screen_reader = null,
+    ): void {
+        self::message(
+            $title,
+            $body,
+            UnityHTTPDMessageLevel::WARNING,
+            body_screen_reader: $body_screen_reader,
+        );
     }
-    public static function messageError(string $title, string $body): void
-    {
-        self::message($title, $body, UnityHTTPDMessageLevel::ERROR);
+
+    public static function messageError(
+        string $title,
+        string $body,
+        ?string $body_screen_reader = null,
+    ): void {
+        self::message(
+            $title,
+            $body,
+            UnityHTTPDMessageLevel::ERROR,
+            body_screen_reader: $body_screen_reader,
+        );
     }
 
     /** @return message[] */

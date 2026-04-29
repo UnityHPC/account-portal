@@ -54,10 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     UnityHTTPD::messageError("SSH Key Not Added: $explanation", $keyShort);
                     continue;
                 }
-                $key_info = getSSHKeyInfo($key);
+                [$key_info, $key_info_sentence] = getSSHKeyInfo($key);
                 $keyWasAdded = $USER->addSSHKey($key);
                 if ($keyWasAdded) {
-                    UnityHTTPD::messageSuccess("SSH Key Added", $key_info);
+                    UnityHTTPD::messageSuccess(
+                        "SSH Key Added",
+                        $key_info,
+                        body_screen_reader: $key_info_sentence
+                    );
                 } else {
                     UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $key_info);
                 }
@@ -72,8 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 UnityHTTPD::messageError("Cannot Remove SSH Key", "Key not found");
                 UnityHTTPD::redirect();
             }
-            $key_info = getSSHKeyInfo($key);
-            UnityHTTPD::messageSuccess("SSH Key Removed", $key_info);
+            [$key_info, $key_info_sentence] = getSSHKeyInfo($key);
+            UnityHTTPD::messageSuccess(
+                "SSH Key Removed",
+                $key_info,
+                body_screen_reader: $key_info_sentence
+            );
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "loginshell":
@@ -247,26 +255,34 @@ if (count($sshPubKeys) == 0) {
     echo "<p>You do not have any SSH public keys, press the button below to add one.</p>";
 }
 
+// TODO aria-expanded for the show/hide key contents button
 echo "<table>\n";
 foreach ($sshPubKeys as $i => $key) {
     $key_escaped = htmlspecialchars($key);
     try {
-        $key_info = htmlspecialchars(getSSHKeyInfo($key));
+        [$key_info, $key_info_sentence] = getSSHKeyInfo($key);
+        $key_info = htmlspecialchars($key_info);
+        $key_info_sentence = htmlspecialchars($key_info_sentence);
     } catch (\Throwable $e) {
         $errorid = uniqid();
         UnityHTTPD::errorLog("error", "getSSHKeyInfo failed!", errorid: $errorid, error: $e, data: $key);
         $key_info = "ERROR: Something went wrong while fetching your key. error ID: $errorid";
+        $key_info_sentence = "ERROR: Something went wrong while fetching your key. error ID: " . sound_it_out($errorid);
     }
     $key_b64 = base64_encode($key);
+    $key_info_screen_reader = "SSH key #$i, " . $key_info_sentence;
+    $key_contents_screen_reader = "SSH key #$i, contents: " . sound_it_out($key_escaped);
     echo"
-        <tr>
-            <td><span class='ssh-key-info'>$key_info</span></td>
+        <tr aria-label='key #$i'>
+            <td class='ssh-key-info'>
+                <span aria-hidden='true'>$key_info</span>
+                <span class='screen-reader-only'>$key_info_screen_reader</span>
+            </td>
             <td>
                 <form
                     action=''
                     onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
                     method='POST'
-                    aria-label='delete key'
                 >
                     $CSRFTokenHiddenFormInput
                     <input type='hidden' name='delKey' value='$key_b64' />
@@ -282,10 +298,11 @@ foreach ($sshPubKeys as $i => $key) {
                 </button>
             </td>
         </tr>
-        <tr>
+        <tr aria-label='Key #$i Contents'>
             <td>
-                <div class='key-box' aria-label='Key #$i Contents' style='display: none;'>
+                <div class='key-box' style='display: none;'>
                     <textarea spellcheck='false' readonly aria-hidden='true'>$key_escaped</textarea>
+                    <textarea spellcheck='false' readonly class='screen-reader-only'>$key_contents_screen_reader</textarea>
                 </div>
             </td>
         </tr>
