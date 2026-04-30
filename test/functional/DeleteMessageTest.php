@@ -30,7 +30,7 @@ class DeleteMessageTest extends UnityWebPortalTestCase
             );
             $after = array_map("_json_encode", UnityHTTPD::getMessages());
             $difference = array_diff($before, $after);
-            $message_expected_removed = ["foo2", "bar2", UnityHTTPDMessageLevel::DEBUG];
+            $message_expected_removed = ["foo2", "bar2", UnityHTTPDMessageLevel::DEBUG, null];
             $this->assertEqualsCanonicalizing(
                 [_json_encode($message_expected_removed)],
                 $difference,
