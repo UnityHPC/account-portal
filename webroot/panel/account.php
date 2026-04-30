@@ -280,8 +280,8 @@ foreach ($sshPubKeys as $i => $key) {
     $key_info_sr = "SSH key #$i, " . $key_info_sentence;
     $key_contents_sr = "SSH key #$i, contents: " . sound_it_out($key_escaped);
     echo"
-        <li aria-label='key #$i'>
-            <details class='ssh-key-info'>
+        <li aria-label='key #$i' style='display: flex; align-items: flex-start;'>
+            <details class='ssh-key-info' style='flex: 1;'>
                 <summary>
                     <span aria-hidden='true'>$key_info</span>
                     <span class='screen-reader-only'>$key_info_sr</span>
@@ -404,9 +404,6 @@ echo "</form></div>";
 </script>
 
 <style>
-    #ssh-keys-list {
-        padding-left: 0;
-    }
 
     .key-box {
         position: relative;
