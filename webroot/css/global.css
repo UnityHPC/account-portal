@@ -311,3 +311,8 @@ div.searchWrapper > *:hover {
     height:1px;
     overflow:hidden;
 }
+
+.not-a-list {
+    list-style-type: none;
+    padding-left: 0;
+}

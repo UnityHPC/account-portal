@@ -263,7 +263,7 @@ if (count($sshPubKeys) == 0) {
     echo "<p>You do not have any SSH public keys, press the button below to add one.</p>";
 }
 
-echo "<ul id='ssh-keys-list' style='list-style-type: none' role='list'>\n";
+echo "<ul class='not-a-list' role='list'>\n";
 foreach ($sshPubKeys as $i => $key) {
     $key_escaped = htmlspecialchars($key);
     try {
