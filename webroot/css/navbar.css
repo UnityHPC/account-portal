@@ -97,7 +97,7 @@ header > button.hamburger > img {
   }
 
   #navigation {
-    display: block; /* popover: if hidden before, force un-hide it now */
+    display: block; /* disable popover */
     height: 100%;
   }
 
