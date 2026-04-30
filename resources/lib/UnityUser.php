@@ -252,7 +252,7 @@ class UnityUser
             return false;
         }
         $this->setSSHKeys(array_merge($this->getSSHKeys(), [$key]), $send_mail);
-        $key_info = getSSHKeyInfo($key);
+        $key_info = getSSHKeyInfo($key)[0];
         $this->SQL->addLog("sshkey_added", _json_encode(["uid" => $this->uid, "key" => $key_info]));
         return true;
     }
@@ -271,7 +271,7 @@ class UnityUser
         }
         $keys_after = array_values($keys_after); // reindex
         $this->setSSHKeys($keys_after, $send_mail);
-        $key_info = getSSHKeyInfo($key);
+        $key_info = getSSHKeyInfo($key)[0];
         $this->SQL->addLog(
             "sshkey_removed",
             _json_encode(["uid" => $this->uid, "key" => $key_info]),
