@@ -97,7 +97,8 @@ header > button.hamburger > img {
   }
 
   #navigation {
-    display: block; /* disable popover */
+    /* disable popover */
+    display: block;
     /* for some reason when I use `bottom: 0` it becomes auto-sized with big white gaps */
     height: calc(100% - var(--header-height));
   }
