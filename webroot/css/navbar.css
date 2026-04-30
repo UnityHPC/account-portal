@@ -1,5 +1,10 @@
 /* Navbar */
 
+:root {
+  --header-height: 50px;
+  --header-width-mobile: 250px;
+}
+
 hr.navHR {
   margin-left: 10px;
   margin-right: 10px;
@@ -7,13 +12,14 @@ hr.navHR {
 
 nav.mainNav {
   background: var(--accent);
-  position: fixed;
-  left: 0;
-  top: 45px;
+  inset: unset;
+  position: absolute;
+  top: var(--header-height);
   font-size: 11pt;
   overflow: hidden;
   white-space: nowrap;
-  z-index: 100;
+  border-width: 0;
+  padding: 0;
 }
 
 nav.mainNav a {
@@ -40,41 +46,25 @@ nav.mainNav a.active {
 
 header {
   background: var(--accent);
-  height: 50px;
-  width: 250px;
+  height: var(--header-height);
   position: fixed;
   top: 0;
   left: 0;
   z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 header > #imgLogo {
   height: 65%;
   margin-left: 10px;
-  margin-top: 8px;
-}
-
-header > a.unity-state {
-  background: var(--accent_foreground);
-  color: var(--accent);
-  display: block;
-  position: absolute;
-  top: 8px;
-  left: 140px;
-  padding: 1px 5px 1px 5px;
-  font-weight: bold;
-  font-size: 10pt;
-  border-radius: 5px;
-}
-
-header > a.unity-state:hover {
-  text-decoration: none;
 }
 
 header > button.hamburger {
   background: var(--accent);
   padding: 0;
-  right: 23px;
+  margin-right: 10px;
   height: 60%;
 }
 
@@ -86,37 +76,34 @@ header > button.hamburger > img {
 /* MOBILE VIEW */
 
 @media only screen and (max-width: 1000px) {
-  nav.mainNav {
-    right: 0;
-  }
-
-  header {
+  header, #navigation {
     width: 100%;
   }
 
   main {
-    /* Header element height + 2*element padding */
-    margin-top: 45px;
+    margin-top: var(--header-height);
   }
 }
 
 /* DESKTOP VIEW */
 
 @media only screen and (min-width: 1001px) {
-  nav.mainNav {
-    bottom: 0;
-    width: 250px;
+  header, #navigation {
+    width: var(--header-width-mobile);
   }
 
   header > button.hamburger {
     display: none;
   }
 
-  main {
-    margin-left: 250px;
+  #navigation {
+    /* disable popover */
+    display: block;
+    /* for some reason when I use `bottom: 0` it becomes auto-sized with big white gaps */
+    height: calc(100% - var(--header-height));
   }
 
-  footer {
-    margin-left: 250px;
+  main, footer {
+    margin-left: var(--header-width-mobile);
   }
 }
