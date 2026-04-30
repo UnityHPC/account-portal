@@ -8,12 +8,16 @@ hr.navHR {
 nav.mainNav {
   background: var(--accent);
   position: fixed;
-  left: 0;
-  top: 45px;
+  position-anchor: --header;
+  top: anchor(bottom);
+  width: 100%;
   font-size: 11pt;
   overflow: hidden;
   white-space: nowrap;
-  z-index: 100;
+  inset: auto;
+  margin: auto;
+  border-width: 0;
+  padding: 0;
 }
 
 nav.mainNav a {
@@ -68,31 +72,11 @@ header > button.hamburger > img {
   height: 100%;
 }
 
-#nav-topbar {
-  right: 0;
-  inset: auto;
-  margin: auto;
-  position: fixed;
-  position-anchor: --header;
-  top: anchor(bottom);
-  width: 100%;
-  border-width: 0;
-}
-
-#nav-sidebar {
-  bottom: 0;
-  width: 250px;
-}
-
 /* MOBILE VIEW */
 
 @media only screen and (max-width: 1000px) {
-  header {
+  header, #navigation {
     width: 100%;
-  }
-
-  #nav-sidebar {
-    display: none;
   }
 
   main {
@@ -104,7 +88,7 @@ header > button.hamburger > img {
 /* DESKTOP VIEW */
 
 @media only screen and (min-width: 1001px) {
-  header {
+  header, #navigation {
     width: 250px;
   }
 
@@ -112,8 +96,9 @@ header > button.hamburger > img {
     display: none;
   }
 
-  #nav-topbar {
-    display: none;
+  #navigation {
+    display: block; /* popover: if hidden before, force un-hide it now */
+    height: 100%;
   }
 
   main {
