@@ -1,5 +1,10 @@
 /* Navbar */
 
+:root {
+  --header-height: 50px;
+  --header-width-mobile: 250px;
+}
+
 hr.navHR {
   margin-left: 10px;
   margin-right: 10px;
@@ -7,15 +12,13 @@ hr.navHR {
 
 nav.mainNav {
   background: var(--accent);
-  position: fixed;
-  position-anchor: --header;
-  top: anchor(bottom);
+  inset: unset;
+  position: absolute;
+  top: var(--header-height);
   width: 100%;
   font-size: 11pt;
   overflow: hidden;
   white-space: nowrap;
-  inset: auto;
-  margin: auto;
   border-width: 0;
   padding: 0;
 }
@@ -44,7 +47,7 @@ nav.mainNav a.active {
 
 header {
   background: var(--accent);
-  height: 50px;
+  height: var(--header-height);
   position: fixed;
   top: 0;
   left: 0;
@@ -52,7 +55,6 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  anchor-name: --header;
 }
 
 header > #imgLogo {
@@ -80,8 +82,7 @@ header > button.hamburger > img {
   }
 
   main {
-    /* Header element height + 2*element padding */
-    margin-top: 45px;
+    margin-top: var(--header-height);
   }
 }
 
@@ -89,7 +90,7 @@ header > button.hamburger > img {
 
 @media only screen and (min-width: 1001px) {
   header, #navigation {
-    width: 250px;
+    width: var(--header-width-mobile);
   }
 
   header > button.hamburger {
@@ -101,11 +102,7 @@ header > button.hamburger > img {
     height: 100%;
   }
 
-  main {
-    margin-left: 250px;
-  }
-
-  footer {
-    margin-left: 250px;
+  main, footer {
+    margin-left: var(--header-width-mobile);
   }
 }
