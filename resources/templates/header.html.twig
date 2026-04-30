@@ -48,35 +48,35 @@
 </head>
 
 <body>
-  <header>
-    <img
-      id="imgLogo"
-      draggable="false"
-      src="{{ getRelativeURL('assets', CONFIG['site']['logo']) }}" alt="Unity Logo"
-    />
-    <button class="hamburger" aria-label="toggle navigation" popovertarget="nav-topbar">
-      <img draggable="false" src="{{ getRelativeURL('assets/menu.png') }}" alt="hamburger" />
-    </button>
-    <nav class="mainNav" id="nav-topbar" aria-label="navigation" popover>
-      {{ include('navbar.html.twig') }}
-    </nav>
-  </header>
+   <header>
+     <img
+       id="imgLogo"
+       draggable="false"
+       src="{{ getRelativeURL('assets', CONFIG['site']['logo']) }}" alt="Unity Logo"
+     />
+     <button class="hamburger" aria-label="toggle navigation" popovertarget="nav-topbar">
+       <img draggable="false" src="{{ getRelativeURL('assets/menu.png') }}" alt="hamburger" />
+     </button>
+     <nav class="mainNav" id="nav-topbar" aria-label="navigation" popover>
+       {{ include('navbar.html.twig') }}
+     </nav>
+   </header>
 
-  <nav class="mainNav" id="nav-sidebar" aria-label="navigation">
-    {{ include('navbar.html.twig') }}
-  </nav>
+   <nav class="mainNav" id="nav-sidebar" aria-label="navigation">
+     {{ include('navbar.html.twig') }}
+   </nav>
 
-  <dialog id="modal" aria-labelledby="modalTitle" autofocus>
-    <div id="modalTitleWrapper">
-      <span id="modalTitle"></span>
-      <button id="modalCloseButton" style="position: absolute; right: 10px; top: 10px;" aria-label="Close dialog"></button>
-    </div>
-    <div id="modalBody"></div>
-  </dialog>
-  <script
-    src="{{ getRelativeURL('js/modal.js?cache_bust_increment_me=' ~ CONFIG['upstream']['version']) }}"
-  ></script>
-  <main>
+   <dialog id="modal" aria-labelledby="modalTitle" autofocus>
+     <div id="modalTitleWrapper">
+       <span id="modalTitle"></span>
+       <button id="modalCloseButton" style="position: absolute; right: 10px; top: 10px;" aria-label="Close dialog"></button>
+     </div>
+     <div id="modalBody"></div>
+   </dialog>
+   <script
+     src="{{ getRelativeURL('js/modal.js?cache_bust_increment_me=' ~ CONFIG['upstream']['version']) }}"
+   ></script>
+   <main>
 
   <div id="messages">
     {% if messages|length > 0 %}
