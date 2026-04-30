@@ -60,14 +60,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     );
                     continue;
                 }
-                [$key_info, $key_info_sentence] = getSSHKeyInfo($key);
+                [$key_info, $key_info_screen_reader] = getSSHKeyInfo($key);
                 $keyWasAdded = $USER->addSSHKey($key);
                 if ($keyWasAdded) {
                     UnityHTTPD::message(
                         level: UnityHTTPDMessageLevel::SUCCESS,
                         title: "SSH Key Added",
                         body: $key_info,
-                        body_screen_reader: "key info: $key_info_sentence",
+                        body_screen_reader: "key info: $key_info_screen_reader",
                     );
                 } else {
                     UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $key_info);
@@ -83,12 +83,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 UnityHTTPD::messageError("Cannot Remove SSH Key", "Key not found");
                 UnityHTTPD::redirect();
             }
-            [$key_info, $key_info_sentence] = getSSHKeyInfo($key);
+            [$key_info, $key_info_screen_reader] = getSSHKeyInfo($key);
             UnityHTTPD::message(
                 "SSH Key Removed",
                 $key_info,
                 UnityHTTPDMessageLevel::SUCCESS,
-                body_screen_reader: $key_info_sentence
+                body_screen_reader: $key_info_screen_reader
             );
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
@@ -267,17 +267,17 @@ echo "<ul class='not-a-list' role='list'>\n";
 foreach ($sshPubKeys as $i => $key) {
     $key_escaped = htmlspecialchars($key);
     try {
-        [$key_info, $key_info_sentence] = getSSHKeyInfo($key);
+        [$key_info, $key_info_screen_reader] = getSSHKeyInfo($key);
         $key_info = htmlspecialchars($key_info);
-        $key_info_sentence = htmlspecialchars($key_info_sentence);
+        $key_info_screen_reader = htmlspecialchars($key_info_screen_reader);
     } catch (\Throwable $e) {
         $errorid = uniqid();
         UnityHTTPD::errorLog("error", "getSSHKeyInfo failed!", errorid: $errorid, error: $e, data: $key);
         $key_info = "ERROR: Something went wrong while fetching your key. error ID: $errorid";
-        $key_info_sentence = "ERROR: Something went wrong while fetching your key. error ID: " . sound_it_out($errorid);
+        $key_info_screen_reader = "ERROR: Something went wrong while fetching your key. error ID: " . sound_it_out($errorid);
     }
     $key_b64 = base64_encode($key);
-    $key_info_sr = "SSH key #$i, " . $key_info_sentence;
+    $key_info_sr = "SSH key #$i, " . $key_info_screen_reader;
     $key_contents_sr = "SSH key #$i, contents: " . sound_it_out($key_escaped);
     echo"
         <li aria-label='key #$i' style='display: flex; align-items: flex-start;'>
