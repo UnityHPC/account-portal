@@ -48,47 +48,22 @@
 </head>
 
 <body>
+  <header>
+    <img
+      id="imgLogo"
+      draggable="false"
+      src="{{ getRelativeURL('assets', CONFIG['site']['logo']) }}" alt="Unity Logo"
+    />
+    <button class="hamburger" aria-label="toggle navigation" popovertarget="nav-topbar">
+      <img draggable="false" src="{{ getRelativeURL('assets/menu.png') }}" alt="hamburger" />
+    </button>
+    <nav class="mainNav" id="nav-topbar" aria-label="navigation" popover>
+      {{ include('navbar.html.twig') }}
+    </nav>
+  </header>
 
-   <header>
-     <img id="imgLogo" draggable="false"
-     src="{{ getRelativeURL('assets', CONFIG['site']['logo']) }}" alt="Unity Logo">
-     <button class="hamburger vertical-align" aria-label="toggle navigation bar" aria-controls="navigation">
-       <img
-         draggable="false"
-         src="{{ getRelativeURL('assets/menu.png') }}"
-         alt="Menu Button"
-       >
-     </button>
-   </header>
-
-  <nav class="mainNav" id="navigation" aria-label="navigation">
-    {{ getRelativeHyperlink('Home', 'index.php')|raw }}
-
-    {% for label in CONFIG['menuitems']['labels'] %}
-      <a target="_blank" href="{{ CONFIG['menuitems']['links'][loop.index0] }}">{{ label }}</a>
-    {% endfor %}
-
-    {% if user_exists %}
-      <hr class="navHR">
-      {{ getRelativeHyperlink('Account Settings', 'panel/account.php')|raw }}
-      {{ getRelativeHyperlink('My PIs', 'panel/groups.php')|raw }}
-
-      {% if is_pi %}
-        {{ getRelativeHyperlink('My Users', 'panel/pi.php')|raw }}
-      {% endif %}
-
-      {% for label in CONFIG['menuitems_secure']['labels'] %}
-        <a target="_blank" href="{{ CONFIG['menuitems_secure']['links'][loop.index0] }}">{{ label }}</a>
-      {% endfor %}
-
-      {% if is_admin and (viewUser is null) %}
-        <hr class="navHR">
-        {{ getRelativeHyperlink('User Management', 'admin/user-mgmt.php')|raw }}
-        {{ getRelativeHyperlink('PI Management', 'admin/pi-mgmt.php')|raw }}
-      {% endif %}
-    {% else %}
-      {{ getRelativeHyperlink('Login / Request Account', 'panel/account.php')|raw }}
-    {% endif %}
+  <nav class="mainNav" id="nav-sidebar" aria-label="navigation">
+    {{ include('navbar.html.twig') }}
   </nav>
 
   <dialog id="modal" aria-labelledby="modalTitle" autofocus>
