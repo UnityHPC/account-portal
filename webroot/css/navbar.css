@@ -15,7 +15,6 @@ nav.mainNav {
   inset: unset;
   position: absolute;
   top: var(--header-height);
-  width: 100%;
   font-size: 11pt;
   overflow: hidden;
   white-space: nowrap;
