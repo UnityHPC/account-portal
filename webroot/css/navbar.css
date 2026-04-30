@@ -48,7 +48,6 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  row-gap: 10px;
   anchor-name: --header
 }
 
