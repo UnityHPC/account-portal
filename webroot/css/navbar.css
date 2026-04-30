@@ -51,7 +51,7 @@ header {
   anchor-name: --header
 }
 
-#imgLogo {
+header > #imgLogo {
   height: 65%;
   margin-left: 10px;
 }
