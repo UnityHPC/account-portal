@@ -74,10 +74,7 @@ function sound_it_out(string $x): string
 
 /**
  * @throws Exception
- * @return array{0: string, 1: string}
- * 1st string: {key_length_bits} SHA256:{key_fingerprint} {optional_key_comment} ({key_type})
- * format copied from openssl: https://superuser.com/a/1634883
- * 2nd string: sentence that can be read aloud using text-to-speech
+ * @return array{0: int, 1: string} [length, sha256 fingerprint]
  */
 function getSSHKeyInfo(string $key): array
 {
@@ -90,29 +87,44 @@ function getSSHKeyInfo(string $key): array
     if (!is_int($length)) {
         throw new Exception("unsupported key type, getLength() return value is not an int");
     }
-    [$type, $_, $comment] = tokenizeSSHKey($key);
     $fingerprint = (string) $pubkey->getFingerprint("sha256");
-    if ($comment !== "") {
-        return [
-            "$length SHA256:$fingerprint $comment ($type)",
-            sprintf(
-                "Comment: %s. Type: %s. Length: %d. SHA256 fingerprint beginning with %s.",
-                $comment,
-                sound_it_out($type),
-                $length,
-                sound_it_out(substr($fingerprint, 0, 8)),
-            ),
-        ];
+    return [$length, $fingerprint];
+}
+
+function formatSSHKeyInfoInternal(
+    string $type,
+    int $length,
+    string $sha256_fingerprint,
+    ?string $comment = null,
+): string {
+    if ($comment !== null) {
+        return "$length SHA256:$sha256_fingerprint $comment ($type)";
     } else {
-        return [
-            "$length SHA256:$fingerprint ($type)",
-            sprintf(
-                "Type: %s. Length: %d. SHA256 fingerprint beginning with %s.",
-                sound_it_out($type),
-                $length,
-                sound_it_out(substr($fingerprint, 0, 8)),
-            ),
-        ];
+        return "$length SHA256:$sha256_fingerprint ($type)";
+    }
+}
+
+function formatSSHKeyInfoScreenReader(
+    string $type,
+    int $length,
+    string $sha256_fingerprint,
+    ?string $comment = null,
+): string {
+    if ($comment !== null) {
+        return sprintf(
+            "Comment: %s. Type: %s. Length: %d. SHA256 fingerprint beginning with %s.",
+            $comment,
+            sound_it_out($type),
+            $length,
+            sound_it_out(substr($sha256_fingerprint, 0, 8)),
+        );
+    } else {
+        return sprintf(
+            "Type: %s. Length: %d. SHA256 fingerprint beginning with %s.",
+            sound_it_out($type),
+            $length,
+            sound_it_out(substr($sha256_fingerprint, 0, 8)),
+        );
     }
 }
 
