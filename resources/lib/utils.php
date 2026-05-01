@@ -74,10 +74,10 @@ function sound_it_out(string $x): string
 
 /**
  * @throws Exception
- * @return array{0: string, 1: string}
- * 1st string: {key_length_bits} SHA256:{key_fingerprint} {optional_key_comment} ({key_type})
- * format copied from openssl: https://superuser.com/a/1634883
- * 2nd string: sentence that can be read aloud using text-to-speech
+ * @return array{0: string, 1: string, 2: string}
+ * 1st string: openssl style (https://superuser.com/a/1634883)
+ * 2nd string: user-friendly HTML
+ * 3nd string: sentence that can be read aloud using text-to-speech
  */
 function getSSHKeyInfo(string $key): array
 {
@@ -93,8 +93,18 @@ function getSSHKeyInfo(string $key): array
     [$type, $_, $comment] = tokenizeSSHKey($key);
     $fingerprint = (string) $pubkey->getFingerprint("sha256");
     if ($comment !== "") {
+        if (mb_strlen($comment) >= 30) {
+            $comment = mb_substr($comment, 0, 27) . "...";
+        }
         return [
             "$length SHA256:$fingerprint $comment ($type)",
+            sprintf(
+                "<span class='ssh-key-comment'>%s</span> -- %s:%d <code>%s</code>",
+                htmlspecialchars($comment),
+                htmlspecialchars($type),
+                $length,
+                htmlspecialchars(substr($fingerprint, 0, 8)),
+            ),
             sprintf(
                 "Comment: %s. Type: %s. Length: %d. SHA256 fingerprint beginning with %s.",
                 $comment,
@@ -106,6 +116,12 @@ function getSSHKeyInfo(string $key): array
     } else {
         return [
             "$length SHA256:$fingerprint ($type)",
+            sprintf(
+                "%s:%d <code>%s</code>",
+                htmlspecialchars($type),
+                $length,
+                htmlspecialchars(substr($fingerprint, 0, 8)),
+            ),
             sprintf(
                 "Type: %s. Length: %d. SHA256 fingerprint beginning with %s.",
                 sound_it_out($type),

@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     );
                     continue;
                 }
-                [$key_info, $key_info_screen_reader] = getSSHKeyInfo($key);
+                [$key_info, $_, $key_info_screen_reader] = getSSHKeyInfo($key);
                 $keyWasAdded = $USER->addSSHKey($key);
                 if ($keyWasAdded) {
                     UnityHTTPD::message(
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 UnityHTTPD::messageError("Cannot Remove SSH Key", "Key not found");
                 UnityHTTPD::redirect();
             }
-            [$key_info, $key_info_screen_reader] = getSSHKeyInfo($key);
+            [$key_info, $_, $key_info_screen_reader] = getSSHKeyInfo($key);
             UnityHTTPD::message(
                 "SSH Key Removed",
                 $key_info,
@@ -267,13 +267,12 @@ echo "<ul class='not-a-list' role='list'>\n";
 foreach ($sshPubKeys as $i => $key) {
     $key_escaped = htmlspecialchars($key);
     try {
-        [$key_info, $key_info_screen_reader] = getSSHKeyInfo($key);
-        $key_info = htmlspecialchars($key_info);
+        [$_, $key_info_html, $key_info_screen_reader] = getSSHKeyInfo($key);
         $key_info_screen_reader = htmlspecialchars($key_info_screen_reader);
     } catch (\Throwable $e) {
         $errorid = uniqid();
         UnityHTTPD::errorLog("error", "getSSHKeyInfo failed!", errorid: $errorid, error: $e, data: $key);
-        $key_info = "ERROR: Something went wrong while fetching your key. error ID: $errorid";
+        $key_info_html = "ERROR: Something went wrong while fetching your key. error ID: $errorid";
         $key_info_screen_reader = "ERROR: Something went wrong while fetching your key. error ID: " . sound_it_out($errorid);
     }
     $key_b64 = base64_encode($key);
@@ -283,7 +282,7 @@ foreach ($sshPubKeys as $i => $key) {
         <li aria-label='key #$i' style='display: flex; align-items: flex-start;'>
             <details class='ssh-key-info' style='flex: 1;'>
                 <summary>
-                    <span aria-hidden='true'>$key_info</span>
+                    <span aria-hidden='true'>$key_info_html</span>
                     <span class='screen-reader-only'>$key_info_sr</span>
                 </summary>
                 <textarea spellcheck='false' readonly aria-hidden='true'>$key_escaped</textarea>
@@ -423,6 +422,10 @@ echo "</form></div>";
         word-wrap: break-word;
         word-break: break-all;
         font-family: monospace;
+    }
+
+    .ssh-key-comment {
+        color: var(--accent);
     }
 
     .delete-key-button{
