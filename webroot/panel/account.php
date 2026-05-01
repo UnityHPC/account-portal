@@ -263,48 +263,71 @@ if (count($sshPubKeys) == 0) {
     echo "<p>You do not have any SSH public keys, press the button below to add one.</p>";
 }
 
-echo "<ul class='not-a-list' role='list'>\n";
+echo "<table id='ssh-key-table'>\n";
 foreach ($sshPubKeys as $i => $key) {
+    echo "<tr>\n";
     $key_escaped = htmlspecialchars($key);
+    $key_escaped_screen_reader = "SSH key #$i, contents: " . sound_it_out($key_escaped);
     try {
-        [$key_info, $key_info_screen_reader] = getSSHKeyInfo($key);
-        $key_info = htmlspecialchars($key_info);
-        $key_info_screen_reader = htmlspecialchars($key_info_screen_reader);
+        [$type, $_, $comment] = tokenizeSSHKey($key);
+        [$length, $sha256_fingerprint] = getSSHKeyInfo($key);
+        if (mb_strlen($comment) >= 30) {
+            $comment = mb_substr($comment, 0, 27) . "...";
+        }
+        $sha256_fingerprint = substr($sha256_fingerprint, 0, 8);
     } catch (\Throwable $e) {
         $errorid = uniqid();
         UnityHTTPD::errorLog("error", "getSSHKeyInfo failed!", errorid: $errorid, error: $e, data: $key);
-        $key_info = "ERROR: Something went wrong while fetching your key. error ID: $errorid";
-        $key_info_screen_reader = "ERROR: Something went wrong while fetching your key. error ID: " . sound_it_out($errorid);
+        echo "
+            <tr>
+                <span aria-hidden='true'>ERROR: Something went wrong while fetching your key. error ID: $errorid</span>
+                <span class='screen-reader-only'>ERROR: Something went wrong while fetching your key. error ID: " . sound_it_out($errorid) . "</span>
+            </tr>
+        ";
+        continue;
     }
     $key_b64 = base64_encode($key);
-    $key_info_sr = "SSH key #$i, " . $key_info_screen_reader;
-    $key_contents_sr = "SSH key #$i, contents: " . sound_it_out($key_escaped);
     echo"
-        <li aria-label='key #$i' style='display: flex; align-items: flex-start;'>
-            <details class='ssh-key-info' style='flex: 1;'>
-                <summary>
-                    <span aria-hidden='true'>$key_info</span>
-                    <span class='screen-reader-only'>$key_info_sr</span>
-                </summary>
-                <textarea spellcheck='false' readonly aria-hidden='true'>$key_escaped</textarea>
-                <textarea spellcheck='false' readonly class='screen-reader-only'>$key_contents_sr</textarea>
-            </details>
-            <form
-                action=''
-                onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
-                method='POST'
-            >
-                $CSRFTokenHiddenFormInput
-                <input type='hidden' name='delKey' value='$key_b64' />
-                <input type='hidden' name='form_type' value='delKey' />
-                <button type='submit' class='delete-key-button' aria-label='Delete Key #$i'>
-                    <span class='delete-key-span icon-x' aria-hidden='true'></span>
+        <tr aria-label='key #$i'>
+            <td>
+                <code aria-hidden='true' class='alphabet-soup'>$sha256_fingerprint</code>
+                <span class='screen-reader-only'>TODO</span>
+            </td>
+            <td>
+                <code aria-hidden='true'>$type:$length</code>
+                <span class='screen-reader-only'>TODO</span>
+            </td>
+            <td>
+                <span aria-hidden='true'>$comment</span>
+                <span class='screen-reader-only'>TODO</span>
+            </td>
+            <td>
+                <button command='show-modal' commandfor='key-$i-contents' class='show-key-button' aria-label='Show/Hide Key #$i Contents'>
+                    <span class='show-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
                 </button>
-            </form>
-        </li>
+            </td>
+            <td>
+                <form
+                    action=''
+                    onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
+                    method='POST'
+                >
+                    $CSRFTokenHiddenFormInput
+                    <input type='hidden' name='delKey' value='$key_b64' />
+                    <input type='hidden' name='form_type' value='delKey' />
+                    <button type='submit' class='delete-key-button' aria-label='Delete Key #$i'>
+                        <span class='delete-key-span icon-x' aria-hidden='true'></span>
+                    </button>
+                </form>
+            </td>
+        </tr>
+        <dialog id='key-$i-contents' aria-label='Key #$i Contents' autofocus closedby='any'>
+            <textarea class='alphabet-soup' spellcheck='false' readonly aria-hidden='true' rows=5 cols=50 style='min-height: 10px;'>$key_escaped</textarea>
+            <textarea spellcheck='false' readonly class='screen-reader-only'>$key_escaped_screen_reader</textarea>
+        </dialog>
     ";
 }
-echo "</ul>";
+echo "</table>";
 
 echo "
     <button type='button' class='plusBtn btnAddKey' aria-label='Add SSH Key'><span>&#43;</span></button>
@@ -380,9 +403,9 @@ echo "</form></div>";
         openModal("Add New Key", url);
     });
 
-    $(".show-hide-key-button").click(function() {
+    $(".show-key-button").click(function() {
         const keyBox = $(this).closest("tr").next("tr").find(".key-box");
-        const showKeyIcon = $(this).find(".show-hide-key-span");
+        const showKeyIcon = $(this).find(".show-key-span");
         keyBox.toggle();
     });
 
@@ -404,28 +427,27 @@ echo "</form></div>";
 </script>
 
 <style>
+    #ssh-key-table {
+        width: 100%;
+    }
 
-    .key-box {
-        position: relative;
-        width: auto;
-        height: auto;
+    #ssh-key-table * {
+        font-family: monospace;
     }
 
     .ssh-key-info textarea {
         word-wrap: break-word;
         word-break: break-all;
         border-radius: 3px 0 0 3px;
-        font-family: monospace;
     }
 
-    .ssh-key-info {
+    .alphabet-soup {
         display: inline-block;
         word-wrap: break-word;
         word-break: break-all;
-        font-family: monospace;
     }
 
-    .delete-key-button{
+    .delete-key-button, .show-key-button {
         display: flex; /* using flex inside button allows the X image to be centered */
         align-items: center;
         justify-content: center;
@@ -434,7 +456,7 @@ echo "</form></div>";
         padding: 0;
     }
 
-    .delete-key-span{
+    .delete-key-span, .show-key-span {
         background-color: white;
         mask-size: contain;
     }
@@ -442,6 +464,11 @@ echo "</form></div>";
     .delete-key-span {
         width: 16px;
         height: 16px;
+    }
+
+    .show-key-span {
+        width: 24px;
+        height: 24px;
     }
 </style>
 
