@@ -41,7 +41,7 @@ nav.mainNav a:hover {
 }
 
 nav.mainNav a.active {
-  background: var(--accent_2);
+  border: 2px solid var(--accent_foreground);
 }
 
 header {
