@@ -2,7 +2,6 @@
 
 require_once __DIR__ . "/../../resources/autoload.php";
 
-use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnityHTTPD;
 use UnityWebPortal\lib\exceptions\EncodingUnknownException;
@@ -49,47 +48,33 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             }
             $keys = array_map("trim", $keys);
             foreach ($keys as $key) {
+                $key_short = shortenString($key, 10, 30);
                 [$is_valid, $explanation] = testValidSSHKey($key);
                 if (!$is_valid) {
-                    $keyShort = shortenString($key, 10, 30);
-                    UnityHTTPD::message(
-                        level: UnityHTTPDMessageLevel::ERROR,
-                        title: "SSH Key Not Added: $explanation",
-                        body: $keyShort,
-                        body_screen_reader: "key contents: " . sound_it_out($keyShort),
-                    );
+                    UnityHTTPD::messageError("SSH Key Not Added: $explanation", $key_short);
                     continue;
                 }
-                [$key_info, $key_info_screen_reader] = getSSHKeyInfo($key);
                 $keyWasAdded = $USER->addSSHKey($key);
                 if ($keyWasAdded) {
-                    UnityHTTPD::message(
-                        level: UnityHTTPDMessageLevel::SUCCESS,
-                        title: "SSH Key Added",
-                        body: $key_info,
-                        body_screen_reader: "key info: $key_info_screen_reader",
-                    );
+                    [$length, $sha256_fingerprint] = getSSHKeyInfo($key);
+                    $stub_fingprint = substr($sha256_fingerprint, 0, 6);
+                    UnityHTTPD::messageSuccess("SSH Key Added", $stub_fingprint);
                 } else {
-                    UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $key_info);
+                    UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $key_short);
                 }
             }
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "delKey":
             $key = base64_decode(UnityHTTPD::getPostData("delKey"));
+            $key_short = shortenString($key, 10, 30);
             try {
                 $USER->removeSSHKey($key);
             } catch (ArrayKeyException) {
                 UnityHTTPD::messageError("Cannot Remove SSH Key", "Key not found");
                 UnityHTTPD::redirect();
             }
-            [$key_info, $key_info_screen_reader] = getSSHKeyInfo($key);
-            UnityHTTPD::message(
-                "SSH Key Removed",
-                $key_info,
-                UnityHTTPDMessageLevel::SUCCESS,
-                body_screen_reader: $key_info_screen_reader
-            );
+            UnityHTTPD::messageSuccess("SSH Key Removed", "");
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "loginshell":
@@ -265,9 +250,8 @@ if (count($sshPubKeys) == 0) {
 
 echo "<table id='ssh-key-table'>\n";
 foreach ($sshPubKeys as $i => $key) {
-    echo "<tr>\n";
     $key_escaped = htmlspecialchars($key);
-    $key_escaped_screen_reader = "SSH key #$i, contents: " . sound_it_out($key_escaped);
+    $key_escaped_sounded_out = sound_it_out($key_escaped);
     try {
         [$type, $_, $comment] = tokenizeSSHKey($key);
         [$length, $sha256_fingerprint] = getSSHKeyInfo($key);
@@ -282,7 +266,6 @@ foreach ($sshPubKeys as $i => $key) {
         echo "
             <tr>
                 <span aria-hidden='true'>ERROR: Something went wrong while fetching your key. error ID: $errorid</span>
-                <span class='screen-reader-only'>ERROR: Something went wrong while fetching your key. error ID: " . sound_it_out($errorid) . "</span>
             </tr>
         ";
         continue;
@@ -322,7 +305,7 @@ foreach ($sshPubKeys as $i => $key) {
         <dialog class='ssh-key-contents' id='key-$i-contents' autofocus closedby='any'>
             <p style='font-size: 16pt'>Contents of SSH key <code>$stub_fingprint</code></p>
             <hr>
-            <p class='alphabet-soup' aria-label='$key_escaped_screen_reader'>$key_escaped</p>
+            <p class='alphabet-soup' aria-label='$key_escaped_sounded_out'>$key_escaped</p>
         </dialog>
     ";
 }
