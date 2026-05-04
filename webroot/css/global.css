@@ -29,7 +29,7 @@ code {
   background: var(--light_panel_background);
   border-radius: 5px;
   padding: 3px 8px;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .code {

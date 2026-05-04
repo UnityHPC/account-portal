@@ -249,7 +249,7 @@ if (count($sshPubKeys) == 0) {
 }
 
 echo "
-    <table id='ssh-key-table'>
+    <table id='ssh-key-table' class='stripe compact hover'>
     <thead>
         <tr>
             <th scope='col'>Fingerprint</th>
@@ -283,7 +283,7 @@ foreach ($sshPubKeys as $i => $key) {
     echo"
         <tr>
             <td><code class='alphabet-soup'>$stub_fingprint</code></td>
-            <td><code class='alphabet-soup'>$type</code></td>
+            <td><code class='alphabet-soup' style='white-space: nowrap'>$type</code></td>
             <td>$length</td>
             <td>$comment_escaped</td>
             <td>
@@ -307,7 +307,7 @@ foreach ($sshPubKeys as $i => $key) {
             </td>
         </tr>
         <dialog class='ssh-key-contents' id='key-$i-contents' autofocus closedby='any'>
-            <p style='font-size: 16pt'>Contents of SSH key <code>$stub_fingprint</code></p>
+            <span style='font-size: 16pt'>Contents of SSH key </span><code>$stub_fingprint</code>
             <hr>
             <code class='alphabet-soup' aria-label='$key_escaped_sounded_out'>$key_escaped</code>
         </dialog>
@@ -417,6 +417,12 @@ echo "</form></div>";
             ordering: false,
             paging: false,
             responsive: true,
+            layout: {
+                topStart: null,
+                topEnd: null,
+                bottomStart: null,
+                bottomEnd: null,
+            },
             columns: [
                 {responsivePriority: 2}, // fingerprint
                 {responsivePriority: 999}, // type
