@@ -445,11 +445,6 @@ echo "</form></div>";
         word-break: break-all;
     }
 
-    .ssh-key-actions {
-        display: flex;
-        gap: 5px;
-    }
-
     .delete-key-button, .show-key-button {
         display: flex; /* using flex inside button allows the X image to be centered */
         align-items: center;
