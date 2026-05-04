@@ -252,7 +252,7 @@ echo "
     <table id='ssh-key-table' class='stripe compact hover'>
     <thead>
         <tr>
-            <th scope='col'>Fingerprint</th>
+            <th scope='col'>Fingerprint<sup>*</sup></th>
             <th scope='col'>Type</th>
             <th scope='col'>Length</th>
             <th scope='col'>Comment</th>
@@ -274,7 +274,7 @@ foreach ($sshPubKeys as $i => $key) {
         $stub_fingprint = substr($sha256_fingerprint, 0, 6);
     } catch (\Throwable $e) {
         $errorid = uniqid();
-        UnityHTTPD::errorLog("error", "getSSHKeyInfo failed!", errorid: $errorid, error: $e, data: $key);
+        UnityHTTPD::errorLog("error", "failed to analyze SSH key!", errorid: $errorid, error: $e, data: $key);
         echo "<tr>ERROR: Something went wrong while fetching your key. error ID: $errorid</tr>";
         continue;
     }
@@ -315,6 +315,7 @@ foreach ($sshPubKeys as $i => $key) {
 echo "</tbody></table>";
 
 echo "
+     <p style='font-size: 11px'>* First 6 characters of the SHA256 fingerprint (hash) of the key data (excluding type, comment)</p>
     <button type='button' class='plusBtn btnAddKey' aria-label='Add SSH Key'><span>&#43;</span></button>
     <hr>
     <h2>Login Shell</h2>
