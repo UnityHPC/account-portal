@@ -324,7 +324,3 @@ dialog {
   background-color: gray;
   opacity: 0.5;
 }
-
-:popover-open {
-    border-radius: 5px;
-}
