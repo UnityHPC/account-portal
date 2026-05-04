@@ -275,8 +275,8 @@ foreach ($sshPubKeys as $i => $key) {
     try {
         [$type, $_, $comment] = tokenizeSSHKey($key);
         [$length, $sha256_fingerprint] = getSSHKeyInfo($key);
-        if (mb_strlen($comment) >= 30) {
-            $comment = mb_substr($comment, 0, 27) . "...";
+        if (mb_strlen($comment) >= 50) {
+            $comment = mb_substr($comment, 0, 47) . "...";
         }
         $type_sounded_out = sound_it_out($type);
         $stub_fingprint = substr($sha256_fingerprint, 0, 6);
@@ -421,6 +421,22 @@ echo "</form></div>";
     }
     $("#loginSelector").change(enableOrDisableSubmitLoginShell);
     enableOrDisableSubmitLoginShell()
+
+    $(document).ready(() => {
+        let pi_request_datatable = $('#ssh-key-table').DataTable({
+            searching: false,
+            ordering: false,
+            paging: false,
+            responsive: true,
+            columns: [
+                {responsivePriority: 2}, // fingerprint
+                {responsivePriority: 999}, // type
+                {responsivePriority: 999}, // length
+                {responsivePriority: 2}, // comment
+                {responsivePriority: 1}, // actions
+            ],
+        });
+    });
 </script>
 
 <style>

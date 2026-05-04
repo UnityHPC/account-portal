@@ -10,7 +10,7 @@ body {
   color: var(--light_foreground);
   height: 100%;
   overscroll-behavior-y: none;
-  font-size: 11pt;
+  font-size: 16px;
   box-sizing: border-box;
 }
 
@@ -29,6 +29,7 @@ code {
   background: var(--light_panel_background);
   border-radius: 5px;
   padding: 3px 8px;
+  font-size: 12px;
   line-height: 22pt;
 }
 
