@@ -281,8 +281,8 @@ foreach ($sshPubKeys as $i => $key) {
     $key_b64 = base64_encode($key);
     echo"
         <tr>
-            <td><code class='alphabet-soup'>$stub_fingprint</code></td>
-            <td><code class='alphabet-soup' style='white-space: nowrap'>$type</code></td>
+            <td style='white-space: nowrap'><code>$stub_fingprint</code></td>
+            <td style='white-space: nowrap'><code>$type</code></td>
             <td>$length</td>
             <td>$comment_escaped</td>
             <td>
@@ -308,7 +308,7 @@ foreach ($sshPubKeys as $i => $key) {
         <dialog class='ssh-key-contents' id='key-$i-contents' autofocus closedby='any'>
             <span style='font-size: 16pt'>Contents of SSH key </span><code>$stub_fingprint</code>
             <hr>
-            <code class='alphabet-soup' aria-label='$key_escaped_sounded_out'>$key_escaped</code>
+            <code class='hard-wrap' aria-label='$key_escaped_sounded_out'>$key_escaped</code>
         </dialog>
     ";
 }
@@ -445,6 +445,8 @@ echo "</form></div>";
 
     .ssh-key-contents {
         max-width: var(--main-max-width);
+        word-wrap: break-word;
+        word-break: break-all;
     }
 
     .ssh-key-actions {
@@ -452,13 +454,6 @@ echo "</form></div>";
         gap: 5px;
     }
 
-    /* seemingly random characters such as a base64 string */
-    .alphabet-soup {
-        display: inline-block;
-        word-wrap: break-word;
-        word-break: break-all;
-        font-family: monospace;
-    }
 
     .delete-key-button, .show-key-button {
         display: flex; /* using flex inside button allows the X image to be centered */
