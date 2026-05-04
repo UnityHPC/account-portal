@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 }
                 $keyWasAdded = $USER->addSSHKey($key);
                 if ($keyWasAdded) {
-                    [$length, $sha256_fingerprint] = getSSHKeyInfo($key);
+                    $sha256_fingerprint = getSSHKeyInfo($key)[1];
                     $stub_fingprint = substr($sha256_fingerprint, 0, 6);
                     UnityHTTPD::messageSuccess("SSH Key Added", $stub_fingprint);
                 } else {
