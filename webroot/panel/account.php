@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "delKey":
-            $key = base64_decode(UnityHTTPD::getPostData("delKey"));
+            $key = _base64_decode(UnityHTTPD::getPostData("delKey"));
             $key_short = shortenString($key, 10, 30);
             try {
                 $USER->removeSSHKey($key);

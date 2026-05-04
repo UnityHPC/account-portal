@@ -352,3 +352,12 @@ function _array_last(array $x): mixed
     }
     return $x[array_key_last($x)];
 }
+
+function _base64_decode(string $x): string
+{
+    $output = base64_decode($x, true);
+    if ($output === false) {
+        throw new Exception("base64_decode returned false!");
+    }
+    return $output;
+}
