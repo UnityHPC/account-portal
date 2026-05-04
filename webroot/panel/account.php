@@ -248,7 +248,27 @@ if (count($sshPubKeys) == 0) {
     echo "<p>You do not have any SSH public keys, press the button below to add one.</p>";
 }
 
-echo "<table id='ssh-key-table'>\n";
+echo "
+    <table id='ssh-key-table'>
+    <thead>
+        <tr>
+            <!-- fingerprint is 6 characters, +2 for code block padding -->
+            <th scope='col' style='width: 8ch'>Fingerprint</th>
+            <!-- longest type 'ecdsa-sha2-nistp256' is 19 characters, incremented until it looks right -->
+            <th scope='col' style='width: 23ch'>Type</th>
+            <!-- longest length is 5 characters, +2 for code block padding -->
+            <th scope='col' style='width: 7ch'>Length</th>
+            <th scope='col'>Comment</th>
+            <th
+                scope='col'
+                style='width: calc(2*var(--ssh-key-button-width) + var(--ssh-key-button-gap))'
+            >
+                Actions
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+";
 foreach ($sshPubKeys as $i => $key) {
     $key_escaped = htmlspecialchars($key);
     $key_escaped_sounded_out = sound_it_out($key_escaped);
@@ -272,34 +292,29 @@ foreach ($sshPubKeys as $i => $key) {
     }
     $key_b64 = base64_encode($key);
     echo"
-        <tr aria-label='key $stub_fingprint'>
+        <tr>
+            <td><code>$stub_fingprint</code></td>
+            <td><code>$type</code></td>
+            <td>$length</td>
+            <td>$comment</td>
             <td>
-                <code class='alphabet-soup'>$stub_fingprint</code>
-            </td>
-            <td>
-                <code>$type:$length</code>
-            </td>
-            <td>
-                <span>$comment</span>
-            </td>
-            <td>
-                <button command='show-modal' commandfor='key-$i-contents' class='show-key-button' aria-label='Show Contents of key $stub_fingprint'>
-                    <span class='show-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
-                </button>
-            </td>
-            <td>
-                <form
-                    action=''
-                    onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
-                    method='POST'
-                >
-                    $CSRFTokenHiddenFormInput
-                    <input type='hidden' name='delKey' value='$key_b64' />
-                    <input type='hidden' name='form_type' value='delKey' />
-                    <button type='submit' class='delete-key-button' aria-label='Delete Key $stub_fingprint'>
-                        <span class='delete-key-span icon-x' aria-hidden='true'></span>
+                <div class='ssh-key-actions'>
+                    <button command='show-modal' commandfor='key-$i-contents' class='show-key-button' aria-label='Show Contents of key $stub_fingprint'>
+                        <span class='show-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
                     </button>
-                </form>
+                    <form
+                        action=''
+                        onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
+                        method='POST'
+                    >
+                        $CSRFTokenHiddenFormInput
+                        <input type='hidden' name='delKey' value='$key_b64' />
+                        <input type='hidden' name='form_type' value='delKey' />
+                        <button type='submit' class='delete-key-button' aria-label='Delete Key $stub_fingprint'>
+                            <span class='delete-key-span icon-x' aria-hidden='true'></span>
+                        </button>
+                    </form>
+                </div>
             </td>
         </tr>
         <dialog class='ssh-key-contents' id='key-$i-contents' autofocus closedby='any'>
@@ -309,7 +324,7 @@ foreach ($sshPubKeys as $i => $key) {
         </dialog>
     ";
 }
-echo "</table>";
+echo "</tbody></table>";
 
 echo "
     <button type='button' class='plusBtn btnAddKey' aria-label='Add SSH Key'><span>&#43;</span></button>
@@ -409,12 +424,27 @@ echo "</form></div>";
 </script>
 
 <style>
+    :root {
+        --ssh-key-button-width: 32px;
+        --ssh-key-button-height: 32px;
+        --ssh-key-button-gap: 5px;
+    }
+
     #ssh-key-table {
         width: 100%;
     }
 
+    #ssh-key-table * {
+        text-align: center;
+    }
+
     .ssh-key-contents {
         max-width: var(--main-max-width);
+    }
+
+    .ssh-key-actions {
+        display: flex;
+        gap: var(--ssh-key-button-gap);
     }
 
     .alphabet-soup {
@@ -428,8 +458,8 @@ echo "</form></div>";
         display: flex; /* using flex inside button allows the X image to be centered */
         align-items: center;
         justify-content: center;
-        width: 32px;
-        height: 32px;
+        width: var(--ssh-key-button-width);
+        height: var(--ssh-key-button-height);
         padding: 0;
     }
 
