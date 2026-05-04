@@ -270,6 +270,7 @@ foreach ($sshPubKeys as $i => $key) {
         if (mb_strlen($comment) >= 50) {
             $comment = mb_substr($comment, 0, 47) . "...";
         }
+        $comment_escaped = htmlspecialchars($comment);
         $type_sounded_out = sound_it_out($type);
         $stub_fingprint = substr($sha256_fingerprint, 0, 6);
     } catch (\Throwable $e) {
@@ -288,7 +289,7 @@ foreach ($sshPubKeys as $i => $key) {
             <td><code class='alphabet-soup'>$stub_fingprint</code></td>
             <td><code class='alphabet-soup'>$type</code></td>
             <td>$length</td>
-            <td>$comment</td>
+            <td>$comment_escaped</td>
             <td>
                 <div class='ssh-key-actions'>
                     <button command='show-modal' commandfor='key-$i-contents' class='show-key-button' aria-label='Show Contents of key $stub_fingprint'>
