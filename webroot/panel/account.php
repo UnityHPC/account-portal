@@ -286,8 +286,8 @@ foreach ($sshPubKeys as $i => $key) {
             <td>$length</td>
             <td>$comment_escaped</td>
             <td>
-                <div class='ssh-key-actions'>
-                    <button command='show-modal' commandfor='key-$i-contents' class='show-key-button' aria-label='Show Contents of key $stub_fingprint'>
+                <div style='display: flex; gap: 5px;'>
+                    <button command='show-modal' commandfor='key-$i-contents' class='show-key-button' aria-label='show key contents'>
                         <span class='show-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
                     </button>
                     <form
