@@ -95,6 +95,7 @@ function formatSSHKeyInfoInternal(string $key): string
 {
     [$type, $_, $comment] = tokenizeSSHKey($key);
     [$length, $fingerprint] = getSSHKeyInfo($key);
+    // format copied from openssl: https://superuser.com/a/1634883
     if ($comment !== "") {
         return "$length SHA256:$fingerprint $comment ($type)";
     } else {
