@@ -263,7 +263,7 @@ echo "
 ";
 foreach ($sshPubKeys as $i => $key) {
     $key_escaped = htmlspecialchars($key);
-    $key_escaped_sounded_out = sound_it_out($key_escaped);
+    $key_escaped_sounded_out = htmlspecialchars(sound_it_out($key));
     try {
         [$type, $_, $comment] = tokenizeSSHKey($key);
         [$length, $sha256_fingerprint] = getSSHKeyInfo($key);
