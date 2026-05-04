@@ -252,19 +252,11 @@ echo "
     <table id='ssh-key-table'>
     <thead>
         <tr>
-            <!-- fingerprint is 6 characters, +2 for code block padding -->
-            <th scope='col' style='width: 8ch'>Fingerprint</th>
-            <!-- longest type 'ecdsa-sha2-nistp256' is 19 characters, incremented until it looks right -->
-            <th scope='col' style='width: 23ch'>Type</th>
-            <!-- longest length '16384' is 5 characters, +2 for code block padding -->
-            <th scope='col' style='width: 7ch'>Length</th>
+            <th scope='col'>Fingerprint</th>
+            <th scope='col'>Type</th>
+            <th scope='col'>Length</th>
             <th scope='col'>Comment</th>
-            <th
-                scope='col'
-                style='width: calc(2*var(--ssh-key-button-width) + var(--ssh-key-button-gap))'
-            >
-                Actions
-            </th>
+            <th scope='col'>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -440,12 +432,6 @@ echo "</form></div>";
 </script>
 
 <style>
-    :root {
-        --ssh-key-button-width: 32px;
-        --ssh-key-button-height: 32px;
-        --ssh-key-button-gap: 5px;
-    }
-
     #ssh-key-table {
         width: 100%;
     }
@@ -460,7 +446,7 @@ echo "</form></div>";
 
     .ssh-key-actions {
         display: flex;
-        gap: var(--ssh-key-button-gap);
+        gap: 5px;
     }
 
     .alphabet-soup {
@@ -474,8 +460,8 @@ echo "</form></div>";
         display: flex; /* using flex inside button allows the X image to be centered */
         align-items: center;
         justify-content: center;
-        width: var(--ssh-key-button-width);
-        height: var(--ssh-key-button-height);
+        width: 32px;
+        height: 32px;
         padding: 0;
     }
 
