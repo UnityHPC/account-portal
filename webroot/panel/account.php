@@ -270,6 +270,7 @@ foreach ($sshPubKeys as $i => $key) {
         if (mb_strlen($comment) >= 50) {
             $comment = mb_substr($comment, 0, 47) . "...";
         }
+        $type_escaped = htmlspecialchars($type);
         $comment_escaped = htmlspecialchars($comment);
         $stub_fingprint = substr($sha256_fingerprint, 0, 6);
     } catch (\Throwable $e) {
@@ -282,7 +283,7 @@ foreach ($sshPubKeys as $i => $key) {
     echo"
         <tr>
             <td style='white-space: nowrap'><code>$stub_fingprint</code></td>
-            <td style='white-space: nowrap'><code>$type</code></td>
+            <td style='white-space: nowrap'><code>$type_escaped</code></td>
             <td>$length</td>
             <td>$comment_escaped</td>
             <td>
