@@ -256,7 +256,7 @@ echo "
             <th scope='col' style='width: 8ch'>Fingerprint</th>
             <!-- longest type 'ecdsa-sha2-nistp256' is 19 characters, incremented until it looks right -->
             <th scope='col' style='width: 23ch'>Type</th>
-            <!-- longest length is 5 characters, +2 for code block padding -->
+            <!-- longest length '16384' is 5 characters, +2 for code block padding -->
             <th scope='col' style='width: 7ch'>Length</th>
             <th scope='col'>Comment</th>
             <th
@@ -293,8 +293,8 @@ foreach ($sshPubKeys as $i => $key) {
     $key_b64 = base64_encode($key);
     echo"
         <tr>
-            <td><code>$stub_fingprint</code></td>
-            <td><code>$type</code></td>
+            <td><code class='alphabet-soup'>$stub_fingprint</code></td>
+            <td><code class='alphabet-soup'>$type</code></td>
             <td>$length</td>
             <td>$comment</td>
             <td>
