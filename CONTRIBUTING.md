@@ -188,3 +188,13 @@ Now, you should be able to observe with your web browser that `http://account-po
 
 Note: it is possible to configure your web browser to ignore your local machine's DNS resolver and rely entirely on a 3rd party.
 In Firefox, I found the section "enable DNS over HTTPS using" and set it to "Off: Use your default DNS resolveer".
+
+## Notes
+
+### DataTables
+
+The "responsive" feature of DataTables is great for making a table usable on mobile.
+It estimates the width of each column and hides certain columns based on the width of the display.
+Sometimes it doesn't hide as aggressively as I would like, and instead the text in a column is wrapped over many lines.
+This can be avoided by setting `white-space: nowrap` on the `<td>` element.
+Alternatively, you can also add the `nowrap` class to the `<table>` element if you want this effect for every single column.
