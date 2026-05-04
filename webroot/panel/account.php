@@ -293,7 +293,7 @@ foreach ($sshPubKeys as $i => $key) {
                     </button>
                     <form
                         action=''
-                        onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
+                        onsubmit='return confirm(\"Are you sure you want to delete the SSH key $stub_fingprint?\");'
                         method='POST'
                     >
                         $CSRFTokenHiddenFormInput
