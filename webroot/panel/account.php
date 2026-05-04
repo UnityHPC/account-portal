@@ -276,11 +276,7 @@ foreach ($sshPubKeys as $i => $key) {
     } catch (\Throwable $e) {
         $errorid = uniqid();
         UnityHTTPD::errorLog("error", "getSSHKeyInfo failed!", errorid: $errorid, error: $e, data: $key);
-        echo "
-            <tr>
-                <span aria-hidden='true'>ERROR: Something went wrong while fetching your key. error ID: $errorid</span>
-            </tr>
-        ";
+        echo "<tr>ERROR: Something went wrong while fetching your key. error ID: $errorid</tr>";
         continue;
     }
     $key_b64 = base64_encode($key);
