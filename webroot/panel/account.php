@@ -425,8 +425,8 @@ echo "</form></div>";
             },
             columns: [
                 {responsivePriority: 2}, // fingerprint
-                {responsivePriority: 999}, // type
-                {responsivePriority: 999}, // length
+                {responsivePriority: 4}, // type
+                {responsivePriority: 3}, // length
                 {responsivePriority: 2}, // comment
                 {responsivePriority: 1}, // actions
             ],
