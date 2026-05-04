@@ -309,7 +309,7 @@ foreach ($sshPubKeys as $i => $key) {
         <dialog class='ssh-key-contents' id='key-$i-contents' autofocus closedby='any'>
             <p style='font-size: 16pt'>Contents of SSH key <code>$stub_fingprint</code></p>
             <hr>
-            <p class='alphabet-soup' aria-label='$key_escaped_sounded_out'>$key_escaped</p>
+            <code class='alphabet-soup' aria-label='$key_escaped_sounded_out'>$key_escaped</code>
         </dialog>
     ";
 }
