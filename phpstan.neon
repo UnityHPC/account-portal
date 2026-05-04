@@ -62,7 +62,3 @@ parameters:
         - '#Method UnityWebPortal\\lib\\UnitySQL::removeUserLastLogin\(\) is unused.#'
       paths:
         - 'resources/lib/UnitySQL.php'
-    - messages:
-        - '#Strict comparison using \!\=\= between string and null will always evaluate to true#'
-      paths:
-        - resources/lib/utils.php
