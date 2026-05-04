@@ -312,7 +312,7 @@ foreach ($sshPubKeys as $i => $key) {
         </dialog>
     ";
 }
-echo "</tbody></table>";
+echo "</tbody></table>\n";
 
 echo "
     <p style='font-size: 11px'>* First 6 characters of the SHA256 fingerprint (hash) of the key data (excluding type, comment)</p>
