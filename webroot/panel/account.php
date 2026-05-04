@@ -306,6 +306,11 @@ foreach ($sshPubKeys as $i => $key) {
                 </div>
             </td>
         </tr>
+    ";
+    // you shouldn't have a <dialog> in the middle of a table outside of any <tr>
+    // chrome and firefox seem to automatically move the <dialog> elements outside the table
+    // which works for me
+    echo "
         <dialog class='ssh-key-contents' id='key-$i-contents' autofocus closedby='any'>
             <span style='font-size: 16pt'>Contents of SSH key </span><code>$stub_fingprint</code>
             <hr>
