@@ -315,9 +315,10 @@ div.searchWrapper > *:hover {
 }
 
 dialog {
-    border-color: var(--light_foreground);
-    border-radius: 5px;
-    border-width: 1px;
+  max-height: 75vh;
+  border-color: var(--light_foreground);
+  border-radius: 5px;
+  border-width: 1px;
 }
 
 ::backdrop {
