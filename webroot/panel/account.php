@@ -274,7 +274,8 @@ foreach ($sshPubKeys as $i => $key) {
         if (mb_strlen($comment) >= 30) {
             $comment = mb_substr($comment, 0, 27) . "...";
         }
-        $sha256_fingerprint = substr($sha256_fingerprint, 0, 8);
+        $type_sounded_out = sound_it_out($type);
+        $stub_fingprint = substr($sha256_fingerprint, 0, 6);
     } catch (\Throwable $e) {
         $errorid = uniqid();
         UnityHTTPD::errorLog("error", "getSSHKeyInfo failed!", errorid: $errorid, error: $e, data: $key);
@@ -288,21 +289,18 @@ foreach ($sshPubKeys as $i => $key) {
     }
     $key_b64 = base64_encode($key);
     echo"
-        <tr aria-label='key #$i'>
+        <tr aria-label='key $stub_fingprint'>
             <td>
-                <code aria-hidden='true' class='alphabet-soup'>$sha256_fingerprint</code>
-                <span class='screen-reader-only'>TODO</span>
+                <code class='alphabet-soup'>$stub_fingprint</code>
             </td>
             <td>
-                <code aria-hidden='true'>$type:$length</code>
-                <span class='screen-reader-only'>TODO</span>
+                <code>$type:$length</code>
             </td>
             <td>
-                <span aria-hidden='true'>$comment</span>
-                <span class='screen-reader-only'>TODO</span>
+                <span>$comment</span>
             </td>
             <td>
-                <button command='show-modal' commandfor='key-$i-contents' class='show-key-button' aria-label='Show/Hide Key #$i Contents'>
+                <button command='show-modal' commandfor='key-$i-contents' class='show-key-button' aria-label='Show Contents of key $stub_fingprint'>
                     <span class='show-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
                 </button>
             </td>
@@ -315,15 +313,16 @@ foreach ($sshPubKeys as $i => $key) {
                     $CSRFTokenHiddenFormInput
                     <input type='hidden' name='delKey' value='$key_b64' />
                     <input type='hidden' name='form_type' value='delKey' />
-                    <button type='submit' class='delete-key-button' aria-label='Delete Key #$i'>
+                    <button type='submit' class='delete-key-button' aria-label='Delete Key $stub_fingprint'>
                         <span class='delete-key-span icon-x' aria-hidden='true'></span>
                     </button>
                 </form>
             </td>
         </tr>
-        <dialog id='key-$i-contents' aria-label='Key #$i Contents' autofocus closedby='any'>
-            <textarea class='alphabet-soup' spellcheck='false' readonly aria-hidden='true' rows=5 cols=50 style='min-height: 10px;'>$key_escaped</textarea>
-            <textarea spellcheck='false' readonly class='screen-reader-only'>$key_escaped_screen_reader</textarea>
+        <dialog class='ssh-key-contents' id='key-$i-contents' autofocus closedby='any'>
+            <p style='font-size: 16pt'>Contents of SSH key <code>$stub_fingprint</code></p>
+            <hr>
+            <p class='alphabet-soup' aria-label='$key_escaped_screen_reader'>$key_escaped</p>
         </dialog>
     ";
 }
@@ -431,20 +430,15 @@ echo "</form></div>";
         width: 100%;
     }
 
-    #ssh-key-table * {
-        font-family: monospace;
-    }
-
-    .ssh-key-info textarea {
-        word-wrap: break-word;
-        word-break: break-all;
-        border-radius: 3px 0 0 3px;
+    .ssh-key-contents {
+        max-width: var(--main-max-width);
     }
 
     .alphabet-soup {
         display: inline-block;
         word-wrap: break-word;
         word-break: break-all;
+        font-family: monospace;
     }
 
     .delete-key-button, .show-key-button {

@@ -1,3 +1,7 @@
+:root {
+    --main-max-width: 1000px;
+}
+
 html,
 body {
   margin: 0;
@@ -219,7 +223,7 @@ div.inline * {
 main {
   flex: 1 0 auto;
   padding: 15px 20px 20px 20px;
-  max-width: 1000px;
+  max-width: var(--main-max-width);
   line-height: 24px;
 }
 
@@ -318,6 +322,12 @@ div.searchWrapper > *:hover {
     width:1px;
     height:1px;
     overflow:hidden;
+}
+
+dialog {
+    border-color: var(--light_foreground);
+    border-radius: 5px;
+    border-width: 1px;
 }
 
 ::backdrop {
