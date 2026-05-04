@@ -389,12 +389,6 @@ echo "</form></div>";
         openModal("Add New Key", url);
     });
 
-    $(".show-key-button").click(function() {
-        const keyBox = $(this).closest("tr").next("tr").find(".key-box");
-        const showKeyIcon = $(this).find(".show-key-span");
-        keyBox.toggle();
-    });
-
     $("#loginSelector option").each(function(i, e) {
         if ($(this).val() == ldapLoginShell) {
             $(this).prop("selected", true);
