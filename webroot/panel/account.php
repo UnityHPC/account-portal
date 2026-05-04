@@ -435,10 +435,6 @@ echo "</form></div>";
 </script>
 
 <style>
-    #ssh-key-table {
-        width: 100%;
-    }
-
     #ssh-key-table * {
         text-align: center;
     }
