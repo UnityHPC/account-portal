@@ -94,11 +94,11 @@ function getSSHKeyInfo(string $key): array
 function formatSSHKeyInfoInternal(string $key): string
 {
     [$type, $_, $comment] = tokenizeSSHKey($key);
-    [$length, $sha256_fingerprint] = getSSHKeyInfo($key);
+    [$length, $fingerprint] = getSSHKeyInfo($key);
     if ($comment !== null) {
-        return "$length SHA256:$sha256_fingerprint $comment ($type)";
+        return "$length SHA256:$fingerprint $comment ($type)";
     } else {
-        return "$length SHA256:$sha256_fingerprint ($type)";
+        return "$length SHA256:$fingerprint ($type)";
     }
 }
 
