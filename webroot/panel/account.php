@@ -450,7 +450,6 @@ echo "</form></div>";
         gap: 5px;
     }
 
-
     .delete-key-button, .show-key-button {
         display: flex; /* using flex inside button allows the X image to be centered */
         align-items: center;
