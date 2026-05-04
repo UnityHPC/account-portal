@@ -315,15 +315,6 @@ div.searchWrapper > *:hover {
   mask-image: url('/assets/magnifying-glass-minus.svg');
 }
 
-.screen-reader-only {
-    position:absolute;
-    left:-10000px;
-    top:auto;
-    width:1px;
-    height:1px;
-    overflow:hidden;
-}
-
 dialog {
     border-color: var(--light_foreground);
     border-radius: 5px;

@@ -170,6 +170,6 @@ class UtilsTest extends UnityWebPortalTestCase
     #[DataProvider("getSSHKeyInfoProvider")]
     public function testGetSSHKeyInfo(string $key, string $expected)
     {
-        $this->assertEquals($expected, getSSHKeyInfo($key)[0]);
+        $this->assertEquals($expected, getSSHKeyInfo($key));
     }
 }

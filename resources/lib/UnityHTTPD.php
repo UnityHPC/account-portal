@@ -318,14 +318,10 @@ class UnityHTTPD
         }
     }
 
-    public static function message(
-        string $title,
-        string $body,
-        UnityHTTPDMessageLevel $level,
-        ?string $body_screen_reader = null,
-    ): void {
+    public static function message(string $title, string $body, UnityHTTPDMessageLevel $level): void
+    {
         self::ensureSessionMessagesSanity();
-        array_push($_SESSION["messages"], [$title, $body, $level, $body_screen_reader]);
+        array_push($_SESSION["messages"], [$title, $body, $level]);
     }
 
     public static function messageDebug(string $title, string $body): void

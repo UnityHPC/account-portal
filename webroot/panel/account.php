@@ -271,7 +271,6 @@ foreach ($sshPubKeys as $i => $key) {
             $comment = mb_substr($comment, 0, 47) . "...";
         }
         $comment_escaped = htmlspecialchars($comment);
-        $type_sounded_out = sound_it_out($type);
         $stub_fingprint = substr($sha256_fingerprint, 0, 6);
     } catch (\Throwable $e) {
         $errorid = uniqid();

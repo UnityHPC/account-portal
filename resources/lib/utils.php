@@ -104,30 +104,6 @@ function formatSSHKeyInfoInternal(
     }
 }
 
-function formatSSHKeyInfoScreenReader(
-    string $type,
-    int $length,
-    string $sha256_fingerprint,
-    ?string $comment = null,
-): string {
-    if ($comment !== null) {
-        return sprintf(
-            "Comment: %s. Type: %s. Length: %d. SHA256 fingerprint beginning with %s.",
-            $comment,
-            sound_it_out($type),
-            $length,
-            sound_it_out(substr($sha256_fingerprint, 0, 8)),
-        );
-    } else {
-        return sprintf(
-            "Type: %s. Length: %d. SHA256 fingerprint beginning with %s.",
-            sound_it_out($type),
-            $length,
-            sound_it_out(substr($sha256_fingerprint, 0, 8)),
-        );
-    }
-}
-
 /**
  * @param int<1,max> $depth
  * @throws \JsonException
