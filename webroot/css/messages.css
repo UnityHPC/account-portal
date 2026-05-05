@@ -20,8 +20,10 @@
     word-wrap: break-word;
 }
 
-.message h3 {
+.message-title {
     margin: 0;
+    font-size: 16pt;
+    padding-bottom: 5px;
 }
 
 .message.debug {
