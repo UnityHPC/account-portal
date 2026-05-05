@@ -153,7 +153,7 @@ class UtilsTest extends UnityWebPortalTestCase
         $this->assertEquals(shortenString(...$input_args), $expected_output);
     }
 
-    public static function getSSHKeyInfoProvider()
+    public static function formatSSHKeyInfoInternalProvider()
     {
         return [
             [
@@ -167,9 +167,9 @@ class UtilsTest extends UnityWebPortalTestCase
         ];
     }
 
-    #[DataProvider("getSSHKeyInfoProvider")]
-    public function testGetSSHKeyInfo(string $key, string $expected)
+    #[DataProvider("formatSSHKeyInfoInternalProvider")]
+    public function testFormatSSHKeyInfoInternal(string $key, string $expected)
     {
-        $this->assertEquals($expected, getSSHKeyInfo($key));
+        $this->assertEquals($expected, formatSSHKeyInfoInternal($key));
     }
 }

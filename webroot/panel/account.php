@@ -48,32 +48,33 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             }
             $keys = array_map("trim", $keys);
             foreach ($keys as $key) {
+                $key_short = shortenString($key, 10, 30);
                 [$is_valid, $explanation] = testValidSSHKey($key);
                 if (!$is_valid) {
-                    $keyShort = shortenString($key, 10, 30);
-                    UnityHTTPD::messageError("SSH Key Not Added: $explanation", $keyShort);
+                    UnityHTTPD::messageError("SSH Key Not Added: $explanation", $key_short);
                     continue;
                 }
-                $key_info = getSSHKeyInfo($key);
                 $keyWasAdded = $USER->addSSHKey($key);
                 if ($keyWasAdded) {
-                    UnityHTTPD::messageSuccess("SSH Key Added", $key_info);
+                    $sha256_fingerprint = getSSHKeyInfo($key)[1];
+                    $stub_fingprint = substr($sha256_fingerprint, 0, 6);
+                    UnityHTTPD::messageSuccess("SSH Key Added", $stub_fingprint);
                 } else {
-                    UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $key_info);
+                    UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $key_short);
                 }
             }
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "delKey":
-            $key = base64_decode(UnityHTTPD::getPostData("delKey"));
+            $key = _base64_decode(UnityHTTPD::getPostData("delKey"));
+            $key_short = shortenString($key, 10, 30);
             try {
                 $USER->removeSSHKey($key);
             } catch (ArrayKeyException) {
                 UnityHTTPD::messageError("Cannot Remove SSH Key", "Key not found");
                 UnityHTTPD::redirect();
             }
-            $key_info = getSSHKeyInfo($key);
-            UnityHTTPD::messageSuccess("SSH Key Removed", $key_info);
+            UnityHTTPD::messageSuccess("SSH Key Removed", "$key_short");
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "loginshell":
@@ -247,53 +248,88 @@ if (count($sshPubKeys) == 0) {
     echo "<p>You do not have any SSH public keys, press the button below to add one.</p>";
 }
 
-echo "<table>\n";
+echo "
+    <table id='ssh-key-table' class='stripe compact hover'>
+    <thead>
+        <tr>
+            <th scope='col'>Fingerprint<sup>*</sup></th>
+            <th scope='col'>Type</th>
+            <th scope='col'>Length</th>
+            <th scope='col'>Comment</th>
+            <th scope='col'>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+";
 foreach ($sshPubKeys as $i => $key) {
     $key_escaped = htmlspecialchars($key);
+    $key_escaped_sounded_out = htmlspecialchars(sound_it_out($key));
     try {
-        $key_info = htmlspecialchars(getSSHKeyInfo($key));
+        [$type, $_, $comment] = tokenizeSSHKey($key);
+        [$length, $sha256_fingerprint] = getSSHKeyInfo($key);
+        if (mb_strlen($comment) >= 50) {
+            $comment = mb_substr($comment, 0, 47) . "...";
+        }
+        $type_escaped = htmlspecialchars($type);
+        $comment_escaped = htmlspecialchars($comment);
+        $stub_fingprint = substr($sha256_fingerprint, 0, 6);
     } catch (\Throwable $e) {
         $errorid = uniqid();
-        UnityHTTPD::errorLog("error", "getSSHKeyInfo failed!", errorid: $errorid, error: $e, data: $key);
-        $key_info = "ERROR: Something went wrong while fetching your key. error ID: $errorid";
+        UnityHTTPD::errorLog("error", "failed to analyze SSH key!", errorid: $errorid, error: $e, data: $key);
+        echo "
+            <tr>
+                <td />
+                <td />
+                <td />
+                <td>ERROR: Something went wrong while fetching your key. error ID: $errorid</td>
+                <td />
+            </tr>
+        ";
+        continue;
     }
     $key_b64 = base64_encode($key);
     echo"
         <tr>
-            <td><span class='ssh-key-info'>$key_info</span></td>
+            <td style='white-space: nowrap'><code>$stub_fingprint</code></td>
+            <td style='white-space: nowrap'><code>$type_escaped</code></td>
+            <td>$length</td>
+            <td>$comment_escaped</td>
             <td>
-                <form
-                    action=''
-                    onsubmit='return confirm(\"Are you sure you want to delete this SSH key?\");'
-                    method='POST'
-                    aria-label='delete key'
-                >
-                    $CSRFTokenHiddenFormInput
-                    <input type='hidden' name='delKey' value='$key_b64' />
-                    <input type='hidden' name='form_type' value='delKey' />
-                    <button type='submit' class='delete-key-button' aria-label='Delete Key #$i'>
-                        <span class='delete-key-span icon-x' aria-hidden='true'></span>
+                <div style='display: flex; gap: 5px;'>
+                    <button command='show-modal' commandfor='key-$i-contents' class='show-key-button' aria-label='show key contents'>
+                        <span class='show-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
                     </button>
-                </form>
-            </td>
-            <td>
-                <button type='button' class='show-hide-key-button' aria-label='Show/Hide Key #$i Contents'>
-                    <span class='show-hide-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
-                </button>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div class='key-box' aria-label='Key #$i Contents' style='display: none;'>
-                    <textarea spellcheck='false' readonly aria-hidden='true'>$key_escaped</textarea>
+                    <form
+                        action=''
+                        onsubmit='return confirm(\"Are you sure you want to delete the SSH key $stub_fingprint?\");'
+                        method='POST'
+                    >
+                        $CSRFTokenHiddenFormInput
+                        <input type='hidden' name='delKey' value='$key_b64' />
+                        <input type='hidden' name='form_type' value='delKey' />
+                        <button type='submit' class='delete-key-button' aria-label='Delete Key $stub_fingprint'>
+                            <span class='delete-key-span icon-x' aria-hidden='true'></span>
+                        </button>
+                    </form>
                 </div>
             </td>
         </tr>
     ";
+    // you shouldn't have a <dialog> in the middle of a table outside of any <tr>
+    // chrome and firefox seem to automatically move the <dialog> elements outside the table
+    // which works for me
+    echo "
+        <dialog class='ssh-key-contents' id='key-$i-contents' autofocus closedby='any'>
+            <span style='font-size: 16pt'>Contents of SSH key </span><code>$stub_fingprint</code>
+            <hr>
+            <code class='hard-wrap' aria-label='$key_escaped_sounded_out'>$key_escaped</code>
+        </dialog>
+    ";
 }
-echo "</table>\n";
+echo "</tbody></table>\n";
 
 echo "
+    <p style='font-size: 11px'>* First 6 characters of the SHA256 fingerprint (hash) of the key data (excluding type, comment)</p>
     <button type='button' class='plusBtn btnAddKey' aria-label='Add SSH Key'><span>&#43;</span></button>
     <hr>
     <h2>Login Shell</h2>
@@ -367,14 +403,6 @@ echo "</form></div>";
         openModal("Add New Key", url);
     });
 
-    $(".show-hide-key-button").click(function() {
-        const keyBox = $(this).closest("tr").next("tr").find(".key-box");
-        const showKeyIcon = $(this).find(".show-hide-key-span");
-        keyBox.toggle();
-        showKeyIcon.toggleClass("icon-magnifying-glass-plus", !keyBox.is(":visible"));
-        showKeyIcon.toggleClass("icon-magnifying-glass-minus", keyBox.is(":visible"));
-    });
-
     $("#loginSelector option").each(function(i, e) {
         if ($(this).val() == ldapLoginShell) {
             $(this).prop("selected", true);
@@ -390,30 +418,42 @@ echo "</form></div>";
     }
     $("#loginSelector").change(enableOrDisableSubmitLoginShell);
     enableOrDisableSubmitLoginShell()
+
+    $(document).ready(() => {
+        let pi_request_datatable = $('#ssh-key-table').DataTable({
+            searching: false,
+            ordering: false,
+            paging: false,
+            responsive: true,
+            layout: {
+                topStart: null,
+                topEnd: null,
+                bottomStart: null,
+                bottomEnd: null,
+            },
+            columns: [
+                {responsivePriority: 2}, // fingerprint
+                {responsivePriority: 4}, // type
+                {responsivePriority: 3}, // length
+                {responsivePriority: 2}, // comment
+                {responsivePriority: 1}, // actions
+            ],
+        });
+    });
 </script>
 
 <style>
-    .key-box {
-        position: relative;
-        width: auto;
-        height: auto;
+    #ssh-key-table * {
+        text-align: center;
     }
 
-    .key-box textarea {
+    .ssh-key-contents {
+        max-width: var(--main-max-width);
         word-wrap: break-word;
         word-break: break-all;
-        border-radius: 3px 0 0 3px;
-        font-family: monospace;
     }
 
-    .ssh-key-info {
-        display: inline-block;
-        word-wrap: break-word;
-        word-break: break-all;
-        font-family: monospace;
-    }
-
-    .delete-key-button, .show-hide-key-button {
+    .delete-key-button, .show-key-button {
         display: flex; /* using flex inside button allows the X image to be centered */
         align-items: center;
         justify-content: center;
@@ -422,7 +462,7 @@ echo "</form></div>";
         padding: 0;
     }
 
-    .delete-key-span, .show-hide-key-span {
+    .delete-key-span, .show-key-span {
         background-color: white;
         mask-size: contain;
     }
@@ -432,7 +472,7 @@ echo "</form></div>";
         height: 16px;
     }
 
-    .show-hide-key-span {
+    .show-key-span {
         width: 24px;
         height: 24px;
     }

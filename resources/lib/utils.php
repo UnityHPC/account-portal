@@ -66,8 +66,17 @@ function testValidSSHKey(string $key): array
     }
 }
 
-/** @return string {key_length_bits} SHA256:{key_fingerprint} {optional_key_comment} ({key_type}) */
-function getSSHKeyInfo(string $key): string
+/** convert to uppercase and insert spaces so that text-to-speech will "sound out" each character */
+function sound_it_out(string $x): string
+{
+    return strtoupper(chunk_split($x, 1, " "));
+}
+
+/**
+ * @throws Exception
+ * @return array{0: int, 1: string} [length, sha256 fingerprint]
+ */
+function getSSHKeyInfo(string $key): array
 {
     $pubkey = PublicKeyLoader::loadPublicKey($key);
     // phpseclib maintainer does not wish to include `getLength()` in the public key interface
@@ -78,8 +87,14 @@ function getSSHKeyInfo(string $key): string
     if (!is_int($length)) {
         throw new Exception("unsupported key type, getLength() return value is not an int");
     }
-    [$type, $_, $comment] = tokenizeSSHKey($key);
     $fingerprint = (string) $pubkey->getFingerprint("sha256");
+    return [$length, $fingerprint];
+}
+
+function formatSSHKeyInfoInternal(string $key): string
+{
+    [$type, $_, $comment] = tokenizeSSHKey($key);
+    [$length, $fingerprint] = getSSHKeyInfo($key);
     // format copied from openssl: https://superuser.com/a/1634883
     if ($comment !== "") {
         return "$length SHA256:$fingerprint $comment ($type)";
@@ -337,4 +352,13 @@ function _array_last(array $x): mixed
         throw new Exception("cannot get the last element of an empty array");
     }
     return $x[array_key_last($x)];
+}
+
+function _base64_decode(string $x): string
+{
+    $output = base64_decode($x, true);
+    if ($output === false) {
+        throw new Exception("base64_decode returned false!");
+    }
+    return $output;
 }

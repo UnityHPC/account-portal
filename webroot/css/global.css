@@ -1,3 +1,7 @@
+:root {
+    --main-max-width: 1000px;
+}
+
 html,
 body {
   margin: 0;
@@ -25,7 +29,6 @@ code {
   background: var(--light_panel_background);
   border-radius: 5px;
   padding: 3px 8px;
-  line-height: 22pt;
 }
 
 .code {
@@ -219,7 +222,7 @@ div.inline * {
 main {
   flex: 1 0 auto;
   padding: 15px 20px 20px 20px;
-  max-width: 1000px;
+  max-width: var(--main-max-width);
   line-height: 24px;
 }
 
@@ -309,4 +312,16 @@ div.searchWrapper > *:hover {
 
 .icon-magnifying-glass-minus {
   mask-image: url('/assets/magnifying-glass-minus.svg');
+}
+
+dialog {
+  max-height: 75vh;
+  border-color: var(--light_foreground);
+  border-radius: 5px;
+  border-width: 1px;
+}
+
+::backdrop {
+  background-color: gray;
+  opacity: 0.5;
 }
