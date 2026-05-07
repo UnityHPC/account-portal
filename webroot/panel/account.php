@@ -246,87 +246,87 @@ $sshPubKeys = $USER->getSSHKeys();
 
 if (count($sshPubKeys) == 0) {
     echo "<p>You do not have any SSH public keys, press the button below to add one.</p>";
-}
-
-echo "
-    <table id='ssh-key-table' class='stripe compact hover'>
-    <thead>
-        <tr>
-            <th scope='col'>Fingerprint<sup>*</sup></th>
-            <th scope='col'>Type</th>
-            <th scope='col'>Length</th>
-            <th scope='col'>Comment</th>
-            <th scope='col'>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-";
-foreach ($sshPubKeys as $i => $key) {
-    $key_escaped = htmlspecialchars($key);
-    $key_escaped_sounded_out = htmlspecialchars(sound_it_out($key));
-    try {
-        [$type, $_, $comment] = tokenizeSSHKey($key);
-        [$length, $sha256_fingerprint] = getSSHKeyInfo($key);
-        if (mb_strlen($comment) >= 50) {
-            $comment = mb_substr($comment, 0, 47) . "...";
-        }
-        $type_escaped = htmlspecialchars($type);
-        $comment_escaped = htmlspecialchars($comment);
-        $stub_fingprint = substr($sha256_fingerprint, 0, 6);
-    } catch (\Throwable $e) {
-        $errorid = uniqid();
-        UnityHTTPD::errorLog("error", "failed to analyze SSH key!", errorid: $errorid, error: $e, data: $key);
-        echo "
+} else {
+    echo "
+        <table id='ssh-key-table' class='stripe compact hover'>
+        <thead>
             <tr>
-                <td />
-                <td />
-                <td />
-                <td>ERROR: Something went wrong while fetching your key. error ID: $errorid</td>
-                <td />
+                <th scope='col'>Fingerprint<sup>*</sup></th>
+                <th scope='col'>Type</th>
+                <th scope='col'>Length</th>
+                <th scope='col'>Comment</th>
+                <th scope='col'>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+    ";
+    foreach ($sshPubKeys as $i => $key) {
+        $key_escaped = htmlspecialchars($key);
+        $key_escaped_sounded_out = htmlspecialchars(sound_it_out($key));
+        try {
+            [$type, $_, $comment] = tokenizeSSHKey($key);
+            [$length, $sha256_fingerprint] = getSSHKeyInfo($key);
+            if (mb_strlen($comment) >= 50) {
+                $comment = mb_substr($comment, 0, 47) . "...";
+            }
+            $type_escaped = htmlspecialchars($type);
+            $comment_escaped = htmlspecialchars($comment);
+            $stub_fingprint = substr($sha256_fingerprint, 0, 6);
+        } catch (\Throwable $e) {
+            $errorid = uniqid();
+            UnityHTTPD::errorLog("error", "failed to analyze SSH key!", errorid: $errorid, error: $e, data: $key);
+            echo "
+                <tr>
+                    <td />
+                    <td />
+                    <td />
+                    <td>ERROR: Something went wrong while fetching your key. error ID: $errorid</td>
+                    <td />
+                </tr>
+            ";
+            continue;
+        }
+        $key_b64 = base64_encode($key);
+        echo"
+            <tr>
+                <td style='white-space: nowrap'><code>$stub_fingprint</code></td>
+                <td style='white-space: nowrap'><code>$type_escaped</code></td>
+                <td>$length</td>
+                <td>$comment_escaped</td>
+                <td>
+                    <div style='display: flex; gap: 5px;'>
+                        <button command='show-modal' commandfor='key-$i-contents' class='show-key-button' aria-label='show key contents'>
+                            <span class='show-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
+                        </button>
+                        <form
+                            action=''
+                            onsubmit='return confirm(\"Are you sure you want to delete the SSH key $stub_fingprint?\");'
+                            method='POST'
+                        >
+                            $CSRFTokenHiddenFormInput
+                            <input type='hidden' name='delKey' value='$key_b64' />
+                            <input type='hidden' name='form_type' value='delKey' />
+                            <button type='submit' class='delete-key-button' aria-label='Delete Key $stub_fingprint'>
+                                <span class='delete-key-span icon-x' aria-hidden='true'></span>
+                            </button>
+                        </form>
+                    </div>
+                </td>
             </tr>
         ";
-        continue;
+        // you shouldn't have a <dialog> in the middle of a table outside of any <tr>
+        // chrome and firefox seem to automatically move the <dialog> elements outside the table
+        // which works for me
+        echo "
+            <dialog class='ssh-key-contents' id='key-$i-contents' autofocus closedby='any'>
+                <span style='font-size: 16pt'>Contents of SSH key </span><code>$stub_fingprint</code>
+                <hr>
+                <code class='hard-wrap' aria-label='$key_escaped_sounded_out'>$key_escaped</code>
+            </dialog>
+        ";
     }
-    $key_b64 = base64_encode($key);
-    echo"
-        <tr>
-            <td style='white-space: nowrap'><code>$stub_fingprint</code></td>
-            <td style='white-space: nowrap'><code>$type_escaped</code></td>
-            <td>$length</td>
-            <td>$comment_escaped</td>
-            <td>
-                <div style='display: flex; gap: 5px;'>
-                    <button command='show-modal' commandfor='key-$i-contents' class='show-key-button' aria-label='show key contents'>
-                        <span class='show-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
-                    </button>
-                    <form
-                        action=''
-                        onsubmit='return confirm(\"Are you sure you want to delete the SSH key $stub_fingprint?\");'
-                        method='POST'
-                    >
-                        $CSRFTokenHiddenFormInput
-                        <input type='hidden' name='delKey' value='$key_b64' />
-                        <input type='hidden' name='form_type' value='delKey' />
-                        <button type='submit' class='delete-key-button' aria-label='Delete Key $stub_fingprint'>
-                            <span class='delete-key-span icon-x' aria-hidden='true'></span>
-                        </button>
-                    </form>
-                </div>
-            </td>
-        </tr>
-    ";
-    // you shouldn't have a <dialog> in the middle of a table outside of any <tr>
-    // chrome and firefox seem to automatically move the <dialog> elements outside the table
-    // which works for me
-    echo "
-        <dialog class='ssh-key-contents' id='key-$i-contents' autofocus closedby='any'>
-            <span style='font-size: 16pt'>Contents of SSH key </span><code>$stub_fingprint</code>
-            <hr>
-            <code class='hard-wrap' aria-label='$key_escaped_sounded_out'>$key_escaped</code>
-        </dialog>
-    ";
+    echo "</tbody></table>\n";
 }
-echo "</tbody></table>\n";
 
 echo "
     <p style='font-size: 11px'>＊ First 6 characters of the SHA256 fingerprint (hash) of the key data (excluding type, comment)</p>
