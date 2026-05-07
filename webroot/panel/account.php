@@ -418,7 +418,7 @@ echo "</form></div>";
     }
     $("#loginSelector").change(enableOrDisableSubmitLoginShell);
     enableOrDisableSubmitLoginShell()
-
+<?php if (count($sshPubKeys) > 0) : ?>
     $(document).ready(() => {
         let pi_request_datatable = $('#ssh-key-table').DataTable({
             searching: false,
@@ -440,6 +440,7 @@ echo "</form></div>";
             ],
         });
     });
+<?php endif ?>
 </script>
 
 <style>
