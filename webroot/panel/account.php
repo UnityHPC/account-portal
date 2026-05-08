@@ -245,7 +245,7 @@ echo "<hr><h2>SSH Keys</h2>";
 $sshPubKeys = $USER->getSSHKeys();
 
 if (count($sshPubKeys) == 0) {
-    echo "<p>You do not have any SSH public keys, press the button below to add one.</p>";
+    echo "<p>You do not have any SSH public keys, press the button below to add one.</p><br>";
 } else {
     echo "
         <table id='ssh-key-table' class='stripe compact hover'>
