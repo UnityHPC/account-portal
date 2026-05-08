@@ -367,7 +367,7 @@ class UnityLDAP extends LDAPConn
             ["sshPublicKey" => []],
         );
         foreach ($attributes as $attrs) {
-            foreach ($attrs["sshPublicKey"] as $key) {
+            foreach ($attrs["sshpublickey"] as $key) {
                 [$type, $data, $comment] = tokenizeSSHKey((string) $key);
                 if ($type === $target_type && $data === $target_data) {
                     array_push($who, (string) $attrs["uid"][0]);
