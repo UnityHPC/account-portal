@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                             "attempted SSH public key sharing between users",
                             data: ["already using this key" => $already_using_this_key]
                         );
-                        UnityHTTPD::messageError(
+                        UnityHTTPD::messageWarning(
                             "SSH Key Not Added: Another User Is Already Using This Key",
                             "Sharing SSH keys with other users is against terms of service. This incident has been reported.",
                         );
