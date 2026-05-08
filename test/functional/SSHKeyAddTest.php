@@ -225,7 +225,7 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
                 "/Key Already Added/",
                 "/.*/",
             );
-            $this->assertEquals($keys_before, $USER->getSSHKeys());
+            $this->assertEquals([$key], $USER->getSSHKeys());
         } finally {
             callPrivateMethod($USER, "setSSHKeys", $keys_before);
         }
