@@ -11,7 +11,7 @@ class AjaxSshValidateTest extends UnityWebPortalTestCase
             [false, "foobar"],
             [
                 true,
-                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB+XqO25MUB9x/pS04I3JQ7rMGboWyGXh0GUzkOrTi7a",
+                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p",
             ],
         ];
     }

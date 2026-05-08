@@ -10,7 +10,7 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
     public static function keyProvider()
     {
         $validKey =
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB+XqO25MUB9x/pS04I3JQ7rMGboWyGXh0GUzkOrTi7a foobar";
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p foobar";
         $invalidKey = "foobar";
         return [[false, $invalidKey], [true, $validKey]];
     }
@@ -18,9 +18,9 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
     public static function keysProvider()
     {
         $validKey =
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB+XqO25MUB9x/pS04I3JQ7rMGboWyGXh0GUzkOrTi7a foobar";
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p foobar";
         $validKeyDuplicateDifferentComment =
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB+XqO25MUB9x/pS04I3JQ7rMGboWyGXh0GUzkOrTi7a foobar2";
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p foobar2";
         $validKey2 =
             "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBF/dSI9/7YWeyB8wa4rEWRdeb9pQbrGxZwYFV2ulr0agXdbiJIApp0MWDYlIc9XI+4Y+cVAj66PQ2YaRz44BV+o=";
         $invalidKey = "foobar";
