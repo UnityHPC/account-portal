@@ -211,6 +211,7 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
         $keys_before = $USER->getSSHKeys();
         try {
             $USER->addSSHKey($key);
+            $this->assertEquals([$key], $USER->getSSHKeys());
             $this->http_post(
                 __DIR__ . "/../../webroot/panel/account.php",
                 [
