@@ -3,6 +3,7 @@
 use UnityWebPortal\lib\UnityGithub;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 
 #[AllowMockObjectsWithoutExpectations]
 class SSHKeyAddTest extends UnityWebPortalTestCase
@@ -159,6 +160,41 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
         } finally {
             $GITHUB = $oldGithub;
             callPrivateMethod($USER, "setSSHKeys", []);
+        }
+    }
+
+    public function testShareKeysBetweenUsers()
+    {
+        global $USER;
+        $key =
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p foobar";
+        $this->switchUser("Admin");
+        $user1 = $USER;
+        $this->switchUser("Blank");
+        $user2 = $USER;
+        $user1_keys_before = $user1->getSSHKeys();
+        $user2_keys_before = $user2->getSSHKeys();
+        try {
+            $user1->addSSHKey($key);
+            // as user2, try to add the key that user1 already added
+            $this->http_post(
+                __DIR__ . "/../../webroot/panel/account.php",
+                [
+                    "form_type" => "addKey",
+                    "add_type" => "paste",
+                    "key" => $key,
+                ],
+                do_validate_messages: false,
+            );
+            $this->assertMessageExists(
+                UnityHTTPDMessageLevel::WARNING,
+                "/.*/",
+                "/This incident has been reported/",
+            );
+            $this->assertEquals($user2_keys_before, $user2->getSSHKeys());
+        } finally {
+            callPrivateMethod($user1, "setSSHKeys", $user1_keys_before);
+            callPrivateMethod($user2, "setSSHKeys", $user2_keys_before);
         }
     }
 }
