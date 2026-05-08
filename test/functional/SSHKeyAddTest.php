@@ -197,4 +197,37 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
             callPrivateMethod($user2, "setSSHKeys", $user2_keys_before);
         }
     }
+
+    /*
+    while attempting to share keys between users says "this incident has been reported"
+    you should not see this message if you add the same key to your account twice
+    */
+    public function testAddDuplicateKey()
+    {
+        global $USER;
+        $key =
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p foobar";
+        $this->switchUser("Blank");
+        $keys_before = $USER->getSSHKeys();
+        try {
+            $USER->addSSHKey($key);
+            $this->http_post(
+                __DIR__ . "/../../webroot/panel/account.php",
+                [
+                    "form_type" => "addKey",
+                    "add_type" => "paste",
+                    "key" => $key,
+                ],
+                do_validate_messages: false,
+            );
+            $this->assertMessageExists(
+                UnityHTTPDMessageLevel::WARNING,
+                "/Key Already Added/",
+                "/.*/",
+            );
+            $this->assertEquals($keys_before, $USER->getSSHKeys());
+        } finally {
+            callPrivateMethod($USER, "setSSHKeys", $keys_before);
+        }
+    }
 }

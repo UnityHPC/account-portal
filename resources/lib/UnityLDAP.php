@@ -379,6 +379,6 @@ class UnityLDAP extends LDAPConn
                 }
             }
         }
-        return $who;
+        return array_unique($who);
     }
 }
