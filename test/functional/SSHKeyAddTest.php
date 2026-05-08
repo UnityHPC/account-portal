@@ -208,7 +208,7 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
         $key =
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p foobar";
         $this->switchUser("Blank");
-        $keys_before = $USER->getSSHKeys();
+        $this->assertEmpty($USER->getSSHKeys());
         try {
             $USER->addSSHKey($key);
             $this->assertEquals([$key], $USER->getSSHKeys());
@@ -228,7 +228,7 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
             );
             $this->assertEquals([$key], $USER->getSSHKeys());
         } finally {
-            callPrivateMethod($USER, "setSSHKeys", $keys_before);
+            callPrivateMethod($USER, "setSSHKeys", []);
         }
     }
 }
