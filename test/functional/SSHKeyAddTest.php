@@ -22,7 +22,7 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
         $validKeyDuplicateDifferentComment =
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p foobar2";
         $validKey2 =
-            "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBF/dSI9/7YWeyB8wa4rEWRdeb9pQbrGxZwYFV2ulr0agXdbiJIApp0MWDYlIc9XI+4Y+cVAj66PQ2YaRz44BV+o=";
+            "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBF5Ossk5huH48Gdyw1nuC+1TKajZzF+83rwbFhml0b915mWzYbKqFtjFze8+4uW+xBjLmwx4e+vGiZbNR4ucm6w=";
         $invalidKey = "foobar";
         return [
             [0, []],
