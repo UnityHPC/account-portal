@@ -443,7 +443,7 @@ echo "</form></div>";
             ],
         });
     });
-<?php endif ?>
+<?php endif; ?>
 </script>
 
 <style>
