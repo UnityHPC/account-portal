@@ -277,11 +277,11 @@ if (count($sshPubKeys) == 0) {
             UnityHTTPD::errorLog("error", "failed to analyze SSH key!", errorid: $errorid, error: $e, data: $key);
             echo "
                 <tr>
-                    <td />
-                    <td />
-                    <td />
+                    <td></td>
+                    <td></td>
+                    <td></td>
                     <td>ERROR: Something went wrong while fetching your key. error ID: $errorid</td>
-                    <td />
+                    <td></td>
                 </tr>
             ";
             continue;
