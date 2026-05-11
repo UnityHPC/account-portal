@@ -329,7 +329,7 @@ foreach ($sshPubKeys as $i => $key) {
 echo "</tbody></table>\n";
 
 echo "
-    <p style='font-size: 11px'>* First 6 characters of the SHA256 fingerprint (hash) of the key data (excluding type, comment)</p>
+    <p style='font-size: 11px'>＊ First 6 characters of the SHA256 fingerprint (hash) of the key data (excluding type, comment)</p>
     <button type='button' class='plusBtn btnAddKey' aria-label='Add SSH Key'><span>&#43;</span></button>
     <hr>
     <h2>Login Shell</h2>
