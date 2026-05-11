@@ -71,30 +71,30 @@ class UnityHTTPD
         $errorid = uniqid();
         $title = trim($user_message_title);
         if (trim($user_message_body) !== "") {
-            $body_lines = explode("\n", trim($user_message_body));
+            $body_paragraphs = [htmlspecialchars(trim($user_message_body))];
         } else {
-            $body_lines = [];
+            $body_paragraphs = [];
         }
         $support = CONFIG["mail"]["support"];
-        array_push($body_lines, "For assistance, contact a Unity admin at $support.");
-        array_push($body_lines, "Error ID: $errorid");
+        array_push($body_paragraphs, "For assistance, contact a Unity admin at $support.");
+        array_push($body_paragraphs, "Error ID: $errorid");
         self::errorLog($log_title, $log_message, data: $data, error: $error, errorid: $errorid);
         if (
             ($_SERVER["REQUEST_METHOD"] ?? "") == "POST" &&
             !str_starts_with($_SERVER["REQUEST_URI"], "/lan/api/")
         ) {
-            self::messageError($title, implode("\n", $body_lines));
+            self::messageError($title, implode("\n", $body_paragraphs));
             self::redirect();
         } else {
             if (!headers_sent()) {
                 http_response_code($http_response_code);
             }
             // text may not be shown in the webpage in an obvious way, so make a popup
-            self::alert(implode(" -- ", [$title, ...$body_lines]));
+            self::alert(implode(" -- ", [$title, ...$body_paragraphs]));
             echo sprintf(
-                "<h1>%s</h1>\n<p>\n%s\n</p>\n",
-                nl2br(htmlspecialchars($title)),
-                nl2br(htmlspecialchars(implode("\n", $body_lines))),
+                "<h1>%s</h1>\n%s\n",
+                htmlspecialchars($title),
+                implode("<br>", $body_paragraphs),
             );
             // display_errors should not be enabled in production
             if (

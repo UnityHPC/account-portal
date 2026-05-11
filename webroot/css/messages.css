@@ -26,6 +26,10 @@
     padding-bottom: 5px;
 }
 
+.message-body {
+    white-space: pre-line;
+}
+
 .message.debug {
     color: #856404;
     background-color: #fff3cd;
