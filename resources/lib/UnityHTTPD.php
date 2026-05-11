@@ -94,7 +94,7 @@ class UnityHTTPD
             echo sprintf(
                 "<h1>%s</h1>\n%s\n",
                 htmlspecialchars($title),
-                implode("<br>", $body_paragraphs),
+                implode("\n<br>\n", $body_paragraphs),
             );
             // display_errors should not be enabled in production
             if (
