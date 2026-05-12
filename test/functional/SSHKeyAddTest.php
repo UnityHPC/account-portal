@@ -3,6 +3,7 @@
 use UnityWebPortal\lib\UnityGithub;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 
 #[AllowMockObjectsWithoutExpectations]
 class SSHKeyAddTest extends UnityWebPortalTestCase
@@ -10,7 +11,7 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
     public static function keyProvider()
     {
         $validKey =
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB+XqO25MUB9x/pS04I3JQ7rMGboWyGXh0GUzkOrTi7a foobar";
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p foobar";
         $invalidKey = "foobar";
         return [[false, $invalidKey], [true, $validKey]];
     }
@@ -18,11 +19,11 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
     public static function keysProvider()
     {
         $validKey =
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB+XqO25MUB9x/pS04I3JQ7rMGboWyGXh0GUzkOrTi7a foobar";
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p foobar";
         $validKeyDuplicateDifferentComment =
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB+XqO25MUB9x/pS04I3JQ7rMGboWyGXh0GUzkOrTi7a foobar2";
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p foobar2";
         $validKey2 =
-            "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBF/dSI9/7YWeyB8wa4rEWRdeb9pQbrGxZwYFV2ulr0agXdbiJIApp0MWDYlIc9XI+4Y+cVAj66PQ2YaRz44BV+o=";
+            "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBF5Ossk5huH48Gdyw1nuC+1TKajZzF+83rwbFhml0b915mWzYbKqFtjFze8+4uW+xBjLmwx4e+vGiZbNR4ucm6w=";
         $invalidKey = "foobar";
         return [
             [0, []],
@@ -158,6 +159,75 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
             $this->assertEquals($expectedKeysAdded, $numKeysAfter - $numKeysBefore);
         } finally {
             $GITHUB = $oldGithub;
+            callPrivateMethod($USER, "setSSHKeys", []);
+        }
+    }
+
+    public function testShareKeysBetweenUsers()
+    {
+        global $USER;
+        $key =
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p foobar";
+        $this->switchUser("Admin");
+        $user1 = $USER;
+        $this->switchUser("Blank");
+        $user2 = $USER;
+        $user1_keys_before = $user1->getSSHKeys();
+        $user2_keys_before = $user2->getSSHKeys();
+        try {
+            $user1->addSSHKey($key);
+            // as user2, try to add the key that user1 already added
+            $this->http_post(
+                __DIR__ . "/../../webroot/panel/account.php",
+                [
+                    "form_type" => "addKey",
+                    "add_type" => "paste",
+                    "key" => $key,
+                ],
+                do_validate_messages: false,
+            );
+            $this->assertMessageExists(
+                UnityHTTPDMessageLevel::WARNING,
+                "/.*/",
+                "/This incident has been reported/",
+            );
+            $this->assertEquals($user2_keys_before, $user2->getSSHKeys());
+        } finally {
+            callPrivateMethod($user1, "setSSHKeys", $user1_keys_before);
+            callPrivateMethod($user2, "setSSHKeys", $user2_keys_before);
+        }
+    }
+
+    /*
+    while attempting to share keys between users says "this incident has been reported"
+    you should not see this message if you add the same key to your account twice
+    */
+    public function testAddDuplicateKey()
+    {
+        global $USER;
+        $key =
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p foobar";
+        $this->switchUser("Blank");
+        $this->assertEmpty($USER->getSSHKeys());
+        try {
+            $USER->addSSHKey($key);
+            $this->assertEquals([$key], $USER->getSSHKeys());
+            $this->http_post(
+                __DIR__ . "/../../webroot/panel/account.php",
+                [
+                    "form_type" => "addKey",
+                    "add_type" => "paste",
+                    "key" => $key,
+                ],
+                do_validate_messages: false,
+            );
+            $this->assertMessageExists(
+                UnityHTTPDMessageLevel::WARNING,
+                "/Key Already Added/",
+                "/.*/",
+            );
+            $this->assertEquals([$key], $USER->getSSHKeys());
+        } finally {
             callPrivateMethod($USER, "setSSHKeys", []);
         }
     }

@@ -54,14 +54,28 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     UnityHTTPD::messageError("SSH Key Not Added: $explanation", $key_short);
                     continue;
                 }
-                $keyWasAdded = $USER->addSSHKey($key);
-                if ($keyWasAdded) {
-                    $sha256_fingerprint = getSSHKeyInfo($key)[1];
-                    $stub_fingprint = substr($sha256_fingerprint, 0, 6);
-                    UnityHTTPD::messageSuccess("SSH Key Added", $stub_fingprint);
-                } else {
-                    UnityHTTPD::messageInfo("SSH Key Not Added: Already Exists", $key_short);
+                $already_using_this_key = $LDAP->whoIsUsingKey($key);
+                if (count($already_using_this_key) > 0) {
+                    if ($already_using_this_key === [$USER->uid]) {
+                        UnityHTTPD::messageWarning("SSH Key Not Added: Key Already Added", $key_short);
+                        continue;
+                    } else {
+                        UnityHTTPD::errorLog(
+                            "security warning",
+                            "attempted SSH public key sharing between users",
+                            data: ["already using this key" => $already_using_this_key]
+                        );
+                        UnityHTTPD::messageWarning(
+                            "SSH Key Not Added: Another User Is Already Using This Key",
+                            "Sharing SSH keys with other users is against terms of service. This incident has been reported.",
+                        );
+                        continue;
+                    }
                 }
+                $USER->addSSHKey($key);
+                $sha256_fingerprint = getSSHKeyInfo($key)[1];
+                $stub_fingprint = substr($sha256_fingerprint, 0, 6);
+                UnityHTTPD::messageSuccess("SSH Key Added", $stub_fingprint);
             }
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */

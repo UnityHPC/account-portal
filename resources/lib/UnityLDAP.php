@@ -356,4 +356,29 @@ class UnityLDAP extends LDAPConn
         ksort($output);
         return $output;
     }
+
+    /** @return string[] */
+    public function whoIsUsingKey(string $target_key): array
+    {
+        $who = [];
+        [$target_type, $target_data, $target_comment] = tokenizeSSHKey($target_key);
+        $attributes = $this->getAllNativeUsersAttributes(
+            ["uid", "sshPublicKey"],
+            ["sshPublicKey" => []],
+        );
+        foreach ($attributes as $attrs) {
+            foreach ($attrs["sshpublickey"] as $key) {
+                try {
+                    [$type, $data, $comment] = tokenizeSSHKey((string) $key);
+                } catch (\Throwable) {
+                    // if someone's key is invalid, assume it doesn't match
+                    continue;
+                }
+                if ($type === $target_type && $data === $target_data) {
+                    array_push($who, (string) $attrs["uid"][0]);
+                }
+            }
+        }
+        return array_unique($who);
+    }
 }

@@ -9,10 +9,10 @@ class UtilsTest extends UnityWebPortalTestCase
         global $HTTP_HEADER_TEST_INPUTS;
         // these key types must all be in CONFIG["ldap"]["allowed_ssh_key_types"]
         $validKeys = [
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB+XqO25MUB9x/pS04I3JQ7rMGboWyGXh0GUzkOrTi7a",
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB+XqO25MUB9x/pS04I3JQ7rMGboWyGXh0GUzkOrTi7a foobar",
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB+XqO25MUB9x/pS04I3JQ7rMGboWyGXh0GUzkOrTi7a foo bar baz",
-            "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBF/dSI9/7YWeyB8wa4rEWRdeb9pQbrGxZwYFV2ulr0agXdbiJIApp0MWDYlIc9XI+4Y+cVAj66PQ2YaRz44BV+o=",
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p",
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p foobar",
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUef6kU0/P0lTO5KBZq6aFVm7nBHhB85SaG4HB0nh7p foo bar baz",
+            "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBF5Ossk5huH48Gdyw1nuC+1TKajZzF+83rwbFhml0b915mWzYbKqFtjFze8+4uW+xBjLmwx4e+vGiZbNR4ucm6w=",
             "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBOr8ZnJPs/mP/1c74P8NsiPL2pq/vKo6u0vtkgqgyZjqJJpPS5rP6EFJkT8DI0Fx9/70jvyH8wGK6tx+/gNElMlZ6P2RyHbDvL4Nh2LAEW3BQ2lbULyElP/ZeXIEQzPxng==",
             "ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBAFmNNrz+B6exxuReTXQJzXUzJ4zB5JTuB8Xtcr79P4tk4SlA5a5ufQlsqMdPRhA76KFaLmONGF1e+vwcQWsj/MbRQE0H56tkZRNa+ch5/YI6iKSffkzpRKogl/uTP4rlpRb1vppsURRYxQ2JBzLYolj8VUV+N0sCwM+8maiOGJYuc4dlQ==",
             "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQC6RjRhmaBfCN9l9qsnjplvatK/a7zb2tdbg7kDj8mWXfbC1zkELLLX/L+5hAySbm8QXPgr18CqcyV9LqK+vJ/aPHRNo3E/mp14pxp0nHpPlMzUV8ybl2uk2kBMXWRweOYfAcA5eJToHVAXJEVBvcwDI1WVG9Nfo5w1UhGSqcn4oQ==",

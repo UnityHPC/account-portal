@@ -248,9 +248,6 @@ class UnityUser
      */
     public function addSSHKey(string $key, bool $send_mail = true): bool
     {
-        if ($this->SSHKeyExists($key)) {
-            return false;
-        }
         $this->setSSHKeys(array_merge($this->getSSHKeys(), [$key]), $send_mail);
         $key_info = formatSSHKeyInfoInternal($key);
         $this->SQL->addLog("sshkey_added", _json_encode(["uid" => $this->uid, "key" => $key_info]));
