@@ -13,7 +13,7 @@ hr.navHR {
 nav.mainNav {
   background: var(--accent);
   inset: unset;
-  position: absolute;
+  position: fixed;
   top: var(--header-height);
   font-size: 11pt;
   overflow: hidden;
