@@ -95,7 +95,10 @@ function idleLockUser(UnityUser $user)
     echo "idle-locking user '$user->uid'\n";
     if (!$args["dry-run"]) {
         sendUserExpiryNoticeToPIGroupOwners("group_user_idlelocked_owner", $user);
-        $user->setFlag(UserFlag::IDLELOCKED, true, doSendMailAdmin: false);
+        $user->setFlag(UserFlag::IDLELOCKED, true, doSendMail: true, doSendMailAdmin: false);
+        if (isset($args["email-sleep-seconds"])) {
+            sleep($args["email-sleep-seconds"]);
+        }
     }
 }
 
@@ -104,7 +107,15 @@ function disableUser(UnityUser $user)
     global $args;
     echo "disabling user '$user->uid'\n";
     if (!$args["dry-run"]) {
-        $user->disable(UnityUserDisabledReason::Expired);
+        $user->disable(
+            UnityUserDisabledReason::Expired,
+            send_mail: true,
+            send_mail_pi_group_owner: true,
+            send_mail_admin: true,
+        );
+        if (isset($args["email-sleep-seconds"])) {
+            sleep($args["email-sleep-seconds"]);
+        }
     }
 }
 
