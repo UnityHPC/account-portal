@@ -14,7 +14,8 @@ $cli->description(
         "To prevent a user from being expired, add them to the 'immortal' user flag group.",
 )
     ->opt("dry-run", "Print actions without actually doing anything.", false, "boolean")
-    ->opt("verbose", "Print which emails are sent.", false, "boolean")
+    ->opt("show-idlelocks", "Print which users are idlelocked.", true, "boolean")
+    ->opt("show-emails", "Print which emails are sent.", false, "boolean")
     ->opt("timestamp", "Use this unix timestamp instead of right now", false, "int")
     ->opt("email-sleep-seconds", "Number of seconds to sleep after sending an email", false, "int");
 $args = $cli->parse($argv, true);
@@ -55,7 +56,7 @@ $immortal_users = $LDAP->userFlagGroups["immortal"]->getMemberUIDs();
 function sendMail(array|string $recipients, string $template, ?array $data = null)
 {
     global $MAILER, $args;
-    if ($args["verbose"]) {
+    if ($args["show-emails"]) {
         printf(
             "sending %s email to %s with data %s\n",
             $template,
@@ -89,7 +90,9 @@ function sendUserExpiryNoticeToPIGroupOwners(string $template, UnityUser $user)
 function idleLockUser(UnityUser $user)
 {
     global $args;
-    echo "idle-locking user '$user->uid'\n";
+    if ($args["show-idlelocks"]) {
+        echo "idle-locking user '$user->uid'\n";
+    }
     if (!$args["dry-run"]) {
         sendUserExpiryNoticeToPIGroupOwners("group_user_idlelocked_owner", $user);
         $user->setFlag(UserFlag::IDLELOCKED, true, doSendMail: true, doSendMailAdmin: false);
