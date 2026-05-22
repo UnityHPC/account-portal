@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 UnityHTTPD::redirect();
             }
             $group->disable();
-            UnityHTTPD::messageSuccess("Group Disabled", "");
+            UnityHTTPD::messageSuccess("Group Disabled", $group->gid);
             break;
     }
 }
