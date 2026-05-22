@@ -27,11 +27,7 @@ $disable_warning_days = CONFIG["expiry"]["disable_warning_days"];
 $disable_day = CONFIG["expiry"]["disable_day"];
 $final_disable_warning_day = $disable_warning_days[array_key_last($disable_warning_days)];
 $final_idlelock_warning_day = $idlelock_warning_days[array_key_last($idlelock_warning_days)];
-if ($args->hasOpt("timestamp")) {
-    $now = $args->getOpt("timestamp");
-} else {
-    $now = time();
-}
+$now = $args->getOpt("timestamp", time());
 
 $uid_to_last_login = [];
 foreach ($SQL->getAllUserLastLogins() as $record) {
