@@ -15,7 +15,11 @@ $cli->description(
 )
     ->opt("dry-run", "Print actions without actually doing anything.", type: "boolean")
     ->opt("show-idlelocks", "Print which users are idlelocked.", type: "boolean")
-    ->opt("show-emails", "Print which emails are sent.", type: "boolean")
+    ->opt(
+        "show-emails",
+        "Print which warning emails are sent. Does not include action emails.",
+        type: "boolean",
+    )
     ->opt("timestamp", "Use this unix timestamp instead of right now", type: "int")
     ->opt("email-sleep-seconds", "Number of seconds to sleep after sending an email", type: "int");
 $args = $cli->parse($argv, true);
