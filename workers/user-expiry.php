@@ -13,12 +13,13 @@ $cli->description(
         "It is important that this script runs exactly once per day." .
         "To prevent a user from being expired, add them to the 'immortal' user flag group.",
 )
-    ->opt("dry-run", "Print actions without actually doing anything.", false, "boolean")
-    ->opt("show-idlelocks", "Print which users are idlelocked.", true, "boolean")
-    ->opt("show-emails", "Print which emails are sent.", false, "boolean")
-    ->opt("timestamp", "Use this unix timestamp instead of right now", false, "int")
-    ->opt("email-sleep-seconds", "Number of seconds to sleep after sending an email", false, "int");
+    ->opt("dry-run", "Print actions without actually doing anything.", type: "boolean")
+    ->opt("show-idlelocks", "Print which users are idlelocked.", type: "boolean")
+    ->opt("show-emails", "Print which emails are sent.", type: "boolean")
+    ->opt("timestamp", "Use this unix timestamp instead of right now", type: "int")
+    ->opt("email-sleep-seconds", "Number of seconds to sleep after sending an email", type: "int");
 $args = $cli->parse($argv, true);
+$dry_run = $args->getOpt("dry-run", false);
 
 $idlelock_warning_days = CONFIG["expiry"]["idlelock_warning_days"];
 $idlelock_day = CONFIG["expiry"]["idlelock_day"];
@@ -26,9 +27,8 @@ $disable_warning_days = CONFIG["expiry"]["disable_warning_days"];
 $disable_day = CONFIG["expiry"]["disable_day"];
 $final_disable_warning_day = $disable_warning_days[array_key_last($disable_warning_days)];
 $final_idlelock_warning_day = $idlelock_warning_days[array_key_last($idlelock_warning_days)];
-
-if (isset($args["timestamp"])) {
-    $now = $args["timestamp"];
+if ($args->hasOpt("timestamp")) {
+    $now = $args->getOpt("timestamp");
 } else {
     $now = time();
 }
@@ -55,8 +55,8 @@ $immortal_users = $LDAP->userFlagGroups["immortal"]->getMemberUIDs();
 
 function sendMail(array|string $recipients, string $template, ?array $data = null)
 {
-    global $MAILER, $args;
-    if ($args["show-emails"]) {
+    global $MAILER, $args, $dry_run;
+    if ($args->getOpt("show-emails", false)) {
         printf(
             "sending %s email to %s with data %s\n",
             $template,
@@ -64,10 +64,10 @@ function sendMail(array|string $recipients, string $template, ?array $data = nul
             _json_encode($data),
         );
     }
-    if (!$args["dry-run"]) {
+    if (!$dry_run) {
         $MAILER->sendMail($recipients, $template, $data);
-        if (isset($args["email-sleep-seconds"])) {
-            sleep($args["email-sleep-seconds"]);
+        if ($args->hasOpt("email-sleep-seconds")) {
+            sleep($args->getOpt("email-sleep-seconds"));
         }
     }
 }
@@ -89,11 +89,11 @@ function sendUserExpiryNoticeToPIGroupOwners(string $template, UnityUser $user)
 
 function idleLockUser(UnityUser $user)
 {
-    global $args;
-    if ($args["show-idlelocks"]) {
+    global $args, $dry_run;
+    if ($args->getOpt("show-idlelocks", true) === false) {
         echo "idle-locking user '$user->uid'\n";
     }
-    if (!$args["dry-run"]) {
+    if (!$dry_run) {
         sendUserExpiryNoticeToPIGroupOwners("group_user_idlelocked_owner", $user);
         $user->setFlag(UserFlag::IDLELOCKED, true, doSendMail: true, doSendMailAdmin: false);
         if (isset($args["email-sleep-seconds"])) {
@@ -104,9 +104,9 @@ function idleLockUser(UnityUser $user)
 
 function disableUser(UnityUser $user)
 {
-    global $args;
+    global $dry_run;
     echo "disabling user '$user->uid'\n";
-    if (!$args["dry-run"]) {
+    if (!$dry_run) {
         $user->disable(
             UnityUserDisabledReason::Expired,
             send_mail: true,
@@ -205,7 +205,7 @@ foreach ($uid_to_idle_days as $uid => $day) {
     }
 }
 
-if ($args["dry-run"]) {
+if ($dry_run) {
     echo "[DRY RUN]\n";
 }
 
