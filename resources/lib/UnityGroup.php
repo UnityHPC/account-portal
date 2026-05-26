@@ -352,9 +352,10 @@ class UnityGroup extends PosixGroup
         assert(!$this->entry->exists());
         $nextGID = $this->LDAP->getNextPIGIDNumber();
         $this->entry->create([
-            "objectclass" => ["piGroup", "posixGroup", "top"],
+            "objectclass" => ["unityGroup", "posixGroup", "top"],
             "gidnumber" => strval($nextGID),
             "memberuid" => [$owner->uid],
+            "owneruid" => $owner->uid,
         ]);
         // TODO if we ever make this project based,
         // we need to update the cache here with the memberuid
@@ -480,7 +481,7 @@ class UnityGroup extends PosixGroup
         $owner = $this->getOwner();
         $suffix = "_" . $owner->getOrg();
         assert(str_ends_with($owner->uid, $suffix));
-        $short_name = substr($owner->uid, 0, -1 * strlen($suffix));
+        $short_name = substr($owner->uid, 0, -strlen($suffix));
         $parts = explode("@", $mail, 2);
         return sprintf("%s+%s@%s", $parts[0], $short_name, $parts[1]);
     }
