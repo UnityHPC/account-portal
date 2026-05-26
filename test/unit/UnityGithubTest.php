@@ -18,7 +18,7 @@ class UnityGithubTest extends UnityWebPortalTestCase
             [
                 "simonLeary42",
                 [
-                    "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLeHpW10CCamJtXNXJui49WM07wRnQbQTbQ2MSvF4j8vBpBuAbjiEp14qERLDs3FoWdpbiUwL9mZq6PmUSxaTnk=",
+                    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJdU7whk873eXktcZjoFExweGjD5juJwfhy5I6h9oSa9",
                 ],
             ],
         ];
