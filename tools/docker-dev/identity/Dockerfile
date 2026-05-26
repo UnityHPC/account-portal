@@ -18,15 +18,15 @@ COPY bootstrap.ldif /tmp/bootstrap.ldif
 COPY load-modules.ldif /tmp/load-modules.ldif
 COPY configure-unique.ldif /tmp/configure-unique.ldif
 
-RUN service slapd start; \
-    ldapadd    -Y EXTERNAL -H ldapi:/// -f /etc/ldap/schema/cosine.ldif; \
-    ldapadd    -Y EXTERNAL -H ldapi:/// -f /etc/ldap/schema/nis.ldif; \
-    ldapadd    -Y EXTERNAL -H ldapi:/// -f /etc/ldap/schema/inetorgperson.ldif; \
-    ldapadd    -Y EXTERNAL -H ldapi:/// -f /etc/ldap/schema/ssh.ldif; \
-    ldapadd    -Y EXTERNAL -H ldapi:/// -f /etc/ldap/schema/account-portal.ldif; \
-    ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/ldap-config.ldif; \
-    ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/load-modules.ldif; \
-    ldapadd    -Y EXTERNAL -H ldapi:/// -f /tmp/configure-unique.ldif; \
+RUN set -x; service slapd start && \
+    ldapadd    -Y EXTERNAL -H ldapi:/// -f /etc/ldap/schema/cosine.ldif && \
+    ldapadd    -Y EXTERNAL -H ldapi:/// -f /etc/ldap/schema/nis.ldif && \
+    ldapadd    -Y EXTERNAL -H ldapi:/// -f /etc/ldap/schema/inetorgperson.ldif && \
+    ldapadd    -Y EXTERNAL -H ldapi:/// -f /etc/ldap/schema/ssh.ldif && \
+    ldapadd    -Y EXTERNAL -H ldapi:/// -f /etc/ldap/schema/account-portal.ldif && \
+    ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/ldap-config.ldif && \
+    ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/load-modules.ldif && \
+    ldapadd    -Y EXTERNAL -H ldapi:/// -f /tmp/configure-unique.ldif && \
     slapadd                             -l /tmp/bootstrap.ldif
 
 # PHPLDAPAdmin Setup
