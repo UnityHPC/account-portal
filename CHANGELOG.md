@@ -8,7 +8,6 @@ For details on the changes in each release, see [the Releases page](https://gith
 - schema migration:
   - the new LDAP schema should be added in conjunction with the old
   - all entries should have the `piGroup` objectClass replaced with `unityGroup`
-  - once entries are migrated, the `piGroup` objectClass should be removed from the production schema
   - the `setup-pi-group-owners.php` worker should be run
 
 ### 1.7 -> 1.8
