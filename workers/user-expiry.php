@@ -90,7 +90,7 @@ function sendUserExpiryNoticeToPIGroupOwners(string $template, UnityUser $user)
 function idleLockUser(UnityUser $user)
 {
     global $args, $dry_run;
-    if ($args->getOpt("show-idlelocks", true) === false) {
+    if ($args->getOpt("show-idlelocks", false) === true) {
         echo "idle-locking user '$user->uid'\n";
     }
     if (!$dry_run) {
