@@ -38,7 +38,7 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
             callPrivateMethod($SQL, "setUserLastLogin", $USER->uid, 1 * 24 * 60 * 60);
             [$_, $output_lines] = executeWorker(
                 "user-expiry.php",
-                "--verbose --timestamp=" . (1 + $idle_days) * 24 * 60 * 60 + $seconds_offset,
+                "--show-emails --timestamp=" . (1 + $idle_days) * 24 * 60 * 60 + $seconds_offset,
             );
             return trim(implode("\n", $output_lines));
         } finally {
