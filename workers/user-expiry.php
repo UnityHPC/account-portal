@@ -43,10 +43,7 @@ foreach ($uid_to_last_login as $uid => $last_login) {
 }
 
 $pi_group_members = [];
-foreach (
-    $LDAP->getAllNonDisabledPIGroupsAttributes(["cn", "memberuid"], ["memberuid" => []])
-    as $attributes
-) {
+foreach ($LDAP->getPIGroupsAttributes(["cn", "memberuid"], ["memberuid" => []]) as $attributes) {
     $pi_group_members[$attributes["cn"][0]] = $attributes["memberuid"];
 }
 $pi_group_owners = array_map(UnityGroup::GID2OwnerUID(...), array_keys($pi_group_members));
@@ -77,7 +74,7 @@ function sendMail(array|string $recipients, string $template, ?array $data = nul
 function sendUserExpiryNoticeToPIGroupOwners(string $template, UnityUser $user)
 {
     global $LDAP, $SQL, $MAILER;
-    foreach ($LDAP->getNonDisabledPIGroupGIDsWithMemberUID($user->uid) as $gid) {
+    foreach ($LDAP->getPIGroupGIDsWithMemberUID($user->uid) as $gid) {
         $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
         sendMail($group->getOwnerMailAndPlusAddressedManagerMails(), $template, [
             "group" => $gid,

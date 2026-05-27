@@ -391,7 +391,7 @@ class UnityUser
      */
     public function getPIGroupGIDs(): array
     {
-        return $this->LDAP->getNonDisabledPIGroupGIDsWithMemberUID($this->uid);
+        return $this->LDAP->getPIGroupGIDsWithMemberUID($this->uid);
     }
 
     /**
@@ -422,7 +422,7 @@ class UnityUser
         if ($pi_group->exists() && !$pi_group->getIsDisabled()) {
             $pi_group->disable($send_mail);
         }
-        foreach ($this->LDAP->getNonDisabledPIGroupGIDsWithMemberUID($this->uid) as $gid) {
+        foreach ($this->LDAP->getPIGroupGIDsWithMemberUID($this->uid) as $gid) {
             $group = new UnityGroup($gid, $this->LDAP, $this->SQL, $this->MAILER);
             $group->removeUser($this, $why, send_mail: $send_mail_pi_group_owner);
         }

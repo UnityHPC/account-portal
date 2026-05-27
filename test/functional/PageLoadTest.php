@@ -76,7 +76,7 @@ class PageLoadTest extends UnityWebPortalTestCase
     {
         global $LDAP, $USER;
         $this->switchUser("CourseGroupManager");
-        $gids = $LDAP->getNonDisabledPIGroupGIDsWithManagerUID($USER->uid);
+        $gids = $LDAP->getPIGroupGIDsWithManagerUID($USER->uid);
         $this->assertTrue(count($gids) > 0);
         $gid = $gids[0];
         $output = $this->http_get(__DIR__ . "/../../webroot/panel/pi.php", [
@@ -132,7 +132,7 @@ class PageLoadTest extends UnityWebPortalTestCase
     {
         global $USER, $LDAP;
         $this->switchUser("CourseGroupManager");
-        $gids = $LDAP->getNonDisabledPIGroupGIDsWithManagerUID($USER->uid);
+        $gids = $LDAP->getPIGroupGIDsWithManagerUID($USER->uid);
         $this->assertTrue(count($gids) > 0);
         $output = $this->http_get(__DIR__ . "/../../webroot/panel/groups.php");
         foreach ($gids as $gid) {

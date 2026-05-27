@@ -142,7 +142,7 @@ function ensureUserDoesNotExist(string $uid)
             $flag_group->removeMemberUID($uid);
         }
     }
-    foreach ($LDAP->getNonDisabledPIGroupGIDsWithMemberUID($uid) as $gid) {
+    foreach ($LDAP->getPIGroupGIDsWithMemberUID($uid) as $gid) {
         $pi_group_entry = $LDAP->getPIGroupEntry($gid);
         $pi_group_members = $pi_group_entry->getAttribute("memberuid");
         if (in_array($uid, $pi_group_members)) {
@@ -286,7 +286,7 @@ class UnityWebPortalTestCase extends TestCase
                 $this->assertNotEmpty($USER->getPIGroup()->getManagerUIDs());
                 break;
             case "CourseGroupManager":
-                $this->assertNotEmpty($LDAP->getNonDisabledPIGroupGIDsWithManagerUID($USER->uid));
+                $this->assertNotEmpty($LDAP->getPIGroupGIDsWithManagerUID($USER->uid));
                 break;
             case "CustomMapped555":
                 $this->assertFalse($USER->exists());
