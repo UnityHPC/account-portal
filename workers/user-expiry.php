@@ -96,8 +96,8 @@ function idleLockUser(UnityUser $user)
     if (!$dry_run) {
         sendUserExpiryNoticeToPIGroupOwners("group_user_idlelocked_owner", $user);
         $user->setFlag(UserFlag::IDLELOCKED, true, doSendMail: true, doSendMailAdmin: false);
-        if (isset($args["email-sleep-seconds"])) {
-            sleep($args["email-sleep-seconds"]);
+        if ($args->hasOpt("email-sleep-seconds")) {
+            sleep($args->getOpt("email-sleep-seconds"));
         }
     }
 }
@@ -113,8 +113,8 @@ function disableUser(UnityUser $user)
             send_mail_pi_group_owner: true,
             send_mail_admin: true,
         );
-        if (isset($args["email-sleep-seconds"])) {
-            sleep($args["email-sleep-seconds"]);
+        if ($args->hasOpt("email-sleep-seconds")) {
+            sleep($args->getOpt("email-sleep-seconds"));
         }
     }
 }
