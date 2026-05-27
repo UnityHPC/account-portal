@@ -7,7 +7,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 
 // cache PI group info in $_SESSION for ajax pi_search.php
 // cache persists only until the user loads this page again
-$owner_uids = $LDAP->getAllNonDisabledPIGroupOwnerUIDs();
+$owner_uids = $LDAP->getPIGroupOwnerUIDs();
 $owner_attributes = $LDAP->getUsersAttributes(
     $owner_uids,
     ["uid", "gecos", "mail"],

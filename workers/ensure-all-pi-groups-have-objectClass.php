@@ -3,6 +3,7 @@
 include __DIR__ . "/init.php";
 
 use Garden\Cli\Cli;
+use UnityWebPortal\lib\UnityLDAP;
 
 $cli = new Cli();
 $cli->description("Ensure that all PI groups have the 'piGroup' objectClass.")->opt(
@@ -13,7 +14,10 @@ $cli->description("Ensure that all PI groups have the 'piGroup' objectClass.")->
 );
 $args = $cli->parse($argv, true);
 
-foreach ($LDAP->getAllNonDisabledPIGroupsAttributes(["cn", "objectclass"]) as $attributes) {
+foreach (
+    $LDAP->getPIGroupsAttributes(["cn", "objectclass"], filter: UnityLDAP::INCLUDE_DISABLED)
+    as $attributes
+) {
     if (!in_array("piGroup", $attributes["objectclass"])) {
         $gid = $attributes["cn"][0];
         echo "adding value to objectClass of group '$gid'\n";
