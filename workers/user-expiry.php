@@ -104,7 +104,7 @@ function idleLockUser(UnityUser $user)
 
 function disableUser(UnityUser $user)
 {
-    global $dry_run;
+    global $args, $dry_run;
     echo "disabling user '$user->uid'\n";
     if (!$dry_run) {
         $user->disable(
