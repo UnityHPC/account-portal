@@ -15,10 +15,20 @@ $owner_uid = trim(
         "Enter the UID of the Unity admin responsible for the group (example: simonleary_umass_edu): ",
     ),
 );
+$manager_uid = trim(
+    readline(
+        "Enter the UID of the faculty member responsible for the group (example: simonleary_umass_edu): ",
+    ),
+);
 
 $owner = new UnityUser($owner_uid, $LDAP, $SQL, $MAILER);
 if (!$owner->exists()) {
     _die("no such user: '$owner_uid'", 1);
+}
+
+$manager = new UnityUser($manager_uid, $LDAP, $SQL, $MAILER);
+if (!$manager->exists()) {
+    _die("no such user: '$manager_uid'", 1);
 }
 
 $course_pi_group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
@@ -27,8 +37,11 @@ if ($course_pi_group->exists()) {
     _die("course PI group already exists: '$course_pi_group_dn'", 1);
 }
 
-$course_pi_group->requestGroup($owner_uid, false, false);
-$course_pi_group->approveGroup($owner_uid);
+$course_pi_group->requestGroup($owner_uid, send_mail: false, send_mail_to_admins: false);
+$course_pi_group->approveGroup($owner_uid, send_mail: true);
+$course_pi_group->newUserRequest($manager, send_mail: false);
+$course_pi_group->approveUser($manager, send_mail: true);
+$course_pi_group->addManagerUID($manager_uid);
 
 $entry = $LDAP->getPIGroupEntry($course_pi_group->gid);
 $entry->setAttribute("description", "$course_id $course_notes");

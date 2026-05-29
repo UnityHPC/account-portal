@@ -3,6 +3,7 @@
 class WorkerUnityCourseTest extends UnityWebPortalTestCase
 {
     private static string $course_owner_uid = "user2_org1_test";
+    private static string $course_manager_uid = "user3_org1_test";
     private static string $course_gid = "pi_cs124_org1_test";
     private static array $course_info = ["cs124", "Fall 2025"];
 
@@ -18,6 +19,7 @@ class WorkerUnityCourseTest extends UnityWebPortalTestCase
             self::$course_info[1],
             self::$course_gid,
             self::$course_owner_uid,
+            self::$course_manager_uid,
         ]);
         $stdin_file_path = getPathFromFileHandle($stdin_file);
         try {
@@ -29,8 +31,12 @@ class WorkerUnityCourseTest extends UnityWebPortalTestCase
             $pi_group_entry = $LDAP->getPIGroupEntry(self::$course_gid);
             $this->assertTrue($pi_group_entry->exists());
             $this->assertEqualsCanonicalizing(
-                [self::$course_owner_uid],
+                [self::$course_owner_uid, self::$course_manager_uid],
                 $pi_group_entry->getAttribute("memberuid"),
+            );
+            $this->assertEqualsCanonicalizing(
+                [self::$course_manager_uid],
+                $pi_group_entry->getAttribute("manageruid"),
             );
             $this->assertEqualsCanonicalizing(
                 [self::$course_owner_uid],
