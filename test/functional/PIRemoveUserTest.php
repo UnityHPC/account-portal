@@ -93,9 +93,10 @@ class PIRemoveUserTest extends UnityWebPortalTestCase
 
     public function testRemoveMemberAlsoRemovesManager()
     {
-        global $USER;
+        global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("CourseGroupOwner");
-        $group = $USER->getNamesakePIGroup();
+        $gid = $LDAP->getPIGroupGIDsWithOwnerUID($USER->uid)[0];
+        $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
         $manager_uids = $group->getManagerUIDs();
         $this->assertNotEmpty($manager_uids);
         $manager_uid = $manager_uids[0];

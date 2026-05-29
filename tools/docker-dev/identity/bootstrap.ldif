@@ -37594,6 +37594,6 @@ objectClass: top
 gidNumber: 20007
 cn: pi_cs123_org1_test
 owneruid: user1_org1_test
-manageruid: user2_org1_test
+manageruid: user3_org1_test
 memberuid: user1_org1_test
-memberuid: user2_org1_test
+memberuid: user3_org1_test

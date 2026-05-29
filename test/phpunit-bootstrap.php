@@ -244,8 +244,8 @@ class UnityWebPortalTestCase extends TestCase
         "Admin" => "user1_org1_test",
         "Blank" => "user2_org1_test",
         "EmptyPIGroupOwner" => "user5_org2_test",
-        "CourseGroupOwner" => "cs123_org1_test",
-        "CourseGroupManager" => "user2_org1_test",
+        "CourseGroupOwner" => "user1_org1_test",
+        "CourseGroupManager" => "user3_org1_test",
         "CustomMapped555" => "user2002_org998_test",
         "Disabled" => "user7_org1_test",
         "DisabledNotPI" => "user7_org1_test",
@@ -289,7 +289,7 @@ class UnityWebPortalTestCase extends TestCase
                 break;
             case "CourseGroupOwner":
                 $this->assertTrue($USER->getNamesakePIGroup()->exists());
-                $this->assertNotEmpty($USER->getNamesakePIGroup()->getManagerUIDs());
+                $this->assertNotEmpty($LDAP->getPIGroupGIDsWithOwnerUID($USER->uid));
                 break;
             case "CourseGroupManager":
                 $this->assertNotEmpty($LDAP->getPIGroupGIDsWithManagerUID($USER->uid));
