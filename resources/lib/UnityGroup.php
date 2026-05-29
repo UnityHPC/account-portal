@@ -355,7 +355,7 @@ class UnityGroup extends PosixGroup
         return false;
     }
 
-    private function init($owner_uid): void
+    private function init(string $owner_uid): void
     {
         assert(!$this->entry->exists());
         $nextGID = $this->LDAP->getNextPIGIDNumber();
