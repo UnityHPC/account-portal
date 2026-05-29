@@ -107,9 +107,7 @@ class UnityGroup extends PosixGroup
             $this->MAILER->sendMail(
                 $this->getOwnerMailAndPlusAddressedManagerMails(),
                 "group_reenabled",
-                [
-                    "group_name" => $this->gid,
-                ],
+                ["group_name" => $this->gid],
             );
         }
         $this->setIsDisabled(false);
