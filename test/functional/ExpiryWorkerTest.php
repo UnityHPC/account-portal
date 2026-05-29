@@ -291,10 +291,7 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
                     "idle-locking user '%s'\nsending %s email to %s with data %s",
                     $member->uid,
                     "group_user_idlelocked_owner",
-                    _json_encode([
-                        $pi_group->addPlusAddressToMail($manager->getMail()),
-                        $owner->getMail(),
-                    ]),
+                    _json_encode([$manager->getMail(), $owner->getMail()]),
                     _json_encode([
                         "group" => $pi_group->gid,
                         "user" => $member->uid,

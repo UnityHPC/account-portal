@@ -76,7 +76,7 @@ function sendUserExpiryNoticeToPIGroupOwners(string $template, UnityUser $user)
     global $LDAP, $SQL, $MAILER;
     foreach ($LDAP->getPIGroupGIDsWithMemberUID($user->uid) as $gid) {
         $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
-        sendMail($group->getOwnerMailAndPlusAddressedManagerMails(), $template, [
+        sendMail($group->getOwnerMailAndManagerMails(), $template, [
             "group" => $gid,
             "user" => $user->uid,
             "org" => $user->getOrg(),

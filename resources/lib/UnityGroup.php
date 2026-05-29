@@ -104,11 +104,9 @@ class UnityGroup extends PosixGroup
         }
         $this->SQL->addLog("reenabled_pi_group", $this->gid);
         if ($send_mail) {
-            $this->MAILER->sendMail(
-                $this->getOwnerMailAndPlusAddressedManagerMails(),
-                "group_reenabled",
-                ["group_name" => $this->gid],
-            );
+            $this->MAILER->sendMail($this->getOwnerMailAndManagerMails(), "group_reenabled", [
+                "group_name" => $this->gid,
+            ]);
         }
         $this->setIsDisabled(false);
         $owner_uid = $this->getOwner()->uid;
@@ -186,7 +184,7 @@ class UnityGroup extends PosixGroup
         $this->SQL->removeRequest($user->uid, $this->gid);
         if ($send_mail) {
             $this->MAILER->sendMail(
-                $this->getOwnerMailAndPlusAddressedManagerMails(),
+                $this->getOwnerMailAndManagerMails(),
                 "group_join_request_cancelled",
                 ["uid" => $user->uid],
             );
@@ -212,7 +210,7 @@ class UnityGroup extends PosixGroup
                 "group" => $this->gid,
             ]);
             $this->MAILER->sendMail(
-                $this->getOwnerMailAndPlusAddressedManagerMails(),
+                $this->getOwnerMailAndManagerMails(),
                 "group_user_added_owner",
                 [
                     "group" => $this->gid,
@@ -240,7 +238,7 @@ class UnityGroup extends PosixGroup
                 "group" => $this->gid,
             ]);
             $this->MAILER->sendMail(
-                $this->getOwnerMailAndPlusAddressedManagerMails(),
+                $this->getOwnerMailAndManagerMails(),
                 "group_user_denied_owner",
                 [
                     "group" => $this->gid,
@@ -275,7 +273,7 @@ class UnityGroup extends PosixGroup
                 "why" => $why,
             ]);
             $this->MAILER->sendMail(
-                $this->getOwnerMailAndPlusAddressedManagerMails(),
+                $this->getOwnerMailAndManagerMails(),
                 "group_user_removed_owner",
                 [
                     "group" => $this->gid,
@@ -307,7 +305,7 @@ class UnityGroup extends PosixGroup
                 "group" => $this->gid,
             ]);
             $this->MAILER->sendMail(
-                $this->getOwnerMailAndPlusAddressedManagerMails(),
+                $this->getOwnerMailAndManagerMails(),
                 "group_user_request_owner",
                 [
                     "group" => $this->gid,
@@ -481,23 +479,13 @@ class UnityGroup extends PosixGroup
         parent::removeMemberUID($uid);
     }
 
-    public function addPlusAddressToMail(string $mail): string
-    {
-        $owner = $this->getOwner();
-        $suffix = "_" . $owner->getOrg();
-        assert(str_ends_with($owner->uid, $suffix));
-        $short_name = substr($owner->uid, 0, -strlen($suffix));
-        $parts = explode("@", $mail, 2);
-        return sprintf("%s+%s@%s", $parts[0], $short_name, $parts[1]);
-    }
-
     /** @return string[] */
-    public function getOwnerMailAndPlusAddressedManagerMails(): array
+    public function getOwnerMailAndManagerMails(): array
     {
         $mails = [$this->getOwner()->getMail()];
         foreach ($this->getManagerUIDs() as $manager_uid) {
             $manager = new UnityUser($manager_uid, $this->LDAP, $this->SQL, $this->MAILER);
-            array_push($mails, $this->addPlusAddressToMail($manager->getMail()));
+            array_push($mails, $manager->getMail());
         }
         $mails = array_unique($mails);
         sort($mails);
