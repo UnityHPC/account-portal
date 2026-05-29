@@ -376,7 +376,7 @@ class UnityUser
 
     public function isPI(): bool
     {
-        return count($this->getOwnedPIGroupGIDs()) > 0;
+        return $this->getNamesakePIGroup()->exists();
     }
 
     public function getNamesakePIGroup(): UnityGroup
