@@ -18,22 +18,26 @@ $getUserFromPost = function () {
     return new UnityUser(UnityHTTPD::getPostData("uid"), $LDAP, $SQL, $MAILER);
 };
 
+$getGroupFromPost = function () {
+    global $LDAP, $SQL, $MAILER;
+    return new UnityGroup(UnityHTTPD::getPostData("pi"), $LDAP, $SQL, $MAILER);
+};
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     UnityHTTPD::validatePostCSRFToken();
     switch ($_POST["form_type"]) {
         case "req":
-            $form_user = $getUserFromPost();
+            $owner = $getUserFromPost();
+            $group = $getGroupFromPost();
             if ($_POST["action"] == "Approve") {
-                $group = $form_user->getNamesakePIGroup();
-                $group->approveGroup();
+                $group->approveGroup($owner->uid);
             } elseif ($_POST["action"] == "Deny") {
-                $group = $form_user->getNamesakePIGroup();
-                $group->denyGroup();
+                $group->denyGroup($owner->uid);
             }
             break;
         case "reqChild":
             $form_user = $getUserFromPost();
-            $parent_group = new UnityGroup($_POST["pi"], $LDAP, $SQL, $MAILER);
+            $parent_group = $getGroupFromPost();
             if ($_POST["action"] == "Approve") {
                 $parent_group->approveUser($form_user);
             } elseif ($_POST["action"] == "Deny") {
@@ -42,11 +46,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             break;
         case "remUserChild":
             $form_user = $getUserFromPost();
-            $parent = new UnityGroup($_POST["pi"], $LDAP, $SQL, $MAILER);
+            $parent = $getGroupFromPost();
             $parent->removeUser($form_user, UnityGroupUserRemovedReason::RemovedByAdmin);
             break;
         case "disable":
-            $group = new UnityGroup(UnityHTTPD::getPostData("pi"), $LDAP, $SQL, $MAILER);
+            $group = $getGroupFromPost();
             if ($group->getIsDisabled()) {
                 UnityHTTPD::messageError("Cannot Disable PI Group", "Group is already disabled");
                 UnityHTTPD::redirect();
@@ -79,7 +83,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
     </thead>
     <tbody>
     <?php
-    $requests = $SQL->getRequests(UnitySQL::REQUEST_BECOME_PI);
+    $requests = $SQL->getRequests(UnitySQL::REQUEST_CREATE_PI_GROUP);
 
     foreach ($requests as $request) {
         $uid = $request["uid"];

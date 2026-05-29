@@ -9,6 +9,7 @@ For details on the changes in each release, see [the Releases page](https://gith
   - the new LDAP schema should be added in conjunction with the old
   - all entries should have the `piGroup` objectClass replaced with `unityGroup`
   - the `setup-pi-group-owners.php` worker should be run
+- all existing PI requests in SQL must be converted to the format "owner_uid:group_gid"
 
 ### 1.7 -> 1.8
 - the [webhook] section of the config file can be removed

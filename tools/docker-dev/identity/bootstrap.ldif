@@ -37587,36 +37587,11 @@ gecos: Melissa Price
 uid: user2005_org1_test
 uidnumber: 33130
 
-dn: cn=cs123_org1_test,ou=user_groups,dc=unityhpc,dc=test
-objectClass: posixGroup
-objectClass: top
-gidNumber: 20005
-cn: cs123_org1_test
-
-dn: cn=cs123_org1_test,ou=users,dc=unityhpc,dc=test
-objectClass: inetOrgPerson
-objectClass: posixAccount
-objectClass: top
-objectClass: ldapPublicKey
-uid: cs123_org1_test
-givenName: cs123
-sn: Fall 2025
-gecos: cs123 Fall 2025
-mail: user1+cs123@org1.test
-o: org1_test
-homeDirectory: /home/cs123_org1_test
-loginShell: /bin/bash
-uidNumber: 20005
-gidNumber: 20005
-cn: cs123_org1_test
-
 dn: cn=pi_cs123_org1_test,ou=pi_groups,dc=unityhpc,dc=test
 objectclass: unityGroup
 objectClass: posixGroup
 objectClass: top
 gidNumber: 20007
 cn: pi_cs123_org1_test
-owneruid: cs123_org1_test
-manageruid: user1_org1_test
-memberuid: cs123_org1_test
+owneruid: user1_org1_test
 memberuid: user1_org1_test

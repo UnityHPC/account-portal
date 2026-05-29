@@ -14,7 +14,7 @@ class UnitySQL
     private const string TABLE_AUDIT_LOG = "audit_log";
     private const string TABLE_USER_LAST_LOGINS = "user_last_logins";
     // FIXME this string should be changed to something more intuitive, requires production change
-    public const string REQUEST_BECOME_PI = "admin";
+    public const string REQUEST_CREATE_PI_GROUP = "admin";
     private const int TABLE_AUDIT_LOG_RECIPIENT_MAX_MB_STR_LEN = 768;
 
     private PDO $conn;

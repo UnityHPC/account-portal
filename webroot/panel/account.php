@@ -105,23 +105,27 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 UnityHTTPD::messageError("Cannot Submit PI Request", "Already a PI");
                 UnityHTTPD::redirect();
             }
-            if ($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI)) {
+            $group = $USER->getNamesakePIGroup();
+            $request = "$USER->uid:$group->gid";
+            if ($SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP)) {
                 UnityHTTPD::messageError("Cannot Submit PI Request", "This request already exists");
                 UnityHTTPD::redirect();
             }
             if ($_POST["tos"] != "agree") {
                 UnityHTTPD::badRequest("user did not agree to terms of service");
             }
-            $USER->getNamesakePIGroup()->requestGroup();
+            $group->requestGroup($USER->uid);
             UnityHTTPD::messageSuccess("PI Group Requested", "");
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "cancel_pi_request":
-            if (!$SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI)) {
+            $group = $USER->getNamesakePIGroup();
+            $request = "$USER->uid:$group->gid";
+            if (!$SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP)) {
                 UnityHTTPD::messageError("Cannot Cancel PI Request", "No PI request found");
                 UnityHTTPD::redirect();
             }
-            $USER->getNamesakePIGroup()->cancelGroupRequest();
+            $group->cancelGroupRequest($USER->uid);
             UnityHTTPD::messageSuccess("PI Request Cancelled", "");
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
@@ -217,7 +221,7 @@ if (!$isPI) {
         >
     ";
     echo $CSRFTokenHiddenFormInput;
-    if ($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI)) {
+    if ($SQL->requestExists($USER->uid, UnitySQL::REQUEST_CREATE_PI_GROUP)) {
         $onclick = "return confirm(\"Are you sure you want to cancel this request?\")";
         echo "<input type='submit' value='Cancel PI Account Request' onclick='$onclick'/>";
         echo "
