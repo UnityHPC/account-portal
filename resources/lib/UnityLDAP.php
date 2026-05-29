@@ -259,7 +259,7 @@ class UnityLDAP extends LDAPConn
     public function getPIGroupOwnerUIDs(string $filter = self::NON_DISABLED): array
     {
         return array_map(
-            fn($x) => (string) $x["ownerUid"][0],
+            fn($x) => (string) $x["owneruid"][0],
             $this->getPIGroupsAttributes(["ownerUid"], filter: $filter),
         );
     }

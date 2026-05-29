@@ -73,7 +73,7 @@
       {{ getRelativeHyperlink('My PIs', 'panel/groups.php')|raw }}
 
       {% for gid in owned_managed_pi_group_gids %}
-        {% if gid contains uid %}
+        {% if uid in gid %}
           {{ getRelativeHyperlink('My Users', 'panel/pi.php')|raw }}
         {% else %}
           {{ getRelativeHyperlink('PI Group ' ~ (gid|e), 'panel/pi.php?gid=' ~ (gid|e))|raw }}

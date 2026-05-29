@@ -245,7 +245,7 @@ class UnityWebPortalTestCase extends TestCase
         "Blank" => "user2_org1_test",
         "EmptyPIGroupOwner" => "user5_org2_test",
         "CourseGroupOwner" => "cs123_org1_test",
-        "CourseGroupManager" => "user1_org1_test",
+        "CourseGroupManager" => "user2_org1_test",
         "CustomMapped555" => "user2002_org998_test",
         "Disabled" => "user7_org1_test",
         "DisabledNotPI" => "user7_org1_test",

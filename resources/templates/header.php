@@ -40,6 +40,7 @@ echo $TWIG->render("header.html.twig", [
     "messages" => UnityHTTPD::getMessages(),
     "viewUser" => $_SESSION["viewUser"] ?? null,
     "user_exists" => $_SESSION["user_exists"] ?? false,
+    "uid" => $_SESSION["SSO"]["user"],
     "owned_managed_pi_group_gids" => $_SESSION["owned_managed_pi_group_gids"] ?? [],
     "is_admin" => $_SESSION["is_admin"] ?? false
 ]);
