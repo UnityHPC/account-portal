@@ -202,6 +202,12 @@ function accessPrivateVariable($obj, string $name)
     return $property->getValue($obj);
 }
 
+function accessPrivateConst($obj, string $name)
+{
+    $class = new \ReflectionClass($obj);
+    return $class->getConstant($name);
+}
+
 class UnityWebPortalTestCase extends TestCase
 {
     private ?string $last_user_nickname = null;
@@ -432,22 +438,25 @@ class UnityWebPortalTestCase extends TestCase
     public function assertRequestedPIGroup(bool $expected)
     {
         global $USER, $SQL;
+        $gid = UnityGroup::ownerUID2NamesakeGID($USER->uid);
+        $request = "$USER->uid:$gid";
         $this->assertEquals(
             $expected,
-            $SQL->requestExists($USER->uid, UnitySQL::REQUEST_CREATE_PI_GROUP),
+            $SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP),
         );
     }
 
     public function getNumberPiBecomeRequests()
     {
         global $USER, $SQL;
-        // FIXME table name, "admin" are public constants in UnitySQL
-        // FIXME "admin" should be something else
+        $gid = UnityGroup::ownerUID2NamesakeGID($USER->uid);
+        $request = "$USER->uid:$gid";
+        $table = accessPrivateConst($SQL, "TABLE_REQS");
+        $request_for = accessPrivateConst($SQL, "REQUEST_CREATE_PI_GROUP");
         $stmt = $SQL
             ->getConn()
-            ->prepare("SELECT * FROM requests WHERE uid=:uid and request_for='admin'");
-        $uid = $USER->uid;
-        $stmt->bindParam(":uid", $uid);
+            ->prepare("SELECT * FROM $table WHERE uid=:request and request_for='$request_for'");
+        $stmt->bindParam(":request", $request);
         $stmt->execute();
         return count($stmt->fetchAll());
     }
@@ -455,10 +464,12 @@ class UnityWebPortalTestCase extends TestCase
     public function assertNumberPiBecomeRequests(int $x)
     {
         global $USER, $SQL;
+        $gid = UnityGroup::ownerUID2NamesakeGID($USER->uid);
+        $request = "$USER->uid:$gid";
         if ($x == 0) {
-            $this->assertFalse($SQL->requestExists($USER->uid, UnitySQL::REQUEST_CREATE_PI_GROUP));
+            $this->assertFalse($SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP));
         } elseif ($x > 0) {
-            $this->assertTrue($SQL->requestExists($USER->uid, UnitySQL::REQUEST_CREATE_PI_GROUP));
+            $this->assertTrue($SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP));
         } else {
             throw new RuntimeException("x must not be negative");
         }

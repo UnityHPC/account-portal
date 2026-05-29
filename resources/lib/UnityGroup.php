@@ -150,7 +150,7 @@ class UnityGroup extends PosixGroup
         assert($this->SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP));
         $owner = new UnityUser($owner_uid, $this->LDAP, $this->SQL, $this->MAILER);
         assert($owner->exists());
-        $this->SQL->removeRequest($owner_uid, UnitySQL::REQUEST_CREATE_PI_GROUP);
+        $this->SQL->removeRequest($request, UnitySQL::REQUEST_CREATE_PI_GROUP);
         if ($this->exists()) {
             return;
         }

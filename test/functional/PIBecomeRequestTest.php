@@ -4,6 +4,7 @@ use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use UnityWebPortal\lib\UnitySQL;
 use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnityHTTPD;
+use UnityWebPortal\lib\UnityGroup;
 
 class PIBecomeRequestTest extends UnityWebPortalTestCase
 {
@@ -27,11 +28,12 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
         ]);
     }
 
-    private function approveGroup($uid)
+    private function approveGroup($uid, $gid)
     {
         $this->http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
             "form_type" => "req",
             "action" => "Approve",
+            "pi" => $gid,
             "uid" => $uid,
         ]);
     }
@@ -40,6 +42,8 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
     {
         global $USER, $SQL;
         $this->switchUser("Blank");
+        $gid = UnityGroup::ownerUID2NamesakeGID($USER->uid);
+        $request = "$USER->uid:$gid";
         $this->assertNumberPiBecomeRequests(0);
         try {
             $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
@@ -69,8 +73,8 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
             );
             $this->assertNumberPiBecomeRequests(1);
         } finally {
-            if ($SQL->requestExists($USER, UnitySQL::REQUEST_CREATE_PI_GROUP)) {
-                $SQL->removeRequest($USER->uid, UnitySQL::REQUEST_CREATE_PI_GROUP);
+            if ($SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP)) {
+                $SQL->removeRequest($request, UnitySQL::REQUEST_CREATE_PI_GROUP);
             }
         }
     }
@@ -97,7 +101,7 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
 
             $approve_uid = $SSO["user"];
             $this->switchUser("Admin");
-            $this->approveGroup($approve_uid);
+            $this->approveGroup($approve_uid, $pi_group->gid);
             $this->switchUser("Blank", validate: false);
 
             $this->assertRequestedPIGroup(false);
@@ -126,7 +130,7 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
             $this->requestGroupCreation();
             $this->assertRequestedPIGroup(true);
             $this->switchUser("Admin");
-            $this->approveGroup($approve_uid);
+            $this->approveGroup($approve_uid, $pi_group->gid);
             $this->assertTrue($user->isPI());
         } finally {
             if ($pi_group->memberUIDExists($approve_uid)) {
@@ -141,24 +145,26 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
     {
         global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("Blank");
+        $uid = $USER->uid;
         $piGroup = $USER->getNamesakePIGroup();
         $this->assertFalse($piGroup->exists());
-        $this->assertFalse($SQL->requestExists($USER->uid, UnitySQL::REQUEST_CREATE_PI_GROUP));
+        $request = "$USER->uid:$piGroup->gid";
+        $this->assertFalse($SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP));
         $piGroup->requestGroup($USER->uid);
         try {
-            $this->assertTrue($SQL->requestExists($USER->uid, UnitySQL::REQUEST_CREATE_PI_GROUP));
+            $this->assertTrue($SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP));
             $this->switchUser("Admin");
             $this->http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
                 "form_type" => "req",
                 "action" => "Deny",
-                "uid" => $piGroup->getOwner()->uid,
+                "uid" => $uid,
+                "pi" => $piGroup->gid,
             ]);
-            $this->switchBackUser();
             $this->assertFalse($piGroup->exists());
-            $this->assertFalse($SQL->requestExists($USER->uid, UnitySQL::REQUEST_CREATE_PI_GROUP));
+            $this->assertFalse($SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP));
         } finally {
-            if ($SQL->requestExists($USER->uid, UnitySQL::REQUEST_CREATE_PI_GROUP)) {
-                $SQL->removeRequest($USER->uid, UnitySQL::REQUEST_CREATE_PI_GROUP);
+            if ($SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP)) {
+                $SQL->removeRequest($request, UnitySQL::REQUEST_CREATE_PI_GROUP);
             }
         }
     }
