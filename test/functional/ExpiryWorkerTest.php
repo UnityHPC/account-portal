@@ -59,7 +59,7 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
         $this->assertFalse($USER->getFlag(UserFlag::IDLELOCKED));
         $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
         if ($is_pi) {
-            $this->assertFalse($USER->getPIGroup()->getIsDisabled());
+            $this->assertFalse($USER->getNamesakePIGroup()->getIsDisabled());
         }
         // see deployment/overrides/phpunit/config/config.ini
         $this->assertEquals(CONFIG["expiry"]["idlelock_warning_days"], [2, 3]);
@@ -122,7 +122,7 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
             $this->assertTrue($USER->getFlag(UserFlag::DISABLED));
             $this->assertEmpty($USER->getSSHKeys());
             if ($is_pi) {
-                $this->assertTrue($USER->getPIGroup()->getIsDisabled());
+                $this->assertTrue($USER->getNamesakePIGroup()->getIsDisabled());
             }
             // 9 ///////////////////////////////////////////////////////////////////////////////////
             $output = $this->runExpiryWorker(idle_days: 9);
@@ -132,8 +132,8 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
             if ($USER->getFlag(UserFlag::DISABLED)) {
                 $USER->reEnable();
             }
-            if ($is_pi && $USER->getPIGroup()->getIsDisabled()) {
-                callPrivateMethod($USER->getPIGroup(), "reenable");
+            if ($is_pi && $USER->getNamesakePIGroup()->getIsDisabled()) {
+                callPrivateMethod($USER->getNamesakePIGroup(), "reenable");
             }
             callPrivateMethod($USER, "setSSHKeys", $ssh_keys_before);
         }
@@ -214,7 +214,7 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
         $member = $USER;
         $this->switchUser("EmptyPIGroupOwner");
         $owner = $USER;
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         try {
             $owner->setFlag(UserFlag::IDLELOCKED, true);
             $pi_group->newUserRequest($member, false);
@@ -239,7 +239,7 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
                         "idle_days" => 7,
                         "expiration_date" => "1970/01/10",
                         "is_final_warning" => true,
-                        "pi_group_gid" => $owner->getPIGroup()->gid,
+                        "pi_group_gid" => $owner->getNamesakePIGroup()->gid,
                     ]),
                     "user_expiry_disable_warning_member",
                     '["' . $member->getMail() . '"]',
@@ -248,7 +248,7 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
                         "idle_days" => 7,
                         "expiration_date" => "1970/01/10",
                         "is_final_warning" => true,
-                        "pi_group_gid" => $owner->getPIGroup()->gid,
+                        "pi_group_gid" => $owner->getNamesakePIGroup()->gid,
                     ]),
                 ),
                 $output,
@@ -266,7 +266,7 @@ class ExpiryWorkerTest extends UnityWebPortalTestCase
         global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("EmptyPIGroupOwner");
         $owner = $USER;
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         $this->assertEmpty($pi_group->getManagerUIDs());
         $manager_uid = self::$NICKNAME2UID["Admin"];
         $manager = new UnityUser($manager_uid, $LDAP, $SQL, $MAILER);

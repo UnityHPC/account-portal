@@ -11,7 +11,7 @@ class PIRemoveUserTest extends UnityWebPortalTestCase
     private function removeUserByPI(string $uid, string $gid)
     {
         global $USER;
-        assert($USER->getPIGroup()->gid === $gid, "signed in user must be the group owner");
+        assert($USER->getNamesakePIGroup()->gid === $gid, "signed in user must be the group owner");
         $this->http_post(__DIR__ . "/../../webroot/panel/pi.php", [
             "form_type" => "remUser",
             "uid" => $uid,
@@ -45,7 +45,7 @@ class PIRemoveUserTest extends UnityWebPortalTestCase
         $this->switchUser("NormalPI");
         $pi = $USER;
         $piUid = $USER->uid;
-        $piGroup = $USER->getPIGroup();
+        $piGroup = $USER->getNamesakePIGroup();
         $memberUIDs = $piGroup->getMemberUIDs();
         // the ordering of the uids in getGroupMemberUIDs is different each time
         // use a linear search to find a user who is not the PI
@@ -78,7 +78,7 @@ class PIRemoveUserTest extends UnityWebPortalTestCase
         global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("NormalPI");
         $pi = $USER;
-        $piGroup = $USER->getPIGroup();
+        $piGroup = $USER->getNamesakePIGroup();
         $this->expectException(Exception::class);
         try {
             $this->$methodName($piGroup->getOwner()->uid, $piGroup->gid);
@@ -95,7 +95,7 @@ class PIRemoveUserTest extends UnityWebPortalTestCase
     {
         global $USER;
         $this->switchUser("CourseGroupOwner");
-        $group = $USER->getPIGroup();
+        $group = $USER->getNamesakePIGroup();
         $manager_uids = $group->getManagerUIDs();
         $this->assertNotEmpty($manager_uids);
         $manager_uid = $manager_uids[0];

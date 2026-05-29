@@ -362,18 +362,27 @@ class UnityUser
         return $this->entry->getAttribute("homedirectory")[0];
     }
 
-    /**
-     * Checks if current user is a PI
-     */
-    public function isPI(): bool
+    /** @return string[] */
+    public function getOwnedPIGroupGIDs(): array
     {
-        return $this->getPIGroup()->exists() && !$this->getPIGroup()->getIsDisabled();
+        return $this->LDAP->getPIGroupGIDsWithOwnerUID($this->uid);
     }
 
-    public function getPIGroup(): UnityGroup
+    /** @return string[] */
+    public function getManagedPIGroupGIDs(): array
+    {
+        return $this->LDAP->getPIGroupGIDsWithManagerUID($this->uid);
+    }
+
+    public function isPI(): bool
+    {
+        return count($this->getOwnedPIGroupGIDs()) > 0;
+    }
+
+    public function getNamesakePIGroup(): UnityGroup
     {
         return new UnityGroup(
-            UnityGroup::ownerUID2GID($this->uid),
+            UnityGroup::ownerUID2NamesakeGID($this->uid),
             $this->LDAP,
             $this->SQL,
             $this->MAILER,
@@ -418,7 +427,7 @@ class UnityUser
         bool $send_mail_pi_group_owner = true,
         bool $send_mail_admin = true,
     ): void {
-        $pi_group = $this->getPIGroup();
+        $pi_group = $this->getNamesakePIGroup();
         if ($pi_group->exists() && !$pi_group->getIsDisabled()) {
             $pi_group->disable($send_mail);
         }

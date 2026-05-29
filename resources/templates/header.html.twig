@@ -72,9 +72,13 @@
       {{ getRelativeHyperlink('Account Settings', 'panel/account.php')|raw }}
       {{ getRelativeHyperlink('My PIs', 'panel/groups.php')|raw }}
 
-      {% if is_pi %}
-        {{ getRelativeHyperlink('My Users', 'panel/pi.php')|raw }}
-      {% endif %}
+      {% for gid in owned_managed_pi_group_gids %}
+        {% if gid contains uid %}
+          {{ getRelativeHyperlink('My Users', 'panel/pi.php')|raw }}
+        {% else %}
+          {{ getRelativeHyperlink('PI Group ' ~ (gid|e), 'panel/pi.php?gid=' ~ (gid|e))|raw }}
+        {% endif %}
+      {% endfor %}
 
       {% for label in CONFIG['menuitems_secure']['labels'] %}
         <a target="_blank" href="{{ CONFIG['menuitems_secure']['links'][loop.index0] }}">{{ label }}</a>

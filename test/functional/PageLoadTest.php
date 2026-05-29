@@ -89,7 +89,7 @@ class PageLoadTest extends UnityWebPortalTestCase
     {
         global $USER;
         $this->switchUser("EmptyPIGroupOwner");
-        $gid = $USER->getPIGroup()->gid;
+        $gid = $USER->getNamesakePIGroup()->gid;
         $this->switchUser("Blank");
         $output = $this->http_get(
             __DIR__ . "/../../webroot/panel/pi.php",

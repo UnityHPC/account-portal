@@ -9,7 +9,7 @@ class WorkerUpdateQualifiedUsersGroupTest extends UnityWebPortalTestCase
     {
         global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("EmptyPIGroupOwner");
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         $this->switchUser("Blank");
         $user = $USER;
         $expectedOutput = [

@@ -15,7 +15,7 @@ $owner_attributes = $LDAP->getUsersAttributes(
 );
 $pi_group_gid_to_owner_gecos_and_mail = [];
 foreach ($owner_attributes as $attributes) {
-    $gid = UnityGroup::ownerUID2GID($attributes["uid"][0]);
+    $gid = UnityGroup::ownerUID2NamesakeGID($attributes["uid"][0]);
     $pi_group_gid_to_owner_gecos_and_mail[$gid] = [$attributes["gecos"][0], $attributes["mail"][0]];
 }
 $_SESSION["pi_group_gid_to_owner_gecos_and_mail"] = $pi_group_gid_to_owner_gecos_and_mail;

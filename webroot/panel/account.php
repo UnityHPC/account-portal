@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             if ($_POST["tos"] != "agree") {
                 UnityHTTPD::badRequest("user did not agree to terms of service");
             }
-            $USER->getPIGroup()->requestGroup();
+            $USER->getNamesakePIGroup()->requestGroup();
             UnityHTTPD::messageSuccess("PI Group Requested", "");
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 UnityHTTPD::messageError("Cannot Cancel PI Request", "No PI request found");
                 UnityHTTPD::redirect();
             }
-            $USER->getPIGroup()->cancelGroupRequest();
+            $USER->getNamesakePIGroup()->cancelGroupRequest();
             UnityHTTPD::messageSuccess("PI Request Cancelled", "");
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
@@ -178,7 +178,7 @@ if ($isPI) {
         <p>You are currently a <strong>principal investigator</strong> on the Unity HPC Platform.</p>
     ";
 } else {
-    if ($USER->getPIGroup()->exists() && $USER->getPIGroup()->getIsDisabled()) {
+    if ($USER->getNamesakePIGroup()->exists() && $USER->getNamesakePIGroup()->getIsDisabled()) {
         echo "<p>You are no longer a PI because your PI group is disabled.</p>";
     }
     if ($USER->getFlag(UserFlag::QUALIFIED)) {
@@ -227,7 +227,7 @@ if (!$isPI) {
             <input type='hidden' name='form_type' value='cancel_pi_request'/>
         ";
     } else {
-        if ($USER->getPIGroup()->exists() && $USER->getPIGroup()->getIsDisabled()) {
+        if ($USER->getNamesakePIGroup()->exists() && $USER->getNamesakePIGroup()->getIsDisabled()) {
             $button_msg = "Request to Re-Enable PI Group";
             $onclick = "return confirm(\"Are you sure you want to re-enable your old PI group?\")";
         } else {

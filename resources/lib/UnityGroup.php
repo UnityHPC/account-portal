@@ -17,7 +17,7 @@ enum UnityGroupUserRemovedReason: string
  */
 class UnityGroup extends PosixGroup
 {
-    public const string PI_PREFIX = "pi_";
+    public const string NAMESAKE_PI_PREFIX = "pi_";
     public string $gid;
     private UnityLDAP $LDAP;
     private UnitySQL $SQL;
@@ -368,25 +368,20 @@ class UnityGroup extends PosixGroup
 
     public function getOwner(): UnityUser
     {
-        return new UnityUser(
-            self::GID2OwnerUID($this->gid),
-            $this->LDAP,
-            $this->SQL,
-            $this->MAILER,
-        );
+        return $this->entry->getAttribute("ownerUid")[0];
     }
 
-    public static function ownerUID2GID(string $uid): string
+    public static function ownerUID2NamesakeGID(string $uid): string
     {
-        return self::PI_PREFIX . $uid;
+        return self::NAMESAKE_PI_PREFIX . $uid;
     }
 
-    public static function GID2OwnerUID(string $gid): string
+    public static function NamesakeGID2OwnerUID(string $gid): string
     {
-        if (substr($gid, 0, strlen(self::PI_PREFIX)) != self::PI_PREFIX) {
+        if (substr($gid, 0, strlen(self::NAMESAKE_PI_PREFIX)) != self::NAMESAKE_PI_PREFIX) {
             throw new Exception("PI group GID doesn't have the correct prefix.");
         }
-        return substr($gid, strlen(self::PI_PREFIX));
+        return substr($gid, strlen(self::NAMESAKE_PI_PREFIX));
     }
 
     /**

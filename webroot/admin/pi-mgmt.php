@@ -24,10 +24,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         case "req":
             $form_user = $getUserFromPost();
             if ($_POST["action"] == "Approve") {
-                $group = $form_user->getPIGroup();
+                $group = $form_user->getNamesakePIGroup();
                 $group->approveGroup();
             } elseif ($_POST["action"] == "Deny") {
-                $group = $form_user->getPIGroup();
+                $group = $form_user->getNamesakePIGroup();
                 $group->denyGroup();
             }
             break;
@@ -132,7 +132,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
     usort($owner_attributes, fn($a, $b) => strcmp($a["uid"][0], $b["uid"][0]));
     foreach ($owner_attributes as $attributes) {
         $gecos = $attributes["gecos"][0];
-        $gid = UnityGroup::OwnerUID2GID($attributes["uid"][0]);
+        $gid = UnityGroup::ownerUID2NamesakeGID($attributes["uid"][0]);
         $mail = $attributes["mail"][0];
         echo "
             <tr>

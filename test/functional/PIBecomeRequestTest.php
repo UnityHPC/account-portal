@@ -79,7 +79,7 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
     {
         global $USER, $SSO, $LDAP, $SQL, $MAILER;
         $this->switchUser("Blank");
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         try {
             $this->requestGroupCreation();
             $this->assertRequestedPIGroup(true);
@@ -120,7 +120,7 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
         $this->switchUser("ReenabledOwnerOfDisabledPIGroup");
         $this->assertFalse($USER->isPI());
         $user = $USER;
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         $approve_uid = $USER->uid;
         try {
             $this->requestGroupCreation();
@@ -141,7 +141,7 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
     {
         global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("Blank");
-        $piGroup = $USER->getPIGroup();
+        $piGroup = $USER->getNamesakePIGroup();
         $this->assertFalse($piGroup->exists());
         $this->assertFalse($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI));
         $piGroup->requestGroup();

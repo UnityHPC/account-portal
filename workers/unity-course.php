@@ -48,7 +48,7 @@ $mail = ""; // temporary empty mail
 $course_user->init($givenName, $sn, $mail, $org_gid);
 $course_user->setFlag(UserFlag::IMMORTAL, true, false, true);
 
-$course_pi_group = $course_user->getPIGroup();
+$course_pi_group = $course_user->getNamesakePIGroup();
 $course_user->setMail($course_pi_group->addPlusAddressToMail($manager->getMail()));
 
 if ($course_pi_group->exists()) {

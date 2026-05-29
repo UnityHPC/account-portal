@@ -10,7 +10,7 @@ class WorkerRemoveUsersFromGroupTest extends UnityWebPortalTestCase
         global $USER, $LDAP, $SQL, $MAILER;
         $this->switchUser("EmptyPIGroupOwner");
         $pi = $USER;
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         $this->assertTrue($pi->isPI());
         $this->assertEqualsCanonicalizing([$pi->uid], $pi_group->getMemberUIDs());
         $this->assertEqualsCanonicalizing([$pi->uid], $pi_group->getMemberUIDs());
@@ -33,7 +33,7 @@ class WorkerRemoveUsersFromGroupTest extends UnityWebPortalTestCase
             print implode("\n", $output);
             $this->switchUser("EmptyPIGroupOwner", validate: false);
             $pi = $USER;
-            $pi_group = $USER->getPIGroup();
+            $pi_group = $USER->getNamesakePIGroup();
             $this->assertEqualsCanonicalizing($expected_new_uids, $pi_group->getMemberUIDs());
             $this->assertEqualsCanonicalizing($expected_new_uids, $pi_group->getMemberUIDs());
         } finally {
@@ -77,7 +77,7 @@ class WorkerRemoveUsersFromGroupTest extends UnityWebPortalTestCase
     {
         global $USER;
         $this->switchUser("EmptyPIGroupOwner");
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         $members_before = $pi_group->getMemberUIDs();
         $remove_uids_file = writeLinesToTmpFile(["foo", "bar"]);
         $remove_uids_file_path = getPathFromFileHandle($remove_uids_file);

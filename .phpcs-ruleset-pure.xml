@@ -22,4 +22,7 @@
     <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
         <exclude name="PSR1.Classes.ClassDeclaration.MultipleClasses" />
     </rule>
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps" />
+    </rule>
 </ruleset>
