@@ -376,7 +376,8 @@ class UnityGroup extends PosixGroup
 
     public function getOwner(): UnityUser
     {
-        return $this->entry->getAttribute("ownerUid")[0];
+        $uid = $this->entry->getAttribute("ownerUid")[0];
+        return new UnityUser($uid, $this->LDAP, $this->SQL, $this->MAILER);
     }
 
     public static function ownerUID2NamesakeGID(string $uid): string
