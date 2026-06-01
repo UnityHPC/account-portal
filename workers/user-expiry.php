@@ -191,10 +191,10 @@ foreach ($uid_to_idle_days as $uid => $day) {
     if (in_array($day, $disable_warning_days) && !in_array($uid, $initially_disabled_users)) {
         disableWarnUser($user, $day);
     }
-    if ($day === $idlelock_day) {
+    if ($day === $idlelock_day && !in_array($uid, $initially_idlelocked_users)) {
         idleLockUser($user);
     }
-    if ($day === $disable_day) {
+    if ($day === $disable_day && !in_array($uid, $initially_disabled_users)) {
         disableUser($user);
     }
     if (!in_array($uid, $initially_idlelocked_users) && $day > $idlelock_day) {
