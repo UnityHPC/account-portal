@@ -23,6 +23,6 @@ olcObjectClasses: ( 1.1.2 NAME 'piGroup' SUP top AUXILIARY
     MAY ( isDisabled $ managerUid )
     )
 olcObjectClasses: ( 1.1.5 NAME 'xGroup' SUP top AUXILIARY
-    DESC 'general-purpose group in the Unity HPC Platform'
+    DESC 'extended group'
     MAY ( isDisabled $ managerUid $ ownerUid )
     )
