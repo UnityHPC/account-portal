@@ -22,7 +22,7 @@ olcObjectClasses: ( 1.1.2 NAME 'piGroup' SUP top AUXILIARY
     DESC 'DEPRECATED, DO NOT USE'
     MAY ( isDisabled $ managerUid )
     )
-olcObjectClasses: ( 1.1.5 NAME 'unityGroup' SUP top AUXILIARY
+olcObjectClasses: ( 1.1.5 NAME 'xGroup' SUP top AUXILIARY
     DESC 'general-purpose group in the Unity HPC Platform'
     MAY ( isDisabled $ managerUid $ ownerUid )
     )
