@@ -6,10 +6,11 @@ For details on the changes in each release, see [the Releases page](https://gith
 
 ### 1.8 -> 1.9
 - schema migration:
+  - add the new LDAP schema in conjunction with the old
   - shut down the account portal
-  - the new LDAP schema should be added in conjunction with the old
-  - all entries should have the `piGroup` objectClass replaced with `xGroup`
-  - the `setup-pi-group-owners.php` worker should be run
+  - add the `xGroup` objectClass to all PI groups
+  - remove the `piGroup` object class from all PI groups
+  - run the `setup-pi-group-owners.php` worker
   - restart the account portal
 
 ### 1.7 -> 1.8
