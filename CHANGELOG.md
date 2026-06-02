@@ -6,9 +6,11 @@ For details on the changes in each release, see [the Releases page](https://gith
 
 ### 1.8 -> 1.9
 - schema migration:
+  - shut down the account portal
   - the new LDAP schema should be added in conjunction with the old
   - all entries should have the `piGroup` objectClass replaced with `unityGroup`
   - the `setup-pi-group-owners.php` worker should be run
+  - restart the account portal
 
 ### 1.7 -> 1.8
 - the [webhook] section of the config file can be removed
