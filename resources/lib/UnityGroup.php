@@ -330,7 +330,6 @@ class UnityGroup extends PosixGroup
             $user_obj = new UnityUser($member, $this->LDAP, $this->SQL, $this->MAILER);
             array_push($out, $user_obj);
         }
-        sort($out);
         return $out;
     }
 
