@@ -301,7 +301,7 @@ class UnitySQL
     }
 
     /** @throws PDOException */
-    public function setPIGroupExpirationDate(string $gid, int $expiration_date)
+    public function setPIGroupExpirationDate(string $gid, int $expiration_date): void
     {
         $table = self::TABLE_PI_GROUP_EXPIRATION_DATES;
         $stmt = $this->conn->prepare("
@@ -317,7 +317,7 @@ class UnitySQL
     }
 
     /** @throws PDOException */
-    public function removePIGroupExpirationDate(string $gid)
+    public function removePIGroupExpirationDate(string $gid): void
     {
         $table = self::TABLE_PI_GROUP_EXPIRATION_DATES;
         $stmt = $this->conn->prepare("DELETE FROM $table WHERE gid=:gid");
