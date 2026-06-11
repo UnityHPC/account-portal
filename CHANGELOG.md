@@ -8,7 +8,7 @@ For details on the changes in each release, see [the Releases page](https://gith
 - schema migration:
   - add the new LDAP schema in conjunction with the old
   - shut down the account portal
-  - add the `xGroup` objectClass to all PI groups
+  - add the `extendedGroup` objectClass to all PI groups
   - remove the `piGroup` object class from all PI groups
   - run the `setup-pi-group-owners.php` worker
   - restart the account portal
