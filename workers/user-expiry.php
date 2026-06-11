@@ -35,7 +35,7 @@ $now = $args->getOpt("timestamp", time());
 
 $uid_to_last_login = [];
 foreach ($SQL->getAllUserLastLogins() as $record) {
-    $uid_to_last_login[$record["operator"]] = strtotime($record["last_login"]);
+    $uid_to_last_login[$record["operator"]] = $record["last_login"];
 }
 
 $uid_to_idle_days = [];
