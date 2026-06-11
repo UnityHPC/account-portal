@@ -12,6 +12,7 @@ For details on the changes in each release, see [the Releases page](https://gith
 - the `overrides` directory has been renamed to `domain_overrides`
 - the size of the `recipient` column in the `audit_log` SQL table should be increased from 128 to 768
 - the `check-ssh-keys.php` worker should be executed and any invalid SSH keys should be manually removed by an admin and any affected users should be notified
+- the `pi_group_expiration_dates` SQL table should be created according to `bootstrap.sql`
 
 ### 1.6 -> 1.7
 
