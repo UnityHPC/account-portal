@@ -3,9 +3,10 @@
 namespace UnityWebPortal\lib;
 
 use PDO;
+use PDOException;
 
 /**
- * @phpstan-type user_last_login array{operator: string, last_login: string}
+ * @phpstan-type user_last_login array{operator: string, last_login: int}
  * @phpstan-type request array{request_for: string, uid: string, timestamp: string}
  */
 class UnitySQL
@@ -19,6 +20,7 @@ class UnitySQL
 
     private PDO $conn;
 
+    /** @throws PDOException */
     public function __construct()
     {
         $this->conn = new PDO(
@@ -34,9 +36,7 @@ class UnitySQL
         return $this->conn;
     }
 
-    //
-    // requests table methods
-    //
+    /** @throws PDOException */
     public function addRequest(string $requestor, string $dest): void
     {
         if ($this->requestExists($requestor, $dest)) {
@@ -51,6 +51,7 @@ class UnitySQL
         $stmt->execute();
     }
 
+    /** @throws PDOException */
     public function removeRequest(string $requestor, string $dest): void
     {
         if (!$this->requestExists($requestor, $dest)) {
@@ -65,6 +66,7 @@ class UnitySQL
         $stmt->execute();
     }
 
+    /** @throws PDOException */
     public function removeRequests(string $dest): void
     {
         $stmt = $this->conn->prepare(
@@ -75,7 +77,8 @@ class UnitySQL
     }
 
     /**
-     * @throws \Exception
+     * @throws PDOException
+     * @throws \Exception if the request is not found or multiple requests are found (FIXME)
      * @return request
      */
     public function getRequest(string $user, string $dest): array
@@ -96,6 +99,7 @@ class UnitySQL
         return $result[0];
     }
 
+    /** @throws PDOException */
     public function requestExists(string $requestor, string $dest): bool
     {
         try {
@@ -107,7 +111,10 @@ class UnitySQL
         }
     }
 
-    /** @return request[] */
+    /**
+     * @return request[]
+     * @throws PDOException
+     */
     public function getAllRequests(): array
     {
         $stmt = $this->conn->prepare("SELECT * FROM " . self::TABLE_REQS);
@@ -115,7 +122,10 @@ class UnitySQL
         return $stmt->fetchAll();
     }
 
-    /** @return request[] */
+    /**
+     * @return request[]
+     * @throws PDOException
+     */
     public function getRequests(string $dest): array
     {
         $stmt = $this->conn->prepare(
@@ -126,7 +136,10 @@ class UnitySQL
         return $stmt->fetchAll();
     }
 
-    /** @return request[] */
+    /**
+     * @return request[]
+     * @throws PDOException
+     */
     public function getRequestsByUser(string $user): array
     {
         $stmt = $this->conn->prepare("SELECT * FROM " . self::TABLE_REQS . " WHERE uid=:uid");
@@ -135,6 +148,7 @@ class UnitySQL
         return $stmt->fetchAll();
     }
 
+    /** @throws PDOException */
     public function deleteRequestsByUser(string $user): void
     {
         $stmt = $this->conn->prepare("DELETE FROM " . self::TABLE_REQS . " WHERE uid=:uid");
@@ -142,6 +156,7 @@ class UnitySQL
         $stmt->execute();
     }
 
+    /** @throws PDOException */
     public function addLog(string $action_type, string $recipient): void
     {
         if (mb_strlen($recipient, "UTF-8") > self::TABLE_AUDIT_LOG_RECIPIENT_MAX_MB_STR_LEN) {
@@ -165,6 +180,7 @@ class UnitySQL
         $stmt->execute();
     }
 
+    /** @throws PDOException */
     public function updateUserLastLogin(string $uid): void
     {
         $table = self::TABLE_USER_LAST_LOGINS;
@@ -179,14 +195,26 @@ class UnitySQL
         $stmt->execute();
     }
 
-    /** @return user_last_login[] */
+    /**
+     * @return user_last_login[]
+     * @throws PDOException
+     */
     public function getAllUserLastLogins(): array
     {
         $stmt = $this->conn->prepare("SELECT * FROM " . self::TABLE_USER_LAST_LOGINS);
         $stmt->execute();
-        return $stmt->fetchAll();
+        $records = $stmt->fetchAll();
+        $output = [];
+        foreach ($records as $record) {
+            array_push($output, [
+                "operator" => $record["operator"],
+                "last_login" => strtotime($record["last_login"]),
+            ]);
+        }
+        return $output;
     }
 
+    /** @throws PDOException */
     public function convertLastLoginToDaysIdle(?int $timestamp, ?int $now = null): int
     {
         if ($timestamp === null) {
@@ -197,7 +225,10 @@ class UnitySQL
         return intdiv($idle_seconds, 60 * 60 * 24);
     }
 
-    /* for testing purposes */
+    /**
+     * for testing purposes
+     * @throws PDOException
+     */
     private function setUserLastLogin(string $uid, int $timestamp): void
     {
         $datetime = date("Y-m-d H:i:s", $timestamp);
@@ -213,7 +244,10 @@ class UnitySQL
         $stmt->execute();
     }
 
-    /* for testing purposes */
+    /**
+     * for testing purposes
+     * @throws PDOException
+     */
     private function removeUserLastLogin(string $uid): void
     {
         $table = self::TABLE_USER_LAST_LOGINS;
@@ -222,6 +256,10 @@ class UnitySQL
         $stmt->execute();
     }
 
+    /**
+     * @throws PDOException
+     * @throws \Exception if multiple records are found (this should never happen)
+     */
     public function getUserLastLogin(string $uid): ?int
     {
         $table = self::TABLE_USER_LAST_LOGINS;
