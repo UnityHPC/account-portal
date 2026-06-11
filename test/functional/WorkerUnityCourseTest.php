@@ -25,6 +25,7 @@ class WorkerUnityCourseTest extends UnityWebPortalTestCase
             self::$course_owner_name[1],
             self::$course_owner_uid,
             self::$manager_uid,
+            "1970/1/2",
         ]);
         $stdin_file_path = getPathFromFileHandle($stdin_file);
         try {

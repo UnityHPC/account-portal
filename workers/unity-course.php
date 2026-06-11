@@ -28,6 +28,9 @@ $cn = strtolower(
 $manager_uid = trim(
     readline("Enter the UID of the group manager (example: simonleary_umass_edu): "),
 );
+$expiration = strtotime(trim(
+    readline("Enter the expiration date for the course (example: 2026/6/11): "),
+));
 $org_gid = cn2org($cn);
 
 $manager = new UnityUser($manager_uid, $LDAP, $SQL, $MAILER);
@@ -61,6 +64,8 @@ $course_pi_group->approveGroup();
 $course_pi_group->newUserRequest($manager, false);
 $course_pi_group->approveUser($manager);
 $course_pi_group->addManagerUID($manager_uid);
+
+$SQL->setPIGroupExpirationDate($cn, $expiration);
 
 print "LDAP entries created:\n";
 print _json_encode(
