@@ -285,7 +285,7 @@ class UnitySQL
      */
     public function getPIGroupExpirationDate(string $gid): int|null
     {
-        $table = self::TABLE_USER_LAST_LOGINS;
+        $table = self::TABLE_PI_GROUP_EXPIRATION_DATES;
         $stmt = $this->conn->prepare("SELECT * FROM $table WHERE gid=:gid");
         $stmt->bindParam(":gid", $gid);
         $stmt->execute();
@@ -311,7 +311,8 @@ class UnitySQL
             UPDATE expiration_date=:expiration_date
         ");
         $stmt->bindParam(":gid", $gid);
-        $stmt->bindParam(":expiration_date", $expiration_date);
+        $expiration_date_str = date("Y-m-d H:i:s", $expiration_date);
+        $stmt->bindParam(":expiration_date", $expiration_date_str);
         $stmt->execute();
     }
 

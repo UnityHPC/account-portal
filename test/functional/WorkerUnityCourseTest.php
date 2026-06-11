@@ -30,8 +30,6 @@ class WorkerUnityCourseTest extends UnityWebPortalTestCase
         try {
             executeWorker("unity-course.php", stdinFilePath: $stdin_file_path);
             // error_log(implode("\n", $output_lines));
-            // our LDAP conn doesn't know about changes from subprocess
-            unset($GLOBALS["ldapconn"]);
             $this->switchUser("Admin");
             $pi_group_entry = $LDAP->getPIGroupEntry(self::$course_gid);
             $owner_user_entry = $LDAP->getUserEntry(self::$course_owner_uid);

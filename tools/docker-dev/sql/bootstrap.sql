@@ -25,6 +25,6 @@ CREATE TABLE `requests` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `pi_group_expiration_dates` (
-  `gid` varchar(131) NOT NULL,
-  `expiration_date` timestamp NOT NULL,
+  `gid` varchar(131) NOT NULL PRIMARY KEY,
+  `expiration_date` timestamp NOT NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
