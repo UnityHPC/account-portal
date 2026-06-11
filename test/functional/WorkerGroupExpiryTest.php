@@ -55,6 +55,12 @@ class WorkerGroupExpiryTest extends UnityWebPortalTestCase
             } else {
                 $SQL->setPIGroupExpirationDate($gid, $expiration_date_before);
             }
+            $LDAP->userFlagGroups["qualified"]->overwriteMemberUIDs(
+                array_merge(
+                    $LDAP->userFlagGroups["qualified"]->getMemberUIDs(),
+                    $member_uids_before,
+                ),
+            );
         }
     }
 }
