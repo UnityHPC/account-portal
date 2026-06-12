@@ -62,7 +62,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
                 </td>
                 <td>Upload Public Key</td>
                 <td>
-                    <input id="key_generate_upload_button" type="submit" value="Upload" disabled />
+                    <button type="button" id="key_generate_upload_button" disabled>Upload</button>
                 </td>
             </tr>
         </table>
@@ -87,7 +87,13 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
         }
     });
 
-    function generateKey(type) {
+    $("#key_generate_download_buttons > button").click(function() {
+        // get type
+        if ($(this).hasClass('btnWin')) {
+            var type = "ppk";
+        } else if ($(this).hasClass('btnLin')) {
+            var type = "key";
+        }
         $.ajax({
             url: "<?php echo getRelativeURL("panel/ajax/ssh_generate.php"); ?>?type=" + type,
             dataType: "json",
@@ -105,21 +111,15 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
                 $("#key_generate").append(result.responseText);
             },
         });
-    }
-
-    $("#key_generate_download_buttons > button").click(function() {
-        // get type
-        if ($(this).hasClass('btnWin')) {
-            var type = "ppk";
-        } else if ($(this).hasClass('btnLin')) {
-            var type = "key";
-        }
-
-        generateKey(type);
         setTimeout(() => {
             $("#key_generate_upload_button").prop("disabled", false);
             $("#key_generate_download_buttons > button").prop("disabled", true);
         }, 300);
+    });
+
+    $("#key_generate_upload_button").click(function() {
+        $("#generate_key_upload_checkmark").text("✅");
+        $("#newKeyform").submit();
     });
 
     $("#key_paste > textarea").on("input", function() {
