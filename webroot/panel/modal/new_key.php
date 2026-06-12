@@ -101,6 +101,8 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
                 $("input[type=hidden][name=gen_key]").val(result.public);
                 downloadFile(result.private, "privkey." + type); // Force download of private key
                 $("#generate_key_download_checkmark").text("✅");
+                $("#key_generate_upload_button").prop("disabled", false);
+                $("#key_generate_download_buttons > button").prop("disabled", true);
                 // now that private key is downloading, don't let them close the modal or
                 // switch method until they upload the pubkey (which reloads the page)
                 $("#modal").attr("closedby", "none");
@@ -111,10 +113,6 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
                 $("#key_generate").append(result.responseText);
             },
         });
-        setTimeout(() => {
-            $("#key_generate_upload_button").prop("disabled", false);
-            $("#key_generate_download_buttons > button").prop("disabled", true);
-        }, 300);
     });
 
     $("#key_generate_upload_button").click(function() {
