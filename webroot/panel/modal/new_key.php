@@ -95,6 +95,11 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
                 $("input[type=hidden][name=gen_key]").val(result.public);
                 downloadFile(result.private, "privkey." + type); // Force download of private key
                 $("#generate_key_download_checkmark").text("✅");
+                // now that private key is downloading, don't let them close the modal or
+                // switch method until they upload the pubkey (which reloads the page)
+                $("#modal").attr("closedby", "none");
+                $("#modalCloseButton").prop("disabled", true);
+                $("#newKeyform > input[type=radio]:not(:checked)").prop("disabled", true);
             },
             error: function (result) {
                 $("#key_generate").append(result.responseText);
