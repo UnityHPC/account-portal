@@ -14,25 +14,17 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
     <?php echo $CSRFTokenHiddenFormInput; ?>
     <input type='hidden' name='form_type' value='addKey'>
 
-    <div class='inline'>
-        <input type="radio" id="paste" name="add_type" value="paste" checked>
-        <label for="paste">Paste Key</label>
-    </div>
-
-    <div class='inline'>
-        <input type="radio" id="import" name="add_type" value="import">
-        <label for="import">Local File</label>
-    </div>
-
-    <div class='inline'>
-        <input type="radio" id="generate" name="add_type" value="generate">
-        <label for="generate">Generate Key</label>
-    </div>
-
-    <div class='inline'>
-        <input type="radio" id="github" name="add_type" value="github">
-        <label for="github">Import from GitHub</label>
-    </div>
+    <input type="radio" id="paste" name="add_type" value="paste" checked>
+    <label for="paste">Paste Key</label>
+    <br>
+    <input type="radio" id="import" name="add_type" value="import">
+    <label for="import">Local File</label>
+    <br>
+    <input type="radio" id="generate" name="add_type" value="generate">
+    <label for="generate">Generate Key</label>
+    <br>
+    <input type="radio" id="github" name="add_type" value="github">
+    <label for="github">Import from GitHub</label>
 
     <hr>
 
@@ -51,10 +43,29 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 
     <div style="display: none;" id="key_generate">
         <input type="hidden" name="gen_key" />
-        <button type="button" class="btnLin">OpenSSH</button>
-        <button type="button" class="btnWin">PuTTY</button>
-        <input type="submit" value="Upload Public Key" disabled />
-        <br>
+        <table style="border-spacing: 5px;">
+            <tr>
+                <td>
+                    <span id="generate_key_download_checkmark">&hellip;</span>
+                </td>
+                <td>Download Private Key</td>
+                <td>
+                    <div style="display: flex; gap: 5px;" id="key_generate_download_buttons">
+                        <button type="button" class="btnLin">OpenSSH (recommended)</button>
+                        <button type="button" class="btnWin">PuTTY</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span id="generate_key_upload_checkmark">&hellip;</span>
+                </td>
+                <td>Upload Public Key</td>
+                <td>
+                    <input id="key_generate_upload_button" type="submit" value="Upload" disabled />
+                </td>
+            </tr>
+        </table>
         <p style="margin-top: 10px;">
             Once you download your private key, you must also upload your public key.
         </p>
@@ -71,7 +82,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 <script>
     $("input[type=radio]").change(function() {
         if ($(this).is(":checked")) {
-            $("[id^=key_]").hide()  // Hide existing divs
+            $("#newKeyform > div").hide()  // Hide existing divs
             $("div#key_" + $(this).attr('id')).show();  // show only one div
         }
     });
@@ -83,6 +94,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
             success: function(result) {
                 $("input[type=hidden][name=gen_key]").val(result.public);
                 downloadFile(result.private, "privkey." + type); // Force download of private key
+                $("#generate_key_download_checkmark").text("✅");
             },
             error: function (result) {
                 $("#key_generate").append(result.responseText);
@@ -90,7 +102,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
         });
     }
 
-    $("div#key_generate > button").click(function() {
+    $("#key_generate_download_buttons > button").click(function() {
         // get type
         if ($(this).hasClass('btnWin')) {
             var type = "ppk";
@@ -100,10 +112,8 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 
         generateKey(type);
         setTimeout(() => {
-            $(this).siblings("input[type=submit]").prop("disabled", false);
-            // for some reason $(this).siblings("button") is missing btnLin
-            // btnLin is in $(this).siblings().prevObject
-            $("#key_generate > button").prop("disabled", true);
+            $("#key_generate_upload_button").prop("disabled", false);
+            $("#key_generate_download_buttons > button").prop("disabled", true);
         }, 300);
     });
 
