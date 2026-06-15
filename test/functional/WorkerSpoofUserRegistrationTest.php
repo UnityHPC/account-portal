@@ -18,45 +18,31 @@ class WorkerSpoofUserRegistrationTest extends UnityWebPortalTestCase
         $this->assertFalse($user_entry->exists());
         $this->assertFalse($SQL->requestExists(self::$uid, UnitySQL::REQUEST_BECOME_PI));
 
-        $stdin_file = writeLinesToTmpFile([
-            self::$first_name,
-            self::$last_name,
-            self::$eppn,
-            self::$mail,
-        ]);
-        $stdin_file_path = getPathFromFileHandle($stdin_file);
-
+        $args = [self::$first_name, self::$last_name, self::$eppn, self::$mail];
         try {
-            executeWorker("spoof-user-registration.php", stdinFilePath: $stdin_file_path);
+            executeWorker("spoof-user-registration.php", implode(" ", $args));
             $this->assertTrue($user_entry->exists());
         } finally {
             ensureUserDoesNotExist(self::$uid);
-            unlink($stdin_file_path);
         }
     }
 
     public function testSpoofUserRegistrationUserAlreadyExists()
     {
-        global $LDAP, $SQL, $USER;
+        global $LDAP, $USER;
         $this->switchUser("Blank");
         $user_entry = $LDAP->getUserEntry($USER->uid);
         $this->assertTrue($user_entry->exists());
 
         $eppn = self::$UID2ATTRIBUTES[$USER->uid][0];
-        $stdin_file = writeLinesToTmpFile(["foo", "foo", $eppn, "foo"]);
-        $stdin_file_path = getPathFromFileHandle($stdin_file);
-
-        try {
-            [$rc, $output_lines] = executeWorker(
-                "spoof-user-registration.php",
-                stdinFilePath: $stdin_file_path,
-                doThrowIfNonzero: false,
-            );
-            $output = implode("\n", $output_lines);
-            $this->assertEquals(1, $rc);
-            $this->assertStringContainsString("login as them in user-mgmt.php", $output);
-        } finally {
-            unlink($stdin_file_path);
-        }
+        $args = ["foo", "foo", $eppn, "foo"];
+        [$rc, $output_lines] = executeWorker(
+            "spoof-user-registration.php",
+            args: implode(" ", $args),
+            doThrowIfNonzero: false,
+        );
+        $output = implode("\n", $output_lines);
+        $this->assertEquals(1, $rc);
+        $this->assertStringContainsString("login as them in user-mgmt.php", $output);
     }
 }

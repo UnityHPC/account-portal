@@ -3,15 +3,24 @@
 include __DIR__ . "/init.php";
 
 use UnityWebPortal\lib\UnitySSO;
+use Garden\Cli\Cli;
 
-if (stream_isatty(STDIN)) {
-    _die("ERROR: use spoof-user-registration.bash instead\n", 1);
-}
+$cli = new Cli();
+$cli->description(
+    "Spoof a user registration." .
+        " Name and email can be imprecise and they will be updated when the real user logs in." .
+        " EPPN must be the exact value from the home institution. This determines their username and cannot be changed later.",
+)
+    ->arg("first_name", "first name", required: true)
+    ->arg("last_name", "last name", required: true)
+    ->arg("eppn", "EPPN", required: true)
+    ->arg("mail", "mail", required: true);
+$args = $cli->parse($argv, true);
 
-$first_name = trim(readline());
-$last_name = trim(readline());
-$eppn = strtolower(trim(readline()));
-$mail = strtolower(trim(readline()));
+$first_name = $args->getArg("first_name");
+$last_name = $args->getArg("last_name");
+$eppn = $args->getArg("eppn");
+$mail = $args->getArg("mail");
 
 $uid = UnitySSO::eppnToUID($eppn);
 if ($LDAP->getUserEntry($uid)->exists()) {
@@ -50,3 +59,4 @@ if ($SSO != $expected_sso) {
 $USER->init($first_name, $last_name, $mail, $org);
 
 echo "user '$uid' registered successfully.\n";
+
