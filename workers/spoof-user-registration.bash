@@ -13,4 +13,4 @@ read -r -p "last name: " last_name
 read -r -p "EPPN: " eppn
 read -r -p "mail: " mail
 
-printf '%s\n' $first_name $last_name $eppn $mail | ./spoof-user-registration.php
+printf '%s\n' "$first_name" "$last_name" "$eppn" "$mail" | ./spoof-user-registration.php
