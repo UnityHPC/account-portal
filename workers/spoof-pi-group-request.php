@@ -25,6 +25,7 @@ $_SERVER = array_merge($_SERVER, [
     "REMOTE_USER" => $eppn,
     "mail" => $mail,
 ]);
+session_write_close();
 include __DIR__ . "/../resources/init.php";
 
 $expected_sso = [
