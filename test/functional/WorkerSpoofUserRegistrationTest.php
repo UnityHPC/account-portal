@@ -2,7 +2,7 @@
 
 use UnityWebPortal\lib\UnitySQL;
 
-class WorkerSpoofPIGroupRequestTest extends UnityWebPortalTestCase
+class WorkerSpoofUserRegistrationTest extends UnityWebPortalTestCase
 {
     private static string $first_name = "Spoof";
     private static string $last_name = "Tester";
@@ -10,7 +10,7 @@ class WorkerSpoofPIGroupRequestTest extends UnityWebPortalTestCase
     private static string $mail = "spoof.pi.group.request@org1.test";
     private static string $uid = "spoof_pi_group_request_org1_test";
 
-    public function testSpoofPIGroupRequest()
+    public function testSpoofUserRegistration()
     {
         global $LDAP, $SQL;
         $this->switchUser("Blank");
@@ -27,25 +27,20 @@ class WorkerSpoofPIGroupRequestTest extends UnityWebPortalTestCase
         $stdin_file_path = getPathFromFileHandle($stdin_file);
 
         try {
-            executeWorker("spoof-pi-group-request.php", stdinFilePath: $stdin_file_path);
+            executeWorker("spoof-user-registration.php", stdinFilePath: $stdin_file_path);
             $this->assertTrue($user_entry->exists());
-            $this->assertTrue($SQL->requestExists(self::$uid, UnitySQL::REQUEST_BECOME_PI));
         } finally {
-            if ($SQL->requestExists(self::$uid, UnitySQL::REQUEST_BECOME_PI)) {
-                $SQL->removeRequest(self::$uid, UnitySQL::REQUEST_BECOME_PI);
-            }
             ensureUserDoesNotExist(self::$uid);
             unlink($stdin_file_path);
         }
     }
 
-    public function testSpoofPIGroupRequestUserAlreadyExists()
+    public function testSpoofUserRegistrationUserAlreadyExists()
     {
         global $LDAP, $SQL, $USER;
         $this->switchUser("Blank");
         $user_entry = $LDAP->getUserEntry($USER->uid);
         $this->assertTrue($user_entry->exists());
-        $this->assertFalse($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI));
 
         $eppn = self::$UID2ATTRIBUTES[$USER->uid][0];
         $stdin_file = writeLinesToTmpFile(["foo", "foo", $eppn, "foo"]);
@@ -53,18 +48,14 @@ class WorkerSpoofPIGroupRequestTest extends UnityWebPortalTestCase
 
         try {
             [$rc, $output_lines] = executeWorker(
-                "spoof-pi-group-request.php",
+                "spoof-user-registration.php",
                 stdinFilePath: $stdin_file_path,
                 doThrowIfNonzero: false,
             );
             $output = implode("\n", $output_lines);
             $this->assertEquals(1, $rc);
             $this->assertStringContainsString("login as them in user-mgmt.php", $output);
-            $this->assertFalse($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI));
         } finally {
-            if ($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI)) {
-                $SQL->removeRequest($USER->uid, UnitySQL::REQUEST_BECOME_PI);
-            }
             unlink($stdin_file_path);
         }
     }

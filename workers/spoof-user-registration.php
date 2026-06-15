@@ -48,5 +48,4 @@ if ($SSO != $expected_sso) {
 }
 
 $USER->init($first_name, $last_name, $mail, $org);
-$USER->getPIGroup()->requestGroup();
 
