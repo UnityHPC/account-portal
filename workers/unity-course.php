@@ -65,7 +65,7 @@ $course_pi_group->newUserRequest($manager, false);
 $course_pi_group->approveUser($manager);
 $course_pi_group->addManagerUID($manager_uid);
 
-$SQL->setPIGroupExpirationDate($cn, $expiration);
+$SQL->setPIGroupExpirationDate($course_pi_group->gid, $expiration);
 
 print "LDAP entries created:\n";
 print _json_encode(
