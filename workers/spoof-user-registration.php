@@ -49,3 +49,4 @@ if ($SSO != $expected_sso) {
 
 $USER->init($first_name, $last_name, $mail, $org);
 
+echo "user '$uid' registered successfully.\n";
