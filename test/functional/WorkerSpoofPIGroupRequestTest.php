@@ -65,7 +65,6 @@ class WorkerSpoofPIGroupRequestTest extends UnityWebPortalTestCase
             if ($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI)) {
                 $SQL->removeRequest($USER->uid, UnitySQL::REQUEST_BECOME_PI);
             }
-            ensureUserDoesNotExist($USER->uid);
             unlink($stdin_file_path);
         }
     }
