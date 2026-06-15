@@ -28,6 +28,7 @@ class WorkerSpoofPIGroupRequestTest extends UnityWebPortalTestCase
 
         try {
             executeWorker("spoof-pi-group-request.php", stdinFilePath: $stdin_file_path);
+            $this->assertTrue($user_entry->exists());
             $this->assertTrue($SQL->requestExists(self::$uid, UnitySQL::REQUEST_BECOME_PI));
         } finally {
             if ($SQL->requestExists(self::$uid, UnitySQL::REQUEST_BECOME_PI)) {
