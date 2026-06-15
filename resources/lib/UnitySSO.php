@@ -6,14 +6,14 @@ use UnityWebPortal\lib\exceptions\SSOException;
 
 class UnitySSO
 {
-    private static function eppnToUID(string $eppn): string
+    public static function eppnToUID(string $eppn): string
     {
         $eppn_output = str_replace(".", "_", $eppn);
         $eppn_output = str_replace("@", "_", $eppn_output);
         return strtolower($eppn_output);
     }
 
-    private static function eppnToOrg(string $eppn): string
+    public static function eppnToOrg(string $eppn): string
     {
         $parts = explode("@", $eppn);
         if (count($parts) != 2) {
