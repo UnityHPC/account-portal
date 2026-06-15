@@ -4,14 +4,14 @@ include __DIR__ . "/init.php";
 
 use UnityWebPortal\lib\UnitySSO;
 
-echo "Please enter the spoofed user's attributes below.\n";
-echo "Name and email can be imprecise and they will be updated when the real user logs in.\n";
-echo "EPPN must be the exact value from the home institution. This determines their username and cannot be changed later.\n";
+if (stream_isatty(STDIN)) {
+    _die("ERROR: use spoof-user-registration.bash instead\n", 1);
+}
 
-$first_name = trim(readline("first name: "));
-$last_name = trim(readline("last name: "));
-$eppn = strtolower(trim(readline("EPPN: ")));
-$mail = strtolower(trim(readline("mail: ")));
+$first_name = trim(readline());
+$last_name = trim(readline());
+$eppn = strtolower(trim(readline()));
+$mail = strtolower(trim(readline()));
 
 $uid = UnitySSO::eppnToUID($eppn);
 if ($LDAP->getUserEntry($uid)->exists()) {
