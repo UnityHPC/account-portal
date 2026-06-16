@@ -19,6 +19,8 @@ use UnityWebPortal\lib\UnityGithub;
 use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\AccountController;
 use DI\Container;
+use phpseclib3\Crypt\EC;
+use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 
 require_once __DIR__ . "/../resources/autoload.php";
 require_once __DIR__ . "/../resources/config.php";
@@ -125,20 +127,20 @@ if (isset($_SERVER["REMOTE_USER"])) {
 }
 
 // TODO middleware
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    UnityHTTPD::validatePostCSRFToken();
-    if (($_SESSION["is_admin"] ?? false) == true && ($_POST["form_type"] ?? null) == "clearView") {
-        unset($_SESSION["viewUser"]);
-        UnityHTTPD::redirect(getRelativeURL("admin/user-mgmt.php"));
-    }
-    // Webroot files need to handle their own POSTs before loading the header
-    // so that they can do UnityHTTPD::badRequest before anything else has been printed.
-    // They also must not redirect like standard PRG practice because this
-    // header also needs to handle POST data. So this header does the PRG redirect
-    // for all pages.
-    unset($_POST); // unset ensures that header must not come before POST handling
-    UnityHTTPD::redirect();
-}
+// if ($_SERVER["REQUEST_METHOD"] == "POST") {
+//     UnityHTTPD::validatePostCSRFToken();
+//   if (($_SESSION["is_admin"] ?? false) == true && ($_POST["form_type"] ?? null) == "clearView") {
+//         unset($_SESSION["viewUser"]);
+//         UnityHTTPD::redirect(getRelativeURL("admin/user-mgmt.php"));
+//     }
+//     // Webroot files need to handle their own POSTs before loading the header
+//     // so that they can do UnityHTTPD::badRequest before anything else has been printed.
+//     // They also must not redirect like standard PRG practice because this
+//     // header also needs to handle POST data. So this header does the PRG redirect
+//     // for all pages.
+//     unset($_POST); // unset ensures that header must not come before POST handling
+//     UnityHTTPD::redirect();
+// }
 
 if (isset($SSO)) {
     if (!$USER->exists() && !str_ends_with($_SERVER["PHP_SELF"], "/panel/new_account.php")) {
@@ -177,14 +179,6 @@ $twig_env->addFunction(new TwigFunction("sound_it_out", sound_it_out(...)));
 $twig_env->addGlobal("CONFIG", CONFIG);
 $app->add(TwigMiddleware::create($app, $twig));
 
-$render = function (Response $response, string $scriptPath): Response {
-    ob_start();
-    include $scriptPath;
-    $output = _ob_get_clean();
-    $response->getBody()->write($output);
-    return $response;
-};
-
 $app->any("/", function (Request $_request, Response $response): Response {
     $view = Twig::fromRequest($_request);
     return $view->render($response, "home.html.twig", [
@@ -198,6 +192,39 @@ $app->any("/", function (Request $_request, Response $response): Response {
 
 $app->get("/panel/account.php", AccountController::class . ":get");
 $app->post("/panel/account.php", AccountController::class . ":post");
+$app->get("/panel/modal/new_key.php", function (Request $request, Response $response) {
+    $view = Twig::fromRequest($request);
+    return $view->render($response, "panel/modal/new_key.html.twig");
+});
+$app->post("/panel/ajax/ssh_generate.php", function (Request $request, Response $response) {
+    $private = EC::createKey("Ed25519");
+    $public = $private->getPublicKey();
+    $public_str = $public->toString("OpenSSH");
+    if (($request->getQueryParams()["type"] ?? null) === "ppk") {
+        $private_str = $private->toString("PuTTY");
+    } else {
+        $private_str = $private->toString("OpenSSH");
+    }
+    $response->getBody()->write(_json_encode(["public" => $public_str, "private" => $private_str]));
+    return $response->withHeader("Content-Type", "application/json; charset=utf-8");
+});
+$app->post("/panel/ajax/ssh_validate.php", function (Request $request, Response $response) {
+    $post_data = (array) $request->getParsedBody();
+    [$is_valid, $explanation] = testValidSSHKey($post_data("key"));
+    $response
+        ->getBody()
+        ->write(_json_encode(["is_valid" => $is_valid, "explanation" => $explanation]));
+    return $response->withHeader("Content-Type", "application/json; charset=utf-8");
+});
+$app->post("/panel/ajax/delete_message.php", function (Request $request, Response $response) {
+    $post_data = (array) $request->getParsedBody();
+    $level_str = _base64_decode($post_data["level"]);
+    $level = UnityHTTPDMessageLevel::from($level_str);
+    $title = _base64_decode($post_data["title"]);
+    $body = _base64_decode($post_data["body"]);
+    UnityHTTPD::deleteMessage($level, $title, $body);
+    return $response;
+});
 
 // $legacyRoutes = [];
 // $iterator = new RecursiveIteratorIterator(
