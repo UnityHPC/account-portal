@@ -1,0 +1,136 @@
+{{ include('header.html.twig') }}
+
+{% if user_is_owner %}
+    <h1>My Users</h1>
+{% else %}
+    <h1>PI Group '{{ group_gid }}'</h1>
+{% endif %}
+<hr>
+
+<h2>Pending Requests</h2>
+{% if pending_requests|length == 0 %}
+    <p>You do not have any pending requests.</p>
+{% endif %}
+<table id="requests-table" class="stripe compact hover">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Mail</th>
+            <th>Requested On</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for request in pending_requests %}
+            <tr>
+                <td>{{ request.name }}</td>
+                <td>{{ request.uid }}</td>
+                <td>{{ request.email }}</td>
+                <td>{{ request.requested_on }}</td>
+                <td>
+                    <form action="" method="POST">
+                        {{ getCSRFTokenHiddenFormInput()|raw }}
+                        <input type="hidden" name="form_type" value="userReq">
+                        <input type="hidden" name="uid" value="{{ request.uid }}">
+                        <input type="submit" name="action" value="Approve" onclick="return confirm('Are you sure you want to approve {{ request.uid }}?')">
+                        <input type="submit" name="action" value="Deny" onclick="return confirm('Are you sure you want to deny {{ request.uid }}?')">
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if users|length > 0 %}
+    <hr>
+{% endif %}
+
+<h2>Users in Group</h2>
+{% if users|length == 1 %}
+    <p>
+        You do not have any users in your group.
+        Ask your users to request to join your account on the
+        <a href="{{ getRelativeURL('panel/groups.php') }}">My PIs</a>
+        page.
+    </p>
+{% endif %}
+
+<table id="users-table" class="stripe compact hover">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Mail</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.uid }}</td>
+                <td>{{ user.mail }}</td>
+                <td>
+                    <form action="" method="POST">
+                        {{ getCSRFTokenHiddenFormInput()|raw }}
+                        <input type="hidden" name="form_type" value="remUser">
+                        <input type="hidden" name="uid" value="{{ user.uid }}">
+                        <input
+                            type="submit"
+                            value="Remove"
+                            onclick="return confirm('Are you sure you want to remove {{ user.uid }} from your PI group?')"
+                            {% if user.is_owner %}disabled{% endif %}
+                        >
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<hr>
+<h2>Danger Zone</h2>
+<div style="display: flex; flex-direction: row; align-items: center;">
+    <p>
+        <strong>Disable PI Group</strong>
+        <br>
+        Your group's files will be permanently deleted,
+        and you will lose access to Unity HPC Platform services
+        unless you are a member of some other group.
+    </p>
+    <form
+        action=""
+        method="POST"
+        onsubmit="return confirm('🚨 Are you sure you want to DISABLE your PI group? 🚨')"
+    >
+        {{ getCSRFTokenHiddenFormInput()|raw }}
+        <input type="hidden" name="form_type" value="disable">
+        {% if not user_is_owner %}
+            <input type="submit" value="Disable PI Group" class="danger" disabled>
+            <p>Only the group owner can disable the group.</p>
+        {% elseif users|length > 1 %}
+            <input type="submit" value="Disable PI Group" class="danger" disabled>
+            <p>You must first remove all members before you can disable.</p>
+        {% else %}
+            <input type="submit" value="Disable PI Group" class="danger">
+        {% endif %}
+    </form>
+</div>
+
+<script>
+    $(document).ready(() => {
+        $('#users-table').DataTable({
+            stateSave: true,
+            responsive: true,
+            columns: [
+                {responsivePriority: 2},
+                {responsivePriority: 1},
+                {responsivePriority: 2, render: dataTablesRenderMailtoLink},
+                {responsivePriority: 1, searchable: false},
+            ],
+        });
+    });
+</script>
+
+{{ include('footer.html.twig') }}

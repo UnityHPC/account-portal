@@ -22,12 +22,14 @@ use UnityWebPortal\lib\AccountController;
 use UnityWebPortal\lib\GroupsController;
 use UnityWebPortal\lib\NewAccountController;
 use UnityWebPortal\lib\DisabledAccountController;
+use UnityWebPortal\lib\PiController;
 use DI\Container;
 use phpseclib3\Crypt\EC;
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 
 require_once __DIR__ . "/../resources/autoload.php";
 require_once __DIR__ . "/../resources/config.php";
+require_once __DIR__ . "/../resources/controllers/pi.php";
 
 if (CONFIG["site"]["enable_exception_handler"]) {
     set_exception_handler(["UnityWebPortal\lib\UnityHTTPD", "exceptionHandler"]);
@@ -202,6 +204,8 @@ $app->get("/panel/disabled_account.php", DisabledAccountController::class . ":ge
 $app->post("/panel/disabled_account.php", DisabledAccountController::class . ":post");
 $app->get("/panel/groups.php", GroupsController::class . ":get");
 $app->post("/panel/groups.php", GroupsController::class . ":post");
+$app->get("/panel/pi.php", PiController::class . ":get");
+$app->post("/panel/pi.php", PiController::class . ":post");
 $app->get("/panel/modal/new_key.php", function (Request $request, Response $response) {
     $view = Twig::fromRequest($request);
     return $view->render($response, "panel/modal/new_key.html.twig");
