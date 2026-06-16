@@ -14,7 +14,6 @@ use UnityWebPortal\lib\UnityLDAP;
 use UnityWebPortal\lib\UnityMailer;
 use UnityWebPortal\lib\UnitySQL;
 use UnityWebPortal\lib\UnitySSO;
-use UnityWebPortal\lib\UnityGroup;
 use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UnityGithub;
 use UnityWebPortal\lib\UserFlag;
@@ -26,9 +25,10 @@ use UnityWebPortal\lib\PiController;
 use UnityWebPortal\lib\LanApiController;
 use UnityWebPortal\lib\AdminPiMgmtController;
 use UnityWebPortal\lib\AdminUserMgmtController;
+use UnityWebPortal\lib\PanelModalController;
+use UnityWebPortal\lib\PanelAjaxController;
+use UnityWebPortal\lib\AdminAjaxController;
 use DI\Container;
-use phpseclib3\Crypt\EC;
-use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 
 require_once __DIR__ . "/../resources/autoload.php";
 require_once __DIR__ . "/../resources/config.php";
@@ -214,135 +214,13 @@ $app->get("/admin/pi-mgmt.php", AdminPiMgmtController::class . ":get");
 $app->post("/admin/pi-mgmt.php", AdminPiMgmtController::class . ":post");
 $app->get("/admin/user-mgmt.php", AdminUserMgmtController::class . ":get");
 $app->post("/admin/user-mgmt.php", AdminUserMgmtController::class . ":post");
-$app->get("/panel/modal/new_key.php", function (Request $request, Response $response) {
-    $view = Twig::fromRequest($request);
-    return $view->render($response, "panel/modal/new_key.html.twig");
-});
-$app->get("/panel/modal/new_pi.php", function (Request $request, Response $response) {
-    $owner_uids = $GLOBALS["ldapconn"]->getPIGroupOwnerUIDs();
-    $owner_attributes = $GLOBALS["ldapconn"]->getUsersAttributes(
-        $owner_uids,
-        ["uid", "gecos", "mail"],
-        default_values: ["gecos" => [""], "mail" => [""]],
-    );
-    $pi_group_gid_to_owner_gecos_and_mail = [];
-    foreach ($owner_attributes as $attributes) {
-        $gid = UnityGroup::ownerUID2GID($attributes["uid"][0]);
-        $pi_group_gid_to_owner_gecos_and_mail[$gid] = [
-            $attributes["gecos"][0],
-            $attributes["mail"][0],
-        ];
-    }
-    $_SESSION["pi_group_gid_to_owner_gecos_and_mail"] = $pi_group_gid_to_owner_gecos_and_mail;
-
-    $view = Twig::fromRequest($request);
-    return $view->render($response, "panel/modal/new_pi.html.twig");
-});
-$app->post("/panel/ajax/ssh_generate.php", function (Request $request, Response $response) {
-    $private = EC::createKey("Ed25519");
-    $public = $private->getPublicKey();
-    $public_str = $public->toString("OpenSSH");
-    if (($request->getQueryParams()["type"] ?? null) === "ppk") {
-        $private_str = $private->toString("PuTTY");
-    } else {
-        $private_str = $private->toString("OpenSSH");
-    }
-    $response->getBody()->write(_json_encode(["public" => $public_str, "private" => $private_str]));
-    return $response->withHeader("Content-Type", "application/json; charset=utf-8");
-});
-$app->post("/panel/ajax/ssh_validate.php", function (Request $request, Response $response) {
-    $post_data = (array) $request->getParsedBody();
-    [$is_valid, $explanation] = testValidSSHKey($post_data["key"]);
-    $response
-        ->getBody()
-        ->write(_json_encode(["is_valid" => $is_valid, "explanation" => $explanation]));
-    return $response->withHeader("Content-Type", "application/json; charset=utf-8");
-});
-$app->get("/panel/ajax/pi_search.php", function (Request $request, Response $response) {
-    $search_query = strtolower((string) ($request->getQueryParams()["search"] ?? ""));
-    if ($search_query === "") {
-        $response->getBody()->write("[]");
-        return $response->withHeader("Content-Type", "application/json; charset=utf-8");
-    }
-    if (!array_key_exists("pi_group_gid_to_owner_gecos_and_mail", $_SESSION)) {
-        UnityHTTPD::internalServerError(
-            '$_SESSION["pi_group_gid_to_owner_gecos_and_mail"] does not exist!',
-            "Session cache not found. Try reloading the page.",
-        );
-    }
-    $pi_group_gid_to_owner_gecos_and_mail = $_SESSION["pi_group_gid_to_owner_gecos_and_mail"];
-    $output = [];
-    foreach ($pi_group_gid_to_owner_gecos_and_mail as $gid => [$gecos, $mail]) {
-        $gid = strtolower($gid);
-        $gecos = strtolower($gecos);
-        $mail = strtolower($mail);
-        if (
-            str_contains($gid, $search_query) ||
-            str_contains($gecos, $search_query) ||
-            str_contains($mail, $search_query)
-        ) {
-            $output[] = $gid;
-            if (count($output) >= 10) {
-                break;
-            }
-        }
-    }
-    $response->getBody()->write(_json_encode($output));
-    return $response->withHeader("Content-Type", "application/json; charset=utf-8");
-});
-$app->post("/panel/ajax/delete_message.php", function (Request $request, Response $response) {
-    $post_data = (array) $request->getParsedBody();
-    $level_str = _base64_decode($post_data["level"]);
-    $level = UnityHTTPDMessageLevel::from($level_str);
-    $title = _base64_decode($post_data["title"]);
-    $body = _base64_decode($post_data["body"]);
-    UnityHTTPD::deleteMessage($level, $title, $body);
-    return $response;
-});
-$app->get("/admin/ajax/get_group_members.php", function (
-    Request $request,
-    Response $response
-) use (
-    $LDAP,
-    $SQL,
-    $MAILER,
-    $USER,
-): Response {
-    if (!$USER->getFlag(UserFlag::ADMIN)) {
-        UnityHTTPD::forbidden("not an admin", "You are not an admin.");
-    }
-
-    $view = Twig::fromRequest($request);
-    $gid = UnityHTTPD::getQueryParameter("gid");
-    $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
-    $requests = [];
-    foreach ($group->getRequests() as [$user, $timestamp]) {
-        $requests[] = [
-            "uid" => $user->uid,
-            "name" => $user->getFullName(),
-            "mail" => $user->getMail(),
-            "requested_on" => $timestamp,
-        ];
-    }
-
-    $members = [];
-    foreach ($group->getGroupMembersAttributes(["gecos", "mail"]) as $uid => $attributes) {
-        if ($uid == $group->getOwner()->uid) {
-            continue;
-        }
-        $members[] = [
-            "uid" => $uid,
-            "name" => $attributes["gecos"][0],
-            "mail" => $attributes["mail"][0],
-        ];
-    }
-
-    return $view->render($response, "admin/ajax/get_group_members.html.twig", [
-        "group_gid" => $group->gid,
-        "requests" => $requests,
-        "members" => $members,
-    ]);
-});
+$app->get("/panel/modal/new_key.php", PanelModalController::class . ":new_key");
+$app->get("/panel/modal/new_pi.php", PanelModalController::class . ":new_pi");
+$app->post("/panel/ajax/ssh_validate.php", PanelAjaxController::class . ":ssh_validate");
+$app->post("/panel/ajax/ssh_generate.php", PanelAjaxController::class . ":ssh_generate");
+$app->get("/panel/ajax/pi_search.php", PanelAjaxController::class . ":pi_search");
+$app->post("/panel/ajax/delete_message.php", PanelAjaxController::class . ":delete_message");
+$app->get("/admin/ajax/get_group_members.php", AdminAjaxController::class . ":get_group_members");
 
 // $legacyRoutes = [];
 // $iterator = new RecursiveIteratorIterator(
