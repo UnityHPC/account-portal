@@ -31,9 +31,6 @@ deployment/**/*
 
 node_modules
 # copied from node_modules using the copy-files-from-to NPM package
-webroot/js/jquery.min.js
-webroot/js/*dataTables*.js
-webroot/js/buttons.colVis.min.js
-webroot/js/buttons.html5.min.js
-webroot/js/buttons.print.min.js
-webroot/css/*dataTables*.css
+*.min.js
+public/js/*dataTables*.js
+public/css/*dataTables*.css
