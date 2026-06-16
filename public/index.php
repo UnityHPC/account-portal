@@ -20,6 +20,8 @@ use UnityWebPortal\lib\UnityGithub;
 use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\AccountController;
 use UnityWebPortal\lib\GroupsController;
+use UnityWebPortal\lib\NewAccountController;
+use UnityWebPortal\lib\DisabledAccountController;
 use DI\Container;
 use phpseclib3\Crypt\EC;
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
@@ -194,6 +196,10 @@ $app->any("/", function (Request $_request, Response $response): Response {
 
 $app->get("/panel/account.php", AccountController::class . ":get");
 $app->post("/panel/account.php", AccountController::class . ":post");
+$app->get("/panel/new_account.php", NewAccountController::class . ":get");
+$app->post("/panel/new_account.php", NewAccountController::class . ":post");
+$app->get("/panel/disabled_account.php", DisabledAccountController::class . ":get");
+$app->post("/panel/disabled_account.php", DisabledAccountController::class . ":post");
 $app->get("/panel/groups.php", GroupsController::class . ":get");
 $app->post("/panel/groups.php", GroupsController::class . ":post");
 $app->get("/panel/modal/new_key.php", function (Request $request, Response $response) {

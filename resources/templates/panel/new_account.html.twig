@@ -1,0 +1,21 @@
+{{ include('header.html.twig') }}
+
+<h1>Register New Account</h1>
+<hr>
+<p>Please verify that the information below is correct before continuing:</p>
+<div>
+    <strong>Name&nbsp;&nbsp;</strong>
+    {{ firstname }} {{ lastname }}
+    <br>
+    <strong>Email&nbsp;&nbsp;</strong>
+    {{ mail }}
+</div>
+<p>Your Unity HPC username will be <strong>{{ username }}</strong>.</p>
+<br>
+<form action="" method="POST">
+    {{ getCSRFTokenHiddenFormInput()|raw }}
+    <input type="hidden" name="form_type" value="register">
+    <input type="submit" value="Register">
+</form>
+
+{{ include('footer.html.twig') }}

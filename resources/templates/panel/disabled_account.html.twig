@@ -1,0 +1,26 @@
+{{ include('header.html.twig') }}
+
+<h1>Disabled Account</h1>
+<hr>
+<p style="text-wrap: balance;">
+    Your account has been disabled, but you can re-enable it.
+    Accounts are disabled automatically according to our <a href="{{ account_expiration_policy_url }}">account policy</a>.
+    If this is unexpected, <a href="mailto:{{ support_mail }}">send us an email</a>.
+</p>
+<br>
+<p>Please verify that the information below is correct before continuing:</p>
+<div>
+    <strong>Name&nbsp;&nbsp;</strong>
+    {{ fullname }}
+    <br>
+    <strong>Email&nbsp;&nbsp;</strong>
+    {{ mail }}
+</div>
+<br>
+<form action="" method="POST">
+    {{ getCSRFTokenHiddenFormInput()|raw }}
+    <input type="hidden" name="form_type" value="reEnable">
+    <input type="submit" value="Re-Enable Account">
+</form>
+
+{{ include('footer.html.twig') }}
