@@ -78,7 +78,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
 
     function generateKey(type) {
         $.ajax({
-            url: "<?php echo getRelativeURL("js/ajax/ssh_generate.php"); ?>?type=" + type,
+            url: "<?php echo getRelativeURL("panel/ajax/ssh_generate.php"); ?>?type=" + type,
             dataType: "json",
             success: function(result) {
                 $("input[type=hidden][name=gen_key]").val(result.public);
@@ -116,7 +116,7 @@ $CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
             return;
         }
         $.ajax({
-            url: "<?php echo getRelativeURL("js/ajax/ssh_validate.php"); ?>",
+            url: "<?php echo getRelativeURL("panel/ajax/ssh_validate.php"); ?>",
             dataType: "json",
             type: "POST",
             data: {key: key},
