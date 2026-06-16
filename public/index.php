@@ -32,10 +32,6 @@ use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 
 require_once __DIR__ . "/../resources/autoload.php";
 require_once __DIR__ . "/../resources/config.php";
-require_once __DIR__ . "/../resources/controllers/lan_api.php";
-require_once __DIR__ . "/../resources/controllers/pi.php";
-require_once __DIR__ . "/../resources/controllers/admin_pi_mgmt.php";
-require_once __DIR__ . "/../resources/controllers/admin_user_mgmt.php";
 
 if (CONFIG["site"]["enable_exception_handler"]) {
     set_exception_handler(["UnityWebPortal\lib\UnityHTTPD", "exceptionHandler"]);
