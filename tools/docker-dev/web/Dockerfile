@@ -21,6 +21,8 @@ RUN chown www-data /etc/apache2/.htpasswd
 COPY unity-apache.conf /etc/apache2/sites-available/unity.conf
 RUN a2dissite 000-default
 RUN a2ensite unity
+RUN a2enmod rewrite
+RUN a2enmod actions
 RUN echo "ServerName 127.0.0.1" >> /etc/apache2/apache2.conf
 
 RUN sed -i '/display_errors/c\display_errors = on' /etc/php/8.3/apache2/php.ini
