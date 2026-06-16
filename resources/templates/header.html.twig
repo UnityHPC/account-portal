@@ -114,7 +114,7 @@
       {% set body = message[1] %}
       {% set level = message[2] %}
       {% set msg_role = (level in [level_enum.WARNING, level_enum.ERROR]) ? 'alert' : 'status' %}
-      <div class="message {{ level.value|e }}" role="{{ msg_role }}">
+      <div class="message {{ level.value }}" role="{{ msg_role }}">
         <p class="message-title">{{ title }}</p>
         <p class="message-body">{{ body }}</p>
         <button

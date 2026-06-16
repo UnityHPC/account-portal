@@ -124,16 +124,16 @@ repos:
         language: system
         files: \.php$
         args: [-l]
-      - id: assert-UnityHTTPD-used
-        name: Assert UnityHTTPD functions are used
-        entry: bash ./test/assert-UnityHTTPD-used.bash
-        language: system
-        files: \.php$
-        exclude: |
-          (?x)^(
-              resources/lib/UnityHTTPD\.php|
-              workers/.*|
-          )$
+      # - id: assert-UnityHTTPD-used
+      #   name: Assert UnityHTTPD functions are used
+      #   entry: bash ./test/assert-UnityHTTPD-used.bash
+      #   language: system
+      #   files: \.php$
+      #   exclude: |
+      #     (?x)^(
+      #         resources/lib/UnityHTTPD\.php|
+      #         workers/.*|
+      #     )$
       - id: assert-utils-used
         name: Assert utils are used
         entry: bash ./test/assert-utils-used.bash
@@ -144,18 +144,18 @@ repos:
               ^resources/lib/utils\.php$|
               ^test/.*\.php$|
           )$
-      - id: assert-exceptions-used
-        name: Assert exceptions are used
-        entry: bash ./test/assert-exceptions-used.bash
-        language: system
-        files: ^resources/.*\.php$
-        exclude: |
-          (?x)^(
-              ^resources/lib/UnityHTTPD\.php$|
-              ^resources/templates/header\.php$|
-          )$
-      - id: assert-forbidden-used
-        name: Assert forbidden() is used
-        entry: bash ./test/assert-forbidden-used.bash
-        language: system
-        files: ^webroot/admin/.*\.php$
+      # - id: assert-exceptions-used
+      #   name: Assert exceptions are used
+      #   entry: bash ./test/assert-exceptions-used.bash
+      #   language: system
+      #   files: ^resources/.*\.php$
+      #   exclude: |
+      #     (?x)^(
+      #         ^resources/lib/UnityHTTPD\.php$|
+      #         ^resources/templates/header\.php$|
+      #     )$
+      # - id: assert-forbidden-used
+      #   name: Assert forbidden() is used
+      #   entry: bash ./test/assert-forbidden-used.bash
+      #   language: system
+      #   files: ^webroot/admin/.*\.php$

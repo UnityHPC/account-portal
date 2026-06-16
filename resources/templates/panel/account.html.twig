@@ -1,0 +1,273 @@
+{{ include('header.html.twig') }}
+
+<h1>Account Settings</h1>
+<hr>
+<h2>Account Details</h2>
+<table>
+    <tr>
+        <td>Username</td>
+        <td><code>{{ uid }}</code></td>
+    </tr>
+    <tr>
+        <td>Organization</td>
+        <td><code>{{ org }}</code></td>
+    </tr>
+    <tr>
+        <td>Email</td>
+        <td><code>{{ mail }}</code></td>
+    </tr>
+</table>
+<hr>
+<h2>Account Status</h2>
+
+{% if is_pi %}
+    <p>You are currently a <strong>principal investigator</strong> on the Unity HPC Platform.</p>
+{% else %}
+    {% if pi_group_exists and pi_group_is_disabled %}
+        <p>You are no longer a PI because your PI group is disabled.</p>
+    {% endif %}
+    {% if isQualified %}
+        <p>You are currently a <strong>qualified user</strong> on the Unity HPC Platform.</p>
+    {% else %}
+        <p>
+            You are currently an <strong>unqualified user</strong>, and will be
+            <strong>unable to access Unity HPC Platform services</strong>.
+            To become qualified, request to join a PI group, or if you are a PI, request a PI group.
+            Do not request a PI group if you are a student.
+        </p>
+        <br>
+        <form action="/panel/groups.php" method="GET">
+            <label>
+                <input type="checkbox" name="tos" value="agree" required />
+                I have read and accept the
+                <a target="_blank" href="{{ CONFIG['site']['terms_of_service_url'] }}">Terms of Service</a>.
+            </label>
+            <br>
+            <input type="submit" value="Request to Join a PI Group" />
+        </form>
+        <br>
+    {% endif %}
+{% endif %}
+
+{% if not is_pi %}
+    <form
+        action=""
+        method="POST"
+        id="piReq"
+    >
+        {{ getCSRFTokenHiddenFormInput()|raw }}
+        {% if requestExists %}
+            <input type="submit" value="Cancel PI Account Request" onclick="return confirm('Are you sure you want to cancel this request?')" />
+            <label style="margin-left: 10px">
+                Your request has been submitted and is currently pending
+            </label>
+            <input type="hidden" name="form_type" value="cancel_pi_request"/>
+        {% else %}
+            {% if pi_group_exists and pi_group_is_disabled %}
+                {% set buttonMsg = 'Request to Re-Enable PI Group' %}
+                {% set onclick = "return confirm('Are you sure you want to re-enable your old PI group?')" %}
+            {% else %}
+                {% set buttonMsg = 'Request PI Group' %}
+                {% set onclick = "return confirm('Are you sure you want to request a PI group?')" %}
+            {% endif %}
+            <label>
+                <input type="checkbox" name="confirm_pi" value="agree" required>
+                I have read the PI
+                <a target="_blank" href="{{ CONFIG['site']['pi_qualification_docs_url'] }}"> account policy</a> guidelines.
+            </label>
+            <br>
+            <label><input type="checkbox" name="tos" value="agree" required>
+                I have read and accept the
+                <a target="_blank" href="{{ CONFIG['site']['terms_of_service_url'] }}">Terms of Service</a>.
+            </label>
+            <br>
+            <input type="hidden" name="form_type" value="pi_request"/>
+            <input type="submit" value="{{ buttonMsg }}" onclick="{{ onclick }}" />
+        {% endif %}
+    </form>
+{% endif %}
+
+<hr>
+<h2>SSH Keys</h2>
+
+{% if ssh_public_keys|length == 0 %}
+    <p>You do not have any SSH public keys, press the button below to add one.</p><br>
+{% else %}
+    <table id="ssh-key-table" class="stripe compact hover">
+        <thead>
+            <tr>
+                <th scope="col">Fingerprint<sup>*</sup></th>
+                <th scope="col">Type</th>
+                <th scope="col">Length</th>
+                <th scope="col">Comment</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key, key_info in ssh_public_keys %}
+            {% do [type, comment, length, stub_fingprint] = key_info %}
+            {% set i = loop.index %}
+                <tr>
+                    <td style="white-space: nowrap"><code>{{ stub_fingprint }}</code></td>
+                    <td style="white-space: nowrap"><code>{{ type }}</code></td>
+                    <td>{{ length }}</td>
+                    <td>{{ comment }}</td>
+                    <td>
+                        <div style="display: flex; gap: 5px;">
+                            <button command="show-modal" commandfor="key-{{ i }}-contents" class="show-key-button" aria-label="show key contents">
+                                <span class="show-key-span icon-magnifying-glass-plus" aria-hidden="true"></span>
+                            </button>
+                            <form
+                                action=""
+                                onsubmit="return confirm('Are you sure you want to delete the SSH key {{ stub_fingprint }}?');"
+                                method="POST"
+                            >
+                                {{ getCSRFTokenHiddenFormInput()|raw }}
+                                <input type="hidden" name="delKey" value="{{ base64_encode(key) }}" />
+                                <input type="hidden" name="form_type" value="delKey" />
+                                <button type="submit" class="delete-key-button" aria-label="Delete Key {{ stub_fingprint }}">
+                                    <span class="delete-key-span icon-x" aria-hidden="true"></span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <dialog class="ssh-key-contents" id="key-{{ i }}-contents" autofocus closedby="any">
+                    <span style="font-size: 16pt">Contents of SSH key </span><code>{{ stub_fingprint }}</code>
+                    <hr>
+                    <code class="hard-wrap" aria-label="{{ sound_it_out(key) }}">{{ key }}</code>
+                </dialog>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p style="font-size: 11px">＊ First 6 characters of the SHA256 fingerprint (hash) of the key data (excluding type, comment)</p>
+{% endif %}
+
+<button type="button" class="plusBtn btnAddKey" aria-label="Add SSH Key"><span>&#43;</span></button>
+<hr>
+<h2>Login Shell</h2>
+<form action="" method="POST">
+    {{ getCSRFTokenHiddenFormInput()|raw }}
+    <input type="hidden" name="form_type" value="loginshell" />
+    <select id="loginSelector" class="code" name="shellSelect" aria-label="Login Shell">
+        {% for shell in CONFIG['loginshell']['shell'] %}
+            <option>{{ shell }}</option>
+        {% endfor %}
+    </select>
+    <br style="margin-top: 10px;">
+    <input id="submitLoginShell" type="submit" value="Set Login Shell" />
+</form>
+<hr>
+<h2>Danger Zone</h2>
+<div style="display: flex; flex-direction: row; align-items: center;">
+    <p>
+        <strong>Disable Account</strong>
+        <br>
+        You will lose access to Unity HPC Platform services
+        and your home directory will be permanently deleted.
+        Your account can later be re-enabled.
+    </p>
+    <form
+        action=""
+        method="POST"
+        onsubmit="return confirm('🚨 Are you sure you want to DISABLE your account? 🚨')"
+    >
+        {{ getCSRFTokenHiddenFormInput()|raw }}
+        <input type="hidden" name="form_type" value="disable">
+        {% if is_pi %}
+            <input type="submit" value="Disable Account" class="danger" disabled>
+            <p>You must first disable your PI group before you can disable your account.</p>
+        {% elseif hasGroups %}
+            <input type="submit" value="Disable Account" class="danger" disabled>
+            <p>You cannot disable your account while you are in a PI group.</p>
+        {% else %}
+            <input type="submit" value="Disable Account" class="danger">
+        {% endif %}
+    </form>
+</div>
+
+<script>
+    const url = '/panel/modal/new_key.php';
+    const ldapLoginShell = '{{ login_shell }}';
+
+    $("button.btnAddKey").click(function() {
+        openModal("Add New Key", url);
+    });
+
+    $("#loginSelector option").each(function(i, e) {
+        if ($(this).val() == ldapLoginShell) {
+            $(this).prop("selected", true);
+        }
+    });
+
+    function enableOrDisableSubmitLoginShell() {
+        if ($("#loginSelector").val() == ldapLoginShell) {
+            $("#submitLoginShell").prop("disabled", true);
+        } else {
+            $("#submitLoginShell").prop("disabled", false);
+        }
+    }
+    $("#loginSelector").change(enableOrDisableSubmitLoginShell);
+    enableOrDisableSubmitLoginShell()
+    {% if ssh_public_keys|length > 0 %}
+        $(document).ready(() => {
+            let pi_request_datatable = $('#ssh-key-table').DataTable({
+                searching: false,
+                ordering: false,
+                paging: false,
+                responsive: true,
+                layout: {
+                    topStart: null,
+                    topEnd: null,
+                    bottomStart: null,
+                    bottomEnd: null,
+                },
+                columns: [
+                    {responsivePriority: 2},
+                    {responsivePriority: 4},
+                    {responsivePriority: 3},
+                    {responsivePriority: 2},
+                    {responsivePriority: 1},
+                ],
+            });
+        });
+    {% endif %}
+</script>
+
+<style>
+    #ssh-key-table * {
+        text-align: center;
+    }
+
+    .ssh-key-contents {
+        max-width: var(--main-max-width);
+        word-wrap: break-word;
+        word-break: break-all;
+    }
+
+    .delete-key-button, .show-key-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+    }
+
+    .delete-key-span, .show-key-span {
+        background-color: white;
+        mask-size: contain;
+    }
+
+    .delete-key-span {
+        width: 16px;
+        height: 16px;
+    }
+
+    .show-key-span {
+        width: 24px;
+        height: 24px;
+    }
+</style>
+
+{{ include('footer.html.twig') }}

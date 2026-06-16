@@ -17,6 +17,8 @@ use UnityWebPortal\lib\UnitySSO;
 use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UnityGithub;
 use UnityWebPortal\lib\UserFlag;
+use UnityWebPortal\lib\AccountController;
+use DI\Container;
 
 require_once __DIR__ . "/../resources/autoload.php";
 require_once __DIR__ . "/../resources/config.php";
@@ -38,6 +40,11 @@ if (isset($GLOBALS["ldapconn"])) {
 $SQL = new UnitySQL();
 $MAILER = new UnityMailer();
 $GITHUB = new UnityGithub();
+$container = new Container();
+$container->set("SQL", fn() => $SQL);
+$container->set("LDAP", fn() => $LDAP);
+$container->set("MAILER", fn() => $MAILER);
+$container->set("GITHUB", fn() => $GITHUB);
 
 session_start();
 // https://stackoverflow.com/a/1270960/18696276
@@ -112,12 +119,14 @@ if (isset($_SERVER["REMOTE_USER"])) {
             );
         }
     }
+    $container->set("USER", fn() => $USER);
+    $container->set("OPERATOR", fn() => $OPERATOR);
+    $container->set("SSO", fn() => $SSO);
 }
 
 // TODO middleware
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // another page should have already validated and we can't validate the same token twice
-    // UnityHTTPD::validatePostCSRFToken();
+    UnityHTTPD::validatePostCSRFToken();
     if (($_SESSION["is_admin"] ?? false) == true && ($_POST["form_type"] ?? null) == "clearView") {
         unset($_SESSION["viewUser"]);
         UnityHTTPD::redirect(getRelativeURL("admin/user-mgmt.php"));
@@ -146,10 +155,14 @@ if (isset($SSO)) {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+AppFactory::setContainer($container);
 $app = AppFactory::create();
 $twig = Twig::create(UnityDeployment::getTemplateDirs(), [
     "cache" => false,
     "strict_variables" => true,
+    "autoescape" => "name",
 ]);
 $twig_env = $twig->getEnvironment();
 $twig_env->addFunction(new TwigFunction("getRelativeURL", getRelativeURL(...)));
@@ -160,6 +173,7 @@ $twig_env->addFunction(
     new TwigFunction("getCSRFTokenHiddenFormInput", UnityHTTPD::getCSRFTokenHiddenFormInput(...)),
 );
 $twig_env->addFunction(new TwigFunction("base64_encode", base64_encode(...)));
+$twig_env->addFunction(new TwigFunction("sound_it_out", sound_it_out(...)));
 $twig_env->addGlobal("CONFIG", CONFIG);
 $app->add(TwigMiddleware::create($app, $twig));
 
@@ -182,45 +196,48 @@ $app->any("/", function (Request $_request, Response $response): Response {
     ]);
 });
 
-$legacyRoutes = [];
-$iterator = new RecursiveIteratorIterator(
-    new RecursiveDirectoryIterator(__DIR__ . "/../webroot", FilesystemIterator::SKIP_DOTS),
-);
+$app->get("/panel/account.php", AccountController::class . ":get");
+$app->post("/panel/account.php", AccountController::class . ":post");
 
-foreach ($iterator as $fileInfo) {
-    if (!$fileInfo->isFile()) {
-        continue;
-    }
-    $absolute = $fileInfo->getPathname();
-    if (pathinfo($absolute, PATHINFO_EXTENSION) !== "php") {
-        continue;
-    }
-    if (realpath($absolute) === __FILE__) {
-        continue;
-    }
-    $relative = str_replace(__DIR__ . "/../webroot" . DIRECTORY_SEPARATOR, "", $absolute);
-    $relative = str_replace(DIRECTORY_SEPARATOR, "/", $relative);
-    $withExtension = "/" . ltrim($relative, "/");
-    $legacyRoutes[$withExtension] = $absolute;
-    $withoutExtension = _preg_replace('/\.php$/', "", $withExtension);
-    if (is_string($withoutExtension) && $withoutExtension !== $withExtension) {
-        $legacyRoutes[$withoutExtension] = $absolute;
-    }
-}
+// $legacyRoutes = [];
+// $iterator = new RecursiveIteratorIterator(
+//     new RecursiveDirectoryIterator(__DIR__ . "/../webroot", FilesystemIterator::SKIP_DOTS),
+// );
 
-ksort($legacyRoutes);
+// foreach ($iterator as $fileInfo) {
+//     if (!$fileInfo->isFile()) {
+//         continue;
+//     }
+//     $absolute = $fileInfo->getPathname();
+//     if (pathinfo($absolute, PATHINFO_EXTENSION) !== "php") {
+//         continue;
+//     }
+//     if (realpath($absolute) === __FILE__) {
+//         continue;
+//     }
+//     $relative = str_replace(__DIR__ . "/../webroot" . DIRECTORY_SEPARATOR, "", $absolute);
+//     $relative = str_replace(DIRECTORY_SEPARATOR, "/", $relative);
+//     $withExtension = "/" . ltrim($relative, "/");
+//     $legacyRoutes[$withExtension] = $absolute;
+//     $withoutExtension = _preg_replace('/\.php$/', "", $withExtension);
+//     if (is_string($withoutExtension) && $withoutExtension !== $withExtension) {
+//         $legacyRoutes[$withoutExtension] = $absolute;
+//     }
+// }
 
-foreach ($legacyRoutes as $route => $scriptPath) {
-    $app->any($route, function (
-        Request $_request,
-        Response $response
-    ) use (
-        $render,
-        $scriptPath,
-    ): Response {
-        return $render($response, $scriptPath);
-    });
-}
+// ksort($legacyRoutes);
+
+// foreach ($legacyRoutes as $route => $scriptPath) {
+//     $app->any($route, function (
+//         Request $_request,
+//         Response $response
+//     ) use (
+//         $render,
+//         $scriptPath,
+//     ): Response {
+//         return $render($response, $scriptPath);
+//     });
+// }
 
 $app->map(["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], "/{routes:.+}", function (
     Request $_request,
