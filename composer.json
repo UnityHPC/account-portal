@@ -1,6 +1,8 @@
 {
     "require": {
         "psr/log": ">=1",
+        "slim/psr7": "^1.7",
+        "slim/slim": "^4.15",
         "phpseclib/phpseclib": ">=3",
         "phpmailer/phpmailer": ">=6",
         "vanilla/garden-cli": "^4.0",
