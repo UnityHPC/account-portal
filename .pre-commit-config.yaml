@@ -16,10 +16,10 @@ repos:
 
   - repo: local
     hooks:
-      - id: phpcbf-pure
-        name: PHP Code Beautifier and Fixer (pure PHP files)
+      - id: phpcbf
+        name: PHP Code Beautifier and Fixer
         entry: ./vendor/bin/phpcbf
-        args: [--standard=./.phpcs-ruleset-pure.xml, --colors]
+        args: [--standard=./.phpcs-ruleset.xml, --colors]
         language: system
         files: \.php$
         exclude: |
@@ -29,18 +29,6 @@ repos:
               node_modules/.*|
               resources/lib/phpopenldaper/.*|
               vendor/.*|
-              resources/templates/.*|
-              webroot/.*|
-          )$
-      - id: phpcbf-impure
-        name: PHP Code Beautifier and Fixer (mixed PHP/HTML files)
-        entry: ./vendor/bin/phpcbf
-        args: [--standard=./.phpcs-ruleset-impure.xml, --colors]
-        language: system
-        files: |
-          (?x)^(
-              resources/templates/.*\.php|
-              webroot/.*\.php|
           )$
       - id: php-cs-fixer
         name: PHP CS Fixer
@@ -86,10 +74,10 @@ repos:
               \.json
           )$
         # exclude is done with .prettierignore
-      - id: phpcs-pure
-        name: PHP Code Sniffer (pure PHP files)
+      - id: phpcs
+        name: PHP Code Sniffer
         entry: ./vendor/bin/phpcs
-        args: [--standard=./.phpcs-ruleset-pure.xml, --colors, -s]
+        args: [--standard=./.phpcs-ruleset.xml, --colors, -s]
         language: system
         files: \.php$
         exclude: |
@@ -99,18 +87,6 @@ repos:
               node_modules/.*|
               resources/lib/phpopenldaper/.*|
               vendor/.*|
-              resources/templates/.*|
-              webroot/.*|
-          )$
-      - id: phpcs-impure
-        name: PHP Code Sniffer (mixed PHP/HTML files)
-        entry: ./vendor/bin/phpcs
-        args: [--standard=./.phpcs-ruleset-impure.xml, --colors, -s]
-        language: system
-        files: |
-          (?x)^(
-              resources/templates/.*\.php|
-              webroot/.*\.php|
           )$
       - id: twig-cs-fixer
         name: Twig CS Fixer
