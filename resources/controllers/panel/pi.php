@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Views\Twig;
 
-class PiController
+class PiController extends UnitySlimController
 {
     private $container;
 
@@ -80,12 +80,7 @@ class PiController
             ];
         }
 
-        return $view->render($response, "panel/pi.html.twig", [
-            "messages" => UnityHTTPD::getMessages(),
-            "viewUser" => $_SESSION["viewUser"] ?? null,
-            "user_exists" => $_SESSION["user_exists"] ?? false,
-            "is_pi" => $_SESSION["is_pi"] ?? false,
-            "is_admin" => $_SESSION["is_admin"] ?? false,
+        return $view->render($response, "panel/pi.html.twig", $this->setupTwigContext([
             "group_gid" => $group->gid,
             "user_is_owner" => $user_is_owner,
             "pending_requests" => $pending_requests,
@@ -93,7 +88,7 @@ class PiController
             "users_count" => count($assocs),
             "group_disabled" => $group->getIsDisabled(),
             "account_page_url" => getRelativeURL("panel/groups.php"),
-        ]);
+        ]));
     }
 
     public function post(

@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Views\Twig;
 
-class AdminUserMgmtController
+class AdminUserMgmtController extends UnitySlimController
 {
     private $container;
 
@@ -69,10 +69,10 @@ class AdminUserMgmtController
             ];
         }
 
-        return $view->render($response, "admin/user-mgmt.html.twig", [
+        return $view->render($response, "admin/user-mgmt.html.twig", $this->setupTwigContext([
             "users" => $users,
             "flags_to_display" => array_map(fn($f) => $f->value, $flags_to_display),
-        ]);
+        ]));
     }
 
     public function post(

@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Views\Twig;
 
-class NewAccountController
+class NewAccountController extends UnitySlimController
 {
     private $container;
 
@@ -25,19 +25,14 @@ class NewAccountController
         if ($USER->exists()) {
             UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
         }
-
         $view = Twig::fromRequest($request);
-        return $view->render($response, "panel/new_account.html.twig", [
-            "messages" => UnityHTTPD::getMessages(),
-            "viewUser" => $_SESSION["viewUser"] ?? null,
-            "user_exists" => $_SESSION["user_exists"] ?? false,
-            "is_pi" => $_SESSION["is_pi"] ?? false,
+        return $view->render($response, "panel/new_account.html.twig", $this->setupTwigContext([
             "is_admin" => $_SESSION["is_admin"] ?? false,
             "firstname" => $SSO["firstname"],
             "lastname" => $SSO["lastname"],
             "mail" => $SSO["mail"],
             "username" => $SSO["user"],
-        ]);
+        ]));
     }
 
     public function post(

@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Views\Twig;
 
-class AdminPiMgmtController
+class AdminPiMgmtController extends UnitySlimController
 {
     private $container;
 
@@ -59,15 +59,10 @@ class AdminPiMgmtController
             ];
         }
 
-        return $view->render($response, "admin/pi-mgmt.html.twig", [
-            "messages" => UnityHTTPD::getMessages(),
-            "viewUser" => $_SESSION["viewUser"] ?? null,
-            "user_exists" => $_SESSION["user_exists"] ?? false,
-            "is_pi" => $_SESSION["is_pi"] ?? false,
-            "is_admin" => $_SESSION["is_admin"] ?? false,
+        return $view->render($response, "admin/pi-mgmt.html.twig", $this->setupTwigContext([
             "requests" => $requests,
             "pi_groups" => $pi_groups,
-        ]);
+        ]));
     }
 
     public function post(

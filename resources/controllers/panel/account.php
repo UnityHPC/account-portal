@@ -9,7 +9,7 @@ use UnityWebPortal\lib\exceptions\EncodingUnknownException;
 use UnityWebPortal\lib\exceptions\EncodingConversionException;
 use Slim\Views\Twig;
 
-class AccountController
+class AccountController extends UnitySlimController
 {
     private $container;
     public function __construct(ContainerInterface $container)
@@ -43,12 +43,7 @@ class AccountController
                 $ssh_public_keys[$key] = [null, $comment, null, null];
             }
         }
-        return $view->render($response, "panel/account.html.twig", [
-            "messages" => UnityHTTPD::getMessages(),
-            "viewUser" => $_SESSION["viewUser"] ?? null,
-            "user_exists" => $_SESSION["user_exists"] ?? false,
-            "is_pi" => $_SESSION["is_pi"] ?? false,
-            "is_admin" => $_SESSION["is_admin"] ?? false,
+        return $view->render($response, "panel/account.html.twig", $this->setupTwigContext([
             "uid" => $USER->uid,
             "org" => $USER->getOrg(),
             "mail" => $USER->getMail(),
@@ -56,7 +51,7 @@ class AccountController
             "login_shell" => $USER->getLoginShell(),
             "pi_group_exists" => $USER->getPIGroup()->exists(),
             "pi_group_is_disabled" => $USER->getPIGroup()->getIsDisabled(),
-        ]);
+        ]));
     }
 
     public function post(

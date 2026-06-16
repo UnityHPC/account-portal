@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Views\Twig;
 
-class GroupsController
+class GroupsController extends UnitySlimController
 {
     private $container;
 
@@ -90,18 +90,13 @@ class GroupsController
         }
         $_SESSION["pi_group_gid_to_owner_gecos_and_mail"] = $pi_group_gid_to_owner_gecos_and_mail;
 
-        return $view->render($response, "panel/groups.html.twig", [
-            "messages" => UnityHTTPD::getMessages(),
-            "viewUser" => $_SESSION["viewUser"] ?? null,
-            "user_exists" => $_SESSION["user_exists"] ?? false,
-            "is_pi" => $_SESSION["is_pi"] ?? false,
-            "is_admin" => $_SESSION["is_admin"] ?? false,
+        return $view->render($response, "panel/groups.html.twig", $this->setupTwigContext([
             "pi_group_gids" => $pi_group_gids,
             "pi_groups" => $pi_groups,
             "pi_group_members" => $pi_group_members,
             "pi_group_managers" => $pi_group_managers,
             "pending_requests" => $pending_requests,
-        ]);
+        ]));
     }
 
     public function post(
