@@ -1,0 +1,34 @@
+{% for request in requests %}
+<tr style="background: var(--light_panel_background);">
+    <td>{{ request.name }}</td>
+    <td>{{ request.uid }}</td>
+    <td>{{ request.mail }}</td>
+    <td>
+        <form action="" method="POST" onsubmit="return confirm('Are you sure you want to approve {{ request.uid }} ?');">
+            {{ getCSRFTokenHiddenFormInput()|raw }}
+            <input type="hidden" name="form_type" value="reqChild">
+            <input type="hidden" name="uid" value="{{ request.uid }}">
+            <input type="hidden" name="pi" value="{{ group_gid }}">
+            <input type="submit" name="action" value="Approve">
+            <input type="submit" name="action" value="Deny">
+        </form>
+    </td>
+</tr>
+{% endfor %}
+
+{% for member in members %}
+<tr style="background: var(--light_panel_background);">
+    <td>{{ member.name }}</td>
+    <td>{{ member.uid }}</td>
+    <td>{{ member.mail }}</td>
+    <td>
+        <form action="" method="POST" onsubmit="return confirm('Are you sure you want to remove {{ member.uid }} from this group?');">
+            {{ getCSRFTokenHiddenFormInput()|raw }}
+            <input type="hidden" name="form_type" value="remUserChild">
+            <input type="hidden" name="uid" value="{{ member.uid }}">
+            <input type="hidden" name="pi" value="{{ group_gid }}">
+            <input type="submit" value="Remove">
+        </form>
+    </td>
+</tr>
+{% endfor %}

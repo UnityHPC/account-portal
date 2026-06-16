@@ -287,6 +287,50 @@ $app->post("/panel/ajax/delete_message.php", function (Request $request, Respons
     UnityHTTPD::deleteMessage($level, $title, $body);
     return $response;
 });
+$app->get("/admin/ajax/get_group_members.php", function (
+    Request $request,
+    Response $response
+) use (
+    $LDAP,
+    $SQL,
+    $MAILER,
+    $USER,
+): Response {
+    if (!$USER->getFlag(UserFlag::ADMIN)) {
+        UnityHTTPD::forbidden("not an admin", "You are not an admin.");
+    }
+
+    $view = Twig::fromRequest($request);
+    $gid = UnityHTTPD::getQueryParameter("gid");
+    $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
+    $requests = [];
+    foreach ($group->getRequests() as [$user, $timestamp]) {
+        $requests[] = [
+            "uid" => $user->uid,
+            "name" => $user->getFullName(),
+            "mail" => $user->getMail(),
+            "requested_on" => $timestamp,
+        ];
+    }
+
+    $members = [];
+    foreach ($group->getGroupMembersAttributes(["gecos", "mail"]) as $uid => $attributes) {
+        if ($uid == $group->getOwner()->uid) {
+            continue;
+        }
+        $members[] = [
+            "uid" => $uid,
+            "name" => $attributes["gecos"][0],
+            "mail" => $attributes["mail"][0],
+        ];
+    }
+
+    return $view->render($response, "admin/ajax/get_group_members.html.twig", [
+        "group_gid" => $group->gid,
+        "requests" => $requests,
+        "members" => $members,
+    ]);
+});
 
 // $legacyRoutes = [];
 // $iterator = new RecursiveIteratorIterator(
