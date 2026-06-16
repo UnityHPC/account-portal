@@ -1,0 +1,148 @@
+{{ include('header.html.twig') }}
+
+<h1>My Principal Investigators</h1>
+<hr>
+
+{% if pending_requests|length > 0 %}
+    <h2>Pending Requests</h2>
+    <table id="pi-request-table" class="stripe compact hover">
+        <thead>
+            <tr>
+                <th>Group Owner Name</th>
+                <th>Group ID</th>
+                <th>Group Owner Mail</th>
+                <th>Requested On</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in pending_requests %}
+                <tr class="pending_request">
+                    <td>{{ request.owner_name }}</td>
+                    <td>{{ request.gid }}</td>
+                    <td>{{ request.owner_mail }}</td>
+                    <td>{{ request.requested_on }}</td>
+                    <td>
+                        <form action="" method="POST" id="cancelPI">
+                            {{ getCSRFTokenHiddenFormInput()|raw }}
+                            <input type="hidden" name="pi" value="{{ request.gid }}">
+                            <input type="hidden" name="form_type" value="cancelPIForm">
+                            <input name="cancel" style="margin-top: 10px;" type="submit" value="Cancel Request"/>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if pi_group_gids|length > 0 %}
+        <hr>
+    {% endif %}
+{% endif %}
+
+<h2>Current Groups</h2>
+
+{% if is_pi and pi_group_gids|length == 1 %}
+    You are only a member of your own PI group.
+    Navigate to the
+    <a href="/panel/pi.php">my users</a>
+    page to see your group.
+{% endif %}
+
+{% if pi_group_gids|length == 0 %}
+    You are not a member of any groups. Request to join a PI using the button below,
+    or request your own PI account on the <a href="/panel/account.php">account settings</a> page.
+{% endif %}
+
+<table id="pi-table" class="stripe compact hover">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>GID</th>
+            <th>PI Mail</th>
+            <th>Members</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for group in pi_groups %}
+            <tr>
+                <td>{{ group.owner_name }}</td>
+                <td>{{ group.gid }}</td>
+                <td>{{ group.owner_mail }}</td>
+                <td>
+                    <ul>
+                        {% for memberuid in group.members %}
+                            <li>{{ memberuid }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>
+                    <form
+                        action=""
+                        method="POST"
+                        onsubmit="return confirm('Are you sure you want to leave the PI group {{ group.gid }}?')"
+                    >
+                        {{ getCSRFTokenHiddenFormInput()|raw }}
+                        <input type="hidden" name="form_type" value="removePIForm">
+                        <input type="hidden" name="pi" value="{{ group.gid }}">
+                        <input type="submit" value="Leave Group">
+                    </form>
+                    {% if group.can_manage %}
+                        <form action="/panel/pi.php" method="GET">
+                            <input type="hidden" name="gid" value="{{ group.gid }}">
+                            <input type="submit" value="Manage Group">
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<button type="button" class="plusBtn btnAddPI"><span>&#43;</span></button>
+
+<style>
+    #modal {
+        max-width: 300px;
+    }
+</style>
+
+<script>
+    $("button.btnAddPI").click(function () {
+        openModal("Add New PI", "{{ getRelativeURL('panel/modal/new_pi.php') }}");
+    });
+</script>
+
+<script>
+    $(document).ready(() => {
+        $('#pi-table').DataTable({
+            stateSave: true,
+            responsive: true,
+            columns: [
+                {responsivePriority: 1},
+                {responsivePriority: 2},
+                {responsivePriority: 2},
+                {responsivePriority: 3, visible: false, searchable: false},
+                {responsivePriority: 1, searchable: false},
+            ],
+            layout: {topStart: {buttons: ['colvis']}}
+        });
+
+        {% if pending_requests|length > 0 %}
+            $('#pi-request-table').DataTable({
+                stateSave: true,
+                responsive: true,
+                columns: [
+                    {responsivePriority: 1},
+                    {responsivePriority: 2},
+                    {responsivePriority: 2},
+                    {responsivePriority: 2, searchable: false},
+                    {responsivePriority: 1, searchable: false},
+                ],
+            });
+        {% endif %}
+    });
+</script>
+
+{{ include('footer.html.twig') }}

@@ -27,3 +27,4 @@ require_once __DIR__ . "/lib/utils.php";
 require_once __DIR__ . "/lib/CSRFToken.php";
 require_once __DIR__ . "/lib/exceptions.php";
 require_once __DIR__ . "/controllers/account.php";
+require_once __DIR__ . "/controllers/groups.php";

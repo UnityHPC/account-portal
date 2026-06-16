@@ -14,10 +14,12 @@ use UnityWebPortal\lib\UnityLDAP;
 use UnityWebPortal\lib\UnityMailer;
 use UnityWebPortal\lib\UnitySQL;
 use UnityWebPortal\lib\UnitySSO;
+use UnityWebPortal\lib\UnityGroup;
 use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UnityGithub;
 use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\AccountController;
+use UnityWebPortal\lib\GroupsController;
 use DI\Container;
 use phpseclib3\Crypt\EC;
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
@@ -192,9 +194,31 @@ $app->any("/", function (Request $_request, Response $response): Response {
 
 $app->get("/panel/account.php", AccountController::class . ":get");
 $app->post("/panel/account.php", AccountController::class . ":post");
+$app->get("/panel/groups.php", GroupsController::class . ":get");
+$app->post("/panel/groups.php", GroupsController::class . ":post");
 $app->get("/panel/modal/new_key.php", function (Request $request, Response $response) {
     $view = Twig::fromRequest($request);
     return $view->render($response, "panel/modal/new_key.html.twig");
+});
+$app->get("/panel/modal/new_pi.php", function (Request $request, Response $response) {
+    $owner_uids = $GLOBALS["ldapconn"]->getPIGroupOwnerUIDs();
+    $owner_attributes = $GLOBALS["ldapconn"]->getUsersAttributes(
+        $owner_uids,
+        ["uid", "gecos", "mail"],
+        default_values: ["gecos" => [""], "mail" => [""]],
+    );
+    $pi_group_gid_to_owner_gecos_and_mail = [];
+    foreach ($owner_attributes as $attributes) {
+        $gid = UnityGroup::ownerUID2GID($attributes["uid"][0]);
+        $pi_group_gid_to_owner_gecos_and_mail[$gid] = [
+            $attributes["gecos"][0],
+            $attributes["mail"][0],
+        ];
+    }
+    $_SESSION["pi_group_gid_to_owner_gecos_and_mail"] = $pi_group_gid_to_owner_gecos_and_mail;
+
+    $view = Twig::fromRequest($request);
+    return $view->render($response, "panel/modal/new_pi.html.twig");
 });
 $app->post("/panel/ajax/ssh_generate.php", function (Request $request, Response $response) {
     $private = EC::createKey("Ed25519");
@@ -210,10 +234,42 @@ $app->post("/panel/ajax/ssh_generate.php", function (Request $request, Response 
 });
 $app->post("/panel/ajax/ssh_validate.php", function (Request $request, Response $response) {
     $post_data = (array) $request->getParsedBody();
-    [$is_valid, $explanation] = testValidSSHKey($post_data("key"));
+    [$is_valid, $explanation] = testValidSSHKey($post_data["key"]);
     $response
         ->getBody()
         ->write(_json_encode(["is_valid" => $is_valid, "explanation" => $explanation]));
+    return $response->withHeader("Content-Type", "application/json; charset=utf-8");
+});
+$app->get("/panel/ajax/pi_search.php", function (Request $request, Response $response) {
+    $search_query = strtolower((string) ($request->getQueryParams()["search"] ?? ""));
+    if ($search_query === "") {
+        $response->getBody()->write("[]");
+        return $response->withHeader("Content-Type", "application/json; charset=utf-8");
+    }
+    if (!array_key_exists("pi_group_gid_to_owner_gecos_and_mail", $_SESSION)) {
+        UnityHTTPD::internalServerError(
+            '$_SESSION["pi_group_gid_to_owner_gecos_and_mail"] does not exist!',
+            "Session cache not found. Try reloading the page.",
+        );
+    }
+    $pi_group_gid_to_owner_gecos_and_mail = $_SESSION["pi_group_gid_to_owner_gecos_and_mail"];
+    $output = [];
+    foreach ($pi_group_gid_to_owner_gecos_and_mail as $gid => [$gecos, $mail]) {
+        $gid = strtolower($gid);
+        $gecos = strtolower($gecos);
+        $mail = strtolower($mail);
+        if (
+            str_contains($gid, $search_query) ||
+            str_contains($gecos, $search_query) ||
+            str_contains($mail, $search_query)
+        ) {
+            $output[] = $gid;
+            if (count($output) >= 10) {
+                break;
+            }
+        }
+    }
+    $response->getBody()->write(_json_encode($output));
     return $response->withHeader("Content-Type", "application/json; charset=utf-8");
 });
 $app->post("/panel/ajax/delete_message.php", function (Request $request, Response $response) {

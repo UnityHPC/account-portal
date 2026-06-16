@@ -1,32 +1,9 @@
-<?php
-
-require_once __DIR__ . "/../../../resources/autoload.php";
-use UnityWebPortal\lib\UnityHTTPD;
-use UnityWebPortal\lib\UnityGroup;
-$CSRFTokenHiddenFormInput = UnityHTTPD::getCSRFTokenHiddenFormInput();
-
-// cache PI group info in $_SESSION for ajax pi_search.php
-// cache persists only until the user loads this page again
-$owner_uids = $LDAP->getPIGroupOwnerUIDs();
-$owner_attributes = $LDAP->getUsersAttributes(
-    $owner_uids,
-    ["uid", "gecos", "mail"],
-    default_values: ["gecos" => [""], "mail" => [""]]
-);
-$pi_group_gid_to_owner_gecos_and_mail = [];
-foreach ($owner_attributes as $attributes) {
-    $gid = UnityGroup::ownerUID2GID($attributes["uid"][0]);
-    $pi_group_gid_to_owner_gecos_and_mail[$gid] = [$attributes["gecos"][0], $attributes["mail"][0]];
-}
-$_SESSION["pi_group_gid_to_owner_gecos_and_mail"] = $pi_group_gid_to_owner_gecos_and_mail;
-?>
-
 <form
     id="newPIform"
     method="POST"
-    action="<?php echo getRelativeURL("panel/groups.php"); ?>"
+    action="{{ getRelativeURL('panel/groups.php') }}"
 >
-    <?php echo $CSRFTokenHiddenFormInput; ?>
+    {{ getCSRFTokenHiddenFormInput()|raw }}
     <input type="hidden" name="form_type" value="addPIform">
     <div style="position: relative;">
         <input
@@ -41,7 +18,7 @@ $_SESSION["pi_group_gid_to_owner_gecos_and_mail"] = $pi_group_gid_to_owner_gecos
     <label>
         <input type='checkbox' name='tos' value='agree' required>
         I have read and accept the
-        <a href='<?php echo CONFIG["site"]["terms_of_service_url"]; ?>' target='_blank'>
+        <a href='{{ CONFIG['site']['terms_of_service_url'] }}' target='_blank'>
             Terms of Service
         </a>.
     </label>
@@ -56,15 +33,13 @@ $_SESSION["pi_group_gid_to_owner_gecos_and_mail"] = $pi_group_gid_to_owner_gecos
         function updateSearch() {
             const query = input.val();
             $.ajax({
-                url: '<?php echo getRelativeURL("panel/ajax/pi_search.php") ?>',
+                url: "{{ getRelativeURL('panel/ajax/pi_search.php') }}",
                 data: {"search": query},
-                success: function(data) {
-                    const results = JSON.parse(data);
+                success: function(results) {
                     if (results.length === 0) {
                         wrapper.html("<span>No Results</span>").show();
                         submit.prop("disabled", true);
                     } else if (results.includes(query)) {
-                        // search query exactly matches a PI group GID
                         wrapper.html("").hide();
                         submit.prop("disabled", false);
                     } else {
