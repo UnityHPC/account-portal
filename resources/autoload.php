@@ -33,3 +33,4 @@ require_once __DIR__ . "/controllers/disabled_account.php";
 require_once __DIR__ . "/controllers/pi.php";
 require_once __DIR__ . "/controllers/lan_api.php";
 require_once __DIR__ . "/controllers/admin_pi_mgmt.php";
+require_once __DIR__ . "/controllers/admin_user_mgmt.php";

@@ -1,0 +1,71 @@
+{{ include('header.html.twig') }}
+
+<h1>User Management</h1>
+<hr>
+
+<table id="user-table" class="stripe compact hover">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>UID</th>
+            <th>Org</th>
+            <th>Mail</th>
+            <th>Groups</th>
+            <th>Actions</th>
+            {% for flag in flags_to_display %}
+            <th>{{ flag }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.name }}</td>
+            <td>{{ user.uid }}</td>
+            <td>{{ user.org }}</td>
+            <td>{{ user.mail }}</td>
+            <td>
+                <ul style="padding-left: 2ch; margin: 0;">
+                    {% for group in user.groups %}
+                    <li>{{ group }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>
+                <form class="viewAsUserForm" action="" method="POST" onsubmit="return confirm('Are you sure you want to switch to the user {{ user.uid }}?');">
+                    {{ getCSRFTokenHiddenFormInput()|raw }}
+                    <input type="hidden" name="form_type" value="viewAsUser">
+                    <input type="hidden" name="uid" value="{{ user.uid }}">
+                    <input type="submit" name="action" value="Access">
+                </form>
+            </td>
+            {% for flag in flags_to_display %}
+            <td>{% if user.flags[flag] %}{{ flag }}{% endif %}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+$(document).ready(() => {
+    $('#user-table').DataTable({
+        stateSave: true,
+        responsive: true,
+        columns: [
+            {responsivePriority: 2},
+            {responsivePriority: 1},
+            {responsivePriority: 2},
+            {responsivePriority: 2, render: dataTablesRenderMailtoLink},
+            {responsivePriority: 3, searchable: false},
+            {responsivePriority: 1, searchable: false},
+            {% for flag in flags_to_display %}
+            {visible: false},
+            {% endfor %}
+        ],
+        layout: {topStart: {buttons: ['colvis']}}
+    });
+});
+</script>
+
+{{ include('footer.html.twig') }}

@@ -25,6 +25,7 @@ use UnityWebPortal\lib\DisabledAccountController;
 use UnityWebPortal\lib\PiController;
 use UnityWebPortal\lib\LanApiController;
 use UnityWebPortal\lib\AdminPiMgmtController;
+use UnityWebPortal\lib\AdminUserMgmtController;
 use DI\Container;
 use phpseclib3\Crypt\EC;
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
@@ -34,6 +35,7 @@ require_once __DIR__ . "/../resources/config.php";
 require_once __DIR__ . "/../resources/controllers/lan_api.php";
 require_once __DIR__ . "/../resources/controllers/pi.php";
 require_once __DIR__ . "/../resources/controllers/admin_pi_mgmt.php";
+require_once __DIR__ . "/../resources/controllers/admin_user_mgmt.php";
 
 if (CONFIG["site"]["enable_exception_handler"]) {
     set_exception_handler(["UnityWebPortal\lib\UnityHTTPD", "exceptionHandler"]);
@@ -214,6 +216,8 @@ $app->get("/lan/api/expiry.php", LanApiController::class . ":expiry");
 $app->post("/lan/api/bump-last-login.php", LanApiController::class . ":bumpLastLogin");
 $app->get("/admin/pi-mgmt.php", AdminPiMgmtController::class . ":get");
 $app->post("/admin/pi-mgmt.php", AdminPiMgmtController::class . ":post");
+$app->get("/admin/user-mgmt.php", AdminUserMgmtController::class . ":get");
+$app->post("/admin/user-mgmt.php", AdminUserMgmtController::class . ":post");
 $app->get("/panel/modal/new_key.php", function (Request $request, Response $response) {
     $view = Twig::fromRequest($request);
     return $view->render($response, "panel/modal/new_key.html.twig");
