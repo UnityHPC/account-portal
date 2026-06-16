@@ -1,0 +1,127 @@
+{{ include('header.html.twig') }}
+
+<h1>PI Management</h1>
+<hr>
+
+<h2>PI Group Requests</h2>
+<table id="pi-request-table" class="stripe compact hover">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>UID</th>
+            <th>Mail</th>
+            <th>Requested On</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for request in requests %}
+        <tr>
+            <td>{{ request.name }}</td>
+            <td>{{ request.uid }}</td>
+            <td>{{ request.mail }}</td>
+            <td>{{ request.requested_on }}</td>
+            <td>
+                <form action="" method="POST">
+                    {{ getCSRFTokenHiddenFormInput()|raw }}
+                    <input type="hidden" name="form_type" value="req">
+                    <input type="hidden" name="uid" value="{{ request.uid }}">
+                    <input type="submit" name="action" value="Approve" onclick="return confirm('Are you sure you want to approve {{ request.uid }}?');">
+                    <input type="submit" name="action" value="Deny" onclick="return confirm('Are you sure you want to deny {{ request.uid }}?');">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br>
+<h2>PI Groups</h2>
+
+<table id="pi-table" class="stripe compact hover">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>GID</th>
+            <th>Mail</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for group in pi_groups %}
+        <tr>
+            <td>{{ group.name }}</td>
+            <td>{{ group.gid }}</td>
+            <td>{{ group.mail }}</td>
+            <td>
+                <form action="" method="POST" onsubmit="return confirm('🚨 Are you sure you want to REMOVE ALL MEMBERS and DISABLE group {{ group.gid }}? 🚨');">
+                    {{ getCSRFTokenHiddenFormInput()|raw }}
+                    <input type="hidden" name="form_type" value="disable">
+                    <input type="hidden" name="pi" value="{{ group.gid }}">
+                    <input class="danger" type="submit" value="Disable">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(() => {
+        let pi_request_datatable = $('#pi-request-table').DataTable({
+            responsive: true,
+            stateSave: true,
+            columns: [
+                {responsivePriority: 2},
+                {responsivePriority: 1},
+                {responsivePriority: 2, render: dataTablesRenderMailtoLink},
+                {responsivePriority: 2, searchable: false},
+                {responsivePriority: 1, searchable: false},
+            ],
+        });
+        let pi_datatable = $('#pi-table').DataTable({
+            stateSave: true,
+            columns: [
+                {className: 'details-control'},
+                {},
+                {render: dataTablesRenderMailtoLink},
+                {searchable: false},
+            ]
+        });
+        $('#pi-table tbody').on('click', 'td.details-control', function() {
+            var tr = $(this).closest('tr');
+            var row = pi_datatable.row(tr);
+            if (row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+            }
+            else {
+                const gid = tr.children('td').eq(1).text().trim();
+                $.ajax({
+                    url: `/admin/ajax/get_group_members.php?gid=${encodeURIComponent(gid)}`,
+                    success: function(responseText) {
+                        const responseElements = $(responseText).toArray();
+                        row.child(responseElements).show();
+                    },
+                    error: function(x) {
+                        row.child($(`<span>${x.responseText}</span>`)).show();
+                    },
+                });
+                tr.addClass('shown');
+            }
+        });
+    });
+</script>
+<style>
+.details-control::before {
+    content: "▶ ";
+}
+tr.shown td.details-control::before {
+    content: "▼ ";
+}
+th.details-control::before {
+    content: "";
+}
+</style>
+
+{{ include('footer.html.twig') }}
