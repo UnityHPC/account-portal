@@ -25,15 +25,6 @@ require_once __DIR__ . "/lib/UnityDeployment.php";
 require_once __DIR__ . "/lib/UnityGithub.php";
 require_once __DIR__ . "/lib/utils.php";
 require_once __DIR__ . "/lib/CSRFToken.php";
-require_once __DIR__ . "/lib/exceptions/NoDieException.php";
-require_once __DIR__ . "/lib/exceptions/SSOException.php";
-require_once __DIR__ . "/lib/exceptions/ArrayKeyException.php";
-require_once __DIR__ . "/lib/exceptions/CurlException.php";
-require_once __DIR__ . "/lib/exceptions/EntryNotFoundException.php";
-require_once __DIR__ . "/lib/exceptions/EncodingUnknownException.php";
-require_once __DIR__ . "/lib/exceptions/EncodingConversionException.php";
-require_once __DIR__ . "/lib/exceptions/UnityHTTPDMessageNotFoundException.php";
-require_once __DIR__ . "/lib/exceptions/InvalidConfigurationException.php";
-
+require_once __DIR__ . "/lib/exceptions.php";
 require_once __DIR__ . "/config.php";
 require __DIR__ . "/init.php";
