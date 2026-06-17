@@ -180,7 +180,7 @@ class SlimErrorHandler extends ErrorHandler
     public function respond(): Response
     {
         $e = $this->exception;
-        $response = $this->responseFactory->createResponse($e->getCode());
+        $response = $this->responseFactory->createResponse();
         if ($e instanceof HTTPRedirect) {
             // TODO check $_SERVER["REDIRECT_STATUS"]?
             $relative_path = $e->getMessage();
