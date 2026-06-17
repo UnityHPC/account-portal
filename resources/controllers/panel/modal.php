@@ -2,20 +2,12 @@
 
 namespace UnityWebPortal\lib;
 
-use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 class PanelModalController extends UnitySlimController
 {
-    private Container $container;
-
-    public function __construct(Container $container)
-    {
-        $this->container = $container;
-    }
-
     public function new_key(Request $request, Response $response)
     {
         $view = Twig::fromRequest($request);

@@ -4,24 +4,15 @@ namespace UnityWebPortal\lib;
 
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use UnityWebPortal\lib\exceptions\HTTPBadRequest;
-use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 class NewAccountController extends UnitySlimController
 {
-    private Container $container;
-
-    public function __construct(Container $container)
-    {
-        $this->container = $container;
-    }
-
     public function get(Request $request, Response $response): Response
     {
-        $USER = $this->container->get("USER");
-        $SSO = $this->container->get("SSO");
+        global $USER, $SSO;
         if ($USER->exists()) {
             throw new HTTPRedirect("panel/account.php");
         }
@@ -41,10 +32,9 @@ class NewAccountController extends UnitySlimController
 
     public function post(Request $request, Response $response): Response
     {
+        global $USER, $SSO;
         switch (getPostData("form_type")) {
             case "register":
-                $USER = $this->container->get("USER");
-                $SSO = $this->container->get("SSO");
                 $USER->init($SSO["firstname"], $SSO["lastname"], $SSO["mail"], $SSO["org"]);
                 throw new HTTPRedirect("panel/account.php");
             default:

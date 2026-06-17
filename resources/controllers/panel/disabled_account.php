@@ -4,27 +4,18 @@ namespace UnityWebPortal\lib;
 
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use UnityWebPortal\lib\exceptions\HTTPBadRequest;
-use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 class DisabledAccountController extends UnitySlimController
 {
-    private Container $container;
-
-    public function __construct(Container $container)
-    {
-        $this->container = $container;
-    }
-
     public function get(Request $request, Response $response): Response
     {
-        $USER = $this->container->get("USER");
+        global $USER;
         if (!$USER->getFlag(UserFlag::DISABLED)) {
             throw new HTTPRedirect("panel/account.php");
         }
-
         $view = Twig::fromRequest($request);
         return $view->render(
             $response,
@@ -40,8 +31,7 @@ class DisabledAccountController extends UnitySlimController
 
     public function post(Request $request, Response $response): Response
     {
-        $USER = $this->container->get("USER");
-
+        global $USER;
         switch (getPostData("form_type")) {
             case "reEnable":
                 $USER->reEnable();
@@ -50,7 +40,5 @@ class DisabledAccountController extends UnitySlimController
             default:
                 throw new HTTPBadRequest("invalid form_type");
         }
-
-        return $response;
     }
 }

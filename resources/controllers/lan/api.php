@@ -3,22 +3,14 @@
 namespace UnityWebPortal\lib;
 
 use UnityWebPortal\lib\exceptions\HTTPBadRequest;
-use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 class LanApiController extends UnitySlimController
 {
-    private Container $container;
-
-    public function __construct(Container $container)
-    {
-        $this->container = $container;
-    }
-
     public function expiry(Request $request, Response $response): Response
     {
-        $SQL = $this->container->get("SQL");
+        global $SQL;
         $uid = getQueryParameter("uid");
         $last_login = $SQL->getUserLastLogin($uid);
         if ($last_login === null) {
@@ -39,14 +31,13 @@ class LanApiController extends UnitySlimController
 
     public function bumpLastLogin(Request $request, Response $response): Response
     {
+        global $SQL;
         if ($_SERVER["REQUEST_METHOD"] !== "POST") {
             throw new HTTPBadRequest("invalid request method {$_SERVER["REQUEST_METHOD"]}");
         }
         UnityHTTPD::validateAPIKey();
-
-        $SQL = $this->container->get("SQL");
         $uid = getQueryParameter("uid");
         $SQL->updateUserLastLogin($uid);
-        return $response;
+        return $response->withStatus(200);
     }
 }

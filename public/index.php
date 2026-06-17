@@ -27,7 +27,6 @@ use UnityWebPortal\lib\AdminUserMgmtController;
 use UnityWebPortal\lib\PanelModalController;
 use UnityWebPortal\lib\PanelAjaxController;
 use UnityWebPortal\lib\AdminAjaxController;
-use DI\Container;
 use UnityWebPortal\lib\CSRFToken;
 
 require_once __DIR__ . "/../resources/autoload.php";
@@ -42,16 +41,10 @@ if (isset($GLOBALS["ldapconn"])) {
 $SQL = new UnitySQL();
 $MAILER = new UnityMailer();
 $GITHUB = new UnityGithub();
-$container = new Container();
-$container->set("SQL", fn() => $SQL);
-$container->set("LDAP", fn() => $LDAP);
-$container->set("MAILER", fn() => $MAILER);
-$container->set("GITHUB", fn() => $GITHUB);
 
-AppFactory::setContainer($container);
 $app = AppFactory::create();
 
-$middleware = new UnitySlimMiddleware($container);
+$middleware = new UnitySlimMiddleware();
 $app->add($middleware);
 
 $error_middleware = $app->addErrorMiddleware(

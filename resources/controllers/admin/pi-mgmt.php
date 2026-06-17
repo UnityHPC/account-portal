@@ -5,36 +5,25 @@ namespace UnityWebPortal\lib;
 use UnityWebPortal\lib\exceptions\HTTPForbidden;
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use UnityWebPortal\lib\exceptions\HTTPBadRequest;
-use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 class AdminPiMgmtController extends UnitySlimController
 {
-    private Container $container;
-
-    public function __construct(Container $container)
-    {
-        $this->container = $container;
-    }
-
     public function get(Request $request, Response $response): Response
     {
+        global $USER, $LDAP, $SQL, $MAILER;
         $view = Twig::fromRequest($request);
-        $USER = $this->container->get("USER");
 
         if (!$USER->getFlag(UserFlag::ADMIN)) {
             throw new HTTPForbidden("not an admin", user_msg_body: "You are not an admin.");
         }
 
-        $LDAP = $this->container->get("LDAP");
-        $SQL = $this->container->get("SQL");
-
         $requests = [];
         foreach ($SQL->getRequests(UnitySQL::REQUEST_BECOME_PI) as $request_row) {
             $uid = $request_row["uid"];
-            $request_user = new UnityUser($uid, $LDAP, $SQL, $this->container->get("MAILER"));
+            $request_user = new UnityUser($uid, $LDAP, $SQL, $MAILER);
             $requests[] = [
                 "uid" => $uid,
                 "name" => $request_user->getFullname(),
@@ -72,22 +61,16 @@ class AdminPiMgmtController extends UnitySlimController
 
     private function getUserFromPost()
     {
-        $LDAP = $this->container->get("LDAP");
-        $SQL = $this->container->get("SQL");
-        $MAILER = $this->container->get("MAILER");
+        global $LDAP, $SQL, $MAILER;
         return new UnityUser(getPostData("uid"), $LDAP, $SQL, $MAILER);
     }
 
     public function post(Request $request, Response $response): Response
     {
-        $USER = $this->container->get("USER");
+        global $USER, $LDAP, $SQL, $MAILER;
         if (!$USER->getFlag(UserFlag::ADMIN)) {
             throw new HTTPForbidden("not an admin", user_msg_body: "You are not an admin.");
         }
-
-        $LDAP = $this->container->get("LDAP");
-        $SQL = $this->container->get("SQL");
-        $MAILER = $this->container->get("MAILER");
 
         switch (getPostData("form_type")) {
             case "req":
@@ -130,6 +113,5 @@ class AdminPiMgmtController extends UnitySlimController
                 throw new HTTPBadRequest("invalid form_type");
         }
         throw new HTTPRedirect();
-        return $response;
     }
 }

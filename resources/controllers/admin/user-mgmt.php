@@ -5,30 +5,19 @@ namespace UnityWebPortal\lib;
 use UnityWebPortal\lib\exceptions\HTTPForbidden;
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use UnityWebPortal\lib\exceptions\HTTPBadRequest;
-use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 class AdminUserMgmtController extends UnitySlimController
 {
-    private Container $container;
-
-    public function __construct(Container $container)
-    {
-        $this->container = $container;
-    }
-
     public function get(Request $request, Response $response): Response
     {
         $view = Twig::fromRequest($request);
-        $USER = $this->container->get("USER");
-
+        global $USER, $LDAP;
         if (!$USER->getFlag(UserFlag::ADMIN)) {
             throw new HTTPForbidden("not an admin", user_msg_body: "You are not an admin.");
         }
-
-        $LDAP = $this->container->get("LDAP");
 
         $flags_to_display = array_filter(UserFlag::cases(), fn($x) => $x !== UserFlag::DISABLED);
 
@@ -82,11 +71,10 @@ class AdminUserMgmtController extends UnitySlimController
 
     public function post(Request $request, Response $response): Response
     {
-        $USER = $this->container->get("USER");
+        global $USER;
         if (!$USER->getFlag(UserFlag::ADMIN)) {
             throw new HTTPForbidden("not an admin", user_msg_body: "You are not an admin.");
         }
-
         switch (getPostData("form_type")) {
             case "viewAsUser":
                 $_SESSION["viewUser"] = $_POST["uid"];
@@ -94,7 +82,5 @@ class AdminUserMgmtController extends UnitySlimController
             default:
                 throw new HTTPBadRequest("invalid form_type");
         }
-
-        return $response;
     }
 }

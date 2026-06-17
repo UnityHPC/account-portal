@@ -4,27 +4,16 @@ namespace UnityWebPortal\lib;
 
 use UnityWebPortal\lib\exceptions\HTTPBadRequest;
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
-use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 class GroupsController extends UnitySlimController
 {
-    private Container $container;
-
-    public function __construct(Container $container)
-    {
-        $this->container = $container;
-    }
-
     public function get(Request $request, Response $response): Response
     {
+        global $USER, $LDAP, $SQL, $MAILER;
         $view = Twig::fromRequest($request);
-        $USER = $this->container->get("USER");
-        $LDAP = $this->container->get("LDAP");
-        $SQL = $this->container->get("SQL");
-        $MAILER = $this->container->get("MAILER");
 
         $pi_group_attributes = $LDAP->getPIGroupAttributesWithMemberUID(
             $USER->uid,
@@ -105,9 +94,7 @@ class GroupsController extends UnitySlimController
 
     private function getPIGroupFromPost()
     {
-        $LDAP = $this->container->get("LDAP");
-        $SQL = $this->container->get("SQL");
-        $MAILER = $this->container->get("MAILER");
+        global $LDAP, $SQL, $MAILER;
         $gid = getPostData("pi");
         $pi_group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
         if (!$pi_group->exists()) {
@@ -119,7 +106,7 @@ class GroupsController extends UnitySlimController
 
     public function post(Request $request, Response $response): Response
     {
-        $USER = $this->container->get("USER");
+        global $USER;
         switch (getPostData("form_type")) {
             case "addPIform":
                 $pi_account = $this->getPIGroupFromPost();
@@ -153,7 +140,5 @@ class GroupsController extends UnitySlimController
             default:
                 throw new HTTPBadRequest("invalid form_type");
         }
-
-        return $response;
     }
 }

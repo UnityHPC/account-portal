@@ -4,7 +4,6 @@ namespace UnityWebPortal\lib;
 
 use UnityWebPortal\lib\exceptions\HTTPBadRequest;
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
-use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use UnityWebPortal\lib\exceptions\EncodingUnknownException;
@@ -13,16 +12,10 @@ use Slim\Views\Twig;
 
 class AccountController extends UnitySlimController
 {
-    private Container $container;
-    public function __construct(Container $container)
-    {
-        $this->container = $container;
-    }
-
     public function get(Request $request, Response $response): Response
     {
+        global $USER;
         $view = Twig::fromRequest($request);
-        $USER = $this->container->get("USER");
         $ssh_public_keys = [];
         foreach ($USER->getSSHKeys() as $key) {
             try {
@@ -60,10 +53,7 @@ class AccountController extends UnitySlimController
 
     public function post(Request $request, Response $response): Response
     {
-        $USER = $this->container->get("USER");
-        $GITHUB = $this->container->get("GITHUB");
-        $LDAP = $this->container->get("LDAP");
-        $SQL = $this->container->get("SQL");
+        global $USER, $GITHUB, $LDAP, $SQL;
         $hasGroups = count($USER->getPIGroupGIDs()) > 0;
         switch (getPostData("form_type")) {
             case "addKey":
@@ -198,6 +188,5 @@ class AccountController extends UnitySlimController
             default:
                 throw new HTTPBadRequest("invalid form_type");
         }
-        return $response;
     }
 }

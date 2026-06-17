@@ -11,7 +11,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Handlers\ErrorHandler;
-use DI\Container;
 
 class UnitySlimController
 {
@@ -133,14 +132,9 @@ class UnitySlimErrorHandler extends ErrorHandler
 
 class UnitySlimMiddleware implements MiddlewareInterface
 {
-    private Container $container;
-    public function __construct(Container $container)
-    {
-        $this->container = $container;
-    }
-
     public function process(Request $request, RequestHandler $handler): Response
     {
+        global $LDAP, $SQL, $MAILER, $SSO, $USER, $OPERATOR;
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
         }
@@ -177,10 +171,6 @@ class UnitySlimMiddleware implements MiddlewareInterface
             // Check if SSO is enabled on this page
             $SSO = UnitySSO::getSSO();
             $_SESSION["SSO"] = $SSO;
-
-            $LDAP = $this->container->get("LDAP");
-            $SQL = $this->container->get("SQL");
-            $MAILER = $this->container->get("MAILER");
 
             $OPERATOR = new UnityUser($SSO["user"], $LDAP, $SQL, $MAILER);
             $_SESSION["is_admin"] = $OPERATOR->getFlag(UserFlag::ADMIN);
@@ -223,9 +213,6 @@ class UnitySlimMiddleware implements MiddlewareInterface
                     );
                 }
             }
-            $this->container->set("USER", fn() => $USER);
-            $this->container->set("OPERATOR", fn() => $OPERATOR);
-            $this->container->set("SSO", fn() => $SSO);
         }
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {

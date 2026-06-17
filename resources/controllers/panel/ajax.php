@@ -2,20 +2,12 @@
 
 namespace UnityWebPortal\lib;
 
-use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use phpseclib3\Crypt\EC;
 
 class PanelAjaxController extends UnitySlimController
 {
-    private Container $container;
-
-    public function __construct(Container $container)
-    {
-        $this->container = $container;
-    }
-
     public function ssh_generate(Request $request, Response $response)
     {
         $private = EC::createKey("Ed25519");

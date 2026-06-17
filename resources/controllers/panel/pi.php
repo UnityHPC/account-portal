@@ -5,32 +5,19 @@ namespace UnityWebPortal\lib;
 use UnityWebPortal\lib\exceptions\HTTPForbidden;
 use UnityWebPortal\lib\exceptions\HTTPBadRequest;
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
-use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 class PiController extends UnitySlimController
 {
-    private Container $container;
-
-    public function __construct(Container $container)
-    {
-        $this->container = $container;
-    }
-
     public function get(Request $request, Response $response): Response
     {
+        global $USER, $LDAP, $SQL, $MAILER;
         $view = Twig::fromRequest($request);
-        $USER = $this->container->get("USER");
 
         if (($gid = $request->getQueryParams()["gid"] ?? null) !== null) {
-            $group = new UnityGroup(
-                $gid,
-                $this->container->get("LDAP"),
-                $this->container->get("SQL"),
-                $this->container->get("MAILER"),
-            );
+            $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
             $user_is_owner = false;
             if (!$group->exists()) {
                 throw new HTTPBadRequest(
@@ -104,23 +91,15 @@ class PiController extends UnitySlimController
 
     private function getUserFromPost()
     {
-        $LDAP = $this->container->get("LDAP");
-        $SQL = $this->container->get("SQL");
-        $MAILER = $this->container->get("MAILER");
+        global $LDAP, $SQL, $MAILER;
         return new UnityUser(getPostData("uid"), $LDAP, $SQL, $MAILER);
     }
 
     public function post(Request $request, Response $response): Response
     {
-        $USER = $this->container->get("USER");
-
+        global $USER, $LDAP, $SQL, $MAILER;
         if (($gid = $request->getQueryParams()["gid"] ?? null) !== null) {
-            $group = new UnityGroup(
-                $gid,
-                $this->container->get("LDAP"),
-                $this->container->get("SQL"),
-                $this->container->get("MAILER"),
-            );
+            $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
             $user_is_owner = false;
             if (!$group->exists()) {
                 throw new HTTPBadRequest(
