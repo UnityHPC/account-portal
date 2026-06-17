@@ -402,7 +402,7 @@ function _error_log(
  * recursive on $t->getPrevious()
  * @return array<string, mixed>
  */
-function throwableToArray(\Throwable $t): array
+function throwableToArray(\Throwable $t, bool $hide_vendor_slim = true): array
 {
     $output = [
         "class" => get_class($t),
@@ -410,6 +410,17 @@ function throwableToArray(\Throwable $t): array
         // newlines are bad for error log, but getTrace() is too verbose
         "trace" => explode("\n", $t->getTraceAsString()),
     ];
+    if ($hide_vendor_slim) {
+        $new_trace = [];
+        foreach ($output["trace"] as $line) {
+            if (str_contains($line, "/vendor/slim/")) {
+                array_push($new_trace, "...");
+            } else {
+                array_push($new_trace, $line);
+            }
+        }
+        $output["trace"] = $new_trace;
+    }
     $previous = $t->getPrevious();
     if (!is_null($previous)) {
         $output["previous"] = throwableToArray($previous);
