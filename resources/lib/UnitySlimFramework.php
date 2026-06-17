@@ -2,6 +2,7 @@
 
 namespace UnityWebPortal\lib;
 
+use Slim\Exception\HttpNotFoundException;
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use UnityWebPortal\lib\exceptions\HTTPError;
 use UnityWebPortal\lib\exceptions\HTTPForbidden;
@@ -52,8 +53,21 @@ class UnitySlimErrorHandler extends ErrorHandler
     {
         $e = $this->exception;
         $response = $this->responseFactory->createResponse();
+        $body = $response->getBody();
         if ($e instanceof HTTPRedirect) {
             return $this->respondRedirect($e->getMessage());
+        }
+        // use Slim\Exception\HttpException as SlimHTTPException;
+        // use Slim\Error\Renderers\HtmlErrorRenderer;
+        // if ($e instanceof SlimHTTPException) {
+        //     $builtin_renderer = new HtmlErrorRenderer();
+        //     $output = $builtin_renderer->__invoke($e, $this->displayErrorDetails);
+        //     $body->write($output);
+        //     return $response->withStatus($e->getCode());
+        // }
+        if ($e instanceof HttpNotFoundException) {
+            $body->write("404: Not Found");
+            return $response->withStatus(404);
         }
         if ($e instanceof HTTPError) {
             $status = $e->getCode();
@@ -99,7 +113,6 @@ class UnitySlimErrorHandler extends ErrorHandler
             UnityHTTPD::messageError($title, implode("\n", $body_paragraphs));
             return $this->respondRedirect();
         }
-        $body = $response->getBody();
         // text may not be shown in the webpage in an obvious way, so make a popup
         $body->write(alert(implode(" -- ", [$title, ...$body_paragraphs])));
         $body->write(
