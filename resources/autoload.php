@@ -26,7 +26,7 @@ require_once __DIR__ . "/lib/UnityGithub.php";
 require_once __DIR__ . "/lib/utils.php";
 require_once __DIR__ . "/lib/CSRFToken.php";
 require_once __DIR__ . "/lib/exceptions.php";
-require_once __DIR__ . "/controllers/UnitySlimController.php";
+require_once __DIR__ . "/lib/UnitySlimController.php";
 require_once __DIR__ . "/controllers/panel/account.php";
 require_once __DIR__ . "/controllers/panel/groups.php";
 require_once __DIR__ . "/controllers/panel/new_account.php";
