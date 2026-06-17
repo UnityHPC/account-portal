@@ -471,9 +471,9 @@ function getUploadedFileContents(
 
 // in firefox, the user can disable alert/confirm/prompt after the 2nd or 3rd popup
 // after I disable alerts, if I quit and reopen my browser, the alerts come back
-function alert(string $message): void
+function alert(string $message): string
 {
-    echo sprintf(
+    return sprintf(
         "<script type='text/javascript'>\nalert('%s');\n</script>\n",
         htmlspecialchars($message),
     );
