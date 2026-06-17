@@ -283,11 +283,11 @@ class UnityGroup extends PosixGroup
     public function newUserRequest(UnityUser $new_user, bool $send_mail = true): void
     {
         if ($this->memberUIDExists($new_user->uid)) {
-            UnityHTTPD::errorLog("warning", "user '$new_user' already in group");
+            _error_log("warning", "user '$new_user' already in group");
             return;
         }
         if ($this->requestExists($new_user)) {
-            UnityHTTPD::errorLog("warning", "user '$new_user' already requested group membership");
+            _error_log("warning", "user '$new_user' already requested group membership");
             return;
         }
         $this->addRequest($new_user->uid);
@@ -480,7 +480,7 @@ class UnityGroup extends PosixGroup
         $owner = $this->getOwner();
         $suffix = "_" . $owner->getOrg();
         assert(str_ends_with($owner->uid, $suffix));
-        $short_name = substr($owner->uid, 0, -1 * strlen($suffix));
+        $short_name = substr($owner->uid, 0, -(1 * strlen($suffix)));
         $parts = explode("@", $mail, 2);
         return sprintf("%s+%s@%s", $parts[0], $short_name, $parts[1]);
     }

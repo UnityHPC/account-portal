@@ -83,7 +83,7 @@ class AdminPiMgmtController extends UnitySlimController
         $MAILER = $this->container->get("MAILER");
 
         $getUserFromPost = function () use ($LDAP, $SQL, $MAILER) {
-            return new UnityUser(UnityHTTPD::getPostData("uid"), $LDAP, $SQL, $MAILER);
+            return new UnityUser(getPostData("uid"), $LDAP, $SQL, $MAILER);
         };
 
         switch ($_POST["form_type"] ?? null) {
@@ -112,7 +112,7 @@ class AdminPiMgmtController extends UnitySlimController
                 $parent->removeUser($form_user, UnityGroupUserRemovedReason::RemovedByAdmin);
                 break;
             case "disable":
-                $group = new UnityGroup(UnityHTTPD::getPostData("pi"), $LDAP, $SQL, $MAILER);
+                $group = new UnityGroup(getPostData("pi"), $LDAP, $SQL, $MAILER);
                 if ($group->getIsDisabled()) {
                     UnityHTTPD::messageError(
                         "Cannot Disable PI Group",

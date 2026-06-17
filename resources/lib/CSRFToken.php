@@ -10,7 +10,7 @@ class CSRFToken
             throw new \RuntimeException("Session is not started. Call session_start() first.");
         }
         if (!array_key_exists("csrf_tokens", $_SESSION)) {
-            UnityHTTPD::errorLog(
+            _error_log(
                 "invalid session",
                 '$_SESSION has no array key "csrf_tokens"',
                 data: ['$_SESSION' => $_SESSION],
@@ -18,7 +18,7 @@ class CSRFToken
             $_SESSION["csrf_tokens"] = [];
         }
         if (!is_array($_SESSION["csrf_tokens"])) {
-            UnityHTTPD::errorLog(
+            _error_log(
                 "invalid session",
                 '$_SESSION["csrf_tokens"] is not an array',
                 data: ['$_SESSION' => $_SESSION],
@@ -39,16 +39,16 @@ class CSRFToken
     {
         self::ensureSessionCSRFTokensSanity();
         if ($token === "") {
-            UnityHTTPD::errorLog("empty CSRF token", "");
+            _error_log("empty CSRF token", "");
             return false;
         }
         if (!array_key_exists($token, $_SESSION["csrf_tokens"])) {
-            UnityHTTPD::errorLog("unknown CSRF token", $token);
+            _error_log("unknown CSRF token", $token);
             return false;
         }
         $entry = $_SESSION["csrf_tokens"][$token];
         if ($entry === true) {
-            UnityHTTPD::errorLog("reused CSRF token", $token);
+            _error_log("reused CSRF token", $token);
             return false;
         }
         $_SESSION["csrf_tokens"][$token] = true;

@@ -43,7 +43,7 @@ class NewAccountController extends UnitySlimController
         $USER = $this->container->get("USER");
         $SSO = $this->container->get("SSO");
 
-        if (UnityHTTPD::getPostData("form_type") === "register") {
+        if (getPostData("form_type") === "register") {
             UnityHTTPD::validatePostCSRFToken();
             $USER->init($SSO["firstname"], $SSO["lastname"], $SSO["mail"], $SSO["org"]);
             throw new HTTPRedirect("panel/account.php");

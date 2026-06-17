@@ -198,7 +198,7 @@ class UnityDeployment
                 continue;
             }
             if ($fileinfo->getExtension() !== "csv") {
-                UnityHTTPD::errorLog("warning", "ID map file $filename ignored, extension != .csv");
+                _error_log("warning", "ID map file $filename ignored, extension != .csv");
                 continue;
             }
             $i = 1;

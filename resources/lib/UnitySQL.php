@@ -160,7 +160,7 @@ class UnitySQL
     public function addLog(string $action_type, string $recipient): void
     {
         if (mb_strlen($recipient, "UTF-8") > self::TABLE_AUDIT_LOG_RECIPIENT_MAX_MB_STR_LEN) {
-            UnityHTTPD::errorLog("warning", "audit log recipient truncated", data: $recipient);
+            _error_log("warning", "audit log recipient truncated", data: $recipient);
             $recipient = mb_substr(
                 $recipient,
                 0,

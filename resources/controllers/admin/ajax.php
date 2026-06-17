@@ -28,7 +28,7 @@ class AdminAjaxController extends UnitySlimController
         }
 
         $view = Twig::fromRequest($request);
-        $gid = UnityHTTPD::getQueryParameter("gid");
+        $gid = getQueryParameter("gid");
         $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
         $requests = [];
         foreach ($group->getRequests() as [$user, $timestamp]) {

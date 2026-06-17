@@ -6,6 +6,7 @@ use phpseclib3\Crypt\PublicKeyLoader;
 use phpseclib3\Exception\NoKeyLoadedException;
 use UnityWebPortal\lib\exceptions\CurlException;
 use UnityWebPortal\lib\UnityDeployment;
+use UnityWebPortal\lib\exceptions\HTTPBadRequest;
 
 /**
  * key must take the form "KEY_TYPE KEY_DATA OPTIONAL_COMMENT"
@@ -215,7 +216,7 @@ function shortenString(
     }
     return substr($x, 0, $leading_chars) .
         $ellipsis .
-        substr($x, -1 * $trailing_chars, $trailing_chars);
+        substr($x, -$trailing_chars, $trailing_chars);
 }
 
 function getTemplatePath(string $basename): string
@@ -361,4 +362,119 @@ function _base64_decode(string $x): string
         throw new Exception("base64_decode returned false!");
     }
     return $output;
+}
+
+function _error_log(
+    string $title,
+    string $message,
+    ?string $errorid = null,
+    ?\Throwable $error = null,
+    mixed $data = null,
+): void {
+    if (!CONFIG["site"]["enable_verbose_error_log"]) {
+        error_log("$title: $message");
+        return;
+    }
+    $output = ["message" => $message];
+    if (!is_null($data)) {
+        try {
+            \_json_encode($data);
+            $output["data"] = $data;
+        } catch (\JsonException $e) {
+            $output["data"] = var_export($data, true);
+        }
+    }
+    if (!is_null($error)) {
+        $output["error"] = throwableToArray($error);
+    } else {
+        // newlines are bad for error log, but getTrace() is too verbose
+        $output["trace"] = explode("\n", (new \Exception())->getTraceAsString());
+    }
+    $output["REMOTE_USER"] = $_SERVER["REMOTE_USER"] ?? null;
+    $output["REMOTE_ADDR"] = $_SERVER["REMOTE_ADDR"] ?? null;
+    if (!is_null($errorid)) {
+        $output["errorid"] = $errorid;
+    }
+    error_log("$title: " . \_json_encode($output));
+}
+
+/**
+ * recursive on $t->getPrevious()
+ * @return array<string, mixed>
+ */
+function throwableToArray(\Throwable $t): array
+{
+    $output = [
+        "class" => get_class($t),
+        "msg" => $t->getMessage(),
+        // newlines are bad for error log, but getTrace() is too verbose
+        "trace" => explode("\n", $t->getTraceAsString()),
+    ];
+    $previous = $t->getPrevious();
+    if (!is_null($previous)) {
+        $output["previous"] = throwableToArray($previous);
+    }
+    return $output;
+}
+
+function getPostData(string $key): string
+{
+    if (!array_key_exists($key, $_POST)) {
+        throw new HTTPBadRequest("\$_POST has no array key '$key'");
+    }
+    return $_POST[$key];
+}
+
+/**
+ * @return ($die_if_not_found is true ? string : string|null)
+ */
+function getQueryParameter(string $key, bool $die_if_not_found = true): ?string
+{
+    if (!array_key_exists($key, $_GET)) {
+        if ($die_if_not_found) {
+            throw new HTTPBadRequest("\$_GET has no array key '$key'");
+        } else {
+            return null;
+        }
+    }
+    return $_GET[$key];
+}
+
+function getUploadedFileContents(
+    string $filename,
+    bool $do_delete_tmpfile_after_read = true,
+    string $encoding = "UTF-8",
+): string {
+    if (!array_key_exists($filename, $_FILES)) {
+        throw new HTTPBadRequest(
+            "\$_FILES has no array key '$filename'",
+            data: ['$_FILES' => $_FILES],
+        );
+    }
+    if (!array_key_exists("tmp_name", $_FILES[$filename])) {
+        throw new HTTPBadRequest(
+            "\$_FILES[$filename] has no array key 'tmp_name'",
+            data: ['$_FILES' => $_FILES],
+        );
+    }
+    $tmpfile_path = $_FILES[$filename]["tmp_name"];
+    $contents = file_get_contents($tmpfile_path);
+    if ($contents === false) {
+        throw new \Exception("Failed to read file: " . $tmpfile_path);
+    }
+    if ($do_delete_tmpfile_after_read) {
+        unlink($tmpfile_path);
+    }
+    $old_encoding = _mb_detect_encoding($contents);
+    return _mb_convert_encoding($contents, $encoding, $old_encoding);
+}
+
+// in firefox, the user can disable alert/confirm/prompt after the 2nd or 3rd popup
+// after I disable alerts, if I quit and reopen my browser, the alerts come back
+function alert(string $message): void
+{
+    echo sprintf(
+        "<script type='text/javascript'>\nalert('%s');\n</script>\n",
+        htmlspecialchars($message),
+    );
 }

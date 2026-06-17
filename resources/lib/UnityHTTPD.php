@@ -26,128 +26,13 @@ enum UnityHTTPDMessageLevel: string
  */
 class UnityHTTPD
 {
-    public static function errorLog(
-        string $title,
-        string $message,
-        ?string $errorid = null,
-        ?\Throwable $error = null,
-        mixed $data = null,
-    ): void {
-        if (!CONFIG["site"]["enable_verbose_error_log"]) {
-            error_log("$title: $message");
-            return;
-        }
-        $output = ["message" => $message];
-        if (!is_null($data)) {
-            try {
-                \_json_encode($data);
-                $output["data"] = $data;
-            } catch (\JsonException $e) {
-                $output["data"] = var_export($data, true);
-            }
-        }
-        if (!is_null($error)) {
-            $output["error"] = self::throwableToArray($error);
-        } else {
-            // newlines are bad for error log, but getTrace() is too verbose
-            $output["trace"] = explode("\n", (new \Exception())->getTraceAsString());
-        }
-        $output["REMOTE_USER"] = $_SERVER["REMOTE_USER"] ?? null;
-        $output["REMOTE_ADDR"] = $_SERVER["REMOTE_ADDR"] ?? null;
-        if (!is_null($errorid)) {
-            $output["errorid"] = $errorid;
-        }
-        error_log("$title: " . \_json_encode($output));
-    }
-
-    /**
-     * recursive on $t->getPrevious()
-     * @return array<string, mixed>
-     */
-    public static function throwableToArray(\Throwable $t): array
-    {
-        $output = [
-            "class" => get_class($t),
-            "msg" => $t->getMessage(),
-            // newlines are bad for error log, but getTrace() is too verbose
-            "trace" => explode("\n", $t->getTraceAsString()),
-        ];
-        $previous = $t->getPrevious();
-        if (!is_null($previous)) {
-            $output["previous"] = self::throwableToArray($previous);
-        }
-        return $output;
-    }
-
-    public static function getPostData(string $key): string
-    {
-        if (!array_key_exists($key, $_POST)) {
-            throw new HTTPBadRequest("\$_POST has no array key '$key'");
-        }
-        return $_POST[$key];
-    }
-
-    /**
-     * @return ($die_if_not_found is true ? string : string|null)
-     */
-    public static function getQueryParameter(string $key, bool $die_if_not_found = true): ?string
-    {
-        if (!array_key_exists($key, $_GET)) {
-            if ($die_if_not_found) {
-                throw new HTTPBadRequest("\$_GET has no array key '$key'");
-            } else {
-                return null;
-            }
-        }
-        return $_GET[$key];
-    }
-
-    public static function getUploadedFileContents(
-        string $filename,
-        bool $do_delete_tmpfile_after_read = true,
-        string $encoding = "UTF-8",
-    ): string {
-        if (!array_key_exists($filename, $_FILES)) {
-            throw new HTTPBadRequest(
-                "\$_FILES has no array key '$filename'",
-                data: ['$_FILES' => $_FILES],
-            );
-        }
-        if (!array_key_exists("tmp_name", $_FILES[$filename])) {
-            throw new HTTPBadRequest(
-                "\$_FILES[$filename] has no array key 'tmp_name'",
-                data: ['$_FILES' => $_FILES],
-            );
-        }
-        $tmpfile_path = $_FILES[$filename]["tmp_name"];
-        $contents = file_get_contents($tmpfile_path);
-        if ($contents === false) {
-            throw new \Exception("Failed to read file: " . $tmpfile_path);
-        }
-        if ($do_delete_tmpfile_after_read) {
-            unlink($tmpfile_path);
-        }
-        $old_encoding = _mb_detect_encoding($contents);
-        return _mb_convert_encoding($contents, $encoding, $old_encoding);
-    }
-
-    // in firefox, the user can disable alert/confirm/prompt after the 2nd or 3rd popup
-    // after I disable alerts, if I quit and reopen my browser, the alerts come back
-    public static function alert(string $message): void
-    {
-        echo sprintf(
-            "<script type='text/javascript'>\nalert('%s');\n</script>\n",
-            htmlspecialchars($message),
-        );
-    }
-
     private static function ensureSessionMessagesSanity(): void
     {
         if (!isset($_SESSION)) {
             throw new RuntimeException('$_SESSION is unset');
         }
         if (!array_key_exists("messages", $_SESSION)) {
-            self::errorLog(
+            _error_log(
                 "invalid session messages",
                 'array key "messages" does not exist for $_SESSION',
                 data: ['$_SESSION' => $_SESSION],
@@ -156,7 +41,7 @@ class UnityHTTPD
         }
         if (!is_array($_SESSION["messages"])) {
             $type = gettype($_SESSION["messages"]);
-            self::errorLog(
+            _error_log(
                 "invalid session messages",
                 "\$_SESSION['messages'] is type '$type', not an array",
                 data: ['$_SESSION' => $_SESSION],
@@ -252,10 +137,10 @@ class UnityHTTPD
 
     public static function validatePostCSRFToken(): void
     {
-        $token = self::getPostData("csrf_token");
+        $token = getPostData("csrf_token");
         if (!CSRFToken::validate($token)) {
             $errorid = uniqid();
-            self::errorLog("csrf failed to validate", "", errorid: $errorid);
+            _error_log("csrf failed to validate", "", errorid: $errorid);
             self::messageError(
                 "Invalid Session Token",
                 "This can happen if you leave your browser open for too long. Error ID: $errorid",
@@ -322,7 +207,7 @@ class SlimErrorHandler extends ErrorHandler
         $support = CONFIG["mail"]["support"];
         array_push($body_paragraphs, "For assistance, contact a Unity admin at $support.");
         array_push($body_paragraphs, "Error ID: $errorid");
-        UnityHTTPD::errorLog(
+        _error_log(
             $e->internal_msg_title,
             $e->internal_msg_body,
             data: $e->data,
@@ -340,7 +225,7 @@ class SlimErrorHandler extends ErrorHandler
         } else {
             $body = $response->getBody();
             // text may not be shown in the webpage in an obvious way, so make a popup
-            $body->write(UnityHTTPD::alert(implode(" -- ", [$title, ...$body_paragraphs])));
+            $body->write(alert(implode(" -- ", [$title, ...$body_paragraphs])));
             $body->write(
                 sprintf(
                     "<h1>%s</h1>\n%s\n",
@@ -363,7 +248,7 @@ class SlimErrorHandler extends ErrorHandler
                     $body->write(
                         sprintf(
                             "<pre>%s</pre>",
-                            _json_encode(UnityHTTPD::throwableToArray($e), JSON_PRETTY_PRINT),
+                            _json_encode(throwableToArray($e), JSON_PRETTY_PRINT),
                         ),
                     );
                 }

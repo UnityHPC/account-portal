@@ -113,7 +113,7 @@ class GroupsController extends UnitySlimController
         $MAILER = $this->container->get("MAILER");
 
         $getPIGroupFromPost = function () use ($LDAP, $SQL, $MAILER) {
-            $gid = UnityHTTPD::getPostData("pi");
+            $gid = getPostData("pi");
             $pi_group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
             if (!$pi_group->exists()) {
                 UnityHTTPD::messageError("This PI Doesn't Exist", $gid);

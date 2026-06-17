@@ -79,7 +79,7 @@ class UnityLDAP extends LDAPConn
             return $customMappedID;
         }
         if (!is_null($customMappedID) && in_array($customMappedID, $IDNumsInUse)) {
-            UnityHTTPD::errorLog(
+            _error_log(
                 "warning",
                 "user '$uid' has a custom mapped IDNumber $customMappedID but it's already in use!",
             );

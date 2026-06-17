@@ -41,7 +41,7 @@ class DisabledAccountController extends UnitySlimController
     {
         $USER = $this->container->get("USER");
 
-        if (UnityHTTPD::getPostData("form_type") === "reEnable") {
+        if (getPostData("form_type") === "reEnable") {
             UnityHTTPD::validatePostCSRFToken();
             $USER->reEnable();
             UnityHTTPD::messageSuccess("Account Re-Enabled", "");

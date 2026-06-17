@@ -183,7 +183,7 @@ $twig_env = $twig->getEnvironment();
 $twig_env->addFunction(new TwigFunction("getRelativeURL", getRelativeURL(...)));
 $twig_env->addFunction(new TwigFunction("getRelativeHyperlink", getRelativeHyperlink(...)));
 $twig_env->addFunction(new TwigFunction("formatHyperlink", formatHyperlink(...)));
-$twig_env->addFunction(new TwigFunction("errorLog", UnityHTTPD::errorLog(...)));
+$twig_env->addFunction(new TwigFunction("errorLog", _error_log(...)));
 $twig_env->addFunction(
     new TwigFunction("getCSRFTokenHiddenFormInput", UnityHTTPD::getCSRFTokenHiddenFormInput(...)),
 );

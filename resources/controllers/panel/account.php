@@ -32,7 +32,7 @@ class AccountController extends UnitySlimController
                 $ssh_public_keys[$key] = [$type, $comment, $length, $stub_fingprint];
             } catch (\Throwable $e) {
                 $errid = uniqid();
-                UnityHTTPD::errorLog(
+                _error_log(
                     "error",
                     "failed to analyze SSH key!",
                     errorid: $errid,
@@ -65,26 +65,26 @@ class AccountController extends UnitySlimController
         $LDAP = $this->container->get("LDAP");
         $SQL = $this->container->get("SQL");
         $hasGroups = count($USER->getPIGroupGIDs()) > 0;
-        switch (UnityHTTPD::getPostData("form_type")) {
+        switch (getPostData("form_type")) {
             case "addKey":
-                switch (UnityHTTPD::getPostData("add_type")) {
+                switch (getPostData("add_type")) {
                     case "paste":
-                        $keys = [UnityHTTPD::getPostData("key")];
+                        $keys = [getPostData("key")];
                         break;
                     case "import":
                         try {
-                            $keys = [UnityHTTPD::getUploadedFileContents("keyfile")];
+                            $keys = [getUploadedFileContents("keyfile")];
                         } catch (EncodingUnknownException | EncodingConversionException $e) {
-                            UnityHTTPD::errorLog("uploaded key has bad encoding", "", error: $e);
+                            _error_log("uploaded key has bad encoding", "", error: $e);
                             UnityHTTPD::messageError("SSH Key Not Added: Invalid Encoding", "");
                             throw new HTTPRedirect();
                         }
                         break;
                     case "generate":
-                        $keys = [UnityHTTPD::getPostData("gen_key")];
+                        $keys = [getPostData("gen_key")];
                         break;
                     case "github":
-                        $githubUsername = UnityHTTPD::getPostData("gh_user");
+                        $githubUsername = getPostData("gh_user");
                         $keys = $GITHUB->getSshPublicKeys($githubUsername);
                         if (count($keys) == 0) {
                             UnityHTTPD::messageWarning(
@@ -114,7 +114,7 @@ class AccountController extends UnitySlimController
                             );
                             continue;
                         } else {
-                            UnityHTTPD::errorLog(
+                            _error_log(
                                 "security warning",
                                 "attempted SSH public key sharing between users",
                                 data: ["already using this key" => $already_using_this_key],
@@ -135,7 +135,7 @@ class AccountController extends UnitySlimController
                 throw new HTTPRedirect();
                 break; /** @phpstan-ignore deadCode.unreachable */
             case "delKey":
-                $key = _base64_decode(UnityHTTPD::getPostData("delKey"));
+                $key = _base64_decode(getPostData("delKey"));
                 $key_short = shortenString($key, 10, 30);
                 try {
                     $USER->removeSSHKey($key);
@@ -147,7 +147,7 @@ class AccountController extends UnitySlimController
                 throw new HTTPRedirect();
                 break; /** @phpstan-ignore deadCode.unreachable */
             case "loginshell":
-                $shell = UnityHTTPD::getPostData("shellSelect");
+                $shell = getPostData("shellSelect");
                 if (!in_array($shell, CONFIG["loginshell"]["shell"])) {
                     throw new HTTPBadRequest(
                         "invalid login shell",

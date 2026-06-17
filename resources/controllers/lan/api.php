@@ -19,7 +19,7 @@ class LanApiController extends UnitySlimController
     public function expiry(Request $request, Response $response): Response
     {
         $SQL = $this->container->get("SQL");
-        $uid = UnityHTTPD::getQueryParameter("uid");
+        $uid = getQueryParameter("uid");
         $last_login = $SQL->getUserLastLogin($uid);
         if ($last_login === null) {
             throw new HTTPBadRequest("no last login timestamp known for user '$uid'");
@@ -45,7 +45,7 @@ class LanApiController extends UnitySlimController
         UnityHTTPD::validateAPIKey();
 
         $SQL = $this->container->get("SQL");
-        $uid = UnityHTTPD::getQueryParameter("uid");
+        $uid = getQueryParameter("uid");
         $SQL->updateUserLastLogin($uid);
         return $response;
     }

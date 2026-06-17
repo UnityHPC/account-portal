@@ -18,6 +18,7 @@ declare -A utils=(
     ["fclose"]="_fclose"
     ["ob_get_clean"]="_ob_get_clean"
     ["base64_decode"]="_base64_decode"
+    ["error_log"]="_error_log"
 )
 
 rc=0

@@ -151,7 +151,7 @@ class PiController extends UnitySlimController
             $LDAP = $this->container->get("LDAP");
             $SQL = $this->container->get("SQL");
             $MAILER = $this->container->get("MAILER");
-            return new UnityUser(UnityHTTPD::getPostData("uid"), $LDAP, $SQL, $MAILER);
+            return new UnityUser(getPostData("uid"), $LDAP, $SQL, $MAILER);
         };
 
         switch ($_POST["form_type"] ?? null) {
