@@ -148,17 +148,14 @@ class GroupsController extends UnitySlimController
                 }
                 $pi_account->newUserRequest($USER);
                 throw new HTTPRedirect();
-                break; /** @phpstan-ignore deadCode.unreachable */
             case "removePIForm":
                 $pi_account = $getPIGroupFromPost();
                 $pi_account->removeUser($USER, UnityGroupUserRemovedReason::RemovedSelf);
                 throw new HTTPRedirect();
-                break; /** @phpstan-ignore deadCode.unreachable */
             case "cancelPIForm":
                 $pi_account = $getPIGroupFromPost();
                 $pi_account->cancelGroupJoinRequest($USER);
                 throw new HTTPRedirect();
-                break; /** @phpstan-ignore deadCode.unreachable */
         }
 
         return $response;

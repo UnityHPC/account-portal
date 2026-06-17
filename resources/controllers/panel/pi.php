@@ -170,7 +170,6 @@ class PiController extends UnitySlimController
                         sprintf("unrecognized action: '%s'", $_POST["action"]),
                     );
                 }
-                break; /** @phpstan-ignore deadCode.unreachable */
             case "remUser":
                 $form_user = $getUserFromPost();
                 $group->removeUser($form_user, UnityGroupUserRemovedReason::RemovedByOwner);
@@ -180,7 +179,6 @@ class PiController extends UnitySlimController
                 } else {
                     throw new HTTPRedirect();
                 }
-                break; /** @phpstan-ignore deadCode.unreachable */
             case "disable":
                 if (!$user_is_owner) {
                     throw new HTTPForbidden(
@@ -202,7 +200,6 @@ class PiController extends UnitySlimController
                 $group->disable();
                 UnityHTTPD::messageSuccess("Group Disabled", "");
                 throw new HTTPRedirect("panel/account.php");
-                break; /** @phpstan-ignore deadCode.unreachable */
         }
 
         return $response;

@@ -133,7 +133,6 @@ class AccountController extends UnitySlimController
                     UnityHTTPD::messageSuccess("SSH Key Added", $stub_fingprint);
                 }
                 throw new HTTPRedirect();
-                break; /** @phpstan-ignore deadCode.unreachable */
             case "delKey":
                 $key = _base64_decode(getPostData("delKey"));
                 $key_short = shortenString($key, 10, 30);
@@ -145,7 +144,6 @@ class AccountController extends UnitySlimController
                 }
                 UnityHTTPD::messageSuccess("SSH Key Removed", "$key_short");
                 throw new HTTPRedirect();
-                break; /** @phpstan-ignore deadCode.unreachable */
             case "loginshell":
                 $shell = getPostData("shellSelect");
                 if (!in_array($shell, CONFIG["loginshell"]["shell"])) {
@@ -157,7 +155,6 @@ class AccountController extends UnitySlimController
                 $USER->setLoginShell($shell);
                 UnityHTTPD::messageSuccess("Login Shell Changed", "");
                 throw new HTTPRedirect();
-                break; /** @phpstan-ignore deadCode.unreachable */
             case "pi_request":
                 if ($USER->isPI()) {
                     UnityHTTPD::messageError("Cannot Submit PI Request", "Already a PI");
@@ -176,7 +173,6 @@ class AccountController extends UnitySlimController
                 $USER->getPIGroup()->requestGroup();
                 UnityHTTPD::messageSuccess("PI Group Requested", "");
                 throw new HTTPRedirect();
-                break; /** @phpstan-ignore deadCode.unreachable */
             case "cancel_pi_request":
                 if (!$SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI)) {
                     UnityHTTPD::messageError("Cannot Cancel PI Request", "No PI request found");
@@ -185,7 +181,6 @@ class AccountController extends UnitySlimController
                 $USER->getPIGroup()->cancelGroupRequest();
                 UnityHTTPD::messageSuccess("PI Request Cancelled", "");
                 throw new HTTPRedirect();
-                break; /** @phpstan-ignore deadCode.unreachable */
             case "disable":
                 if ($hasGroups) {
                     UnityHTTPD::messageError(
@@ -200,7 +195,6 @@ class AccountController extends UnitySlimController
                 $USER->disable(UnityUserDisabledReason::DisabledSelf);
                 UnityHTTPD::messageSuccess("Account Disabled", "");
                 throw new HTTPRedirect();
-                break; /** @phpstan-ignore deadCode.unreachable */
         }
         return $response;
     }
