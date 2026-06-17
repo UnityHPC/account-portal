@@ -9,8 +9,8 @@ use UnityWebPortal\lib\exceptions\HTTPError;
 use UnityWebPortal\lib\exceptions\HTTPInternalServerError;
 use UnityWebPortal\lib\exceptions\UnityHTTPDMessageNotFoundException;
 use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
 use RuntimeException;
+use Slim\Handlers\ErrorHandler;
 
 enum UnityHTTPDMessageLevel: string
 {
@@ -64,7 +64,7 @@ class UnityHTTPD
      * recursive on $t->getPrevious()
      * @return array<string, mixed>
      */
-    private static function throwableToArray(\Throwable $t): array
+    public static function throwableToArray(\Throwable $t): array
     {
         $output = [
             "class" => get_class($t),
@@ -290,11 +290,13 @@ class UnityHTTPD
     }
 }
 
-class SlimErrorHandler
+class SlimErrorHandler extends ErrorHandler
 {
-    public function __invoke(Request $request, Response $response, \Throwable $e)
+    public function respond(): Response
     {
-        if (!is_a($e, HTTPRedirect::class)) {
+        $e = $this->exception;
+        $response = $this->responseFactory->createResponse($e->getCode());
+        if ($e instanceof HTTPRedirect) {
             // TODO check $_SERVER["REDIRECT_STATUS"]?
             $relative_path = $e->getMessage();
             if ($relative_path == "") {
@@ -307,7 +309,7 @@ class SlimErrorHandler
             $response->getBody()->write($msg);
             return $response->withStatus(302)->withHeader("Location", $dest);
         }
-        if (!is_a($e, HTTPError::class)) {
+        if (!($e instanceof HTTPError)) {
             $e = new HTTPInternalServerError($e->getMessage(), previous: $e);
         }
         $errorid = uniqid();
@@ -332,7 +334,9 @@ class SlimErrorHandler
             !str_starts_with($_SERVER["REQUEST_URI"], "/lan/api/")
         ) {
             UnityHTTPD::messageError($title, implode("\n", $body_paragraphs));
-            return $this->__invoke($request, $response, new HTTPRedirect());
+            $new_handler = new SlimErrorHandler($this->callableResolver, $this->responseFactory);
+            $new_handler->exception = new HTTPRedirect();
+            return $new_handler->respond();
         } else {
             $body = $response->getBody();
             // text may not be shown in the webpage in an obvious way, so make a popup
@@ -344,13 +348,11 @@ class SlimErrorHandler
                     implode("\n<br>\n", $body_paragraphs),
                 ),
             );
-            // display_errors should not be enabled in production
-            if (
-                !is_null($e) &&
-                ini_get("display_errors") === "1" &&
-                property_exists($e, "xdebug_message")
-            ) {
-                $body->write("<table>$e->xdebug_message</table>");
+            if ($this->displayErrorDetails) {
+                $body->write(nl2br(_json_encode(UnityHTTPD::throwableToArray($e))));
+                if (property_exists($e, "xdebug_message")) {
+                    $body->write("<table>$e->xdebug_message</table>");
+                }
             }
             return $response->withStatus($e->getCode());
         }

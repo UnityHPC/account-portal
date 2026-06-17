@@ -162,11 +162,18 @@ if (isset($SSO)) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$container->set("errorHandler", fn($c) => new SlimErrorHandler());
-$container->set("phpErrorHandler", fn($c) => new SlimErrorHandler());
-
 AppFactory::setContainer($container);
 $app = AppFactory::create();
+
+$error_middleware = $app->addErrorMiddleware(
+    displayErrorDetails: CONFIG["site"]["debug"],
+    logErrors: true,
+    logErrorDetails: true,
+);
+$error_middleware->setDefaultErrorHandler(
+    new SlimErrorHandler($app->getCallableResolver(), $app->getResponseFactory()),
+);
+
 $twig = Twig::create(UnityDeployment::getTemplateDirs(), [
     "cache" => false,
     "strict_variables" => true,
