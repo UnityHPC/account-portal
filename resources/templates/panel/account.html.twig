@@ -26,7 +26,7 @@
     {% if pi_group_exists and pi_group_is_disabled %}
         <p>You are no longer a PI because your PI group is disabled.</p>
     {% endif %}
-    {% if isQualified %}
+    {% if is_qualified %}
         <p>You are currently a <strong>qualified user</strong> on the Unity HPC Platform.</p>
     {% else %}
         <p>
@@ -56,7 +56,7 @@
         id="piReq"
     >
         {{ formatCSRFTokenHiddenFormInput(csrf_token)|raw }}
-        {% if requestExists %}
+        {% if request_exists %}
             <input type="submit" value="Cancel PI Account Request" onclick="return confirm('Are you sure you want to cancel this request?')" />
             <label style="margin-left: 10px">
                 Your request has been submitted and is currently pending
@@ -177,7 +177,7 @@
         {% if is_pi %}
             <input type="submit" value="Disable Account" class="danger" disabled>
             <p>You must first disable your PI group before you can disable your account.</p>
-        {% elseif hasGroups %}
+        {% elseif has_groups %}
             <input type="submit" value="Disable Account" class="danger" disabled>
             <p>You cannot disable your account while you are in a PI group.</p>
         {% else %}

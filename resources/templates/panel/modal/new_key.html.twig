@@ -74,7 +74,7 @@
         $.ajax({
             url: "/panel/ajax/ssh_generate.php?type=" + type,
             method: "POST",
-            data: {csrf_token: "{{ generateCSRFToken() }}"}
+            data: {csrf_token: "{{ generateCSRFToken() }}"},
             dataType: "json",
             success: function(result) {
                 $("input[type=hidden][name=gen_key]").val(result.public);

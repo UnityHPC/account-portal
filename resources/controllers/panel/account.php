@@ -14,7 +14,7 @@ class AccountController extends UnitySlimController
 {
     public function get(Request $request, Response $response): Response
     {
-        global $USER;
+        global $USER, $SQL;
         $view = Twig::fromRequest($request);
         $ssh_public_keys = [];
         foreach ($USER->getSSHKeys() as $key) {
@@ -45,8 +45,12 @@ class AccountController extends UnitySlimController
                 "mail" => $USER->getMail(),
                 "ssh_public_keys" => $ssh_public_keys,
                 "login_shell" => $USER->getLoginShell(),
+                "is_qualified" => $USER->getFlag(UserFlag::QUALIFIED),
+                "request_exists" => $SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI),
+                "has_groups" => count($USER->getPIGroupGIDs()) > 0,
                 "pi_group_exists" => $USER->getPIGroup()->exists(),
-                "pi_group_is_disabled" => $USER->getPIGroup()->getIsDisabled(),
+                "pi_group_is_disabled" =>
+                    $USER->getPIGroup()->exists() && $USER->getPIGroup()->getIsDisabled(),
             ]),
         );
     }
