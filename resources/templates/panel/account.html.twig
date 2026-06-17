@@ -36,7 +36,7 @@
             Do not request a PI group if you are a student.
         </p>
         <br>
-        <form action="/panel/groups.php" method="GET">
+        <form action="/panel/groups" method="GET">
             <label>
                 <input type="checkbox" name="tos" value="agree" required />
                 I have read and accept the
@@ -187,7 +187,7 @@
 </div>
 
 <script>
-    const url = '/panel/modal/new_key.php';
+    const url = '/panel/modal/new_key';
     const ldapLoginShell = '{{ login_shell }}';
 
     $("button.btnAddKey").click(function() {

@@ -69,11 +69,11 @@
 
     {% if user_exists %}
       <hr class="navHR">
-      {{ getRelativeHyperlink('Account Settings', 'panel/account.php')|raw }}
-      {{ getRelativeHyperlink('My PIs', 'panel/groups.php')|raw }}
+      {{ getRelativeHyperlink('Account Settings', 'panel/account')|raw }}
+      {{ getRelativeHyperlink('My PIs', 'panel/groups')|raw }}
 
       {% if is_pi %}
-        {{ getRelativeHyperlink('My Users', 'panel/pi.php')|raw }}
+        {{ getRelativeHyperlink('My Users', 'panel/pi')|raw }}
       {% endif %}
 
       {% for label in CONFIG['menuitems_secure']['labels'] %}
@@ -82,11 +82,11 @@
 
       {% if is_admin and (viewUser is null) %}
         <hr class="navHR">
-        {{ getRelativeHyperlink('User Management', 'admin/user-mgmt.php')|raw }}
-        {{ getRelativeHyperlink('PI Management', 'admin/pi-mgmt.php')|raw }}
+        {{ getRelativeHyperlink('User Management', 'admin/user-mgmt')|raw }}
+        {{ getRelativeHyperlink('PI Management', 'admin/pi-mgmt')|raw }}
       {% endif %}
     {% else %}
-      {{ getRelativeHyperlink('Login / Request Account', 'panel/account.php')|raw }}
+      {{ getRelativeHyperlink('Login / Request Account', 'panel/account')|raw }}
     {% endif %}
   </nav>
 

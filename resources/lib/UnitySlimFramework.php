@@ -235,7 +235,7 @@ class UnitySlimMiddleware implements MiddlewareInterface
                 ($_POST["form_type"] ?? null) == "clearView"
             ) {
                 unset($_SESSION["viewUser"]);
-                throw new HTTPRedirect("admin/user-mgmt.php");
+                throw new HTTPRedirect("admin/user-mgmt");
             }
         }
 
@@ -250,7 +250,7 @@ class UnitySlimMiddleware implements MiddlewareInterface
                 $USER->getFlag(UserFlag::DISABLED) &&
                 !str_ends_with($_SERVER["PHP_SELF"], "/panel/disabled_account.php")
             ) {
-                throw new HTTPRedirect("panel/disabled_account.php");
+                throw new HTTPRedirect("panel/disabled_account");
             }
             if ($USER->getFlag(UserFlag::LOCKED)) {
                 throw new HTTPForbidden("locked", user_msg_body: "Your account is locked.");

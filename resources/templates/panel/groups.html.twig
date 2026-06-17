@@ -45,13 +45,13 @@
 {% if is_pi and pi_group_gids|length == 1 %}
     You are only a member of your own PI group.
     Navigate to the
-    <a href="/panel/pi.php">my users</a>
+    <a href="/panel/pi">my users</a>
     page to see your group.
 {% endif %}
 
 {% if pi_group_gids|length == 0 %}
     You are not a member of any groups. Request to join a PI using the button below,
-    or request your own PI account on the <a href="/panel/account.php">account settings</a> page.
+    or request your own PI account on the <a href="/panel/account">account settings</a> page.
 {% endif %}
 
 <table id="pi-table" class="stripe compact hover">
@@ -89,7 +89,7 @@
                         <input type="submit" value="Leave Group">
                     </form>
                     {% if group.can_manage %}
-                        <form action="/panel/pi.php" method="GET">
+                        <form action="/panel/pi" method="GET">
                             <input type="hidden" name="gid" value="{{ group.gid }}">
                             <input type="submit" value="Manage Group">
                         </form>
@@ -110,7 +110,7 @@
 
 <script>
     $("button.btnAddPI").click(function () {
-        openModal("Add New PI", "{{ getRelativeURL('panel/modal/new_pi.php') }}");
+        openModal("Add New PI", "{{ getRelativeURL('panel/modal/new_pi') }}");
     });
 </script>
 

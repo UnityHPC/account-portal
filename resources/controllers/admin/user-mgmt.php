@@ -78,7 +78,7 @@ class AdminUserMgmtController extends UnitySlimController
         switch (getPostData("form_type")) {
             case "viewAsUser":
                 $_SESSION["viewUser"] = $_POST["uid"];
-                throw new HTTPRedirect("panel/account.php");
+                throw new HTTPRedirect("panel/account");
             default:
                 throw new HTTPBadRequest("invalid form_type");
         }

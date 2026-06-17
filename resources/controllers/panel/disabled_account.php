@@ -14,7 +14,7 @@ class DisabledAccountController extends UnitySlimController
     {
         global $USER;
         if (!$USER->getFlag(UserFlag::DISABLED)) {
-            throw new HTTPRedirect("panel/account.php");
+            throw new HTTPRedirect("panel/account");
         }
         $view = Twig::fromRequest($request);
         return $view->render(
@@ -36,7 +36,7 @@ class DisabledAccountController extends UnitySlimController
             case "reEnable":
                 $USER->reEnable();
                 UnityHTTPD::messageSuccess("Account Re-Enabled", "");
-                throw new HTTPRedirect("panel/account.php");
+                throw new HTTPRedirect("panel/account");
             default:
                 throw new HTTPBadRequest("invalid form_type");
         }

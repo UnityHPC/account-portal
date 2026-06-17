@@ -2,7 +2,7 @@
 <form
     id="newPIform"
     method="POST"
-    action="{{ getRelativeURL('panel/groups.php') }}"
+    action="{{ getRelativeURL('panel/groups') }}"
 >
     {{ formatCSRFTokenHiddenFormInput(csrf_token)|raw }}
     <input type="hidden" name="form_type" value="addPIform">
@@ -34,7 +34,7 @@
         function updateSearch() {
             const query = input.val();
             $.ajax({
-                url: "{{ getRelativeURL('panel/ajax/pi_search.php') }}",
+                url: "{{ getRelativeURL('panel/ajax/pi_search') }}",
                 data: {"search": query},
                 success: function(results) {
                     if (results.length === 0) {

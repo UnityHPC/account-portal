@@ -3,7 +3,7 @@
     id="newKeyform"
     enctype="multipart/form-data"
     method="POST"
-    action="/panel/account.php"
+    action="/panel/account"
 >
     {{ formatCSRFTokenHiddenFormInput(csrf_token)|raw }}
     <input type="hidden" name="form_type" value="addKey">
@@ -72,7 +72,7 @@
 
     function generateKey(type) {
         $.ajax({
-            url: "/panel/ajax/ssh_generate.php?type=" + type,
+            url: "/panel/ajax/ssh_generate?type=" + type,
             method: "POST",
             data: {csrf_token: "{{ generateCSRFToken() }}"},
             dataType: "json",
@@ -109,7 +109,7 @@
             return;
         }
         $.ajax({
-            url: "/panel/ajax/ssh_validate.php",
+            url: "/panel/ajax/ssh_validate",
             dataType: "json",
             type: "POST",
             data: {key: key},

@@ -14,7 +14,7 @@ class NewAccountController extends UnitySlimController
     {
         global $USER, $SSO;
         if ($USER->exists()) {
-            throw new HTTPRedirect("panel/account.php");
+            throw new HTTPRedirect("panel/account");
         }
         $view = Twig::fromRequest($request);
         return $view->render(
@@ -36,7 +36,7 @@ class NewAccountController extends UnitySlimController
         switch (getPostData("form_type")) {
             case "register":
                 $USER->init($SSO["firstname"], $SSO["lastname"], $SSO["mail"], $SSO["org"]);
-                throw new HTTPRedirect("panel/account.php");
+                throw new HTTPRedirect("panel/account");
             default:
                 throw new HTTPBadRequest("invalid form_type");
         }

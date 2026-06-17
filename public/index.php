@@ -87,33 +87,52 @@ $app->any("/", function (Request $_request, Response $response): Response {
     ]);
 });
 
-$app->get("/panel/account.php", AccountController::class . ":get");
-$app->post("/panel/account.php", AccountController::class . ":post");
-$app->get("/panel/new_account.php", NewAccountController::class . ":get");
-$app->post("/panel/new_account.php", NewAccountController::class . ":post");
-$app->get("/panel/disabled_account.php", DisabledAccountController::class . ":get");
-$app->post("/panel/disabled_account.php", DisabledAccountController::class . ":post");
-$app->get("/panel/groups.php", GroupsController::class . ":get");
-$app->post("/panel/groups.php", GroupsController::class . ":post");
-$app->get("/panel/pi.php", PiController::class . ":get");
-$app->post("/panel/pi.php", PiController::class . ":post");
-$app->get("/lan/api/expiry.php", LanApiController::class . ":expiry");
-$app->post("/lan/api/bump-last-login.php", LanApiController::class . ":bumpLastLogin");
-$app->get("/admin/pi-mgmt.php", AdminPiMgmtController::class . ":get");
-$app->post("/admin/pi-mgmt.php", AdminPiMgmtController::class . ":post");
-$app->get("/admin/user-mgmt.php", AdminUserMgmtController::class . ":get");
-$app->post("/admin/user-mgmt.php", AdminUserMgmtController::class . ":post");
-$app->get("/panel/modal/new_key.php", PanelModalController::class . ":new_key");
-$app->get("/panel/modal/new_pi.php", PanelModalController::class . ":new_pi");
-$app->post("/panel/ajax/ssh_validate.php", PanelAjaxController::class . ":ssh_validate");
-$app->post("/panel/ajax/ssh_generate.php", PanelAjaxController::class . ":ssh_generate");
-$app->get("/panel/ajax/pi_search.php", PanelAjaxController::class . ":pi_search");
-$app->post("/panel/ajax/delete_message.php", PanelAjaxController::class . ":delete_message");
-$app->get("/admin/ajax/get_group_members.php", AdminAjaxController::class . ":get_group_members");
+$routes_get = [
+    "/panel/groups" => GroupsController::class . ":get",
+    "/panel/pi" => PiController::class . ":get",
+    "/lan/api/expiry" => LanApiController::class . ":expiry",
+    "/admin/pi-mgmt" => AdminPiMgmtController::class . ":get",
+    "/admin/user-mgmt" => AdminUserMgmtController::class . ":get",
+    "/panel/modal/new_key" => PanelModalController::class . ":new_key",
+    "/panel/modal/new_pi" => PanelModalController::class . ":new_pi",
+    "/panel/account" => AccountController::class . ":get",
+    "/panel/new_account" => NewAccountController::class . ":get",
+    "/panel/disabled_account" => DisabledAccountController::class . ":get",
+    "/panel/ajax/pi_search" => PanelAjaxController::class . ":pi_search",
+    "/admin/ajax/get_group_members" => AdminAjaxController::class . ":get_group_members",
+];
+
+$routes_post = [
+    "/panel/account" => AccountController::class . ":post",
+    "/panel/new_account" => NewAccountController::class . ":post",
+    "/panel/disabled_account" => DisabledAccountController::class . ":post",
+    "/panel/groups" => GroupsController::class . ":post",
+    "/panel/pi" => PiController::class . ":post",
+    "/lan/api/bump-last-login" => LanApiController::class . ":bumpLastLogin",
+    "/admin/pi-mgmt" => AdminPiMgmtController::class . ":post",
+    "/admin/user-mgmt" => AdminUserMgmtController::class . ":post",
+    "/panel/ajax/ssh_validate" => PanelAjaxController::class . ":ssh_validate",
+    "/panel/ajax/ssh_generate" => PanelAjaxController::class . ":ssh_generate",
+    "/panel/ajax/delete_message" => PanelAjaxController::class . ":delete_message",
+];
+
+foreach ($routes_get as $src => $dest) {
+    $app->get($src, $dest);
+}
+foreach ($routes_post as $src => $dest) {
+    $app->post($src, $dest);
+}
 
 $redirects = [
     "/panel/index.php" => "/",
 ];
+foreach (array_keys($routes_get) as $route) {
+    $redirects["$route.php"] = $route;
+}
+foreach (array_keys($routes_post) as $route) {
+    $redirects["$route.php"] = $route;
+}
+
 foreach ($redirects as $src => $dest) {
     $app->any(
         $src,

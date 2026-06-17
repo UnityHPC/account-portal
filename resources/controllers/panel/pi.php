@@ -153,7 +153,7 @@ class PiController extends UnitySlimController
                 $group->removeUser($form_user, UnityGroupUserRemovedReason::RemovedByOwner);
                 UnityHTTPD::messageSuccess("User Removed", "");
                 if ($USER->uid === $form_user->uid) {
-                    throw new HTTPRedirect("/panel/groups.php");
+                    throw new HTTPRedirect("/panel/groups");
                 } else {
                     throw new HTTPRedirect();
                 }
@@ -177,7 +177,7 @@ class PiController extends UnitySlimController
                 }
                 $group->disable();
                 UnityHTTPD::messageSuccess("Group Disabled", "");
-                throw new HTTPRedirect("panel/account.php");
+                throw new HTTPRedirect("panel/account");
             default:
                 throw new HTTPBadRequest("invalid form_type");
         }
