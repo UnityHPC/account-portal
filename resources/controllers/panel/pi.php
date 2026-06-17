@@ -2,6 +2,7 @@
 
 namespace UnityWebPortal\lib;
 
+use UnityWebPortal\lib\exceptions\HTTPForbidden;
 use UnityWebPortal\lib\exceptions\HTTPBadRequest;
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use Psr\Container\ContainerInterface as Container;
@@ -38,7 +39,7 @@ class PiController extends UnitySlimController
                 !in_array($USER->uid, $group->getManagerUIDs()) &&
                 $USER->uid != $group->getOwner()->uid
             ) {
-                UnityHTTPD::forbidden(
+                throw new HTTPForbidden(
                     "not a manager of group '$gid'",
                     "You cannot manage this group.",
                 );
@@ -53,7 +54,7 @@ class PiController extends UnitySlimController
 
         if ($group->getIsDisabled()) {
             $group_id = $gid ?? $group->gid;
-            UnityHTTPD::forbidden("group '$group_id' is disabled", "This group is disabled.");
+            throw new HTTPForbidden("group '$group_id' is disabled", "This group is disabled.");
         }
 
         $requests = $group->getRequests();
@@ -116,7 +117,7 @@ class PiController extends UnitySlimController
                 !in_array($USER->uid, $group->getManagerUIDs()) &&
                 $USER->uid != $group->getOwner()->uid
             ) {
-                UnityHTTPD::forbidden(
+                throw new HTTPForbidden(
                     "not a manager of group '$gid'",
                     "You cannot manage this group.",
                 );
@@ -131,7 +132,7 @@ class PiController extends UnitySlimController
 
         if ($group->getIsDisabled()) {
             $group_id = $gid ?? $group->gid;
-            UnityHTTPD::forbidden("group '$group_id' is disabled", "This group is disabled.");
+            throw new HTTPForbidden("group '$group_id' is disabled", "This group is disabled.");
         }
 
         $getUserFromPost = function () {
@@ -170,7 +171,7 @@ class PiController extends UnitySlimController
                 break; /** @phpstan-ignore deadCode.unreachable */
             case "disable":
                 if (!$user_is_owner) {
-                    UnityHTTPD::forbidden(
+                    throw new HTTPForbidden(
                         "Manager cannot disable",
                         "Only the group owner can disable",
                     );

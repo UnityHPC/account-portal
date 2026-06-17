@@ -14,7 +14,8 @@
 - No code should fail quietly, instead exceptions should be thrown. PHP builtin functions that fail quietly (ex: `json_encode`) should be replaced with a wrapper in `resources/utils.php`. See `test/assert-utils-used.bash` for a list of wrappers.
 - `UnityHTTPD`'s user-facing error functionality (ex: `badRequest`) should only be called from `webroot/**/*.php`.
   `resources/**/*.php` should throw exceptions instead.
-- all pages under `webroot/admin/` must check for `$USER->getFlag(UserFlag::ADMIN)` and call `UnityHTTPD::forbidden()` if not admin.
+<!-- FIXME middleware -->
+- all pages under `webroot/admin/` must check for `$USER->getFlag(UserFlag::ADMIN)` and call `throw new HTTPForbidden()` if not admin.
 - All these conventions should be enforced with `pre-commit` / github CI if possible
 
 ## Development Environment

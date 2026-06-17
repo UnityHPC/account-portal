@@ -2,6 +2,7 @@
 
 namespace UnityWebPortal\lib;
 
+use UnityWebPortal\lib\exceptions\HTTPForbidden;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -23,7 +24,7 @@ class AdminAjaxController extends UnitySlimController
         $SQL = $this->container->get("SQL");
         $MAILER = $this->container->get("MAILER");
         if (!$USER->getFlag(UserFlag::ADMIN)) {
-            UnityHTTPD::forbidden("not an admin", "You are not an admin.");
+            throw new HTTPForbidden("not an admin", "You are not an admin.");
         }
 
         $view = Twig::fromRequest($request);

@@ -12,7 +12,7 @@ for file in "$@"; do
         0)
             : ;; # code is good, do nothing
         1)
-            echo "UnityHTTPD::forbidden() was not called in file '$file'!"; rc=1 ;;
+            echo "HTTPForbidden() was not called in file '$file'!"; rc=1 ;;
         *)
             echo "grep failed!";  rc=1 ;;
     esac
