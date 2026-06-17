@@ -61,7 +61,7 @@
    </header>
 
   <nav class="mainNav" id="navigation" aria-label="navigation" popover>
-    {{ getRelativeHyperlink('Home', 'index.php')|raw }}
+    {{ getRelativeHyperlink('Home', '/')|raw }}
 
     {% for label in CONFIG['menuitems']['labels'] %}
       <a target="_blank" href="{{ CONFIG['menuitems']['links'][loop.index0] }}">{{ label }}</a>
