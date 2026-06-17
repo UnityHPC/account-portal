@@ -349,9 +349,15 @@ class SlimErrorHandler extends ErrorHandler
                 ),
             );
             if ($this->displayErrorDetails) {
-                $body->write(nl2br(_json_encode(UnityHTTPD::throwableToArray($e))));
                 if (property_exists($e, "xdebug_message")) {
                     $body->write("<table>$e->xdebug_message</table>");
+                } else {
+                    $body->write(
+                        sprintf(
+                            "<pre>%s</pre>",
+                            _json_encode(UnityHTTPD::throwableToArray($e), JSON_PRETTY_PRINT),
+                        ),
+                    );
                 }
             }
             return $response->withStatus($e->getCode());
