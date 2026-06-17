@@ -349,6 +349,14 @@ class SlimErrorHandler extends ErrorHandler
                 ),
             );
             if ($this->displayErrorDetails) {
+                if ($e->data !== null) {
+                    $body->write(
+                        sprintf(
+                            "data relevant to error:<br><pre>%s</pre>",
+                            _json_encode($e->data, JSON_PRETTY_PRINT),
+                        ),
+                    );
+                }
                 if (property_exists($e, "xdebug_message")) {
                     $body->write("<table>$e->xdebug_message</table>");
                 } else {
