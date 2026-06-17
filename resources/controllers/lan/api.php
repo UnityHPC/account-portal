@@ -2,23 +2,21 @@
 
 namespace UnityWebPortal\lib;
 
-use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Container\ContainerInterface as Container;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 class LanApiController extends UnitySlimController
 {
-    private $container;
+    private Container $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(Container $container)
     {
         $this->container = $container;
     }
 
-    public function expiry(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-    ): ResponseInterface {
+    public function expiry(Request $request, Response $response): Response
+    {
         $SQL = $this->container->get("SQL");
         $uid = UnityHTTPD::getQueryParameter("uid");
         $last_login = $SQL->getUserLastLogin($uid);
@@ -38,10 +36,8 @@ class LanApiController extends UnitySlimController
         return $response->withHeader("Content-Type", "application/json; charset=utf-8");
     }
 
-    public function bumpLastLogin(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-    ): ResponseInterface {
+    public function bumpLastLogin(Request $request, Response $response): Response
+    {
         if ($_SERVER["REQUEST_METHOD"] !== "POST") {
             UnityHTTPD::badRequest("invalid request method {$_SERVER["REQUEST_METHOD"]}");
         }

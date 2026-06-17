@@ -2,24 +2,22 @@
 
 namespace UnityWebPortal\lib;
 
-use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Container\ContainerInterface as Container;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 class DisabledAccountController extends UnitySlimController
 {
-    private $container;
+    private Container $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(Container $container)
     {
         $this->container = $container;
     }
 
-    public function get(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-    ): ResponseInterface {
+    public function get(Request $request, Response $response): Response
+    {
         $USER = $this->container->get("USER");
         if (!$USER->getFlag(UserFlag::DISABLED)) {
             UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
@@ -38,10 +36,8 @@ class DisabledAccountController extends UnitySlimController
         );
     }
 
-    public function post(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-    ): ResponseInterface {
+    public function post(Request $request, Response $response): Response
+    {
         $USER = $this->container->get("USER");
 
         if (UnityHTTPD::getPostData("form_type") === "reEnable") {

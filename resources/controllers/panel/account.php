@@ -2,25 +2,23 @@
 
 namespace UnityWebPortal\lib;
 
-use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Container\ContainerInterface as Container;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use UnityWebPortal\lib\exceptions\EncodingUnknownException;
 use UnityWebPortal\lib\exceptions\EncodingConversionException;
 use Slim\Views\Twig;
 
 class AccountController extends UnitySlimController
 {
-    private $container;
-    public function __construct(ContainerInterface $container)
+    private Container $container;
+    public function __construct(Container $container)
     {
         $this->container = $container;
     }
 
-    public function get(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-    ): ResponseInterface {
+    public function get(Request $request, Response $response): Response
+    {
         $view = Twig::fromRequest($request);
         $USER = $this->container->get("USER");
         $ssh_public_keys = [];
@@ -43,21 +41,23 @@ class AccountController extends UnitySlimController
                 $ssh_public_keys[$key] = [null, $comment, null, null];
             }
         }
-        return $view->render($response, "panel/account.html.twig", $this->setupTwigContext([
-            "uid" => $USER->uid,
-            "org" => $USER->getOrg(),
-            "mail" => $USER->getMail(),
-            "ssh_public_keys" => $ssh_public_keys,
-            "login_shell" => $USER->getLoginShell(),
-            "pi_group_exists" => $USER->getPIGroup()->exists(),
-            "pi_group_is_disabled" => $USER->getPIGroup()->getIsDisabled(),
-        ]));
+        return $view->render(
+            $response,
+            "panel/account.html.twig",
+            $this->setupTwigContext([
+                "uid" => $USER->uid,
+                "org" => $USER->getOrg(),
+                "mail" => $USER->getMail(),
+                "ssh_public_keys" => $ssh_public_keys,
+                "login_shell" => $USER->getLoginShell(),
+                "pi_group_exists" => $USER->getPIGroup()->exists(),
+                "pi_group_is_disabled" => $USER->getPIGroup()->getIsDisabled(),
+            ]),
+        );
     }
 
-    public function post(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-    ): ResponseInterface {
+    public function post(Request $request, Response $response): Response
+    {
         $USER = $this->container->get("USER");
         $GITHUB = $this->container->get("GITHUB");
         $LDAP = $this->container->get("LDAP");

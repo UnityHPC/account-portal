@@ -2,43 +2,43 @@
 
 namespace UnityWebPortal\lib;
 
-use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Container\ContainerInterface as Container;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 class NewAccountController extends UnitySlimController
 {
-    private $container;
+    private Container $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(Container $container)
     {
         $this->container = $container;
     }
 
-    public function get(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-    ): ResponseInterface {
+    public function get(Request $request, Response $response): Response
+    {
         $USER = $this->container->get("USER");
         $SSO = $this->container->get("SSO");
         if ($USER->exists()) {
             UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
         }
         $view = Twig::fromRequest($request);
-        return $view->render($response, "panel/new_account.html.twig", $this->setupTwigContext([
-            "is_admin" => $_SESSION["is_admin"] ?? false,
-            "firstname" => $SSO["firstname"],
-            "lastname" => $SSO["lastname"],
-            "mail" => $SSO["mail"],
-            "username" => $SSO["user"],
-        ]));
+        return $view->render(
+            $response,
+            "panel/new_account.html.twig",
+            $this->setupTwigContext([
+                "is_admin" => $_SESSION["is_admin"] ?? false,
+                "firstname" => $SSO["firstname"],
+                "lastname" => $SSO["lastname"],
+                "mail" => $SSO["mail"],
+                "username" => $SSO["user"],
+            ]),
+        );
     }
 
-    public function post(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-    ): ResponseInterface {
+    public function post(Request $request, Response $response): Response
+    {
         $USER = $this->container->get("USER");
         $SSO = $this->container->get("SSO");
 

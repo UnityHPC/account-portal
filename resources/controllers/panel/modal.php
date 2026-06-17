@@ -2,27 +2,27 @@
 
 namespace UnityWebPortal\lib;
 
-use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Container\ContainerInterface as Container;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 class PanelModalController extends UnitySlimController
 {
-    private $container;
+    private Container $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(Container $container)
     {
         $this->container = $container;
     }
 
-    public function new_key(ServerRequestInterface $request, ResponseInterface $response)
+    public function new_key(Request $request, Response $response)
     {
         $view = Twig::fromRequest($request);
         return $view->render($response, "panel/modal/new_key.html.twig");
     }
 
-    public function new_pi(ServerRequestInterface $request, ResponseInterface $response)
+    public function new_pi(Request $request, Response $response)
     {
         $owner_uids = $GLOBALS["ldapconn"]->getPIGroupOwnerUIDs();
         $owner_attributes = $GLOBALS["ldapconn"]->getUsersAttributes(

@@ -2,24 +2,22 @@
 
 namespace UnityWebPortal\lib;
 
-use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Container\ContainerInterface as Container;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 class PiController extends UnitySlimController
 {
-    private $container;
+    private Container $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(Container $container)
     {
         $this->container = $container;
     }
 
-    public function get(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-    ): ResponseInterface {
+    public function get(Request $request, Response $response): Response
+    {
         $view = Twig::fromRequest($request);
         $USER = $this->container->get("USER");
 
@@ -80,21 +78,23 @@ class PiController extends UnitySlimController
             ];
         }
 
-        return $view->render($response, "panel/pi.html.twig", $this->setupTwigContext([
-            "group_gid" => $group->gid,
-            "user_is_owner" => $user_is_owner,
-            "pending_requests" => $pending_requests,
-            "users" => $users,
-            "users_count" => count($assocs),
-            "group_disabled" => $group->getIsDisabled(),
-            "account_page_url" => getRelativeURL("panel/groups.php"),
-        ]));
+        return $view->render(
+            $response,
+            "panel/pi.html.twig",
+            $this->setupTwigContext([
+                "group_gid" => $group->gid,
+                "user_is_owner" => $user_is_owner,
+                "pending_requests" => $pending_requests,
+                "users" => $users,
+                "users_count" => count($assocs),
+                "group_disabled" => $group->getIsDisabled(),
+                "account_page_url" => getRelativeURL("panel/groups.php"),
+            ]),
+        );
     }
 
-    public function post(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-    ): ResponseInterface {
+    public function post(Request $request, Response $response): Response
+    {
         UnityHTTPD::validatePostCSRFToken();
 
         $USER = $this->container->get("USER");

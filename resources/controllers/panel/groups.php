@@ -2,24 +2,22 @@
 
 namespace UnityWebPortal\lib;
 
-use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Container\ContainerInterface as Container;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 class GroupsController extends UnitySlimController
 {
-    private $container;
+    private Container $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(Container $container)
     {
         $this->container = $container;
     }
 
-    public function get(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-    ): ResponseInterface {
+    public function get(Request $request, Response $response): Response
+    {
         $view = Twig::fromRequest($request);
         $USER = $this->container->get("USER");
         $LDAP = $this->container->get("LDAP");
@@ -90,19 +88,21 @@ class GroupsController extends UnitySlimController
         }
         $_SESSION["pi_group_gid_to_owner_gecos_and_mail"] = $pi_group_gid_to_owner_gecos_and_mail;
 
-        return $view->render($response, "panel/groups.html.twig", $this->setupTwigContext([
-            "pi_group_gids" => $pi_group_gids,
-            "pi_groups" => $pi_groups,
-            "pi_group_members" => $pi_group_members,
-            "pi_group_managers" => $pi_group_managers,
-            "pending_requests" => $pending_requests,
-        ]));
+        return $view->render(
+            $response,
+            "panel/groups.html.twig",
+            $this->setupTwigContext([
+                "pi_group_gids" => $pi_group_gids,
+                "pi_groups" => $pi_groups,
+                "pi_group_members" => $pi_group_members,
+                "pi_group_managers" => $pi_group_managers,
+                "pending_requests" => $pending_requests,
+            ]),
+        );
     }
 
-    public function post(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-    ): ResponseInterface {
+    public function post(Request $request, Response $response): Response
+    {
         UnityHTTPD::validatePostCSRFToken();
 
         $USER = $this->container->get("USER");

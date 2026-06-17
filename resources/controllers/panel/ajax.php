@@ -2,21 +2,21 @@
 
 namespace UnityWebPortal\lib;
 
-use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Container\ContainerInterface as Container;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use phpseclib3\Crypt\EC;
 
 class PanelAjaxController extends UnitySlimController
 {
-    private $container;
+    private Container $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(Container $container)
     {
         $this->container = $container;
     }
 
-    public function ssh_generate(ServerRequestInterface $request, ResponseInterface $response)
+    public function ssh_generate(Request $request, Response $response)
     {
         $private = EC::createKey("Ed25519");
         $public = $private->getPublicKey();
@@ -32,7 +32,7 @@ class PanelAjaxController extends UnitySlimController
         return $response->withHeader("Content-Type", "application/json; charset=utf-8");
     }
 
-    public function ssh_validate(ServerRequestInterface $request, ResponseInterface $response)
+    public function ssh_validate(Request $request, Response $response)
     {
         $post_data = (array) $request->getParsedBody();
         [$is_valid, $explanation] = testValidSSHKey($post_data["key"]);
@@ -42,7 +42,7 @@ class PanelAjaxController extends UnitySlimController
         return $response->withHeader("Content-Type", "application/json; charset=utf-8");
     }
 
-    public function pi_search(ServerRequestInterface $request, ResponseInterface $response)
+    public function pi_search(Request $request, Response $response)
     {
         $search_query = strtolower((string) ($request->getQueryParams()["search"] ?? ""));
         if ($search_query === "") {
@@ -76,7 +76,7 @@ class PanelAjaxController extends UnitySlimController
         return $response->withHeader("Content-Type", "application/json; charset=utf-8");
     }
 
-    public function delete_message(ServerRequestInterface $request, ResponseInterface $response)
+    public function delete_message(Request $request, Response $response)
     {
         $post_data = (array) $request->getParsedBody();
         $level_str = _base64_decode($post_data["level"]);

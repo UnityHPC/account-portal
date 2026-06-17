@@ -2,24 +2,22 @@
 
 namespace UnityWebPortal\lib;
 
-use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Container\ContainerInterface as Container;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 class AdminUserMgmtController extends UnitySlimController
 {
-    private $container;
+    private Container $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(Container $container)
     {
         $this->container = $container;
     }
 
-    public function get(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-    ): ResponseInterface {
+    public function get(Request $request, Response $response): Response
+    {
         $view = Twig::fromRequest($request);
         $USER = $this->container->get("USER");
 
@@ -69,16 +67,18 @@ class AdminUserMgmtController extends UnitySlimController
             ];
         }
 
-        return $view->render($response, "admin/user-mgmt.html.twig", $this->setupTwigContext([
-            "users" => $users,
-            "flags_to_display" => array_map(fn($f) => $f->value, $flags_to_display),
-        ]));
+        return $view->render(
+            $response,
+            "admin/user-mgmt.html.twig",
+            $this->setupTwigContext([
+                "users" => $users,
+                "flags_to_display" => array_map(fn($f) => $f->value, $flags_to_display),
+            ]),
+        );
     }
 
-    public function post(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-    ): ResponseInterface {
+    public function post(Request $request, Response $response): Response
+    {
         UnityHTTPD::validatePostCSRFToken();
 
         $USER = $this->container->get("USER");
