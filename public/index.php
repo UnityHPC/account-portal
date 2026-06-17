@@ -111,4 +111,14 @@ $app->get("/panel/ajax/pi_search.php", PanelAjaxController::class . ":pi_search"
 $app->post("/panel/ajax/delete_message.php", PanelAjaxController::class . ":delete_message");
 $app->get("/admin/ajax/get_group_members.php", AdminAjaxController::class . ":get_group_members");
 
+$redirects = [
+    "/panel/index.php" => "/",
+];
+foreach ($redirects as $src => $dest) {
+    $app->any(
+        $src,
+        fn($request, $response) => $response->withHeader("Location", $dest)->withStatus(302),
+    );
+}
+
 $app->run();
