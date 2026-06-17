@@ -2,6 +2,7 @@
 
 namespace UnityWebPortal\lib;
 
+use UnityWebPortal\lib\exceptions\HTTPBadRequest;
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -31,7 +32,7 @@ class PiController extends UnitySlimController
             );
             $user_is_owner = false;
             if (!$group->exists()) {
-                UnityHTTPD::badRequest("no such group: '$gid'", "This group does not exist.");
+                throw new HTTPBadRequest("no such group: '$gid'", "This group does not exist.");
             }
             if (
                 !in_array($USER->uid, $group->getManagerUIDs()) &&
@@ -46,7 +47,7 @@ class PiController extends UnitySlimController
             $group = $USER->getPIGroup();
             $user_is_owner = true;
             if (!$group->exists()) {
-                UnityHTTPD::badRequest("not a PI", "You are not a PI.");
+                throw new HTTPBadRequest("not a PI", "You are not a PI.");
             }
         }
 
@@ -109,7 +110,7 @@ class PiController extends UnitySlimController
             );
             $user_is_owner = false;
             if (!$group->exists()) {
-                UnityHTTPD::badRequest("no such group: '$gid'", "This group does not exist.");
+                throw new HTTPBadRequest("no such group: '$gid'", "This group does not exist.");
             }
             if (
                 !in_array($USER->uid, $group->getManagerUIDs()) &&
@@ -124,7 +125,7 @@ class PiController extends UnitySlimController
             $group = $USER->getPIGroup();
             $user_is_owner = true;
             if (!$group->exists()) {
-                UnityHTTPD::badRequest("not a PI", "You are not a PI.");
+                throw new HTTPBadRequest("not a PI", "You are not a PI.");
             }
         }
 
@@ -152,9 +153,8 @@ class PiController extends UnitySlimController
                     UnityHTTPD::messageSuccess("User Denied", "");
                     throw new HTTPRedirect();
                 } else {
-                    UnityHTTPD::badRequest(
+                    throw new HTTPBadRequest(
                         sprintf("unrecognized action: '%s'", $_POST["action"]),
-                        "",
                     );
                 }
                 break; /** @phpstan-ignore deadCode.unreachable */

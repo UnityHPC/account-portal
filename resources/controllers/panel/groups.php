@@ -2,6 +2,7 @@
 
 namespace UnityWebPortal\lib;
 
+use UnityWebPortal\lib\exceptions\HTTPBadRequest;
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -129,7 +130,7 @@ class GroupsController extends UnitySlimController
             case "addPIform":
                 $pi_account = $getPIGroupFromPost();
                 if ($_POST["tos"] != "agree") {
-                    UnityHTTPD::badRequest("user did not agree to terms of service");
+                    throw new HTTPBadRequest("user did not agree to terms of service");
                 }
                 if ($pi_account->requestExists($USER)) {
                     UnityHTTPD::messageError(

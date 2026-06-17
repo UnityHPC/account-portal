@@ -2,6 +2,7 @@
 
 namespace UnityWebPortal\lib;
 
+use UnityWebPortal\lib\exceptions\HTTPBadRequest;
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -94,7 +95,7 @@ class AccountController extends UnitySlimController
                         }
                         break;
                     default:
-                        UnityHTTPD::badRequest("invalid add_type");
+                        throw new HTTPBadRequest("invalid add_type");
                 }
                 $keys = array_map("trim", $keys);
                 foreach ($keys as $key) {
@@ -148,7 +149,7 @@ class AccountController extends UnitySlimController
             case "loginshell":
                 $shell = UnityHTTPD::getPostData("shellSelect");
                 if (!in_array($shell, CONFIG["loginshell"]["shell"])) {
-                    UnityHTTPD::badRequest("invalid login shell", "invalid login shell");
+                    throw new HTTPBadRequest("invalid login shell", "invalid login shell");
                 }
                 $USER->setLoginShell($shell);
                 UnityHTTPD::messageSuccess("Login Shell Changed", "");
@@ -167,7 +168,7 @@ class AccountController extends UnitySlimController
                     throw new HTTPRedirect();
                 }
                 if ($_POST["tos"] != "agree") {
-                    UnityHTTPD::badRequest("user did not agree to terms of service");
+                    throw new HTTPBadRequest("user did not agree to terms of service");
                 }
                 $USER->getPIGroup()->requestGroup();
                 UnityHTTPD::messageSuccess("PI Group Requested", "");
@@ -191,7 +192,7 @@ class AccountController extends UnitySlimController
                     throw new HTTPRedirect();
                 }
                 if ($USER->getFlag(UserFlag::DISABLED)) {
-                    UnityHTTPD::badRequest("user is already disabled", "");
+                    throw new HTTPBadRequest("user is already disabled");
                 }
                 $USER->disable(UnityUserDisabledReason::DisabledSelf);
                 UnityHTTPD::messageSuccess("Account Disabled", "");

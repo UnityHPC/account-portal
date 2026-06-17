@@ -2,6 +2,7 @@
 
 namespace UnityWebPortal\lib;
 
+use UnityWebPortal\lib\exceptions\HTTPBadRequest;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -21,7 +22,7 @@ class LanApiController extends UnitySlimController
         $uid = UnityHTTPD::getQueryParameter("uid");
         $last_login = $SQL->getUserLastLogin($uid);
         if ($last_login === null) {
-            UnityHTTPD::badRequest("no last login timestamp known for user '$uid'");
+            throw new HTTPBadRequest("no last login timestamp known for user '$uid'");
         }
 
         $idlelock_timestamp = $last_login + CONFIG["expiry"]["idlelock_day"] * 60 * 60 * 24;
@@ -39,7 +40,7 @@ class LanApiController extends UnitySlimController
     public function bumpLastLogin(Request $request, Response $response): Response
     {
         if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-            UnityHTTPD::badRequest("invalid request method {$_SERVER["REQUEST_METHOD"]}");
+            throw new HTTPBadRequest("invalid request method {$_SERVER["REQUEST_METHOD"]}");
         }
         UnityHTTPD::validateAPIKey();
 
