@@ -1,10 +1,11 @@
+{% set csrf_token = generateCSRFToken() %}
 <form
     id="newKeyform"
     enctype="multipart/form-data"
     method="POST"
     action="/panel/account.php"
 >
-    {{ getCSRFTokenHiddenFormInput()|raw }}
+    {{ formatCSRFTokenHiddenFormInput(csrf_token)|raw }}
     <input type="hidden" name="form_type" value="addKey">
 
     <div class="inline">
@@ -73,6 +74,7 @@
         $.ajax({
             url: "/panel/ajax/ssh_generate.php?type=" + type,
             method: "POST",
+            data: {csrf_token: "{{ generateCSRFToken() }}"}
             dataType: "json",
             success: function(result) {
                 $("input[type=hidden][name=gen_key]").val(result.public);

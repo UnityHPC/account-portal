@@ -16,7 +16,8 @@ $(document).ready(function () {
             data: {
                 'level': button.data('level'),
                 'title': button.data('title'),
-                'body': button.data('body')
+                'body': button.data('body'),
+                'csrf_token': button.data('csrf-token'),
             },
             error: function (result) {
                 $("#messages").append(result.responseText);

@@ -1,5 +1,5 @@
 {{ include('header.html.twig') }}
-
+{% set csrf_token = generateCSRFToken() %}
 <h1>PI Management</h1>
 <hr>
 
@@ -23,7 +23,7 @@
             <td>{{ request.requested_on }}</td>
             <td>
                 <form action="" method="POST">
-                    {{ getCSRFTokenHiddenFormInput()|raw }}
+                    {{ formatCSRFTokenHiddenFormInput(csrf_token)|raw }}
                     <input type="hidden" name="form_type" value="req">
                     <input type="hidden" name="uid" value="{{ request.uid }}">
                     <input type="submit" name="action" value="Approve" onclick="return confirm('Are you sure you want to approve {{ request.uid }}?');">
@@ -55,7 +55,7 @@
             <td>{{ group.mail }}</td>
             <td>
                 <form action="" method="POST" onsubmit="return confirm('🚨 Are you sure you want to REMOVE ALL MEMBERS and DISABLE group {{ group.gid }}? 🚨');">
-                    {{ getCSRFTokenHiddenFormInput()|raw }}
+                    {{ formatCSRFTokenHiddenFormInput(csrf_token)|raw }}
                     <input type="hidden" name="form_type" value="disable">
                     <input type="hidden" name="pi" value="{{ group.gid }}">
                     <input class="danger" type="submit" value="Disable">

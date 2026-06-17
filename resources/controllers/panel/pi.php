@@ -112,8 +112,6 @@ class PiController extends UnitySlimController
 
     public function post(Request $request, Response $response): Response
     {
-        UnityHTTPD::validatePostCSRFToken();
-
         $USER = $this->container->get("USER");
 
         if (($gid = $request->getQueryParams()["gid"] ?? null) !== null) {

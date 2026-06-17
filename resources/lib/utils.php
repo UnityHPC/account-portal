@@ -489,3 +489,8 @@ function alert(string $message): string
         htmlspecialchars($message),
     );
 }
+
+function formatCSRFTokenHiddenFormInput(string $token): string
+{
+    return sprintf("<input type='hidden' name='csrf_token' value='%s'>", htmlspecialchars($token));
+}

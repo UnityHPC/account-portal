@@ -1,9 +1,10 @@
+{% set csrf_token = generateCSRFToken() %}
 <form
     id="newPIform"
     method="POST"
     action="{{ getRelativeURL('panel/groups.php') }}"
 >
-    {{ getCSRFTokenHiddenFormInput()|raw }}
+    {{ formatCSRFTokenHiddenFormInput(csrf_token)|raw }}
     <input type="hidden" name="form_type" value="addPIform">
     <div style="position: relative;">
         <input

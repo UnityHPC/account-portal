@@ -80,8 +80,6 @@ class AdminPiMgmtController extends UnitySlimController
 
     public function post(Request $request, Response $response): Response
     {
-        UnityHTTPD::validatePostCSRFToken();
-
         $USER = $this->container->get("USER");
         if (!$USER->getFlag(UserFlag::ADMIN)) {
             throw new HTTPForbidden("not an admin", user_msg_body: "You are not an admin.");

@@ -1,5 +1,5 @@
 {{ include('header.html.twig') }}
-
+{% set csrf_token = generateCSRFToken() %}
 <h1>Disabled Account</h1>
 <hr>
 <p style="text-wrap: balance;">
@@ -18,7 +18,7 @@
 </div>
 <br>
 <form action="" method="POST">
-    {{ getCSRFTokenHiddenFormInput()|raw }}
+    {{ formatCSRFTokenHiddenFormInput(csrf_token)|raw }}
     <input type="hidden" name="form_type" value="reEnable">
     <input type="submit" value="Re-Enable Account">
 </form>

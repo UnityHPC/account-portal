@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
+{% set csrf_token = generateCSRFToken() %}
 <head>
   {% set scripts = [
     'jquery.min',
@@ -113,6 +113,7 @@
       {% set title = message[0] %}
       {% set body = message[1] %}
       {% set level = message[2] %}
+      {% set message_csrf_token = generateCSRFToken() %}
       {% set msg_role = (level in [level_enum.WARNING, level_enum.ERROR]) ? 'alert' : 'status' %}
       <div class="message {{ level.value }}" role="{{ msg_role }}">
         <p class="message-title">{{ title }}</p>
@@ -121,6 +122,7 @@
           data-level="{{ base64_encode(level.value) }}"
           data-title="{{ base64_encode(title) }}"
           data-body="{{ base64_encode(body) }}"
+          data-csrf-token="{{ message_csrf_token }}"
           aria-label="Dismiss this message"
         >
           ×
@@ -133,7 +135,7 @@
     <div id="viewAsBar">
       <span>You are accessing the web portal as the user <strong>{{ viewUser }}</strong></span>
       <form method="POST" action="">
-        {{ getCSRFTokenHiddenFormInput()|raw }}
+        {{ formatCSRFTokenHiddenFormInput(csrf_token)|raw }}
         <input type="hidden" name="form_type" value="clearView">
         <input type="hidden" name="uid" value="{{ viewUser }}">
         <input type="submit" value="Return to My User">

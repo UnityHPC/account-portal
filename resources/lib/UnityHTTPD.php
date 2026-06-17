@@ -149,12 +149,6 @@ class UnityHTTPD
         }
     }
 
-    public static function getCSRFTokenHiddenFormInput(): string
-    {
-        $token = htmlspecialchars(CSRFToken::generate());
-        return "<input type='hidden' name='csrf_token' value='$token'>";
-    }
-
     public static function validateAPIKey(): void
     {
         $authorization = $_SERVER["HTTP_AUTHORIZATION"] ?? "";

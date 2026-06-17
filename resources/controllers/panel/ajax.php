@@ -78,12 +78,13 @@ class PanelAjaxController extends UnitySlimController
 
     public function delete_message(Request $request, Response $response)
     {
+        _error_log("deleteme", "delete message!");
         $post_data = (array) $request->getParsedBody();
         $level_str = _base64_decode($post_data["level"]);
         $level = UnityHTTPDMessageLevel::from($level_str);
         $title = _base64_decode($post_data["title"]);
         $body = _base64_decode($post_data["body"]);
         UnityHTTPD::deleteMessage($level, $title, $body);
-        return $response;
+        return $response->withStatus(200);
     }
 }

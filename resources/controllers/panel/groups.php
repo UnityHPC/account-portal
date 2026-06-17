@@ -119,7 +119,6 @@ class GroupsController extends UnitySlimController
 
     public function post(Request $request, Response $response): Response
     {
-        UnityHTTPD::validatePostCSRFToken();
         $USER = $this->container->get("USER");
         switch (getPostData("form_type")) {
             case "addPIform":

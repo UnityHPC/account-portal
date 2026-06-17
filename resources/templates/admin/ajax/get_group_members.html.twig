@@ -1,3 +1,4 @@
+{% set csrf_token = generateCSRFToken() %}
 {% for request in requests %}
 <tr style="background: var(--light_panel_background);">
     <td>{{ request.name }}</td>
@@ -5,7 +6,7 @@
     <td>{{ request.mail }}</td>
     <td>
         <form action="" method="POST" onsubmit="return confirm('Are you sure you want to approve {{ request.uid }} ?');">
-            {{ getCSRFTokenHiddenFormInput()|raw }}
+            {{ formatCSRFTokenHiddenFormInput(csrf_token)|raw }}
             <input type="hidden" name="form_type" value="reqChild">
             <input type="hidden" name="uid" value="{{ request.uid }}">
             <input type="hidden" name="pi" value="{{ group_gid }}">
@@ -23,7 +24,7 @@
     <td>{{ member.mail }}</td>
     <td>
         <form action="" method="POST" onsubmit="return confirm('Are you sure you want to remove {{ member.uid }} from this group?');">
-            {{ getCSRFTokenHiddenFormInput()|raw }}
+            {{ formatCSRFTokenHiddenFormInput(csrf_token)|raw }}
             <input type="hidden" name="form_type" value="remUserChild">
             <input type="hidden" name="uid" value="{{ member.uid }}">
             <input type="hidden" name="pi" value="{{ group_gid }}">

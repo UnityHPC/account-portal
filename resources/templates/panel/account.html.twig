@@ -1,5 +1,5 @@
 {{ include('header.html.twig') }}
-
+{% set csrf_token = generateCSRFToken() %}
 <h1>Account Settings</h1>
 <hr>
 <h2>Account Details</h2>
@@ -55,7 +55,7 @@
         method="POST"
         id="piReq"
     >
-        {{ getCSRFTokenHiddenFormInput()|raw }}
+        {{ formatCSRFTokenHiddenFormInput(csrf_token)|raw }}
         {% if requestExists %}
             <input type="submit" value="Cancel PI Account Request" onclick="return confirm('Are you sure you want to cancel this request?')" />
             <label style="margin-left: 10px">
@@ -122,7 +122,7 @@
                                 onsubmit="return confirm('Are you sure you want to delete the SSH key {{ stub_fingprint }}?');"
                                 method="POST"
                             >
-                                {{ getCSRFTokenHiddenFormInput()|raw }}
+                                {{ formatCSRFTokenHiddenFormInput(csrf_token)|raw }}
                                 <input type="hidden" name="delKey" value="{{ base64_encode(key) }}" />
                                 <input type="hidden" name="form_type" value="delKey" />
                                 <button type="submit" class="delete-key-button" aria-label="Delete Key {{ stub_fingprint }}">
@@ -147,7 +147,7 @@
 <hr>
 <h2>Login Shell</h2>
 <form action="" method="POST">
-    {{ getCSRFTokenHiddenFormInput()|raw }}
+    {{ formatCSRFTokenHiddenFormInput(csrf_token)|raw }}
     <input type="hidden" name="form_type" value="loginshell" />
     <select id="loginSelector" class="code" name="shellSelect" aria-label="Login Shell">
         {% for shell in CONFIG['loginshell']['shell'] %}
@@ -172,7 +172,7 @@
         method="POST"
         onsubmit="return confirm('🚨 Are you sure you want to DISABLE your account? 🚨')"
     >
-        {{ getCSRFTokenHiddenFormInput()|raw }}
+        {{ formatCSRFTokenHiddenFormInput(csrf_token)|raw }}
         <input type="hidden" name="form_type" value="disable">
         {% if is_pi %}
             <input type="submit" value="Disable Account" class="danger" disabled>
