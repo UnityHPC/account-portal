@@ -32,7 +32,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
     private function approveUserByPI(string $uid, string $gid)
     {
         global $USER;
-        assert($USER->getPIGroup()->gid === $gid, "signed in user must be the group owner");
+        assert($USER->getNamesakePIGroup()->gid === $gid, "signed in user must be the group owner");
         $this->http_post(__DIR__ . "/../../webroot/panel/pi.php", [
             "form_type" => "userReq",
             "action" => "Approve",
@@ -67,7 +67,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
     private function denyRequestByAdmin(string $uid)
     {
         global $USER;
-        $gid = $USER->getPIGroup()->gid;
+        $gid = $USER->getNamesakePIGroup()->gid;
         $this->switchUser("Admin");
         try {
             $this->http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
@@ -85,7 +85,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
     {
         global $USER, $SQL;
         $this->switchUser("EmptyPIGroupOwner");
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         $this->switchUser("Blank");
         try {
             $this->requestMembership($pi_group->gid);
@@ -103,7 +103,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
     {
         global $USER, $SQL;
         $this->switchUser("EmptyPIGroupOwner");
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         $this->switchUser("Blank");
         try {
             UnityHTTPD::clearMessages();
@@ -125,7 +125,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
     {
         global $USER, $SQL;
         $this->switchUser("EmptyPIGroupOwner");
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         $this->switchUser("Blank");
         $this->assertNumberRequests(0);
         try {
@@ -180,7 +180,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
         $this->switchUser("Blank");
         $uid = $USER->uid;
         $this->switchUser("EmptyPIGroupOwner");
-        $piGroup = $USER->getPIGroup();
+        $piGroup = $USER->getNamesakePIGroup();
         try {
             $this->expectException(Exception::class); // FIXME more specific exception type
             $this->$methodName($uid, $piGroup->gid);
@@ -196,7 +196,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
         global $USER, $SSO, $LDAP, $SQL, $MAILER;
         $this->switchUser("EmptyPIGroupOwner");
         $pi_uid = $USER->uid;
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         $gid = $pi_group->gid;
         $this->switchUser("Blank");
         try {
@@ -234,7 +234,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
         $requestedUser = $USER;
         $this->switchUser("EmptyPIGroupOwner");
         $pi = $USER;
-        $piGroup = $USER->getPIGroup();
+        $piGroup = $USER->getNamesakePIGroup();
         $this->assertEmpty($piGroup->getRequests());
         $this->assertEqualsCanonicalizing([$pi->uid], $piGroup->getMemberUIDs());
         try {

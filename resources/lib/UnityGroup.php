@@ -17,7 +17,7 @@ enum UnityGroupUserRemovedReason: string
  */
 class UnityGroup extends PosixGroup
 {
-    public const string PI_PREFIX = "pi_";
+    public const string NAMESAKE_PI_PREFIX = "pi_";
     public string $gid;
     private UnityLDAP $LDAP;
     private UnitySQL $SQL;
@@ -37,21 +37,25 @@ class UnityGroup extends PosixGroup
         return $this->gid;
     }
 
-    public function requestGroup(?bool $send_mail_to_admins = null, bool $send_mail = true): void
-    {
+    public function requestGroup(
+        string $owner_uid,
+        ?bool $send_mail_to_admins = null,
+        bool $send_mail = true,
+    ): void {
         $send_mail_to_admins ??= CONFIG["mail"]["send_pimesg_to_admins"];
         if ($this->exists() && !$this->getIsDisabled()) {
             return;
         }
+        $owner = new UnityUser($owner_uid, $this->LDAP, $this->SQL, $this->MAILER);
         $context = [
-            "user" => $this->getOwner()->uid,
-            "org" => $this->getOwner()->getOrg(),
-            "name" => $this->getOwner()->getFullName(),
-            "email" => $this->getOwner()->getMail(),
+            "user" => $owner_uid,
+            "org" => $owner->getOrg(),
+            "name" => $owner->getFullName(),
+            "email" => $owner->getMail(),
         ];
-        $this->SQL->addRequest($this->getOwner()->uid, UnitySQL::REQUEST_BECOME_PI);
+        $this->SQL->addRequest("$owner_uid:$this->gid", UnitySQL::REQUEST_CREATE_PI_GROUP);
         if ($send_mail) {
-            $this->MAILER->sendMail($this->getOwner()->getMail(), "group_request");
+            $this->MAILER->sendMail($owner->getMail(), "group_request");
             if ($send_mail_to_admins) {
                 $this->MAILER->sendMail("admin", "group_request_admin", $context);
             }
@@ -117,52 +121,59 @@ class UnityGroup extends PosixGroup
     /**
      * This method will create the group (this is what is executed when an admin approved the group)
      */
-    public function approveGroup(bool $send_mail = true): void
+    public function approveGroup(string $owner_uid, bool $send_mail = true): void
     {
-        $uid = $this->getOwner()->uid;
-        $request = $this->SQL->getRequest($uid, UnitySQL::REQUEST_BECOME_PI);
-        assert($this->getOwner()->exists());
+        $request = "$owner_uid:$this->gid";
+        assert($this->SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP));
+        $owner = new UnityUser($owner_uid, $this->LDAP, $this->SQL, $this->MAILER);
+        assert($owner->exists());
         if (!$this->entry->exists()) {
-            $this->init();
+            $this->init($owner_uid);
         } elseif ($this->getIsDisabled()) {
             $this->reenable();
         } else {
             throw new Exception("cannot approve group that already exists and is not disabled");
         }
-        $this->SQL->removeRequest($this->getOwner()->uid, UnitySQL::REQUEST_BECOME_PI);
-        $this->SQL->addLog("approved_group", $this->getOwner()->uid);
+        $this->SQL->removeRequest($request, UnitySQL::REQUEST_CREATE_PI_GROUP);
+        $this->SQL->addLog("approved_group", $request);
         if ($send_mail) {
-            $this->MAILER->sendMail($this->getOwner()->getMail(), "group_created");
+            $this->MAILER->sendMail($owner->getMail(), "group_created");
         }
         // having your own group makes you qualified
-        $this->getOwner()->updateIsQualified($send_mail);
+        $owner->updateIsQualified($send_mail);
     }
 
     /**
      * This method is executed when an admin denys the PI group request
      */
-    public function denyGroup(bool $send_mail = true): void
+    public function denyGroup(string $owner_uid, bool $send_mail = true): void
     {
-        $request = $this->SQL->getRequest($this->getOwner()->uid, UnitySQL::REQUEST_BECOME_PI);
-        $this->SQL->removeRequest($this->getOwner()->uid, UnitySQL::REQUEST_BECOME_PI);
+        $request = "$owner_uid:$this->gid";
+        assert($this->SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP));
+        $owner = new UnityUser($owner_uid, $this->LDAP, $this->SQL, $this->MAILER);
+        assert($owner->exists());
+        $this->SQL->removeRequest($request, UnitySQL::REQUEST_CREATE_PI_GROUP);
         if ($this->exists()) {
             return;
         }
-        $this->SQL->addLog("denied_group", $this->getOwner()->uid);
+        $this->SQL->addLog("denied_group", $owner_uid);
         if ($send_mail) {
-            $this->MAILER->sendMail($this->getOwner()->getMail(), "group_denied");
+            $this->MAILER->sendMail($owner->getMail(), "group_denied");
         }
     }
 
-    public function cancelGroupRequest(bool $send_mail = true): void
+    public function cancelGroupRequest(string $owner_uid, bool $send_mail = true): void
     {
-        if (!$this->SQL->requestExists($this->getOwner()->uid, UnitySQL::REQUEST_BECOME_PI)) {
+        $request = "$owner_uid:$this->gid";
+        if (!$this->SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP)) {
             return;
         }
-        $this->SQL->removeRequest($this->getOwner()->uid, UnitySQL::REQUEST_BECOME_PI);
+        $owner = new UnityUser($owner_uid, $this->LDAP, $this->SQL, $this->MAILER);
+        assert($owner->exists());
+        $this->SQL->removeRequest($request, UnitySQL::REQUEST_CREATE_PI_GROUP);
         if ($send_mail) {
             $this->MAILER->sendMail("pi_approve", "group_request_cancelled", [
-                "uid" => $this->getOwner()->uid,
+                "uid" => $owner_uid,
             ]);
         }
     }
@@ -346,15 +357,15 @@ class UnityGroup extends PosixGroup
         return false;
     }
 
-    private function init(): void
+    private function init(string $owner_uid): void
     {
-        $owner = $this->getOwner();
         assert(!$this->entry->exists());
         $nextGID = $this->LDAP->getNextPIGIDNumber();
         $this->entry->create([
-            "objectclass" => ["piGroup", "posixGroup", "top"],
+            "objectclass" => ["unityGroup", "posixGroup", "top"],
             "gidnumber" => strval($nextGID),
-            "memberuid" => [$owner->uid],
+            "memberuid" => [$owner_uid],
+            "owneruid" => $owner_uid,
         ]);
         // TODO if we ever make this project based,
         // we need to update the cache here with the memberuid
@@ -367,25 +378,21 @@ class UnityGroup extends PosixGroup
 
     public function getOwner(): UnityUser
     {
-        return new UnityUser(
-            self::GID2OwnerUID($this->gid),
-            $this->LDAP,
-            $this->SQL,
-            $this->MAILER,
-        );
+        $uid = $this->entry->getAttribute("ownerUid")[0];
+        return new UnityUser($uid, $this->LDAP, $this->SQL, $this->MAILER);
     }
 
-    public static function ownerUID2GID(string $uid): string
+    public static function ownerUID2NamesakeGID(string $uid): string
     {
-        return self::PI_PREFIX . $uid;
+        return self::NAMESAKE_PI_PREFIX . $uid;
     }
 
-    public static function GID2OwnerUID(string $gid): string
+    public static function NamesakeGID2OwnerUID(string $gid): string
     {
-        if (substr($gid, 0, strlen(self::PI_PREFIX)) != self::PI_PREFIX) {
+        if (substr($gid, 0, strlen(self::NAMESAKE_PI_PREFIX)) != self::NAMESAKE_PI_PREFIX) {
             throw new Exception("PI group GID doesn't have the correct prefix.");
         }
-        return substr($gid, strlen(self::PI_PREFIX));
+        return substr($gid, strlen(self::NAMESAKE_PI_PREFIX));
     }
 
     /**
@@ -480,7 +487,7 @@ class UnityGroup extends PosixGroup
         $owner = $this->getOwner();
         $suffix = "_" . $owner->getOrg();
         assert(str_ends_with($owner->uid, $suffix));
-        $short_name = substr($owner->uid, 0, -1 * strlen($suffix));
+        $short_name = substr($owner->uid, 0, -(1 * strlen($suffix)));
         $parts = explode("@", $mail, 2);
         return sprintf("%s+%s@%s", $parts[0], $short_name, $parts[1]);
     }

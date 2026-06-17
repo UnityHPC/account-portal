@@ -4,6 +4,15 @@ For details on the changes in each release, see [the Releases page](https://gith
 
 ## Version-specific update instructions:
 
+### 1.8 -> 1.9
+- schema migration:
+  - the new LDAP schema should be added in conjunction with the old
+  - all entries should have the `piGroup` objectClass replaced with `unityGroup`
+  - the `setup-pi-group-owners.php` worker should be run
+- all existing PI group requests in SQL must be converted to the format "owner_uid:group_gid"
+- ownership of any course groups should be transferred to a Unity admin
+- dummy course group owners should be deleted
+
 ### 1.7 -> 1.8
 - the [webhook] section of the config file can be removed
 - all mail templates are no longer PHP files, now they are `.html.twig`

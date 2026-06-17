@@ -12,7 +12,17 @@ olcAttributeTypes: ( 1.1.3 NAME 'managerUid'
     EQUALITY caseExactIA5Match
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
     )
+olcAttributeTypes: ( 1.1.4 NAME 'ownerUid'
+    DESC 'group owner'
+    EQUALITY caseIgnoreMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    SINGLE-VALUE
+    )
 olcObjectClasses: ( 1.1.2 NAME 'piGroup' SUP top AUXILIARY
-    DESC 'PI Group'
+    DESC 'DEPRECATED, DO NOT USE'
     MAY ( isDisabled $ managerUid )
+    )
+olcObjectClasses: ( 1.1.5 NAME 'unityGroup' SUP top AUXILIARY
+    DESC 'general-purpose group in the Unity HPC Platform'
+    MAY ( isDisabled $ managerUid $ ownerUid )
     )

@@ -194,6 +194,12 @@ function accessPrivateVariable($obj, string $name)
     return $property->getValue($obj);
 }
 
+function accessPrivateConst($obj, string $name)
+{
+    $class = new \ReflectionClass($obj);
+    return $class->getConstant($name);
+}
+
 class UnityWebPortalTestCase extends TestCase
 {
     private ?string $last_user_nickname = null;
@@ -230,8 +236,8 @@ class UnityWebPortalTestCase extends TestCase
         "Admin" => "user1_org1_test",
         "Blank" => "user2_org1_test",
         "EmptyPIGroupOwner" => "user5_org2_test",
-        "CourseGroupOwner" => "cs123_org1_test",
-        "CourseGroupManager" => "user1_org1_test",
+        "CourseGroupOwner" => "user1_org1_test",
+        "CourseGroupManager" => "user3_org1_test",
         "CustomMapped555" => "user2002_org998_test",
         "Disabled" => "user7_org1_test",
         "DisabledNotPI" => "user7_org1_test",
@@ -274,8 +280,8 @@ class UnityWebPortalTestCase extends TestCase
                 $this->assertTrue($LDAP->getOrgGroupEntry($USER->getOrg())->exists());
                 break;
             case "CourseGroupOwner":
-                $this->assertTrue($USER->getPIGroup()->exists());
-                $this->assertNotEmpty($USER->getPIGroup()->getManagerUIDs());
+                $this->assertTrue($USER->getNamesakePIGroup()->exists());
+                $this->assertNotEmpty($LDAP->getPIGroupGIDsWithOwnerUID($USER->uid));
                 break;
             case "CourseGroupManager":
                 $this->assertNotEmpty($LDAP->getPIGroupGIDsWithManagerUID($USER->uid));
@@ -287,7 +293,7 @@ class UnityWebPortalTestCase extends TestCase
                 break;
             case "EmptyPIGroupOwner":
                 $this->assertTrue($USER->isPI());
-                $pi_group = $USER->getPIGroup();
+                $pi_group = $USER->getNamesakePIGroup();
                 $this->assertEqualsCanonicalizing([$USER->uid], $pi_group->getMemberUIDs());
                 $this->assertEmpty($pi_group->getRequests());
                 break;
@@ -296,12 +302,12 @@ class UnityWebPortalTestCase extends TestCase
                 break;
             case "DisabledOwnerOfDisabledPIGroup":
                 $this->assertTrue($USER->getFlag(UserFlag::DISABLED));
-                $this->assertTrue($USER->getPIGroup()->exists());
-                $this->assertTrue($USER->getPIGroup()->getIsDisabled());
+                $this->assertTrue($USER->getNamesakePIGroup()->exists());
+                $this->assertTrue($USER->getNamesakePIGroup()->getIsDisabled());
                 break;
             case "DisabledNotPI":
                 $this->assertTrue($USER->getFlag(UserFlag::DISABLED));
-                $this->assertFalse($USER->getPIGroup()->exists());
+                $this->assertFalse($USER->getNamesakePIGroup()->exists());
                 break;
             case "DisabledPIGroup_user9_org3_test_Manager":
                 $pi_group_entry = $LDAP->getPIGroupEntry("pi_user9_org3_test");
@@ -312,8 +318,8 @@ class UnityWebPortalTestCase extends TestCase
                 $this->assertTrue($USER->exists());
                 $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
                 $this->assertFalse($USER->isPI());
-                $this->assertTrue($USER->getPIGroup()->exists());
-                $this->assertTrue($USER->getPIGroup()->getIsDisabled());
+                $this->assertTrue($USER->getNamesakePIGroup()->exists());
+                $this->assertTrue($USER->getNamesakePIGroup()->getIsDisabled());
                 break;
             case "HasNoSshKeys":
                 $this->assertEmpty($USER->getSSHKeys());
@@ -325,7 +331,7 @@ class UnityWebPortalTestCase extends TestCase
                 break;
             case "ImmortalNotPI":
                 $this->assertTrue($USER->getFlag(UserFlag::IMMORTAL));
-                $this->assertFalse($USER->getPIGroup()->exists());
+                $this->assertFalse($USER->getNamesakePIGroup()->exists());
                 break;
             case "Locked":
                 $this->assertTrue($USER->getFlag(UserFlag::LOCKED));
@@ -350,7 +356,10 @@ class UnityWebPortalTestCase extends TestCase
                 break;
             case "NormalPI":
                 $this->assertTrue($USER->isPI());
-                $this->assertGreaterThanOrEqual(2, count($USER->getPIGroup()->getMemberUIDs()));
+                $this->assertGreaterThanOrEqual(
+                    2,
+                    count($USER->getNamesakePIGroup()->getMemberUIDs()),
+                );
                 break;
             case "HasOneSshKey":
                 $this->assertEquals(1, count($USER->getSSHKeys()));
@@ -421,22 +430,25 @@ class UnityWebPortalTestCase extends TestCase
     public function assertRequestedPIGroup(bool $expected)
     {
         global $USER, $SQL;
+        $gid = UnityGroup::ownerUID2NamesakeGID($USER->uid);
+        $request = "$USER->uid:$gid";
         $this->assertEquals(
             $expected,
-            $SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI),
+            $SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP),
         );
     }
 
     public function getNumberPiBecomeRequests()
     {
         global $USER, $SQL;
-        // FIXME table name, "admin" are public constants in UnitySQL
-        // FIXME "admin" should be something else
+        $gid = UnityGroup::ownerUID2NamesakeGID($USER->uid);
+        $request = "$USER->uid:$gid";
+        $table = accessPrivateConst($SQL, "TABLE_REQS");
+        $request_for = accessPrivateConst($SQL, "REQUEST_CREATE_PI_GROUP");
         $stmt = $SQL
             ->getConn()
-            ->prepare("SELECT * FROM requests WHERE uid=:uid and request_for='admin'");
-        $uid = $USER->uid;
-        $stmt->bindParam(":uid", $uid);
+            ->prepare("SELECT * FROM $table WHERE uid=:request and request_for='$request_for'");
+        $stmt->bindParam(":request", $request);
         $stmt->execute();
         return count($stmt->fetchAll());
     }
@@ -444,10 +456,12 @@ class UnityWebPortalTestCase extends TestCase
     public function assertNumberPiBecomeRequests(int $x)
     {
         global $USER, $SQL;
+        $gid = UnityGroup::ownerUID2NamesakeGID($USER->uid);
+        $request = "$USER->uid:$gid";
         if ($x == 0) {
-            $this->assertFalse($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI));
+            $this->assertFalse($SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP));
         } elseif ($x > 0) {
-            $this->assertTrue($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI));
+            $this->assertTrue($SQL->requestExists($request, UnitySQL::REQUEST_CREATE_PI_GROUP));
         } else {
             throw new RuntimeException("x must not be negative");
         }

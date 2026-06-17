@@ -80,7 +80,7 @@ if (isset($_SERVER["REMOTE_USER"])) {
     }
 
     $_SESSION["user_exists"] = $USER->exists() && !$USER->getFlag(UserFlag::DISABLED);
-    $_SESSION["is_pi"] = $USER->isPI();
+    $_SESSION["owned_managed_pi_group_gids"] = $USER->getOwnedPIGroupGIDs();
 
     $days_idle = $SQL->convertLastLoginToDaysIdle($SQL->getUserLastLogin($USER->uid));
     $SQL->addLog("user_login", $OPERATOR->uid);

@@ -9,7 +9,7 @@ class PIDisableTest extends UnityWebPortalTestCase
     {
         global $USER, $LDAP;
         $this->switchUser("EmptyPIGroupOwner");
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         $memberuids_before = $pi_group->getMemberUIDs();
         $this->assertFalse($pi_group->getIsDisabled());
         $this->assertNotEmpty($pi_group->getMemberUIDs());
@@ -36,7 +36,7 @@ class PIDisableTest extends UnityWebPortalTestCase
     {
         global $USER, $LDAP;
         $this->switchUser("EmptyPIGroupOwner");
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         $memberuids_before = $pi_group->getMemberUIDs();
         $this->assertFalse($pi_group->getIsDisabled());
         $this->assertNotEmpty($pi_group->getMemberUIDs());
@@ -85,7 +85,7 @@ class PIDisableTest extends UnityWebPortalTestCase
         $new_user = $USER;
         $this->assertFalse($new_user->getFlag(UserFlag::QUALIFIED));
         $this->switchUser("EmptyPIGroupOwner");
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         $memberuids_before = $pi_group->getMemberUIDs();
         try {
             $pi_group->newUserRequest($new_user);
@@ -113,7 +113,7 @@ class PIDisableTest extends UnityWebPortalTestCase
         $new_user = $USER;
         $this->assertFalse($new_user->getFlag(UserFlag::QUALIFIED));
         $this->switchUser("EmptyPIGroupOwner");
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         $memberuids_before = $pi_group->getMemberUIDs();
         try {
             $pi_group->newUserRequest($new_user);
@@ -141,7 +141,7 @@ class PIDisableTest extends UnityWebPortalTestCase
     {
         global $USER, $LDAP;
         $this->switchUser("NormalPI");
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         $entry = $LDAP->getPIGroupEntry($pi_group->gid);
         $this->assertEquals([], $entry->getAttribute("isDisabled"));
         try {
@@ -162,7 +162,7 @@ class PIDisableTest extends UnityWebPortalTestCase
     {
         global $USER, $LDAP;
         $this->switchUser("NormalPI");
-        $pi_group = $USER->getPIGroup();
+        $pi_group = $USER->getNamesakePIGroup();
         $entry = $LDAP->getPIGroupEntry($pi_group->gid);
         $this->assertEquals([], $entry->getAttribute("isDisabled"));
         $this->switchUser("Admin");

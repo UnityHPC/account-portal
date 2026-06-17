@@ -47,7 +47,7 @@ $pi_group_members = [];
 foreach ($LDAP->getPIGroupsAttributes(["cn", "memberuid"], ["memberuid" => []]) as $attributes) {
     $pi_group_members[$attributes["cn"][0]] = $attributes["memberuid"];
 }
-$pi_group_owners = array_map(UnityGroup::GID2OwnerUID(...), array_keys($pi_group_members));
+$pi_group_owners = array_map(UnityGroup::NamesakeGID2OwnerUID(...), array_keys($pi_group_members));
 
 $initially_idlelocked_users = $LDAP->userFlagGroups["idlelocked"]->getMemberUIDs();
 $initially_disabled_users = $LDAP->userFlagGroups["disabled"]->getMemberUIDs();
@@ -149,7 +149,7 @@ function disableWarnUser(UnityUser $user, int $day)
     $idle_days = $uid_to_idle_days[$user->uid];
     $expiration_date = date("Y/m/d", $last_login + $disable_day * 24 * 60 * 60);
     $is_final_warning = $day === $final_disable_warning_day;
-    $pi_group_gid = UnityGroup::ownerUID2GID($user->uid);
+    $pi_group_gid = UnityGroup::ownerUID2NamesakeGID($user->uid);
     $pi_group_member_uids = $pi_group_members[$pi_group_gid] ?? [];
     $mail_template_data = [
         "user" => $user->uid,
