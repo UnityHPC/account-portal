@@ -2,6 +2,7 @@
 
 namespace UnityWebPortal\lib;
 
+use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -89,7 +90,7 @@ class AdminUserMgmtController extends UnitySlimController
         switch ($_POST["form_type"] ?? null) {
             case "viewAsUser":
                 $_SESSION["viewUser"] = $_POST["uid"];
-                UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
+                throw new HTTPRedirect("panel/account.php");
                 break;
         }
 

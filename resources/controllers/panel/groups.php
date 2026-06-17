@@ -2,6 +2,7 @@
 
 namespace UnityWebPortal\lib;
 
+use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -115,7 +116,7 @@ class GroupsController extends UnitySlimController
             $pi_group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
             if (!$pi_group->exists()) {
                 UnityHTTPD::messageError("This PI Doesn't Exist", $gid);
-                UnityHTTPD::redirect();
+                throw new HTTPRedirect();
             }
             return $pi_group;
         };
@@ -135,27 +136,27 @@ class GroupsController extends UnitySlimController
                         "Invalid Group Membership Request",
                         "You've already requested this",
                     );
-                    UnityHTTPD::redirect();
+                    throw new HTTPRedirect();
                 }
                 if ($pi_account->memberUIDExists($USER->uid)) {
                     UnityHTTPD::messageError(
                         "Invalid Group Membership Request",
                         "You're already in this PI group",
                     );
-                    UnityHTTPD::redirect();
+                    throw new HTTPRedirect();
                 }
                 $pi_account->newUserRequest($USER);
-                UnityHTTPD::redirect();
+                throw new HTTPRedirect();
                 break; /** @phpstan-ignore deadCode.unreachable */
             case "removePIForm":
                 $pi_account = $getPIGroupFromPost();
                 $pi_account->removeUser($USER, UnityGroupUserRemovedReason::RemovedSelf);
-                UnityHTTPD::redirect();
+                throw new HTTPRedirect();
                 break; /** @phpstan-ignore deadCode.unreachable */
             case "cancelPIForm":
                 $pi_account = $getPIGroupFromPost();
                 $pi_account->cancelGroupJoinRequest($USER);
-                UnityHTTPD::redirect();
+                throw new HTTPRedirect();
                 break; /** @phpstan-ignore deadCode.unreachable */
         }
 

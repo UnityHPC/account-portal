@@ -29,6 +29,7 @@ use UnityWebPortal\lib\PanelModalController;
 use UnityWebPortal\lib\PanelAjaxController;
 use UnityWebPortal\lib\AdminAjaxController;
 use DI\Container;
+use UnityWebPortal\lib\exceptions\HTTPRedirect;
 
 require_once __DIR__ . "/../resources/autoload.php";
 require_once __DIR__ . "/../resources/config.php";
@@ -139,7 +140,7 @@ if (isset($_SERVER["REMOTE_USER"])) {
 //     UnityHTTPD::validatePostCSRFToken();
 //   if (($_SESSION["is_admin"] ?? false) == true && ($_POST["form_type"] ?? null) == "clearView") {
 //         unset($_SESSION["viewUser"]);
-//         UnityHTTPD::redirect(getRelativeURL("admin/user-mgmt.php"));
+//         throw new HTTPRedirect("admin/user-mgmt.php"));
 //     }
 //     // Webroot files need to handle their own POSTs before loading the header
 //     // so that they can do UnityHTTPD::badRequest before anything else has been printed.
@@ -147,18 +148,18 @@ if (isset($_SERVER["REMOTE_USER"])) {
 //     // header also needs to handle POST data. So this header does the PRG redirect
 //     // for all pages.
 //     unset($_POST); // unset ensures that header must not come before POST handling
-//     UnityHTTPD::redirect();
+//     throw new HTTPRedirect();
 // }
 
 if (isset($SSO)) {
     if (!$USER->exists() && !str_ends_with($_SERVER["PHP_SELF"], "/panel/new_account.php")) {
-        UnityHTTPD::redirect(getRelativeURL("panel/new_account.php"));
+        throw new HTTPRedirect(getRelativeURL("panel/new_account.php"));
     }
     if (
         $USER->getFlag(UserFlag::DISABLED) &&
         !str_ends_with($_SERVER["PHP_SELF"], "/panel/disabled_account.php")
     ) {
-        UnityHTTPD::redirect(getRelativeURL("panel/disabled_account.php"));
+        throw new HTTPRedirect("panel/disabled_account.php");
     }
     if ($USER->getFlag(UserFlag::LOCKED)) {
         UnityHTTPD::forbidden("locked", "Your account is locked.");

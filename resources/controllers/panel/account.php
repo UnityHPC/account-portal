@@ -2,6 +2,7 @@
 
 namespace UnityWebPortal\lib;
 
+use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -75,7 +76,7 @@ class AccountController extends UnitySlimController
                         } catch (EncodingUnknownException | EncodingConversionException $e) {
                             UnityHTTPD::errorLog("uploaded key has bad encoding", "", error: $e);
                             UnityHTTPD::messageError("SSH Key Not Added: Invalid Encoding", "");
-                            UnityHTTPD::redirect();
+                            throw new HTTPRedirect();
                         }
                         break;
                     case "generate":
@@ -89,7 +90,7 @@ class AccountController extends UnitySlimController
                                 "No Keys Added",
                                 "No keys found associated with GitHub account.",
                             );
-                            UnityHTTPD::redirect();
+                            throw new HTTPRedirect();
                         }
                         break;
                     default:
@@ -130,7 +131,7 @@ class AccountController extends UnitySlimController
                     $stub_fingprint = substr($sha256_fingerprint, 0, 6);
                     UnityHTTPD::messageSuccess("SSH Key Added", $stub_fingprint);
                 }
-                UnityHTTPD::redirect();
+                throw new HTTPRedirect();
                 break; /** @phpstan-ignore deadCode.unreachable */
             case "delKey":
                 $key = _base64_decode(UnityHTTPD::getPostData("delKey"));
@@ -139,10 +140,10 @@ class AccountController extends UnitySlimController
                     $USER->removeSSHKey($key);
                 } catch (ArrayKeyException) {
                     UnityHTTPD::messageError("Cannot Remove SSH Key", "Key not found");
-                    UnityHTTPD::redirect();
+                    throw new HTTPRedirect();
                 }
                 UnityHTTPD::messageSuccess("SSH Key Removed", "$key_short");
-                UnityHTTPD::redirect();
+                throw new HTTPRedirect();
                 break; /** @phpstan-ignore deadCode.unreachable */
             case "loginshell":
                 $shell = UnityHTTPD::getPostData("shellSelect");
@@ -151,35 +152,35 @@ class AccountController extends UnitySlimController
                 }
                 $USER->setLoginShell($shell);
                 UnityHTTPD::messageSuccess("Login Shell Changed", "");
-                UnityHTTPD::redirect();
+                throw new HTTPRedirect();
                 break; /** @phpstan-ignore deadCode.unreachable */
             case "pi_request":
                 if ($USER->isPI()) {
                     UnityHTTPD::messageError("Cannot Submit PI Request", "Already a PI");
-                    UnityHTTPD::redirect();
+                    throw new HTTPRedirect();
                 }
                 if ($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI)) {
                     UnityHTTPD::messageError(
                         "Cannot Submit PI Request",
                         "This request already exists",
                     );
-                    UnityHTTPD::redirect();
+                    throw new HTTPRedirect();
                 }
                 if ($_POST["tos"] != "agree") {
                     UnityHTTPD::badRequest("user did not agree to terms of service");
                 }
                 $USER->getPIGroup()->requestGroup();
                 UnityHTTPD::messageSuccess("PI Group Requested", "");
-                UnityHTTPD::redirect();
+                throw new HTTPRedirect();
                 break; /** @phpstan-ignore deadCode.unreachable */
             case "cancel_pi_request":
                 if (!$SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI)) {
                     UnityHTTPD::messageError("Cannot Cancel PI Request", "No PI request found");
-                    UnityHTTPD::redirect();
+                    throw new HTTPRedirect();
                 }
                 $USER->getPIGroup()->cancelGroupRequest();
                 UnityHTTPD::messageSuccess("PI Request Cancelled", "");
-                UnityHTTPD::redirect();
+                throw new HTTPRedirect();
                 break; /** @phpstan-ignore deadCode.unreachable */
             case "disable":
                 if ($hasGroups) {
@@ -187,14 +188,14 @@ class AccountController extends UnitySlimController
                         "Cannot Disable",
                         "You are a PI or you are a member of at least one PI group",
                     );
-                    UnityHTTPD::redirect();
+                    throw new HTTPRedirect();
                 }
                 if ($USER->getFlag(UserFlag::DISABLED)) {
                     UnityHTTPD::badRequest("user is already disabled", "");
                 }
                 $USER->disable(UnityUserDisabledReason::DisabledSelf);
                 UnityHTTPD::messageSuccess("Account Disabled", "");
-                UnityHTTPD::redirect();
+                throw new HTTPRedirect();
                 break; /** @phpstan-ignore deadCode.unreachable */
         }
         return $response;

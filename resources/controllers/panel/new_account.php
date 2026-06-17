@@ -2,6 +2,7 @@
 
 namespace UnityWebPortal\lib;
 
+use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -21,7 +22,7 @@ class NewAccountController extends UnitySlimController
         $USER = $this->container->get("USER");
         $SSO = $this->container->get("SSO");
         if ($USER->exists()) {
-            UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
+            throw new HTTPRedirect("panel/account.php");
         }
         $view = Twig::fromRequest($request);
         return $view->render(
@@ -45,7 +46,7 @@ class NewAccountController extends UnitySlimController
         if (UnityHTTPD::getPostData("form_type") === "register") {
             UnityHTTPD::validatePostCSRFToken();
             $USER->init($SSO["firstname"], $SSO["lastname"], $SSO["mail"], $SSO["org"]);
-            UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
+            throw new HTTPRedirect("panel/account.php");
         }
 
         return $response;

@@ -2,6 +2,7 @@
 
 namespace UnityWebPortal\lib;
 
+use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -145,11 +146,11 @@ class PiController extends UnitySlimController
                 if ($_POST["action"] === "Approve") {
                     $group->approveUser($form_user);
                     UnityHTTPD::messageSuccess("User Approved", "");
-                    UnityHTTPD::redirect();
+                    throw new HTTPRedirect();
                 } elseif ($_POST["action"] === "Deny") {
                     $group->denyUser($form_user);
                     UnityHTTPD::messageSuccess("User Denied", "");
-                    UnityHTTPD::redirect();
+                    throw new HTTPRedirect();
                 } else {
                     UnityHTTPD::badRequest(
                         sprintf("unrecognized action: '%s'", $_POST["action"]),
@@ -162,9 +163,9 @@ class PiController extends UnitySlimController
                 $group->removeUser($form_user, UnityGroupUserRemovedReason::RemovedByOwner);
                 UnityHTTPD::messageSuccess("User Removed", "");
                 if ($USER->uid === $form_user->uid) {
-                    UnityHTTPD::redirect("/panel/groups.php");
+                    throw new HTTPRedirect("/panel/groups.php");
                 } else {
-                    UnityHTTPD::redirect();
+                    throw new HTTPRedirect();
                 }
                 break; /** @phpstan-ignore deadCode.unreachable */
             case "disable":
@@ -176,18 +177,18 @@ class PiController extends UnitySlimController
                 }
                 if (count($group->getMemberUIDs()) > 1) {
                     UnityHTTPD::messageError("Cannot Disable PI Group", "Group still has members");
-                    UnityHTTPD::redirect();
+                    throw new HTTPRedirect();
                 }
                 if ($group->getIsDisabled()) {
                     UnityHTTPD::messageError(
                         "Cannot Disable PI Group",
                         "Group is already disabled",
                     );
-                    UnityHTTPD::redirect();
+                    throw new HTTPRedirect();
                 }
                 $group->disable();
                 UnityHTTPD::messageSuccess("Group Disabled", "");
-                UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
+                throw new HTTPRedirect("panel/account.php");
                 break; /** @phpstan-ignore deadCode.unreachable */
         }
 

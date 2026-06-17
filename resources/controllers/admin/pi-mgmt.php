@@ -2,6 +2,7 @@
 
 namespace UnityWebPortal\lib;
 
+use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -116,14 +117,13 @@ class AdminPiMgmtController extends UnitySlimController
                         "Cannot Disable PI Group",
                         "Group is already disabled",
                     );
-                    UnityHTTPD::redirect();
+                    throw new HTTPRedirect();
                 }
                 $group->disable();
                 UnityHTTPD::messageSuccess("Group Disabled", $group->gid);
                 break;
         }
-
-        UnityHTTPD::redirect();
+        throw new HTTPRedirect();
         return $response;
     }
 }

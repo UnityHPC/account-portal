@@ -2,6 +2,7 @@
 
 namespace UnityWebPortal\lib;
 
+use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -20,7 +21,7 @@ class DisabledAccountController extends UnitySlimController
     {
         $USER = $this->container->get("USER");
         if (!$USER->getFlag(UserFlag::DISABLED)) {
-            UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
+            throw new HTTPRedirect("panel/account.php");
         }
 
         $view = Twig::fromRequest($request);
@@ -44,7 +45,7 @@ class DisabledAccountController extends UnitySlimController
             UnityHTTPD::validatePostCSRFToken();
             $USER->reEnable();
             UnityHTTPD::messageSuccess("Account Re-Enabled", "");
-            UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
+            throw new HTTPRedirect("panel/account.php");
         }
 
         return $response;
