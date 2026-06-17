@@ -3,6 +3,7 @@
 namespace UnityWebPortal\lib;
 
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
+use UnityWebPortal\lib\exceptions\HTTPBadRequest;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -41,11 +42,14 @@ class DisabledAccountController extends UnitySlimController
     {
         $USER = $this->container->get("USER");
 
-        if (getPostData("form_type") === "reEnable") {
-            UnityHTTPD::validatePostCSRFToken();
-            $USER->reEnable();
-            UnityHTTPD::messageSuccess("Account Re-Enabled", "");
-            throw new HTTPRedirect("panel/account.php");
+        switch (getPostData("form_type")) {
+            case "reEnable":
+                UnityHTTPD::validatePostCSRFToken();
+                $USER->reEnable();
+                UnityHTTPD::messageSuccess("Account Re-Enabled", "");
+                throw new HTTPRedirect("panel/account.php");
+            default:
+                throw new HTTPBadRequest("invalid form_type");
         }
 
         return $response;

@@ -4,6 +4,7 @@ namespace UnityWebPortal\lib;
 
 use UnityWebPortal\lib\exceptions\HTTPForbidden;
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
+use UnityWebPortal\lib\exceptions\HTTPBadRequest;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -88,11 +89,12 @@ class AdminUserMgmtController extends UnitySlimController
             throw new HTTPForbidden("not an admin", user_msg_body: "You are not an admin.");
         }
 
-        switch ($_POST["form_type"] ?? null) {
+        switch (getPostData("form_type")) {
             case "viewAsUser":
                 $_SESSION["viewUser"] = $_POST["uid"];
                 throw new HTTPRedirect("panel/account.php");
-                break;
+            default:
+                throw new HTTPBadRequest("invalid form_type");
         }
 
         return $response;

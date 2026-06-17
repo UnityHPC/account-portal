@@ -103,32 +103,27 @@ class GroupsController extends UnitySlimController
         );
     }
 
-    public function post(Request $request, Response $response): Response
+    private function getPIGroupFromPost()
     {
-        UnityHTTPD::validatePostCSRFToken();
-
-        $USER = $this->container->get("USER");
         $LDAP = $this->container->get("LDAP");
         $SQL = $this->container->get("SQL");
         $MAILER = $this->container->get("MAILER");
-
-        $getPIGroupFromPost = function () use ($LDAP, $SQL, $MAILER) {
-            $gid = getPostData("pi");
-            $pi_group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
-            if (!$pi_group->exists()) {
-                UnityHTTPD::messageError("This PI Doesn't Exist", $gid);
-                throw new HTTPRedirect();
-            }
-            return $pi_group;
-        };
-
-        if (!isset($_POST["form_type"])) {
-            return $response;
+        $gid = getPostData("pi");
+        $pi_group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
+        if (!$pi_group->exists()) {
+            UnityHTTPD::messageError("This PI Doesn't Exist", $gid);
+            throw new HTTPRedirect();
         }
+        return $pi_group;
+    }
 
-        switch ($_POST["form_type"]) {
+    public function post(Request $request, Response $response): Response
+    {
+        UnityHTTPD::validatePostCSRFToken();
+        $USER = $this->container->get("USER");
+        switch (getPostData("form_type")) {
             case "addPIform":
-                $pi_account = $getPIGroupFromPost();
+                $pi_account = $this->getPIGroupFromPost();
                 if ($_POST["tos"] != "agree") {
                     throw new HTTPBadRequest("user did not agree to terms of service");
                 }
@@ -149,13 +144,15 @@ class GroupsController extends UnitySlimController
                 $pi_account->newUserRequest($USER);
                 throw new HTTPRedirect();
             case "removePIForm":
-                $pi_account = $getPIGroupFromPost();
+                $pi_account = $this->getPIGroupFromPost();
                 $pi_account->removeUser($USER, UnityGroupUserRemovedReason::RemovedSelf);
                 throw new HTTPRedirect();
             case "cancelPIForm":
-                $pi_account = $getPIGroupFromPost();
+                $pi_account = $this->getPIGroupFromPost();
                 $pi_account->cancelGroupJoinRequest($USER);
                 throw new HTTPRedirect();
+            default:
+                throw new HTTPBadRequest("invalid form_type");
         }
 
         return $response;

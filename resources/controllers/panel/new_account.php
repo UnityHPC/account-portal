@@ -3,6 +3,7 @@
 namespace UnityWebPortal\lib;
 
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
+use UnityWebPortal\lib\exceptions\HTTPBadRequest;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -40,15 +41,15 @@ class NewAccountController extends UnitySlimController
 
     public function post(Request $request, Response $response): Response
     {
-        $USER = $this->container->get("USER");
-        $SSO = $this->container->get("SSO");
-
-        if (getPostData("form_type") === "register") {
-            UnityHTTPD::validatePostCSRFToken();
-            $USER->init($SSO["firstname"], $SSO["lastname"], $SSO["mail"], $SSO["org"]);
-            throw new HTTPRedirect("panel/account.php");
+        switch (getPostData("form_type")) {
+            case "register":
+                $USER = $this->container->get("USER");
+                $SSO = $this->container->get("SSO");
+                UnityHTTPD::validatePostCSRFToken();
+                $USER->init($SSO["firstname"], $SSO["lastname"], $SSO["mail"], $SSO["org"]);
+                throw new HTTPRedirect("panel/account.php");
+            default:
+                throw new HTTPBadRequest("invalid form_type");
         }
-
-        return $response;
     }
 }

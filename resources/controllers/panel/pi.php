@@ -102,6 +102,14 @@ class PiController extends UnitySlimController
         );
     }
 
+    private function getUserFromPost()
+    {
+        $LDAP = $this->container->get("LDAP");
+        $SQL = $this->container->get("SQL");
+        $MAILER = $this->container->get("MAILER");
+        return new UnityUser(getPostData("uid"), $LDAP, $SQL, $MAILER);
+    }
+
     public function post(Request $request, Response $response): Response
     {
         UnityHTTPD::validatePostCSRFToken();
@@ -147,16 +155,9 @@ class PiController extends UnitySlimController
             );
         }
 
-        $getUserFromPost = function () {
-            $LDAP = $this->container->get("LDAP");
-            $SQL = $this->container->get("SQL");
-            $MAILER = $this->container->get("MAILER");
-            return new UnityUser(getPostData("uid"), $LDAP, $SQL, $MAILER);
-        };
-
         switch ($_POST["form_type"] ?? null) {
             case "userReq":
-                $form_user = $getUserFromPost();
+                $form_user = $this->getUserFromPost();
                 if ($_POST["action"] === "Approve") {
                     $group->approveUser($form_user);
                     UnityHTTPD::messageSuccess("User Approved", "");
@@ -171,7 +172,7 @@ class PiController extends UnitySlimController
                     );
                 }
             case "remUser":
-                $form_user = $getUserFromPost();
+                $form_user = $this->getUserFromPost();
                 $group->removeUser($form_user, UnityGroupUserRemovedReason::RemovedByOwner);
                 UnityHTTPD::messageSuccess("User Removed", "");
                 if ($USER->uid === $form_user->uid) {
@@ -200,8 +201,8 @@ class PiController extends UnitySlimController
                 $group->disable();
                 UnityHTTPD::messageSuccess("Group Disabled", "");
                 throw new HTTPRedirect("panel/account.php");
+            default:
+                throw new HTTPBadRequest("invalid form_type");
         }
-
-        return $response;
     }
 }

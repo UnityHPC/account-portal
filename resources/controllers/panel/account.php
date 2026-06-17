@@ -195,6 +195,8 @@ class AccountController extends UnitySlimController
                 $USER->disable(UnityUserDisabledReason::DisabledSelf);
                 UnityHTTPD::messageSuccess("Account Disabled", "");
                 throw new HTTPRedirect();
+            default:
+                throw new HTTPBadRequest("invalid form_type");
         }
         return $response;
     }

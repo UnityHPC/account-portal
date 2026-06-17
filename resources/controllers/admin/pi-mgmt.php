@@ -4,6 +4,7 @@ namespace UnityWebPortal\lib;
 
 use UnityWebPortal\lib\exceptions\HTTPForbidden;
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
+use UnityWebPortal\lib\exceptions\HTTPBadRequest;
 use Psr\Container\ContainerInterface as Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -69,6 +70,14 @@ class AdminPiMgmtController extends UnitySlimController
         );
     }
 
+    private function getUserFromPost()
+    {
+        $LDAP = $this->container->get("LDAP");
+        $SQL = $this->container->get("SQL");
+        $MAILER = $this->container->get("MAILER");
+        return new UnityUser(getPostData("uid"), $LDAP, $SQL, $MAILER);
+    }
+
     public function post(Request $request, Response $response): Response
     {
         UnityHTTPD::validatePostCSRFToken();
@@ -82,13 +91,9 @@ class AdminPiMgmtController extends UnitySlimController
         $SQL = $this->container->get("SQL");
         $MAILER = $this->container->get("MAILER");
 
-        $getUserFromPost = function () use ($LDAP, $SQL, $MAILER) {
-            return new UnityUser(getPostData("uid"), $LDAP, $SQL, $MAILER);
-        };
-
-        switch ($_POST["form_type"] ?? null) {
+        switch (getPostData("form_type")) {
             case "req":
-                $form_user = $getUserFromPost();
+                $form_user = $this->getUserFromPost();
                 if ($_POST["action"] === "Approve") {
                     $group = $form_user->getPIGroup();
                     $group->approveGroup();
@@ -98,7 +103,7 @@ class AdminPiMgmtController extends UnitySlimController
                 }
                 break;
             case "reqChild":
-                $form_user = $getUserFromPost();
+                $form_user = $this->getUserFromPost();
                 $parent_group = new UnityGroup($_POST["pi"], $LDAP, $SQL, $MAILER);
                 if ($_POST["action"] === "Approve") {
                     $parent_group->approveUser($form_user);
@@ -107,7 +112,7 @@ class AdminPiMgmtController extends UnitySlimController
                 }
                 break;
             case "remUserChild":
-                $form_user = $getUserFromPost();
+                $form_user = $this->getUserFromPost();
                 $parent = new UnityGroup($_POST["pi"], $LDAP, $SQL, $MAILER);
                 $parent->removeUser($form_user, UnityGroupUserRemovedReason::RemovedByAdmin);
                 break;
@@ -123,6 +128,8 @@ class AdminPiMgmtController extends UnitySlimController
                 $group->disable();
                 UnityHTTPD::messageSuccess("Group Disabled", $group->gid);
                 break;
+            default:
+                throw new HTTPBadRequest("invalid form_type");
         }
         throw new HTTPRedirect();
         return $response;
