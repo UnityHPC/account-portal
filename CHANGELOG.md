@@ -4,6 +4,15 @@ For details on the changes in each release, see [the Releases page](https://gith
 
 ## Version-specific update instructions:
 
+### 1.8 -> 1.9
+- schema migration:
+  - add the new LDAP schema in conjunction with the old
+  - shut down the account portal
+  - add the `extendedGroup` objectClass to all PI groups
+  - remove the `piGroup` object class from all PI groups
+  - run the `setup-pi-group-owners.php` worker
+  - restart the account portal
+
 ### 1.7 -> 1.8
 - the [webhook] section of the config file can be removed
 - all mail templates are no longer PHP files, now they are `.html.twig`
