@@ -17,11 +17,18 @@ class HTTPError extends \Exception
 {
     public $internal_msg;
     public $user_msg;
-    public function __construct(string $internal_msg, string $user_msg = "")
-    {
+    public $data;
+    public function __construct(
+        string $internal_msg,
+        int $code = 0,
+        ?\Throwable $previous = null,
+        string $user_msg = "",
+        mixed $data = null,
+    ) {
+        parent::__construct($internal_msg, $code, $previous);
         $this->internal_msg = $internal_msg;
         $this->user_msg = $user_msg;
-        $this->message = $internal_msg;
+        $this->data = $data;
     }
 }
 

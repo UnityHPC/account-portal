@@ -30,6 +30,7 @@ use UnityWebPortal\lib\PanelAjaxController;
 use UnityWebPortal\lib\AdminAjaxController;
 use DI\Container;
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
+use UnityWebPortal\lib\exceptions\HTTPForbidden;
 
 require_once __DIR__ . "/../resources/autoload.php";
 require_once __DIR__ . "/../resources/config.php";
@@ -162,7 +163,7 @@ if (isset($SSO)) {
         throw new HTTPRedirect("panel/disabled_account.php");
     }
     if ($USER->getFlag(UserFlag::LOCKED)) {
-        throw new HTTPForbidden("locked", "Your account is locked.");
+        throw new HTTPForbidden("locked", user_msg: "Your account is locked.");
     }
 }
 

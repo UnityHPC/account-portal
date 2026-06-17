@@ -149,7 +149,10 @@ class AccountController extends UnitySlimController
             case "loginshell":
                 $shell = UnityHTTPD::getPostData("shellSelect");
                 if (!in_array($shell, CONFIG["loginshell"]["shell"])) {
-                    throw new HTTPBadRequest("invalid login shell", "invalid login shell");
+                    throw new HTTPBadRequest(
+                        "invalid login shell",
+                        user_msg: "invalid login shell",
+                    );
                 }
                 $USER->setLoginShell($shell);
                 UnityHTTPD::messageSuccess("Login Shell Changed", "");

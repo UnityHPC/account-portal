@@ -33,7 +33,10 @@ class PiController extends UnitySlimController
             );
             $user_is_owner = false;
             if (!$group->exists()) {
-                throw new HTTPBadRequest("no such group: '$gid'", "This group does not exist.");
+                throw new HTTPBadRequest(
+                    "no such group: '$gid'",
+                    user_msg: "This group does not exist.",
+                );
             }
             if (
                 !in_array($USER->uid, $group->getManagerUIDs()) &&
@@ -41,20 +44,23 @@ class PiController extends UnitySlimController
             ) {
                 throw new HTTPForbidden(
                     "not a manager of group '$gid'",
-                    "You cannot manage this group.",
+                    user_msg: "You cannot manage this group.",
                 );
             }
         } else {
             $group = $USER->getPIGroup();
             $user_is_owner = true;
             if (!$group->exists()) {
-                throw new HTTPBadRequest("not a PI", "You are not a PI.");
+                throw new HTTPBadRequest("not a PI", user_msg: "You are not a PI.");
             }
         }
 
         if ($group->getIsDisabled()) {
             $group_id = $gid ?? $group->gid;
-            throw new HTTPForbidden("group '$group_id' is disabled", "This group is disabled.");
+            throw new HTTPForbidden(
+                "group '$group_id' is disabled",
+                user_msg: "This group is disabled.",
+            );
         }
 
         $requests = $group->getRequests();
@@ -111,7 +117,10 @@ class PiController extends UnitySlimController
             );
             $user_is_owner = false;
             if (!$group->exists()) {
-                throw new HTTPBadRequest("no such group: '$gid'", "This group does not exist.");
+                throw new HTTPBadRequest(
+                    "no such group: '$gid'",
+                    user_msg: "This group does not exist.",
+                );
             }
             if (
                 !in_array($USER->uid, $group->getManagerUIDs()) &&
@@ -119,20 +128,23 @@ class PiController extends UnitySlimController
             ) {
                 throw new HTTPForbidden(
                     "not a manager of group '$gid'",
-                    "You cannot manage this group.",
+                    user_msg: "You cannot manage this group.",
                 );
             }
         } else {
             $group = $USER->getPIGroup();
             $user_is_owner = true;
             if (!$group->exists()) {
-                throw new HTTPBadRequest("not a PI", "You are not a PI.");
+                throw new HTTPBadRequest("not a PI", user_msg: "You are not a PI.");
             }
         }
 
         if ($group->getIsDisabled()) {
             $group_id = $gid ?? $group->gid;
-            throw new HTTPForbidden("group '$group_id' is disabled", "This group is disabled.");
+            throw new HTTPForbidden(
+                "group '$group_id' is disabled",
+                user_msg: "This group is disabled.",
+            );
         }
 
         $getUserFromPost = function () {
@@ -173,7 +185,7 @@ class PiController extends UnitySlimController
                 if (!$user_is_owner) {
                     throw new HTTPForbidden(
                         "Manager cannot disable",
-                        "Only the group owner can disable",
+                        user_msg: "Only the group owner can disable",
                     );
                 }
                 if (count($group->getMemberUIDs()) > 1) {

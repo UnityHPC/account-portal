@@ -24,7 +24,7 @@ class AdminAjaxController extends UnitySlimController
         $SQL = $this->container->get("SQL");
         $MAILER = $this->container->get("MAILER");
         if (!$USER->getFlag(UserFlag::ADMIN)) {
-            throw new HTTPForbidden("not an admin", "You are not an admin.");
+            throw new HTTPForbidden("not an admin", user_msg: "You are not an admin.");
         }
 
         $view = Twig::fromRequest($request);

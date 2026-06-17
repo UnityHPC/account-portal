@@ -2,6 +2,9 @@
 
 namespace UnityWebPortal\lib;
 
+use UnityWebPortal\lib\exceptions\HTTPBadRequest;
+use UnityWebPortal\lib\exceptions\HTTPForbidden;
+use UnityWebPortal\lib\exceptions\HTTPInternalServerError;
 use UnityWebPortal\lib\exceptions\NoDieException;
 use UnityWebPortal\lib\exceptions\ArrayKeyException;
 use UnityWebPortal\lib\exceptions\UnityHTTPDMessageNotFoundException;
@@ -223,7 +226,7 @@ class UnityHTTPD
         // we disable log_errors before we enable this exception handler to avoid duplicate logging
         // if this exception handler itself fails, information will be lost unless we re-enable it
         ini_set("log_errors", true);
-        self::internalServerError("", error: $e);
+        throw new HTTPInternalServerError("", previous: $e);
     }
 
     public static function errorHandler(
@@ -241,7 +244,7 @@ class UnityHTTPD
     public static function getPostData(string $key): string
     {
         if (!array_key_exists($key, $_POST)) {
-            self::badRequest("\$_POST has no array key '$key'");
+            throw new HTTPBadRequest("\$_POST has no array key '$key'");
         }
         return $_POST[$key];
     }
@@ -253,7 +256,7 @@ class UnityHTTPD
     {
         if (!array_key_exists($key, $_GET)) {
             if ($die_if_not_found) {
-                self::badRequest("\$_GET has no array key '$key'");
+                throw new HTTPBadRequest("\$_GET has no array key '$key'");
             } else {
                 return null;
             }
@@ -267,10 +270,13 @@ class UnityHTTPD
         string $encoding = "UTF-8",
     ): string {
         if (!array_key_exists($filename, $_FILES)) {
-            self::badRequest("\$_FILES has no array key '$filename'", data: ['$_FILES' => $_FILES]);
+            throw new HTTPBadRequest(
+                "\$_FILES has no array key '$filename'",
+                data: ['$_FILES' => $_FILES],
+            );
         }
         if (!array_key_exists("tmp_name", $_FILES[$filename])) {
-            self::badRequest(
+            throw new HTTPBadRequest(
                 "\$_FILES[$filename] has no array key 'tmp_name'",
                 data: ['$_FILES' => $_FILES],
             );
@@ -431,14 +437,17 @@ class UnityHTTPD
         $authorization = $_SERVER["HTTP_AUTHORIZATION"] ?? "";
         if (!str_starts_with($authorization, "Bearer ")) {
             // this can happen when you don't enable apache CGIPassAuth
-            self::badRequest("HTTP_AUTHORIZATION is not Bearer", "invalid HTTP_AUTHORIZATION");
+            throw new HTTPBadRequest(
+                "HTTP_AUTHORIZATION is not Bearer",
+                user_msg: "invalid HTTP_AUTHORIZATION",
+            );
         }
         $key = trim(substr($authorization, strlen("Bearer ")));
         if ($key === "") {
-            self::forbidden("empty API key", "forbidden");
+            throw new HTTPForbidden("empty API key");
         }
         if (!in_array($key, CONFIG["api"]["keys"])) {
-            self::forbidden("API key not found in config", "forbidden");
+            throw new HTTPForbidden("API key not found in config");
         }
     }
 }
