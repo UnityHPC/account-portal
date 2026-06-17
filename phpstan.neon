@@ -2,7 +2,6 @@ parameters:
   level: 8
   paths:
     - resources
-    - webroot
     - test
   excludePaths:
     - test/Template.php
@@ -48,7 +47,6 @@ parameters:
       paths:
         - test/functional/PIBecomeRequestTest.php
         - test/functional/UserDisableTest.php
-        - webroot/panel/pi.php
         - test/functional/ExpiryWorkerTest.php
         - test/functional/ExpiryGuiTest.php
     # init.php sets these when the user is logged in

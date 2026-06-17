@@ -3,11 +3,13 @@
 namespace UnityWebPortal\lib;
 
 use UnityWebPortal\lib\exceptions\HTTPBadRequest;
+use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use UnityWebPortal\lib\exceptions\HTTPForbidden;
+use UnityWebPortal\lib\exceptions\HTTPError;
 use UnityWebPortal\lib\exceptions\HTTPInternalServerError;
-use UnityWebPortal\lib\exceptions\NoDieException;
-use UnityWebPortal\lib\exceptions\ArrayKeyException;
 use UnityWebPortal\lib\exceptions\UnityHTTPDMessageNotFoundException;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use RuntimeException;
 
 enum UnityHTTPDMessageLevel: string
@@ -24,95 +26,6 @@ enum UnityHTTPDMessageLevel: string
  */
 class UnityHTTPD
 {
-    public static function die(?string $x = null): never
-    {
-        if ($x !== null) {
-            echo $x;
-        }
-        if (CONFIG["site"]["allow_die"]) {
-            die();
-        } else {
-            throw new NoDieException();
-        }
-    }
-
-    /*
-    send HTTP header, set HTTP response code,
-    print a message just in case the browser fails to redirect if PHP is not being run from the CLI,
-    and then die
-    */
-    public static function redirect(?string $dest = null): never
-    {
-        $dest ??= getRelativeURL($_SERVER["REQUEST_URI"]);
-        // TODO check $_SERVER["REDIRECT_STATUS"]?
-        header("Location: $dest");
-        http_response_code(302);
-        if (CONFIG["site"]["enable_redirect_message"]) {
-            echo "If you're reading this message, then your browser has failed to redirect you " .
-                "to the proper destination. click <a href='$dest'>here</a> to continue.";
-        }
-        self::die();
-    }
-
-    /*
-    generates a unique error ID, writes to error log, and then:
-        if the user is doing an HTTP POST:
-            registers a message in the user's session and issues a redirect to display that message
-        else:
-            prints an HTML message to stdout, sets an HTTP response code, and dies
-    we can't always do a redirect or else we could risk an infinite loop.
-    */
-    public static function gracefulDie(
-        string $log_title,
-        string $log_message,
-        string $user_message_title,
-        string $user_message_body,
-        ?\Throwable $error = null,
-        int $http_response_code = 200,
-        mixed $data = null,
-    ): never {
-        $errorid = uniqid();
-        $title = trim($user_message_title);
-        if (trim($user_message_body) !== "") {
-            $body_paragraphs = [htmlspecialchars(trim($user_message_body))];
-        } else {
-            $body_paragraphs = [];
-        }
-        $support = CONFIG["mail"]["support"];
-        array_push($body_paragraphs, "For assistance, contact a Unity admin at $support.");
-        array_push($body_paragraphs, "Error ID: $errorid");
-        self::errorLog($log_title, $log_message, data: $data, error: $error, errorid: $errorid);
-        if (
-            ($_SERVER["REQUEST_METHOD"] ?? "") == "POST" &&
-            !str_starts_with($_SERVER["REQUEST_URI"], "/lan/api/")
-        ) {
-            self::messageError($title, implode("\n", $body_paragraphs));
-            self::redirect();
-        } else {
-            if (!headers_sent()) {
-                http_response_code($http_response_code);
-            }
-            // text may not be shown in the webpage in an obvious way, so make a popup
-            self::alert(implode(" -- ", [$title, ...$body_paragraphs]));
-            echo sprintf(
-                "<h1>%s</h1>\n%s\n",
-                htmlspecialchars($title),
-                implode("\n<br>\n", $body_paragraphs),
-            );
-            // display_errors should not be enabled in production
-            if (
-                !is_null($error) &&
-                ini_get("display_errors") === "1" &&
-                property_exists($error, "xdebug_message")
-            ) {
-                echo "<table>";
-                echo $error->xdebug_message;
-                echo "</table>";
-            }
-            self::die();
-        }
-    }
-
     public static function errorLog(
         string $title,
         string $message,
@@ -164,81 +77,6 @@ class UnityHTTPD
             $output["previous"] = self::throwableToArray($previous);
         }
         return $output;
-    }
-
-    /** @param null|mixed[] $data */
-    public static function badRequest(
-        string $log_message,
-        string $user_message = "",
-        ?\Throwable $error = null,
-        ?array $data = null,
-    ): never {
-        self::gracefulDie(
-            "bad request",
-            $log_message,
-            "Invalid requested action or submitted data.",
-            $user_message,
-            error: $error,
-            http_response_code: 400,
-            data: $data,
-        );
-    }
-
-    /** @param null|mixed[] $data */
-    public static function forbidden(
-        string $log_message,
-        string $user_message = "",
-        ?\Throwable $error = null,
-        ?array $data = null,
-    ): never {
-        self::gracefulDie(
-            "forbidden",
-            $log_message,
-            "Permission denied.",
-            $user_message,
-            error: $error,
-            http_response_code: 403,
-            data: $data,
-        );
-    }
-
-    /** @param null|mixed[] $data */
-    public static function internalServerError(
-        string $log_message,
-        string $user_message = "",
-        ?\Throwable $error = null,
-        ?array $data = null,
-    ): never {
-        self::gracefulDie(
-            "internal server error",
-            $log_message,
-            "An internal server error has occurred.",
-            $user_message,
-            error: $error,
-            http_response_code: 500,
-            data: $data,
-        );
-    }
-
-    // https://www.php.net/manual/en/function.set-exception-handler.php
-    public static function exceptionHandler(\Throwable $e): void
-    {
-        // we disable log_errors before we enable this exception handler to avoid duplicate logging
-        // if this exception handler itself fails, information will be lost unless we re-enable it
-        ini_set("log_errors", true);
-        throw new HTTPInternalServerError("", previous: $e);
-    }
-
-    public static function errorHandler(
-        int $severity,
-        string $message,
-        string $file,
-        int $line,
-    ): bool {
-        if (str_contains($message, "Undefined array key")) {
-            throw new ArrayKeyException($message);
-        }
-        return false;
     }
 
     public static function getPostData(string $key): string
@@ -422,7 +260,7 @@ class UnityHTTPD
                 "Invalid Session Token",
                 "This can happen if you leave your browser open for too long. Error ID: $errorid",
             );
-            self::redirect();
+            throw new HTTPRedirect();
         }
     }
 
@@ -439,7 +277,7 @@ class UnityHTTPD
             // this can happen when you don't enable apache CGIPassAuth
             throw new HTTPBadRequest(
                 "HTTP_AUTHORIZATION is not Bearer",
-                user_msg: "invalid HTTP_AUTHORIZATION",
+                user_msg_body: "invalid HTTP_AUTHORIZATION",
             );
         }
         $key = trim(substr($authorization, strlen("Bearer ")));
@@ -448,6 +286,73 @@ class UnityHTTPD
         }
         if (!in_array($key, CONFIG["api"]["keys"])) {
             throw new HTTPForbidden("API key not found in config");
+        }
+    }
+}
+
+class SlimErrorHandler
+{
+    public function __invoke(Request $request, Response $response, \Throwable $e)
+    {
+        if (!is_a($e, HTTPRedirect::class)) {
+            // TODO check $_SERVER["REDIRECT_STATUS"]?
+            $relative_path = $e->getMessage();
+            if ($relative_path == "") {
+                $relative_path = $_SERVER["REQUEST_URI"];
+            }
+            $dest = getRelativeURL($relative_path);
+            $msg =
+                "If you're reading this message, then your browser has failed to redirect you " .
+                "to the proper destination. click <a href='$dest'>here</a> to continue.";
+            $response->getBody()->write($msg);
+            return $response->withStatus(302)->withHeader("Location", $dest);
+        }
+        if (!is_a($e, HTTPError::class)) {
+            $e = new HTTPInternalServerError($e->getMessage(), previous: $e);
+        }
+        $errorid = uniqid();
+        $title = trim($e->user_msg_title);
+        if (trim($e->user_msg_body) !== "") {
+            $body_paragraphs = [htmlspecialchars(trim($e->user_msg_body))];
+        } else {
+            $body_paragraphs = [];
+        }
+        $support = CONFIG["mail"]["support"];
+        array_push($body_paragraphs, "For assistance, contact a Unity admin at $support.");
+        array_push($body_paragraphs, "Error ID: $errorid");
+        UnityHTTPD::errorLog(
+            $e->internal_msg_title,
+            $e->internal_msg_body,
+            data: $e->data,
+            error: $e,
+            errorid: $errorid,
+        );
+        if (
+            ($_SERVER["REQUEST_METHOD"] ?? "") == "POST" &&
+            !str_starts_with($_SERVER["REQUEST_URI"], "/lan/api/")
+        ) {
+            UnityHTTPD::messageError($title, implode("\n", $body_paragraphs));
+            return $this->__invoke($request, $response, new HTTPRedirect());
+        } else {
+            $body = $response->getBody();
+            // text may not be shown in the webpage in an obvious way, so make a popup
+            $body->write(UnityHTTPD::alert(implode(" -- ", [$title, ...$body_paragraphs])));
+            $body->write(
+                sprintf(
+                    "<h1>%s</h1>\n%s\n",
+                    htmlspecialchars($title),
+                    implode("\n<br>\n", $body_paragraphs),
+                ),
+            );
+            // display_errors should not be enabled in production
+            if (
+                !is_null($e) &&
+                ini_get("display_errors") === "1" &&
+                property_exists($e, "xdebug_message")
+            ) {
+                $body->write("<table>$e->xdebug_message</table>");
+            }
+            return $response->withStatus($e->getCode());
         }
     }
 }

@@ -24,7 +24,7 @@ class AdminUserMgmtController extends UnitySlimController
         $USER = $this->container->get("USER");
 
         if (!$USER->getFlag(UserFlag::ADMIN)) {
-            throw new HTTPForbidden("not an admin", user_msg: "You are not an admin.");
+            throw new HTTPForbidden("not an admin", user_msg_body: "You are not an admin.");
         }
 
         $LDAP = $this->container->get("LDAP");
@@ -85,7 +85,7 @@ class AdminUserMgmtController extends UnitySlimController
 
         $USER = $this->container->get("USER");
         if (!$USER->getFlag(UserFlag::ADMIN)) {
-            throw new HTTPForbidden("not an admin", user_msg: "You are not an admin.");
+            throw new HTTPForbidden("not an admin", user_msg_body: "You are not an admin.");
         }
 
         switch ($_POST["form_type"] ?? null) {

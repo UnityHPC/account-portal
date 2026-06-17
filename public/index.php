@@ -8,6 +8,7 @@ use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use Twig\TwigFunction;
+use UnityWebPortal\lib\SlimErrorHandler;
 use UnityWebPortal\lib\UnityHTTPD;
 use UnityWebPortal\lib\UnityDeployment;
 use UnityWebPortal\lib\UnityLDAP;
@@ -34,14 +35,6 @@ use UnityWebPortal\lib\exceptions\HTTPForbidden;
 
 require_once __DIR__ . "/../resources/autoload.php";
 require_once __DIR__ . "/../resources/config.php";
-
-if (CONFIG["site"]["enable_exception_handler"]) {
-    set_exception_handler(["UnityWebPortal\lib\UnityHTTPD", "exceptionHandler"]);
-}
-
-if (CONFIG["site"]["enable_error_handler"]) {
-    set_error_handler(["UnityWebPortal\lib\UnityHTTPD", "errorHandler"]);
-}
 
 if (isset($GLOBALS["ldapconn"])) {
     $LDAP = $GLOBALS["ldapconn"];
@@ -163,11 +156,14 @@ if (isset($SSO)) {
         throw new HTTPRedirect("panel/disabled_account.php");
     }
     if ($USER->getFlag(UserFlag::LOCKED)) {
-        throw new HTTPForbidden("locked", user_msg: "Your account is locked.");
+        throw new HTTPForbidden("locked", user_msg_body: "Your account is locked.");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+$container->set("errorHandler", fn($c) => new SlimErrorHandler());
+$container->set("phpErrorHandler", fn($c) => new SlimErrorHandler());
 
 AppFactory::setContainer($container);
 $app = AppFactory::create();

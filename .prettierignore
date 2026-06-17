@@ -3,6 +3,4 @@ composer.lock
 node_modules
 resources/lib/phpopenldaper
 vendor
-resources/templates
-webroot
 resources/mail

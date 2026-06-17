@@ -151,7 +151,7 @@ class AccountController extends UnitySlimController
                 if (!in_array($shell, CONFIG["loginshell"]["shell"])) {
                     throw new HTTPBadRequest(
                         "invalid login shell",
-                        user_msg: "invalid login shell",
+                        user_msg_body: "invalid login shell",
                     );
                 }
                 $USER->setLoginShell($shell);
