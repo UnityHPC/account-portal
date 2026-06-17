@@ -4,7 +4,11 @@ namespace UnityWebPortal\lib;
 
 class UnitySlimController
 {
-    public function setupTwigContext($base = []): array
+    /**
+     * @param mixed[] $base
+     * @return mixed[]
+     */
+    public function setupTwigContext(array $base = []): array
     {
         global $_SESSION;
         return array_merge($base, [
