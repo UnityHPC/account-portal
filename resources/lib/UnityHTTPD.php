@@ -5,12 +5,8 @@ namespace UnityWebPortal\lib;
 use UnityWebPortal\lib\exceptions\HTTPBadRequest;
 use UnityWebPortal\lib\exceptions\HTTPRedirect;
 use UnityWebPortal\lib\exceptions\HTTPForbidden;
-use UnityWebPortal\lib\exceptions\HTTPError;
-use UnityWebPortal\lib\exceptions\HTTPInternalServerError;
 use UnityWebPortal\lib\exceptions\UnityHTTPDMessageNotFoundException;
-use Psr\Http\Message\ResponseInterface as Response;
 use RuntimeException;
-use Slim\Handlers\ErrorHandler;
 
 enum UnityHTTPDMessageLevel: string
 {
@@ -166,100 +162,5 @@ class UnityHTTPD
         if (!in_array($key, CONFIG["api"]["keys"])) {
             throw new HTTPForbidden("API key not found in config");
         }
-    }
-}
-
-class SlimErrorHandler extends ErrorHandler
-{
-    private function respondRedirect(?string $relative_path = null): Response
-    {
-        $response = $this->responseFactory->createResponse();
-        if ($relative_path === "" || $relative_path === null) {
-            $relative_path = $_SERVER["REQUEST_URI"];
-        }
-        // TODO check $_SERVER["REDIRECT_STATUS"]?
-        $dest = getRelativeURL($relative_path);
-        $msg =
-            "If you're reading this message, then your browser has failed to redirect you " .
-            "to the proper destination. click <a href='$dest'>here</a> to continue.";
-        $response->getBody()->write($msg);
-        return $response->withStatus(302)->withHeader("Location", $dest);
-    }
-
-    public function respond(): Response
-    {
-        $e = $this->exception;
-        $response = $this->responseFactory->createResponse();
-        if ($e instanceof HTTPRedirect) {
-            return $this->respondRedirect($e->getMessage());
-        }
-        if ($e instanceof HTTPError) {
-            $status = $e->getCode();
-            $internal_msg_title = $e->internal_msg_title;
-            $internal_msg_body = $e->internal_msg_body;
-            $user_msg_title = $e->user_msg_title;
-            $user_msg_body = $e->user_msg_body;
-            $data = $e->data;
-        } else {
-            $dummy_exc = new HTTPInternalServerError("");
-            $status = $dummy_exc->getCode();
-            $internal_msg_title = $dummy_exc->internal_msg_title;
-            $internal_msg_body = $e->getMessage();
-            $user_msg_title = $dummy_exc->user_msg_title;
-            $user_msg_body = "";
-            $data = null;
-        }
-        $errorid = uniqid();
-        $title = trim($user_msg_title);
-        if (trim($user_msg_body) !== "") {
-            $body_paragraphs = [htmlspecialchars(trim($user_msg_body))];
-        } else {
-            $body_paragraphs = [];
-        }
-        $support = CONFIG["mail"]["support"];
-        array_push($body_paragraphs, "For assistance, contact a Unity admin at $support.");
-        array_push($body_paragraphs, "Error ID: $errorid");
-        _error_log(
-            $internal_msg_title,
-            $internal_msg_body,
-            data: $data,
-            error: $e,
-            errorid: $errorid,
-        );
-        if (
-            ($_SERVER["REQUEST_METHOD"] ?? "") == "POST" &&
-            !str_starts_with($_SERVER["REQUEST_URI"], "/lan/api/")
-        ) {
-            UnityHTTPD::messageError($title, implode("\n", $body_paragraphs));
-            return $this->respondRedirect();
-        }
-        $body = $response->getBody();
-        // text may not be shown in the webpage in an obvious way, so make a popup
-        $body->write(alert(implode(" -- ", [$title, ...$body_paragraphs])));
-        $body->write(
-            sprintf(
-                "<h1>%s</h1>\n%s\n",
-                htmlspecialchars($title),
-                implode("\n<br>\n", $body_paragraphs),
-            ),
-        );
-        if ($this->displayErrorDetails) {
-            if ($data !== null) {
-                $body->write(
-                    sprintf(
-                        "data relevant to error:<br><pre>%s</pre>",
-                        _json_encode($data, JSON_PRETTY_PRINT),
-                    ),
-                );
-            }
-            if (property_exists($e, "xdebug_message")) {
-                $body->write("<table>$e->xdebug_message</table>");
-            } else {
-                $body->write(
-                    sprintf("<pre>%s</pre>", _json_encode(throwableToArray($e), JSON_PRETTY_PRINT)),
-                );
-            }
-        }
-        return $response->withStatus($status);
     }
 }
