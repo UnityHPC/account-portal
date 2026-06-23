@@ -29,9 +29,16 @@ use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use PHPUnit\Framework\TestCase;
 use TRegx\PhpUnit\DataProviders\DataProvider as TRegxDataProvider;
 use UnityWebPortal\lib\UnityGroupUserRemovedReason;
+use Psr\Http\Message\ServerRequestInterface;
+use Slim\Psr7\Factory\ServerRequestFactory;
+use Psr\Http\Message\UriInterface;
+use RuntimeException;
 
 $_SERVER["HTTP_HOST"] = "phpunit"; // used for config override
 require_once __DIR__ . "/../resources/config.php";
+require_once __DIR__ . "/../resources/framework.php";
+
+$APP = get_app();
 
 global $HTTP_HEADER_TEST_INPUTS;
 $HTTP_HEADER_TEST_INPUTS = [
@@ -538,87 +545,81 @@ class UnityWebPortalTestCase extends TestCase
         $this->assertEmpty($warning_or_error_messages, $err_msg);
     }
 
+    private function createRequest(
+        string $method,
+        string|UriInterface $uri,
+        ?array $form_data = null,
+        ?array $query_params = null,
+        array $server_params = [],
+    ): ServerRequestInterface {
+        $factory = new ServerRequestFactory();
+        $request = $factory->createServerRequest($method, $uri, $server_params);
+        if ($form_data !== null) {
+            $request = $request
+                ->withParsedBody($form_data)
+                ->withHeader("Content-Type", "application/x-www-form-urlencoded");
+        }
+        if ($query_params !== null) {
+            $request = $request->withQueryParams($query_params);
+        }
+        return $request;
+    }
+
     function http_post(
-        string $phpfile,
-        array $post_data,
+        string $path,
+        array $form_data,
         array $query_params = [],
         bool $do_generate_csrf_token = true,
         bool $do_validate_messages = true,
         ?string $bearer_token = null,
     ): string {
-        global $LDAP, $SQL, $MAILER, $GITHUB, $SITE, $SSO, $USER, $LOC_HEADER, $LOC_FOOTER, $TWIG;
+        global $APP;
         if ($do_validate_messages) {
             $this->assertNoWarningErrorMessages();
         }
-        $_PREVIOUS_SERVER = $_SERVER;
-        $_SERVER["REQUEST_METHOD"] = "POST";
-        $_SERVER["PHP_SELF"] = _preg_replace("/.*webroot\//", "/", $phpfile);
-        $_SERVER["REQUEST_URI"] = _preg_replace("/.*webroot\//", "/", $phpfile); // Slightly imprecise because it doesn't include get parameters
+        $server_params = [];
         if ($bearer_token !== null) {
-            $_SERVER["HTTP_AUTHORIZATION"] = "Bearer $bearer_token";
+            $server_params["HTTP_AUTHORIZATION"] = "Bearer $bearer_token";
         }
-        if (!array_key_exists("csrf_token", $post_data) && $do_generate_csrf_token) {
-            $post_data["csrf_token"] = CSRFToken::generate();
+        if (!array_key_exists("csrf_token", $form_data) && $do_generate_csrf_token) {
+            $form_data["csrf_token"] = CSRFToken::generate();
         }
-        $_POST = $post_data;
-        $_GET = $query_params;
-        ob_start();
-        try {
-            $post_did_redirect_or_die = false;
-            try {
-                include $phpfile;
-            } catch (UnityWebPortal\lib\exceptions\NoDieException $e) {
-                $post_did_redirect_or_die = true;
-            }
-            // https://en.wikipedia.org/wiki/Post/Redirect/Get
-            assert($post_did_redirect_or_die, "post did not redirect or die!");
-        } finally {
-            $output = _ob_get_clean();
-            unset($_POST);
-            unset($_GET);
-            $_SERVER = $_PREVIOUS_SERVER;
-        }
+        $request = $this->createRequest("POST", $path, $form_data, $query_params, $server_params);
+        $response = $APP->handle($request);
         if ($do_validate_messages) {
             $this->assertNoWarningErrorMessages();
         }
-        return $output;
+        return $response->getBody();
     }
 
     function http_get(
-        string $phpfile,
+        string $path,
         array $query_params = [],
-        bool $ignore_die = false,
+        bool $do_validate_status_code = false,
         ?string $bearer_token = null,
         $do_validate_messages = true,
     ): string {
-        global $LDAP, $SQL, $MAILER, $GITHUB, $SITE, $SSO, $USER, $LOC_HEADER, $LOC_FOOTER, $TWIG;
+        global $APP;
         if ($do_validate_messages) {
             $this->assertNoWarningErrorMessages();
         }
-        $_PREVIOUS_SERVER = $_SERVER;
-        $_SERVER["REQUEST_METHOD"] = "GET";
-        $_SERVER["PHP_SELF"] = _preg_replace("/.*webroot\//", "/", $phpfile);
-        $_SERVER["REQUEST_URI"] = _preg_replace("/.*webroot\//", "/", $phpfile); // Slightly imprecise because it doesn't include get parameters
+        $server_params = [];
         if ($bearer_token !== null) {
-            $_SERVER["HTTP_AUTHORIZATION"] = "Bearer $bearer_token";
+            $server_params["HTTP_AUTHORIZATION"] = "Bearer $bearer_token";
         }
-        $_GET = $query_params;
-        ob_start();
-        try {
-            include $phpfile;
-        } catch (UnityWebPortal\lib\exceptions\NoDieException $e) {
-            if (!$ignore_die) {
-                throw $e;
+        $request = $this->createRequest("GET", $path, null, $query_params, $server_params);
+        $response = $APP->handle($request);
+        $body = $response->getBody();
+        if (!$do_validate_status_code) {
+            $status_code = $response->getStatusCode();
+            if ($status_code !== 200) {
+                throw new Exception($body, code: $status_code);
             }
-        } finally {
-            $output = _ob_get_clean();
-            unset($_GET);
-            $_SERVER = $_PREVIOUS_SERVER;
         }
         if ($do_validate_messages) {
             $this->assertNoWarningErrorMessages();
         }
-        return $output;
+        return $body;
     }
 
     private static function findPHPFiles($path)

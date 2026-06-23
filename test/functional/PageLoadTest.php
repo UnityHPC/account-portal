@@ -33,10 +33,13 @@ class PageLoadTest extends UnityWebPortalTestCase
     }
 
     #[DataProvider("provider")]
-    public function testLoadPage($nickname, $path, $regex, $ignore_die = false)
+    public function testLoadPage($nickname, $path, $regex, $do_validate_status_code = true)
     {
         $this->switchUser($nickname);
-        $output = $this->http_get(__DIR__ . "/../../webroot/" . $path, ignore_die: $ignore_die);
+        $output = $this->http_get(
+            __DIR__ . "/../../webroot/" . $path,
+            do_validate_status_code: $do_validate_status_code,
+        );
         $this->assertMatchesRegularExpression($regex, $output);
     }
 
@@ -44,7 +47,7 @@ class PageLoadTest extends UnityWebPortalTestCase
     public function testLoadAdminPageNotAnAdmin($path)
     {
         $this->switchUser("Blank");
-        $output = $this->http_get($path, ignore_die: true);
+        $output = $this->http_get($path, do_validate_status_code: false);
         $this->assertMatchesRegularExpression("/You are not an admin\./", $output);
     }
 
@@ -52,7 +55,7 @@ class PageLoadTest extends UnityWebPortalTestCase
     public function testLoadPageNonexistentUser($path)
     {
         $this->switchUser("NonExistent");
-        $output = $this->http_get($path, ignore_die: true);
+        $output = $this->http_get($path, do_validate_status_code: false);
         $this->assertMatchesRegularExpression("/panel\/new_account\.php/", $output);
     }
 
@@ -60,7 +63,7 @@ class PageLoadTest extends UnityWebPortalTestCase
     public function testLoadPageDisabled($path)
     {
         $this->switchUser("Disabled");
-        $output = $this->http_get($path, ignore_die: true);
+        $output = $this->http_get($path, do_validate_status_code: false);
         $this->assertMatchesRegularExpression("/panel\/disabled_account\.php/", $output);
     }
 
@@ -68,7 +71,7 @@ class PageLoadTest extends UnityWebPortalTestCase
     public function testLoadPageLockedUser($path)
     {
         $this->switchUser("Locked");
-        $output = $this->http_get($path, ignore_die: true);
+        $output = $this->http_get($path, do_validate_status_code: false);
         $this->assertMatchesRegularExpression("/Your account is locked\./", $output);
     }
 
@@ -91,28 +94,32 @@ class PageLoadTest extends UnityWebPortalTestCase
         $this->switchUser("EmptyPIGroupOwner");
         $gid = $USER->getPIGroup()->gid;
         $this->switchUser("Blank");
-        $output = $this->http_get("/panel/pi", ["gid" => $gid], ignore_die: true);
+        $output = $this->http_get("/panel/pi", ["gid" => $gid], do_validate_status_code: false);
         $this->assertMatchesRegularExpression("/You cannot manage this group/", $output);
     }
 
     public function testLoadPIPageForNonexistentGroup()
     {
         $this->switchUser("Blank");
-        $output = $this->http_get("/panel/pi", ["gid" => "foobar"], ignore_die: true);
+        $output = $this->http_get("/panel/pi", ["gid" => "foobar"], do_validate_status_code: false);
         $this->assertMatchesRegularExpression("/This group does not exist/", $output);
     }
 
     public function testLoadPIPageForDisabledGroup()
     {
         $this->switchUser("ReenabledOwnerOfDisabledPIGroup");
-        $output = $this->http_get("/panel/pi", ignore_die: true);
+        $output = $this->http_get("/panel/pi", do_validate_status_code: false);
         $this->assertMatchesRegularExpression("/This group is disabled/", $output);
     }
 
     public function testLoadPIPageForAnotherDisabledGroup()
     {
         $this->switchUser("DisabledPIGroup_user9_org3_test_Manager");
-        $output = $this->http_get("/panel/pi", ["gid" => "pi_user9_org3_test"], ignore_die: true);
+        $output = $this->http_get(
+            "/panel/pi",
+            ["gid" => "pi_user9_org3_test"],
+            do_validate_status_code: false,
+        );
         $this->assertMatchesRegularExpression("/This group is disabled/", $output);
     }
 
