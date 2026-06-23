@@ -11,7 +11,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
     private function requestMembership(string $gid_or_mail, bool $do_validate_messages = true)
     {
         $this->http_post(
-            __DIR__ . "/../../webroot/panel/groups.php",
+            "/panel/groups",
             [
                 "form_type" => "addPIform",
                 "pi" => $gid_or_mail,
@@ -23,7 +23,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
 
     private function cancelRequest(string $gid)
     {
-        $this->http_post(__DIR__ . "/../../webroot/panel/groups.php", [
+        $this->http_post("/panel/groups", [
             "form_type" => "cancelPIForm",
             "pi" => $gid,
         ]);
@@ -33,7 +33,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
     {
         global $USER;
         assert($USER->getPIGroup()->gid === $gid, "signed in user must be the group owner");
-        $this->http_post(__DIR__ . "/../../webroot/panel/pi.php", [
+        $this->http_post("/panel/pi", [
             "form_type" => "userReq",
             "action" => "Approve",
             "uid" => $uid,
@@ -44,7 +44,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
     {
         $this->switchUser("Admin");
         try {
-            $this->http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
+            $this->http_post("/admin/pi-mgmt", [
                 "form_type" => "reqChild",
                 "action" => "Approve",
                 "pi" => $gid,
@@ -57,7 +57,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
 
     private function denyRequestByPI(string $uid)
     {
-        $this->http_post(__DIR__ . "/../../webroot/panel/pi.php", [
+        $this->http_post("/panel/pi", [
             "form_type" => "userReq",
             "action" => "Deny",
             "uid" => $uid,
@@ -70,7 +70,7 @@ class PIMemberRequestTest extends UnityWebPortalTestCase
         $gid = $USER->getPIGroup()->gid;
         $this->switchUser("Admin");
         try {
-            $this->http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
+            $this->http_post("/admin/pi-mgmt", [
                 "form_type" => "reqChild",
                 "action" => "Deny",
                 "pi" => $gid,

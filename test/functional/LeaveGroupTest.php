@@ -15,7 +15,7 @@ class LeaveGroupTest extends UnityWebPortalTestCase
         $this->assertTrue($pi_group->memberUIDExists($USER->uid));
         $this->assertTrue($USER->getFlag(UserFlag::QUALIFIED));
         try {
-            $this->http_post(__DIR__ . "/../../webroot/panel/groups.php", [
+            $this->http_post("/panel/groups", [
                 "form_type" => "removePIForm",
                 "pi" => $gid,
             ]);

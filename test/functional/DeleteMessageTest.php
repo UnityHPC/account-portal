@@ -20,7 +20,7 @@ class DeleteMessageTest extends UnityWebPortalTestCase
         try {
             $before = array_map("_json_encode", UnityHTTPD::getMessages());
             $this->http_post(
-                __DIR__ . "/../../webroot/panel/ajax/delete_message.php",
+                "/panel/ajax/delete_message",
                 [
                     "level" => base64_encode("debug"),
                     "title" => base64_encode("foo2"),

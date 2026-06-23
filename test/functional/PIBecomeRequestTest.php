@@ -10,7 +10,7 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
     private function requestGroupCreation($do_validate_messages = true)
     {
         $this->http_post(
-            __DIR__ . "/../../webroot/panel/account.php",
+            "/panel/account",
             [
                 "form_type" => "pi_request",
                 "tos" => "agree",
@@ -22,14 +22,14 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
 
     private function cancelRequestGroupCreation()
     {
-        $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
+        $this->http_post("/panel/account", [
             "form_type" => "cancel_pi_request",
         ]);
     }
 
     private function approveGroup($uid)
     {
-        $this->http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
+        $this->http_post("/admin/pi-mgmt", [
             "form_type" => "req",
             "action" => "Approve",
             "uid" => $uid,
@@ -42,24 +42,24 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
         $this->switchUser("Blank");
         $this->assertNumberPiBecomeRequests(0);
         try {
-            $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
+            $this->http_post("/panel/account", [
                 "form_type" => "pi_request",
                 "tos" => "agree",
                 "account_policy" => "agree",
             ]);
             $this->assertNumberPiBecomeRequests(1);
-            $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
+            $this->http_post("/panel/account", [
                 "form_type" => "cancel_pi_request",
             ]);
             $this->assertNumberPiBecomeRequests(0);
-            $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
+            $this->http_post("/panel/account", [
                 "form_type" => "pi_request",
                 "tos" => "agree",
                 "account_policy" => "agree",
             ]);
             $this->assertNumberPiBecomeRequests(1);
             $this->http_post(
-                __DIR__ . "/../../webroot/panel/account.php",
+                "/panel/account",
                 [
                     "form_type" => "pi_request",
                     "tos" => "agree",
@@ -148,7 +148,7 @@ class PIBecomeRequestTest extends UnityWebPortalTestCase
         try {
             $this->assertTrue($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI));
             $this->switchUser("Admin");
-            $this->http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
+            $this->http_post("/admin/pi-mgmt", [
                 "form_type" => "req",
                 "action" => "Deny",
                 "uid" => $piGroup->getOwner()->uid,

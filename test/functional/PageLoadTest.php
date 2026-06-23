@@ -79,7 +79,7 @@ class PageLoadTest extends UnityWebPortalTestCase
         $gids = $LDAP->getPIGroupGIDsWithManagerUID($USER->uid);
         $this->assertTrue(count($gids) > 0);
         $gid = $gids[0];
-        $output = $this->http_get(__DIR__ . "/../../webroot/panel/pi.php", [
+        $output = $this->http_get("/panel/pi", [
             "gid" => $gid,
         ]);
         $this->assertMatchesRegularExpression("/PI Group '$gid'/", $output);
@@ -91,40 +91,28 @@ class PageLoadTest extends UnityWebPortalTestCase
         $this->switchUser("EmptyPIGroupOwner");
         $gid = $USER->getPIGroup()->gid;
         $this->switchUser("Blank");
-        $output = $this->http_get(
-            __DIR__ . "/../../webroot/panel/pi.php",
-            ["gid" => $gid],
-            ignore_die: true,
-        );
+        $output = $this->http_get("/panel/pi", ["gid" => $gid], ignore_die: true);
         $this->assertMatchesRegularExpression("/You cannot manage this group/", $output);
     }
 
     public function testLoadPIPageForNonexistentGroup()
     {
         $this->switchUser("Blank");
-        $output = $this->http_get(
-            __DIR__ . "/../../webroot/panel/pi.php",
-            ["gid" => "foobar"],
-            ignore_die: true,
-        );
+        $output = $this->http_get("/panel/pi", ["gid" => "foobar"], ignore_die: true);
         $this->assertMatchesRegularExpression("/This group does not exist/", $output);
     }
 
     public function testLoadPIPageForDisabledGroup()
     {
         $this->switchUser("ReenabledOwnerOfDisabledPIGroup");
-        $output = $this->http_get(__DIR__ . "/../../webroot/panel/pi.php", ignore_die: true);
+        $output = $this->http_get("/panel/pi", ignore_die: true);
         $this->assertMatchesRegularExpression("/This group is disabled/", $output);
     }
 
     public function testLoadPIPageForAnotherDisabledGroup()
     {
         $this->switchUser("DisabledPIGroup_user9_org3_test_Manager");
-        $output = $this->http_get(
-            __DIR__ . "/../../webroot/panel/pi.php",
-            ["gid" => "pi_user9_org3_test"],
-            ignore_die: true,
-        );
+        $output = $this->http_get("/panel/pi", ["gid" => "pi_user9_org3_test"], ignore_die: true);
         $this->assertMatchesRegularExpression("/This group is disabled/", $output);
     }
 
@@ -134,7 +122,7 @@ class PageLoadTest extends UnityWebPortalTestCase
         $this->switchUser("CourseGroupManager");
         $gids = $LDAP->getPIGroupGIDsWithManagerUID($USER->uid);
         $this->assertTrue(count($gids) > 0);
-        $output = $this->http_get(__DIR__ . "/../../webroot/panel/groups.php");
+        $output = $this->http_get("/panel/groups");
         foreach ($gids as $gid) {
             $this->assertMatchesRegularExpression("/name='gid' value='$gid'/", $output);
         }

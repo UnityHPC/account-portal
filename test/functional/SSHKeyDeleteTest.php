@@ -19,7 +19,7 @@ class SSHKeyDeleteTest extends UnityWebPortalTestCase
     private function deleteKey(string $key, bool $do_validate_messages = true): void
     {
         $this->http_post(
-            __DIR__ . "/../../webroot/panel/account.php",
+            "/panel/account",
             [
                 "form_type" => "delKey",
                 "delKey" => base64_encode($key),

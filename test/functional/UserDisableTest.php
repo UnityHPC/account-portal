@@ -10,7 +10,7 @@ class UserDisableTest extends UnityWebPortalTestCase
         $this->switchUser("Blank");
         $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
         try {
-            $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
+            $this->http_post("/panel/account", [
                 "form_type" => "disable",
             ]);
             $this->assertTrue($USER->getFlag(UserFlag::DISABLED));
@@ -28,7 +28,7 @@ class UserDisableTest extends UnityWebPortalTestCase
         $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
         try {
             $this->http_post(
-                __DIR__ . "/../../webroot/panel/account.php",
+                "/panel/account",
                 [
                     "form_type" => "disable",
                 ],
@@ -50,7 +50,7 @@ class UserDisableTest extends UnityWebPortalTestCase
         $this->assertFalse($USER->getFlag(UserFlag::DISABLED));
         try {
             $this->http_post(
-                __DIR__ . "/../../webroot/panel/account.php",
+                "/panel/account",
                 [
                     "form_type" => "disable",
                 ],

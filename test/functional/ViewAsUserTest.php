@@ -9,7 +9,7 @@ class ViewAsUserTest extends UnityWebPortalTestCase
     public function _testViewAsUser(
         string $beforeNickname,
         string $afterNickname,
-        string $phpfile = __DIR__ . "/../../webroot/panel/account.php",
+        string $phpfile = "/panel/account",
     ) {
         global $USER;
         $afterUid = self::$NICKNAME2UID[$afterNickname];
@@ -17,7 +17,7 @@ class ViewAsUserTest extends UnityWebPortalTestCase
         // $this->assertTrue($USER->getFlag(UserFlag::ADMIN));
         $beforeUid = $USER->uid;
         // $this->assertNotEquals($afterUid, $beforeUid);
-        $this->http_post(__DIR__ . "/../../webroot/admin/user-mgmt.php", [
+        $this->http_post("/admin/user-mgmt", [
             "form_type" => "viewAsUser",
             "uid" => $afterUid,
         ]);
@@ -63,7 +63,7 @@ class ViewAsUserTest extends UnityWebPortalTestCase
         $adminUid = $USER->uid;
         $this->switchUser("Blank");
         $this->http_post(
-            __DIR__ . "/../../webroot/admin/user-mgmt.php",
+            "/admin/user-mgmt",
             [
                 "form_type" => "viewAsUser",
                 "uid" => $adminUid,

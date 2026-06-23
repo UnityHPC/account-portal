@@ -157,7 +157,7 @@ using the HTTP API:
 private function requestGroupCreation()
 {
     http_post(
-        __DIR__ . "/../../webroot/panel/new_account.php",
+        "/panel/new_account",
         ["new_user_sel" => "pi", "eula" => "agree", "confirm_pi" => "agree"]
     );
 }

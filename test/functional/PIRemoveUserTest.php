@@ -12,7 +12,7 @@ class PIRemoveUserTest extends UnityWebPortalTestCase
     {
         global $USER;
         assert($USER->getPIGroup()->gid === $gid, "signed in user must be the group owner");
-        $this->http_post(__DIR__ . "/../../webroot/panel/pi.php", [
+        $this->http_post("/panel/pi", [
             "form_type" => "remUser",
             "uid" => $uid,
         ]);
@@ -23,7 +23,7 @@ class PIRemoveUserTest extends UnityWebPortalTestCase
         global $USER;
         $this->switchUser("Admin");
         try {
-            $this->http_post(__DIR__ . "/../../webroot/admin/pi-mgmt.php", [
+            $this->http_post("/admin/pi-mgmt", [
                 "form_type" => "remUserChild",
                 "pi" => $gid,
                 "uid" => $uid,
@@ -123,7 +123,7 @@ class PIRemoveUserTest extends UnityWebPortalTestCase
         $group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
         try {
             $output = $this->http_post(
-                __DIR__ . "/../../webroot/panel/pi.php",
+                "/panel/pi",
                 ["form_type" => "remUser", "uid" => $USER->uid],
                 ["gid" => $gid],
             );

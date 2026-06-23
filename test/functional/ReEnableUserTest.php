@@ -8,7 +8,7 @@ class ReEnableUserTest extends UnityWebPortalTestCase
 {
     private function reEnable()
     {
-        $this->http_post(__DIR__ . "/../../webroot/panel/disabled_account.php", [
+        $this->http_post("/panel/disabled_account", [
             "form_type" => "reEnable",
         ]);
     }

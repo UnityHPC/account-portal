@@ -17,7 +17,7 @@ class RegisterUserTest extends UnityWebPortalTestCase
 
     private function register()
     {
-        $this->http_post(__DIR__ . "/../../webroot/panel/new_account.php", [
+        $this->http_post("/panel/new_account", [
             "form_type" => "register",
         ]);
     }

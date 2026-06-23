@@ -51,7 +51,7 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
         $this->assertEquals(0, $numKeysBefore);
         try {
             $this->http_post(
-                __DIR__ . "/../../webroot/panel/account.php",
+                "/panel/account",
                 [
                     "form_type" => "addKey",
                     "add_type" => "paste",
@@ -84,7 +84,7 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
             $_FILES["keyfile"] = ["tmp_name" => $tmp_path];
             try {
                 $this->http_post(
-                    __DIR__ . "/../../webroot/panel/account.php",
+                    "/panel/account",
                     [
                         "form_type" => "addKey",
                         "add_type" => "import",
@@ -115,7 +115,7 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
         $this->assertEquals(0, $numKeysBefore);
         try {
             $this->http_post(
-                __DIR__ . "/../../webroot/panel/account.php",
+                "/panel/account",
                 [
                     "form_type" => "addKey",
                     "add_type" => "generate",
@@ -147,7 +147,7 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
         $GITHUB->method("getSshPublicKeys")->willReturn($keys);
         try {
             $this->http_post(
-                __DIR__ . "/../../webroot/panel/account.php",
+                "/panel/account",
                 [
                     "form_type" => "addKey",
                     "add_type" => "github",
@@ -178,7 +178,7 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
             $user1->addSSHKey($key);
             // as user2, try to add the key that user1 already added
             $this->http_post(
-                __DIR__ . "/../../webroot/panel/account.php",
+                "/panel/account",
                 [
                     "form_type" => "addKey",
                     "add_type" => "paste",
@@ -213,7 +213,7 @@ class SSHKeyAddTest extends UnityWebPortalTestCase
             $USER->addSSHKey($key);
             $this->assertEquals([$key], $USER->getSSHKeys());
             $this->http_post(
-                __DIR__ . "/../../webroot/panel/account.php",
+                "/panel/account",
                 [
                     "form_type" => "addKey",
                     "add_type" => "paste",

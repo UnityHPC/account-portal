@@ -32,7 +32,7 @@ class UpdateContactInfoTest extends UnityWebPortalTestCase
         $server_before = $_SERVER;
         $before = [$USER->getFirstname(), $USER->getLastname(), $USER->getMail()];
         $this->switchUser("Admin");
-        $this->http_post(__DIR__ . "/../../webroot/admin/user-mgmt.php", [
+        $this->http_post("/admin/user-mgmt", [
             "form_type" => "viewAsUser",
             "uid" => self::$NICKNAME2UID["Blank"],
         ]);

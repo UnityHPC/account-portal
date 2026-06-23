@@ -11,19 +11,19 @@ class LoginShellSetTest extends UnityWebPortalTestCase
         $this->switchUser("Blank");
         $before = $USER->getLoginShell();
         try {
-            $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
+            $this->http_post("/panel/account", [
                 "form_type" => "loginshell",
                 "shellSelect" => "/bin/bash",
             ]);
             $this->assertEquals("/bin/bash", $USER->getLoginShell());
-            $this->http_post(__DIR__ . "/../../webroot/panel/account.php", [
+            $this->http_post("/panel/account", [
                 "form_type" => "loginshell",
                 "shellSelect" => "/bin/zsh",
             ]);
             $this->assertEquals("/bin/zsh", $USER->getLoginShell());
             UnityHTTPD::clearMessages();
             $this->http_post(
-                __DIR__ . "/../../webroot/panel/account.php",
+                "/panel/account",
                 [
                     "form_type" => "loginshell",
                     "shellSelect" => "foobar",
