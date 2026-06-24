@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 $USER->addSSHKey($key);
                 $sha256_fingerprint = getSSHKeyInfo($key)[1];
                 $stub_fingprint = substr($sha256_fingerprint, 0, 6);
-                UnityHTTPD::messageSuccess("SSH Key Added", $stub_fingprint);
+                UnityHTTPD::messageSuccess("SSH Key Added", "Fingerprint: $stub_fingprint");
             }
             UnityHTTPD::redirect();
             break; /** @phpstan-ignore deadCode.unreachable */
