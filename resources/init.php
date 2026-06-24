@@ -112,7 +112,7 @@ if (isset($_SERVER["REMOTE_USER"])) {
 
 $TWIG = new \Twig\Environment(
     new \Twig\Loader\FilesystemLoader(UnityDeployment::getTemplateDirs()),
-    ["strict_variables" => true],
+    ["strict_variables" => true, "autoescape" => "name"],
 );
 $TWIG->addFunction(new TwigFunction("getRelativeURL", getRelativeURL(...)));
 $TWIG->addFunction(new TwigFunction("getRelativeHyperlink", getRelativeHyperlink(...)));
