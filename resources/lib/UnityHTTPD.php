@@ -153,6 +153,7 @@ class UnityHTTPD
         $output = [
             "class" => get_class($t),
             "msg" => $t->getMessage(),
+            "location" => sprintf("%s:%d", $t->getFile(), $t->getLine()),
             // newlines are bad for error log, but getTrace() is too verbose
             "trace" => explode("\n", $t->getTraceAsString()),
         ];
