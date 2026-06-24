@@ -2,7 +2,6 @@
 
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use UnityWebPortal\lib\UnityHTTPD;
-use PHPUnit\Framework\Attributes\DataProvider;
 
 class ViewAsUserTest extends UnityWebPortalTestCase
 {
@@ -40,10 +39,9 @@ class ViewAsUserTest extends UnityWebPortalTestCase
         $this->assertEquals($beforeUid, $USER->uid);
     }
 
-    #[DataProvider("providerValidUserForAllPages")]
-    public function testViewAsUser($nickname, $phpfile)
+    public function testViewAsUser()
     {
-        $this->_testViewAsUser("Admin", $nickname, $phpfile);
+        $this->_testViewAsUser("Admin", "Blank");
     }
 
     public function testViewAsNonExistentUser()

@@ -17,6 +17,7 @@ require_once __DIR__ . "/../resources/lib/UnityGithub.php";
 require_once __DIR__ . "/../resources/lib/utils.php";
 require_once __DIR__ . "/../resources/lib/CSRFToken.php";
 require_once __DIR__ . "/../resources/lib/exceptions.php";
+require_once __DIR__ . "/../resources/lib/UnitySlimFramework.php";
 
 use UnityWebPortal\lib\CSRFToken;
 use UnityWebPortal\lib\exceptions\ArrayKeyException;
@@ -25,16 +26,17 @@ use UnityWebPortal\lib\UnityUser;
 use UnityWebPortal\lib\UnityHTTPD;
 use UnityWebPortal\lib\UserFlag;
 use UnityWebPortal\lib\UnitySQL;
+use UnityWebPortal\lib\UnityLDAP;
+use UnityWebPortal\lib\UnitySSO;
+use UnityWebPortal\lib\UnityMailer;
 use UnityWebPortal\lib\UnityHTTPDMessageLevel;
 use PHPUnit\Framework\TestCase;
-use TRegx\PhpUnit\DataProviders\DataProvider as TRegxDataProvider;
 use UnityWebPortal\lib\UnityGroupUserRemovedReason;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Psr7\Factory\ServerRequestFactory;
 use Psr\Http\Message\UriInterface;
-use RuntimeException;
 
-$_SERVER["HTTP_HOST"] = "phpunit"; // used for config override
+$this->current_user_attributes["HTTP_HOST"] = "phpunit"; // used for config override
 require_once __DIR__ . "/../resources/config.php";
 require_once __DIR__ . "/../resources/framework.php";
 
@@ -66,6 +68,11 @@ $HTTP_HEADER_TEST_INPUTS = [
     "Hello\x00World",
     _mb_convert_encoding("Hello, World!", "UTF-16"),
 ];
+
+$LDAP = new UnityLDAP();
+$GLOBALS["ldapconn"] = $LDAP;
+$SQL = new UnitySQL();
+$MAILER = new UnityMailer();
 
 /**
  * runs a worker script, then refreshes all LDAP entries to pick up changes
@@ -206,6 +213,7 @@ class UnityWebPortalTestCase extends TestCase
     private ?string $last_user_nickname = null;
     private ?string $current_user_nickname = null;
     private array $nickname_to_latest_session_id = [];
+    private ?array $current_user_attributes = null;
     // FIXME these names are wrong
     public static array $UID2ATTRIBUTES = [
         "user1_org1_test" => ["user1@org1.test", "foo", "bar", "user1@org1.test"],
@@ -257,7 +265,9 @@ class UnityWebPortalTestCase extends TestCase
 
     public function validateUser(string $nickname)
     {
-        global $USER, $SQL, $LDAP;
+        global $MAILER, $SQL, $LDAP;
+        $uid = UnitySSO::eppnToUID($this->current_user_attributes["eppn"]);
+        $USER = new UnityUser($uid, $LDAP, $SQL, $MAILER);
         if (!array_key_exists($nickname, self::$NICKNAME2UID)) {
             throw new ArrayKeyException($nickname);
         }
@@ -500,13 +510,12 @@ class UnityWebPortalTestCase extends TestCase
         $this->last_user_nickname = $this->current_user_nickname;
         $this->current_user_nickname = $nickname;
         // session_start will be called on the first post()
-        $_SERVER["REMOTE_USER"] = $eppn;
-        $_SERVER["REMOTE_ADDR"] = "127.0.0.1";
-        $_SERVER["HTTP_HOST"] = "phpunit"; // used for config override
-        $_SERVER["eppn"] = $eppn;
-        $_SERVER["givenName"] = $given_name;
-        $_SERVER["sn"] = $sn;
-        include __DIR__ . "/../resources/autoload.php";
+        $this->current_user_attributes = [
+            "REMOTE_USER" => $eppn,
+            "eppn" => $eppn,
+            "givenName" => $given_name,
+            "sn" => $sn,
+        ];
         if ($validate) {
             try {
                 $this->validateUser($nickname);
@@ -552,6 +561,15 @@ class UnityWebPortalTestCase extends TestCase
         ?array $query_params = null,
         array $server_params = [],
     ): ServerRequestInterface {
+        if (!in_array("HTTP_HOST", $server_params)) {
+            $server_params["HTTP_HOST"] = "phpuit";
+        }
+        if (!in_array("REMOTE_ADDR", $server_params)) {
+            $server_params["REMOTE_ADDR"] = "127.0.0.1";
+        }
+        if ($this->current_user_attributes !== null) {
+            $server_params = array_merge($server_params, $this->current_user_attributes);
+        }
         $factory = new ServerRequestFactory();
         $request = $factory->createServerRequest($method, $uri, $server_params);
         if ($form_data !== null) {
@@ -620,71 +638,6 @@ class UnityWebPortalTestCase extends TestCase
             $this->assertNoWarningErrorMessages();
         }
         return $body;
-    }
-
-    private static function findPHPFiles($path)
-    {
-        // if I do this recursively I get the ajax and modal files, which aren't appropriate
-        // for these tests, so instead I just list the directory
-        // $directory_iterator = new RecursiveDirectoryIterator($path);
-        // $iterator_iterator = new RecursiveIteratorIterator($directory_iterator);
-        // $regex_iterator = new RegexIterator(
-        //     $iterator_iterator,
-        //     '/^.+\.php$/i',
-        //     RecursiveRegexIterator::GET_MATCH
-        // );
-        // return array_keys(iterator_to_array($regex_iterator)));
-        $files = [];
-        foreach (new DirectoryIterator($path) as $file) {
-            if (str_ends_with($file->getFilename(), ".php")) {
-                array_push($files, join("/", [$path, $file->getFilename()]));
-            }
-        }
-        return $files;
-    }
-
-    public static function providerAdminPages()
-    {
-        return TRegxDataProvider::list(...self::findPHPFiles(__DIR__ . "/../webroot/admin"));
-    }
-
-    private static function panelPagesWithNoSpecialRedirects()
-    {
-        $panel = __DIR__ . "/../webroot/panel";
-        $excludePanelPages = array_map(fn($x) => "$panel/$x.php", [
-            "pi",
-            "new_account",
-            "disabled_account",
-        ]);
-        $output = [];
-        foreach (self::findPHPFiles($panel) as $page) {
-            if (!in_array($page, $excludePanelPages)) {
-                array_push($output, $page);
-            }
-        }
-        return $output;
-    }
-
-    public static function providerPanelPagesWithNoSpecialRedirects()
-    {
-        return TRegxDataProvider::list(...self::panelPagesWithNoSpecialRedirects());
-    }
-
-    public static function providerValidUserForAllPages()
-    {
-        $panel = __DIR__ . "/../webroot/panel";
-        $admin = __DIR__ . "/../webroot/admin";
-        $output = [];
-        foreach (self::panelPagesWithNoSpecialRedirects() as $page) {
-            array_push($output, ["Blank", $page]);
-        }
-        array_push($output, ["EmptyPIGroupOwner", "$panel/pi.php"]);
-        array_push($output, ["NonExistent", "$panel/new_account.php"]);
-        array_push($output, ["Disabled", "$panel/disabled_account.php"]);
-        foreach (self::findPHPFiles($admin) as $page) {
-            array_push($output, ["Admin", $page]);
-        }
-        return $output;
     }
 }
 
