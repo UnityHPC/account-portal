@@ -34,10 +34,3 @@
   height: 32px;
   padding: 0;
 }
-
-#modalCloseSpan {
-  background-color: white;
-  mask-size: contain;
-  width: 16px;
-  height: 16px;
-}
