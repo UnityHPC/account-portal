@@ -63,12 +63,7 @@
   <nav class="mainNav" id="navigation" aria-label="navigation" popover>
     {{ getRelativeHyperlink('Home', 'index.php')|raw }}
 
-    {% for label in CONFIG['menuitems']['labels'] %}
-      <a target="_blank" href="{{ CONFIG['menuitems']['links'][loop.index0] }}" class="external">
-        {{ label }}
-        <span class="icon-span icon-external-link" aria-hidden="true"></span>
-      </a>
-    {% endfor %}
+    {{ include('navbar-links.html.twig', {data: CONFIG['menuitems']}) }}
 
     {% if user_exists %}
       <hr class="navHR">
@@ -79,12 +74,7 @@
         {{ getRelativeHyperlink('My Users', 'panel/pi.php')|raw }}
       {% endif %}
 
-      {% for label in CONFIG['menuitems_secure']['labels'] %}
-        <a target="_blank" href="{{ CONFIG['menuitems_secure']['links'][loop.index0] }}" class="external">
-          {{ label }}
-          <span class="icon-span icon-external-link" aria-hidden="true"></span>
-        </a>
-      {% endfor %}
+      {{ include('navbar-links.html.twig', {data: CONFIG['menuitems_secure']}) }}
 
       {% if is_admin and (viewUser is null) %}
         <hr class="navHR">
