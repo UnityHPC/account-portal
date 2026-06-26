@@ -302,16 +302,33 @@ div.searchWrapper > *:hover {
   background: var(--light_panel_background);
 }
 
+.icon-span {
+    background-color: var(--accent_foreground);
+    mask-size: contain;
+}
+
 .icon-x {
   mask-image: url('/assets/x.svg');
+  width: 16px;
+  height: 16px;
 }
 
 .icon-magnifying-glass-plus {
   mask-image: url('/assets/magnifying-glass-plus.svg');
+  width: 24px;
+  height: 24px;
 }
 
 .icon-magnifying-glass-minus {
   mask-image: url('/assets/magnifying-glass-minus.svg');
+  width: 24px;
+  height: 24px;
+}
+
+.icon-external-link {
+  mask-image: url('/assets/external-link.svg');
+  width: 16px;
+  height: 16px;
 }
 
 dialog {

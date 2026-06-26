@@ -310,7 +310,7 @@ if (count($sshPubKeys) == 0) {
                 <td>
                     <div style='display: flex; gap: 5px;'>
                         <button command='show-modal' commandfor='key-$i-contents' class='show-key-button' aria-label='show key contents'>
-                            <span class='show-key-span icon-magnifying-glass-plus' aria-hidden='true'></span>
+                            <span class='icon-span icon-magnifying-glass-plus' aria-hidden='true'></span>
                         </button>
                         <form
                             action=''
@@ -321,7 +321,7 @@ if (count($sshPubKeys) == 0) {
                             <input type='hidden' name='delKey' value='$key_b64' />
                             <input type='hidden' name='form_type' value='delKey' />
                             <button type='submit' class='delete-key-button' aria-label='Delete Key $stub_fingprint'>
-                                <span class='delete-key-span icon-x' aria-hidden='true'></span>
+                                <span class='icon-span icon-x' aria-hidden='true'></span>
                             </button>
                         </form>
                     </div>
@@ -478,21 +478,6 @@ echo "</form></div>";
         width: 32px;
         height: 32px;
         padding: 0;
-    }
-
-    .delete-key-span, .show-key-span {
-        background-color: white;
-        mask-size: contain;
-    }
-
-    .delete-key-span {
-        width: 16px;
-        height: 16px;
-    }
-
-    .show-key-span {
-        width: 24px;
-        height: 24px;
     }
 </style>
 

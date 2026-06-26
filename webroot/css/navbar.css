@@ -35,6 +35,12 @@ nav.mainNav a {
   overflow: hidden;
 }
 
+nav.mainNav a.external {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 nav.mainNav a:hover {
   text-decoration: none;
   background: var(--accent_2);

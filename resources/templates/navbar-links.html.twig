@@ -1,0 +1,12 @@
+{% for link in data['links'] %}
+  {% if link starts with CONFIG['site']['url'] %}
+    <a target="_blank" href="{{ link }}">
+      {{ data['labels'][loop.index0] }}
+    </a>
+  {% else %}
+    <a target="_blank" href="{{ link }}" class="external">
+      {{ data['labels'][loop.index0] }}
+      <span class="icon-span icon-external-link" aria-hidden="true"></span>
+    </a>
+  {% endif %}
+{% endfor %}
