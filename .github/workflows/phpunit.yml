@@ -32,14 +32,12 @@ jobs:
             --tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-identity:latest \
             --cache-from type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-identity:buildcache \
             --cache-to type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-identity:buildcache,mode=max \
-            --push \
             ./tools/docker-dev/identity
 
           docker buildx build \
             --tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-sql:latest \
             --cache-from type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-sql:buildcache \
             --cache-to type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-sql:buildcache,mode=max \
-            --push \
             ./tools/docker-dev/sql
 
           cp package{-lock,}.json tools/docker-dev/web/
@@ -48,7 +46,6 @@ jobs:
             --tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:latest \
             --cache-from type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:buildcache \
             --cache-to type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:buildcache,mode=max \
-            --push \
             ./tools/docker-dev/web
 
       - name: Pull cache images to local Docker
