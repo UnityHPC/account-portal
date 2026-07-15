@@ -16,7 +16,7 @@ fi
 
 changed_files="$(git diff --name-only "$base_ref" "$head_ref")"
 
-if ! grep -Eq '^(webroot/css/|webroot/js/)' <<< "$changed_files"; then
+if ! grep -E '^(webroot/css/|webroot/js/)' <<< "$changed_files"; then
     exit 0
 fi
 
