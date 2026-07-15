@@ -42,6 +42,8 @@ jobs:
             --push \
             ./tools/docker-dev/sql
 
+          cp package{-lock,}.json tools/docker-dev/web/
+          cp composer.{json,lock} tools/docker-dev/web/
           docker buildx build \
             --tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:latest \
             --cache-from type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:buildcache \
