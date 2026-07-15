@@ -1,0 +1,8 @@
+Architectures: amd64 arm64
+Components: main
+X-Repolib-Name: node
+Signed-By: /etc/apt/keyrings/node.asc
+Suites: nodistro
+Trusted: yes
+Types: deb
+URIs: https://deb.nodesource.com/node_24.x
