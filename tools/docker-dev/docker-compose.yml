@@ -39,14 +39,8 @@ services:
     ports:
       - "127.0.0.1:8000:80"
     volumes:
-      - ../../composer.json:/srv/www/unity-web/composer.json
-      - ../../composer.lock:/srv/www/unity-web/composer.lock
-      - ../../package.json:/srv/www/unity-web/package.json
-      - ../../package-lock.json:/srv/www/unity-web/package-lock.json
-      - ../../phpstan.neon:/srv/www/unity-web/phpstan.neon
       - ../../phpunit.xml:/srv/www/unity-web/phpunit.xml
       - ../../resources:/srv/www/unity-web/resources
-      # - ../../.git/modules/hakasapl/phpopenldaper/src/PHPOpenLDAPer:/srv/www/unity-web/resources/lib/phpopenldaper/src/PHPOpenLDAPer
       - ../../test:/srv/www/unity-web/test
       - ../../webroot:/srv/www/unity-web/webroot
       - ../../workers:/srv/www/unity-web/workers
