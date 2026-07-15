@@ -12,6 +12,7 @@ For details on the changes in each release, see [the Releases page](https://gith
   - remove the `piGroup` object class from all PI groups
   - run the `setup-pi-group-owners.php` worker
   - restart the account portal
+- the `[config]custom_user_mappings_dir` option should be removed from the config file
 
 ### 1.7 -> 1.8
 - the [webhook] section of the config file can be removed

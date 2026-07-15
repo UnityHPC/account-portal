@@ -186,7 +186,7 @@ class UnityDeployment
     public static function getCustomIDMappings(): array
     {
         $output = [];
-        $dir_path = __DIR__ . "/../../" . CONFIG["ldap"]["custom_user_mappings_dir"];
+        $dir_path = __DIR__ . "/../../deployment/custom_user_mappings";
         if (!is_dir($dir_path)) {
             throw new \Exception("custom_user_mappings directory '$dir_path' is not a directory");
         }
