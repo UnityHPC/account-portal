@@ -57,10 +57,5 @@ jobs:
           docker tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-sql:latest docker-dev-sql
           docker pull ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:latest
           docker tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:latest docker-dev-web
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.3"
-          tools: composer
-      - run: composer install --dev
       - run: docker compose -f ./tools/docker-dev/docker-compose.yml up -d --no-build
       - run: docker compose -f ./tools/docker-dev/docker-compose.yml exec -w '/srv/www/unity-web' web bash -c 'XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-clover="$(mktemp --suffix=.xml)" -d --min-coverage=./coverage.php'

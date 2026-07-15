@@ -50,7 +50,7 @@ RUN mkdir -p /srv/www/unity-web
 
 COPY composer.json /srv/www/unity-web/composer.json
 COPY composer.lock /srv/www/unity-web/composer.lock
-RUN cd /srv/www/unity-web && COMPOSER_ALLOW_SUPERUSER=1 composer --no-dev --no-scripts --no-plugins install
+RUN cd /srv/www/unity-web && COMPOSER_ALLOW_SUPERUSER=1 composer --dev --no-scripts --no-plugins install
 
 COPY package.json /srv/www/unity-web/package.json
 COPY package-lock.json /srv/www/unity-web/package-lock.json
