@@ -39,18 +39,26 @@ services:
     ports:
       - "127.0.0.1:8000:80"
     volumes:
-      - ../../:/var/www/unity-web-portal
-      - ../../test/deployment/domain_overrides/phpunit:/var/www/unity-web-portal/deployment/domain_overrides/phpunit
+      - ../../phpunit.xml:/srv/www/unity-web/phpunit.xml
+      - ../../resources:/srv/www/unity-web/resources
+      - ../../test:/srv/www/unity-web/test
+      - ../../webroot:/srv/www/unity-web/webroot
+      - ../../workers:/srv/www/unity-web/workers
+      - ../../deployment/config.base.ini:/srv/www/unity-web/deployment/config.base.ini
+      - ../../test/deployment/custom_user_mappings:/srv/www/unity-web/deployment/custom_user_mappings
+      - ../../deployment/domain_overrides/course-creator:/srv/www/unity-web/deployment/domain_overrides/course-creator
+      - ../../deployment/domain_overrides/worker:/srv/www/unity-web/deployment/domain_overrides/worker
+      - ../../test/deployment/domain_overrides/phpunit:/srv/www/unity-web/deployment/domain_overrides/phpunit
       # docker doesn't like how these paths have colons in them
       # https://github.com/docker/compose/issues/12553#issuecomment-2656090965
       - type: bind
         source: ../../test/deployment/domain_overrides/account-portal-docker-web-green:8000
-        target: /var/www/unity-web-portal/deployment/domain_overrides/account-portal-docker-web-green:8000
+        target: /srv/www/unity-web/deployment/domain_overrides/account-portal-docker-web-green:8000
         bind:
           create_host_path: false
       - type: bind
         source: ../../test/deployment/domain_overrides/account-portal-docker-web:8000
-        target: /var/www/unity-web-portal/deployment/domain_overrides/account-portal-docker-web:8000
+        target: /srv/www/unity-web/deployment/domain_overrides/account-portal-docker-web:8000
         bind:
           create_host_path: false
     depends_on:

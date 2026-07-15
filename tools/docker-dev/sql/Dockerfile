@@ -1,6 +1,7 @@
 FROM ubuntu:24.04
 
 ARG DEBIAN_FRONTEND=noninteractive
+RUN sed -i 's/ports.ubuntu.com/mirrors.ocf.berkeley.edu/' /etc/apt/sources.list.d/ubuntu.sources
 RUN apt-get update && apt-get install -y \
     mariadb-server \
     mariadb-client \
