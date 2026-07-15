@@ -28,26 +28,9 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build docker-compose images with cache
+      - name: Prepare web build context
         run: |
-          docker buildx build \
-            --tag docker-dev-identity \
-            --cache-from type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-identity:buildcache \
-            --cache-to type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-identity:buildcache,mode=max \
-            ./tools/docker-dev/identity
-
-          docker buildx build \
-            --tag docker-dev-sql \
-            --cache-from type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-sql:buildcache \
-            --cache-to type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-sql:buildcache,mode=max \
-            ./tools/docker-dev/sql
-
           cp package{-lock,}.json tools/docker-dev/web/
           cp composer.{json,lock} tools/docker-dev/web/
-          docker buildx build \
-            --tag docker-dev-web \
-            --cache-from type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:buildcache \
-            --cache-to type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:buildcache,mode=max \
-            ./tools/docker-dev/web
-      - run: docker compose -f ./tools/docker-dev/docker-compose.yml up -d --no-build
+      - run: COMPOSE_BAKE=true docker compose -f ./tools/docker-dev/docker-compose.yml up -d --build
       - run: docker compose -f ./tools/docker-dev/docker-compose.yml exec -w '/srv/www/unity-web' web bash -c 'XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-clover="$(mktemp --suffix=.xml)" -d --min-coverage=./coverage.php'
