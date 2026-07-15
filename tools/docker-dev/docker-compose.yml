@@ -4,12 +4,7 @@ networks:
 services:
   identity:
     hostname: identity
-    build:
-      context: identity
-      cache_from:
-        - type=registry,ref=ghcr.io/${REPO_OWNER}/unity-dev-identity:buildcache
-      cache_to:
-        - type=registry,ref=ghcr.io/${REPO_OWNER}/unity-dev-identity:buildcache,mode=max
+    build: identity
     ports:
       - "127.0.0.1:8010:80"
       - "127.0.0.1:389:389"
@@ -22,12 +17,7 @@ services:
       interval: 1s
   sql:
     hostname: sql
-    build:
-      context: sql
-      cache_from:
-        - type=registry,ref=ghcr.io/${REPO_OWNER}/unity-dev-sql:buildcache
-      cache_to:
-        - type=registry,ref=ghcr.io/${REPO_OWNER}/unity-dev-sql:buildcache,mode=max
+    build: sql
     ports:
       - "127.0.0.1:8020:80"
       - "127.0.0.1:3306:3306"
@@ -45,12 +35,7 @@ services:
       - "127.0.0.1:8030:1080"
   web:
     hostname: web
-    build:
-      context: web
-      cache_from:
-        - type=registry,ref=ghcr.io/${REPO_OWNER}/unity-dev-web:buildcache
-      cache_to:
-        - type=registry,ref=ghcr.io/${REPO_OWNER}/unity-dev-web:buildcache,mode=max
+    build: web
     ports:
       - "127.0.0.1:8000:80"
     volumes:
