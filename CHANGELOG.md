@@ -4,7 +4,7 @@ For details on the changes in each release, see [the Releases page](https://gith
 
 ## Version-specific update instructions:
 
-### 1.8 -> 1.9
+### 1.7 -> 1.8
 - schema migration:
   - add the new LDAP schema in conjunction with the old
   - shut down the account portal
@@ -13,8 +13,6 @@ For details on the changes in each release, see [the Releases page](https://gith
   - run the `setup-pi-group-owners.php` worker
   - restart the account portal
 - the `[config]custom_user_mappings_dir` option should be removed from the config file
-
-### 1.7 -> 1.8
 - the [webhook] section of the config file can be removed
 - all mail templates are no longer PHP files, now they are `.html.twig`
 - the `mail_overrides` directory has been renamed to `mail`
