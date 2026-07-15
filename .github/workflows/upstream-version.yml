@@ -1,0 +1,18 @@
+name: upstream-version
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  assert-upstream-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+        run: bash ./test/assert-upstream-version-bumped.bash "$BASE_SHA" "$HEAD_SHA"
