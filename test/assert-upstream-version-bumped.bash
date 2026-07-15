@@ -16,6 +16,7 @@ fi
 
 changed_files="$(git diff --name-only "$base_ref" "$head_ref")"
 
+# print out a list of changed files, if nothing was printed then exit
 if ! grep -E '^(webroot/css/|webroot/js/)' <<< "$changed_files"; then
     exit 0
 fi
