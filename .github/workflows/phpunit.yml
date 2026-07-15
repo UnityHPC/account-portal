@@ -29,32 +29,26 @@ jobs:
       - name: Build docker-compose images with cache
         run: |
           docker buildx build \
-            --tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-identity:latest \
+            --tag docker-dev-identity \
             --cache-from type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-identity:buildcache \
             --cache-to type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-identity:buildcache,mode=max \
+            --load \
             ./tools/docker-dev/identity
 
           docker buildx build \
-            --tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-sql:latest \
+            --tag docker-dev-sql \
             --cache-from type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-sql:buildcache \
             --cache-to type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-sql:buildcache,mode=max \
+            --load \
             ./tools/docker-dev/sql
 
           cp package{-lock,}.json tools/docker-dev/web/
           cp composer.{json,lock} tools/docker-dev/web/
           docker buildx build \
-            --tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:latest \
+            --tag docker-dev-web \
             --cache-from type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:buildcache \
             --cache-to type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:buildcache,mode=max \
+            --load \
             ./tools/docker-dev/web
-
-      - name: Pull cache images to local Docker
-        run: |
-          docker pull ghcr.io/${{ env.REPO_OWNER }}/unity-dev-identity:latest
-          docker tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-identity:latest docker-dev-identity
-          docker pull ghcr.io/${{ env.REPO_OWNER }}/unity-dev-sql:latest
-          docker tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-sql:latest docker-dev-sql
-          docker pull ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:latest
-          docker tag ghcr.io/${{ env.REPO_OWNER }}/unity-dev-web:latest docker-dev-web
       - run: docker compose -f ./tools/docker-dev/docker-compose.yml up -d --no-build
       - run: docker compose -f ./tools/docker-dev/docker-compose.yml exec -w '/srv/www/unity-web' web bash -c 'XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-clover="$(mktemp --suffix=.xml)" -d --min-coverage=./coverage.php'
