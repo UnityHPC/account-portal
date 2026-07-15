@@ -5,9 +5,10 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN sed -i 's/ports.ubuntu.com/mirrors.ocf.berkeley.edu/' /etc/apt/sources.list.d/ubuntu.sources
 RUN apt-get update
-RUN apt-get install -y gnupg ca-certificates
+RUN apt-get install -y wget gnupg ca-certificates
 
-ADD https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key /tmp/nodesource-repo.gpg.key
+# I would use ADD but ADD always invalidates the cache, I don't really care about this getting stale
+RUN wget https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key -O /tmp/nodesource-repo.gpg.key
 RUN mkdir -p /etc/apt/keyrings && \
     gpg --dearmor --yes --output /etc/apt/keyrings/node.asc /tmp/nodesource-repo.gpg.key && \
     chmod a+r /etc/apt/keyrings/node.asc
