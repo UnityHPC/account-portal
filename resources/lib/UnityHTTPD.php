@@ -81,7 +81,8 @@ class UnityHTTPD
         self::errorLog($log_title, $log_message, data: $data, error: $error, errorid: $errorid);
         if (
             ($_SERVER["REQUEST_METHOD"] ?? "") == "POST" &&
-            !str_starts_with($_SERVER["REQUEST_URI"], "/lan/api/")
+            !str_starts_with($_SERVER["REQUEST_URI"], "/lan/api/") &&
+            !str_starts_with($_SERVER["REQUEST_URI"], "/panel/ajax/")
         ) {
             self::messageError($title, implode("\n", $body_paragraphs));
             self::redirect();
@@ -239,8 +240,19 @@ class UnityHTTPD
         return false;
     }
 
+    public static function assertRequestMethod(string $expected)
+    {
+        if (($found = $_SERVER["REQUEST_METHOD"] ?? "") != $expected) {
+            UnityHTTPD::badRequest(
+                "expected request method '$expected', got '$found'",
+                "invalid request method",
+            );
+        }
+    }
+
     public static function getPostData(string $key): string
     {
+        self::assertRequestMethod("POST");
         if (!array_key_exists($key, $_POST)) {
             self::badRequest("\$_POST has no array key '$key'");
         }
