@@ -248,7 +248,7 @@ class UnityHTTPD
         return false;
     }
 
-    public static function assertRequestMethod(string $expected)
+    public static function assertRequestMethod(string $expected): void
     {
         if (($found = $_SERVER["REQUEST_METHOD"] ?? "") != $expected) {
             UnityHTTPD::badRequest(
