@@ -1,15 +1,7 @@
-function hideClearAllMessagesButtonIfAllMessagesAlreadyCleared() {
-    var visibleMessages = $('#messages .message:visible').length;
-    if (visibleMessages === 0) {
-        $('#clear_all_messages_button').hide();
-    }
-}
-
 $(document).ready(function () {
     $('#messages').on('click', '.message button', function () {
         var button = $(this);
         var message = button.parent();
-        message.hide();
         $.ajax({
             url: '/panel/ajax/delete_message.php',
             method: 'POST',
@@ -18,14 +10,30 @@ $(document).ready(function () {
                 'title': button.data('title'),
                 'body': button.data('body')
             },
+            success: function () {
+                message.hide();
+                let visibleMessages = $('#messages .message:visible').length;
+                if (visibleMessages === 0) {
+                    $('#clear_all_messages_button').hide();
+                }
+            },
             error: function (result) {
                 $("#messages").append(result.responseText);
             }
         });
-        hideClearAllMessagesButtonIfAllMessagesAlreadyCleared();
     });
 
     $('#clear_all_messages_button').on('click', function () {
-        $('#messages .message:visible button').click();
+        $.ajax({
+            url: '/panel/ajax/clear_messages.php',
+            method: 'POST',
+            success: function () {
+                $('#messages .message').hide();
+                $('#clear_all_messages_button').hide();
+            },
+            error: function (result) {
+                $("#messages").append(result.responseText);
+            }
+        });
     });
 });
