@@ -92,7 +92,6 @@ class UnityHTTPD
             !str_starts_with($_SERVER["REQUEST_URI"], "/panel/ajax/")
         ) {
             self::messageError($title, implode("\n", $body_paragraphs));
-            // change request method POST into GET to prevent an infinite looop of errors
             self::redirectOverrideMethodGet();
         } else {
             if (!headers_sent()) {
