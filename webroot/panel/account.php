@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     } catch (EncodingUnknownException | EncodingConversionException $e) {
                         UnityHTTPD::errorLog("uploaded key has bad encoding", "", error: $e);
                         UnityHTTPD::messageError("SSH Key Not Added: Invalid Encoding", "");
-                        UnityHTTPD::redirect();
+                        UnityHTTPD::redirectOverrideMethodGet();
                     }
                     break;
                 case "generate":
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                             "No Keys Added",
                             "No keys found associated with GitHub account."
                         );
-                        UnityHTTPD::redirect();
+                        UnityHTTPD::redirectOverrideMethodGet();
                     }
                     break;
                 default:
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 $stub_fingprint = substr($sha256_fingerprint, 0, 6);
                 UnityHTTPD::messageSuccess("SSH Key Added", "Fingerprint: $stub_fingprint");
             }
-            UnityHTTPD::redirect();
+            UnityHTTPD::redirectOverrideMethodGet();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "delKey":
             $key = _base64_decode(UnityHTTPD::getPostData("delKey"));
@@ -86,10 +86,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 $USER->removeSSHKey($key);
             } catch (ArrayKeyException) {
                 UnityHTTPD::messageError("Cannot Remove SSH Key", "Key not found");
-                UnityHTTPD::redirect();
+                UnityHTTPD::redirectOverrideMethodGet();
             }
             UnityHTTPD::messageSuccess("SSH Key Removed", "$key_short");
-            UnityHTTPD::redirect();
+            UnityHTTPD::redirectOverrideMethodGet();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "loginshell":
             $shell = UnityHTTPD::getPostData("shellSelect");
@@ -98,32 +98,32 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             }
             $USER->setLoginShell($shell);
             UnityHTTPD::messageSuccess("Login Shell Changed", "");
-            UnityHTTPD::redirect();
+            UnityHTTPD::redirectOverrideMethodGet();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "pi_request":
             if ($USER->isPI()) {
                 UnityHTTPD::messageError("Cannot Submit PI Request", "Already a PI");
-                UnityHTTPD::redirect();
+                UnityHTTPD::redirectOverrideMethodGet();
             }
             if ($SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI)) {
                 UnityHTTPD::messageError("Cannot Submit PI Request", "This request already exists");
-                UnityHTTPD::redirect();
+                UnityHTTPD::redirectOverrideMethodGet();
             }
             if ($_POST["tos"] != "agree") {
                 UnityHTTPD::badRequest("user did not agree to terms of service");
             }
             $USER->getPIGroup()->requestGroup();
             UnityHTTPD::messageSuccess("PI Group Requested", "");
-            UnityHTTPD::redirect();
+            UnityHTTPD::redirectOverrideMethodGet();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "cancel_pi_request":
             if (!$SQL->requestExists($USER->uid, UnitySQL::REQUEST_BECOME_PI)) {
                 UnityHTTPD::messageError("Cannot Cancel PI Request", "No PI request found");
-                UnityHTTPD::redirect();
+                UnityHTTPD::redirectOverrideMethodGet();
             }
             $USER->getPIGroup()->cancelGroupRequest();
             UnityHTTPD::messageSuccess("PI Request Cancelled", "");
-            UnityHTTPD::redirect();
+            UnityHTTPD::redirectOverrideMethodGet();
             break; /** @phpstan-ignore deadCode.unreachable */
         case "disable":
             if ($hasGroups) {
@@ -131,14 +131,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     "Cannot Disable",
                     "You are a PI or you are a member of at least one PI group"
                 );
-                UnityHTTPD::redirect();
+                UnityHTTPD::redirectOverrideMethodGet();
             }
             if ($USER->getFlag(UserFlag::DISABLED)) {
                 UnityHTTPD::badRequest("user is already disabled", "");
             }
             $USER->disable(UnityUserDisabledReason::DisabledSelf);
             UnityHTTPD::messageSuccess("Account Disabled", "");
-            UnityHTTPD::redirect();
+            UnityHTTPD::redirectOverrideMethodGet();
             break; /** @phpstan-ignore deadCode.unreachable */
     }
 }

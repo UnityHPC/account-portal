@@ -33,6 +33,11 @@ class UnityHTTPD
         }
     }
 
+    public static function redirectOverrideMethodGet(?string $dest = null): never
+    {
+        self::redirect(dest: $dest, preserve_request_method: false);
+    }
+
     /*
     send HTTP header, set HTTP response code,
     print a message just in case the browser fails to redirect if PHP is not being run from the CLI,
@@ -88,7 +93,7 @@ class UnityHTTPD
         ) {
             self::messageError($title, implode("\n", $body_paragraphs));
             // change request method POST into GET to prevent an infinite looop of errors
-            self::redirect(preserve_request_method: false);
+            self::redirectOverrideMethodGet();
         } else {
             if (!headers_sent()) {
                 http_response_code($http_response_code);
@@ -432,7 +437,7 @@ class UnityHTTPD
                 "Invalid Session Token",
                 "This can happen if you leave your browser open for too long. Error ID: $errorid",
             );
-            self::redirect();
+            self::redirectOverrideMethodGet();
         }
     }
 
