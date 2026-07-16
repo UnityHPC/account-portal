@@ -1,4 +1,15 @@
+function updateClearMessagesButtonVisibility(minMessageCount = 3) {
+    var visibleMessages = $('#messages .message:visible').length;
+    if (visibleMessages >= minMessageCount) {
+        $('#clear_all_messages_button').show();
+    } else {
+        $('#clear_all_messages_button').hide();
+    }
+}
+
 $(document).ready(function () {
+    updateClearMessagesButtonVisibility();
+
     $('#messages').on('click', '.message button', function () {
         var button = $(this);
         var message = button.parent();
@@ -12,10 +23,7 @@ $(document).ready(function () {
             },
             success: function () {
                 message.hide();
-                let visibleMessages = $('#messages .message:visible').length;
-                if (visibleMessages === 0) {
-                    $('#clear_all_messages_button').hide();
-                }
+                updateClearMessagesButtonVisibility();
             },
             error: function (result) {
                 $("#messages").append(result.responseText);
