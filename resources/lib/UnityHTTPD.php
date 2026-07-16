@@ -43,7 +43,7 @@ class UnityHTTPD
         $dest ??= getRelativeURL($_SERVER["REQUEST_URI"]);
         // TODO check $_SERVER["REDIRECT_STATUS"]?
         header("Location: $dest");
-        http_response_code(302);
+        http_response_code(307); // when using 302, request method may be changed
         if (CONFIG["site"]["enable_redirect_message"]) {
             echo "If you're reading this message, then your browser has failed to redirect you " .
                 "to the proper destination. click <a href='$dest'>here</a> to continue.";
