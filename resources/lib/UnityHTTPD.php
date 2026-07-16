@@ -262,7 +262,7 @@ class UnityHTTPD
     {
         self::assertRequestMethod("POST");
         if (!array_key_exists($key, $_POST)) {
-            self::badRequest("\$_POST has no array key '$key'");
+            self::badRequest("\$_POST has no array key '$key'", data: ['$_POST' => $_POST]);
         }
         return $_POST[$key];
     }
@@ -274,7 +274,7 @@ class UnityHTTPD
     {
         if (!array_key_exists($key, $_GET)) {
             if ($die_if_not_found) {
-                self::badRequest("\$_GET has no array key '$key'");
+                self::badRequest("\$_GET has no array key '$key'", data: ['$_GET' => $_GET]);
             } else {
                 return null;
             }
