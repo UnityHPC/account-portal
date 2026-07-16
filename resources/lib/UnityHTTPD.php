@@ -38,12 +38,14 @@ class UnityHTTPD
     print a message just in case the browser fails to redirect if PHP is not being run from the CLI,
     and then die
     */
-    public static function redirect(?string $dest = null): never
-    {
+    public static function redirect(
+        ?string $dest = null,
+        bool $preserve_request_method = true,
+    ): never {
         $dest ??= getRelativeURL($_SERVER["REQUEST_URI"]);
         // TODO check $_SERVER["REDIRECT_STATUS"]?
         header("Location: $dest");
-        http_response_code(307); // when using 302, request method may be changed
+        http_response_code($preserve_request_method ? 307 : 303);
         if (CONFIG["site"]["enable_redirect_message"]) {
             echo "If you're reading this message, then your browser has failed to redirect you " .
                 "to the proper destination. click <a href='$dest'>here</a> to continue.";
@@ -85,7 +87,8 @@ class UnityHTTPD
             !str_starts_with($_SERVER["REQUEST_URI"], "/panel/ajax/")
         ) {
             self::messageError($title, implode("\n", $body_paragraphs));
-            self::redirect();
+            // change request method POST into GET to prevent an infinite looop of errors
+            self::redirect(preserve_request_method: false);
         } else {
             if (!headers_sent()) {
                 http_response_code($http_response_code);
