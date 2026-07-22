@@ -53,8 +53,9 @@ RUN cd /srv/www/unity-web && COMPOSER_ALLOW_SUPERUSER=1 composer --dev --no-scri
 
 COPY package.json /srv/www/unity-web/package.json
 COPY package-lock.json /srv/www/unity-web/package-lock.json
-COPY copy-node_modules-to-webroot.bash /srv/www/unity-web/tools/copy-node_modules-to-webroot.bash
 RUN cd /srv/www/unity-web && npm install
+
+COPY copy-node_modules-to-webroot.bash /srv/www/unity-web/tools/copy-node_modules-to-webroot.bash
 RUN cd /srv/www/unity-web && mkdir webroot && mkdir webroot/js && mkdir webroot/css
 RUN cd /srv/www/unity-web && ./tools/copy-node_modules-to-webroot.bash
 
