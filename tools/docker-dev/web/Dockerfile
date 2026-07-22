@@ -54,7 +54,7 @@ RUN cd /srv/www/unity-web && COMPOSER_ALLOW_SUPERUSER=1 composer --dev --no-scri
 COPY package.json /srv/www/unity-web/package.json
 COPY package-lock.json /srv/www/unity-web/package-lock.json
 RUN cd /srv/www/unity-web && npm install
-RUN cd /srv/www/unity-web && npx copy-files-from-to
+RUN cd /srv/www/unity-web && ./tools/copy-node_modules-to-webroot.bash
 
 # Start apache2 server
 EXPOSE 80
