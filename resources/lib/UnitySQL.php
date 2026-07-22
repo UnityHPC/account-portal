@@ -7,6 +7,7 @@ use PDOException;
 
 /**
  * @phpstan-type user_last_login array{operator: string, last_login: int}
+ * @phpstan-type pi_group_expiration_date array{gid: string, expiration_date: int}
  * @phpstan-type request array{request_for: string, uid: string, timestamp: string}
  */
 class UnitySQL
@@ -14,6 +15,7 @@ class UnitySQL
     private const string TABLE_REQS = "requests";
     private const string TABLE_AUDIT_LOG = "audit_log";
     private const string TABLE_USER_LAST_LOGINS = "user_last_logins";
+    private const string TABLE_PI_GROUP_EXPIRATION_DATES = "pi_group_expiration_dates";
     // FIXME this string should be changed to something more intuitive, requires production change
     public const string REQUEST_BECOME_PI = "admin";
     private const int TABLE_AUDIT_LOG_RECIPIENT_MAX_MB_STR_LEN = 768;
@@ -275,5 +277,70 @@ class UnitySQL
         }
         $timestamp_str = $result[0]["last_login"];
         return strtotime($timestamp_str);
+    }
+
+    /**
+     * @throws PDOException
+     * @throws \Exception if multiple records are found (this should never happen)
+     */
+    public function getPIGroupExpirationDate(string $gid): int|null
+    {
+        $table = self::TABLE_PI_GROUP_EXPIRATION_DATES;
+        $stmt = $this->conn->prepare("SELECT * FROM $table WHERE gid=:gid");
+        $stmt->bindParam(":gid", $gid);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        if (count($result) == 0) {
+            return null;
+        }
+        if (count($result) > 1) {
+            throw new \Exception("multiple records found with gid '$gid'");
+        }
+        $timestamp_str = $result[0]["expiration_date"];
+        return strtotime($timestamp_str);
+    }
+
+    /** @throws PDOException */
+    public function setPIGroupExpirationDate(string $gid, int $expiration_date): void
+    {
+        $table = self::TABLE_PI_GROUP_EXPIRATION_DATES;
+        $stmt = $this->conn->prepare("
+            INSERT INTO $table
+            VALUES (:gid, :expiration_date)
+            ON DUPLICATE KEY
+            UPDATE expiration_date=:expiration_date
+        ");
+        $stmt->bindParam(":gid", $gid);
+        $expiration_date_str = date("Y-m-d H:i:s", $expiration_date);
+        $stmt->bindParam(":expiration_date", $expiration_date_str);
+        $stmt->execute();
+    }
+
+    /** @throws PDOException */
+    public function removePIGroupExpirationDate(string $gid): void
+    {
+        $table = self::TABLE_PI_GROUP_EXPIRATION_DATES;
+        $stmt = $this->conn->prepare("DELETE FROM $table WHERE gid=:gid");
+        $stmt->bindParam(":gid", $gid);
+        $stmt->execute();
+    }
+
+    /**
+     * @throws PDOException
+     * @return pi_group_expiration_date[]
+     */
+    public function getAllPIGroupExpirationDates(): array
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM " . self::TABLE_PI_GROUP_EXPIRATION_DATES);
+        $stmt->execute();
+        $records = $stmt->fetchAll();
+        $output = [];
+        foreach ($records as $record) {
+            array_push($output, [
+                "gid" => $record["gid"],
+                "expiration_date" => strtotime($record["expiration_date"]),
+            ]);
+        }
+        return $output;
     }
 }
