@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (UnityHTTPD::getPostData("form_type") === "register") {
         UnityHTTPD::validatePostCSRFToken();
         $USER->init($SSO["firstname"], $SSO["lastname"], $SSO["mail"], $SSO["org"]);
-        UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
+        UnityHTTPD::redirectOverrideMethodGet(getRelativeURL("panel/account.php"));
     }
 }
 require getTemplatePath("header.php");

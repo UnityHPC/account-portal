@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         UnityHTTPD::validatePostCSRFToken();
         $USER->reEnable();
         UnityHTTPD::messageSuccess("Account Re-Enabled", "");
-        UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
+        UnityHTTPD::redirectOverrideMethodGet(getRelativeURL("panel/account.php"));
     }
 }
 require getTemplatePath("header.php");

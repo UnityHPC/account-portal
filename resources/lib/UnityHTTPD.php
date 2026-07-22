@@ -33,17 +33,24 @@ class UnityHTTPD
         }
     }
 
+    public static function redirectOverrideMethodGet(?string $dest = null): never
+    {
+        self::redirect(dest: $dest, preserve_request_method: false);
+    }
+
     /*
     send HTTP header, set HTTP response code,
     print a message just in case the browser fails to redirect if PHP is not being run from the CLI,
     and then die
     */
-    public static function redirect(?string $dest = null): never
-    {
+    public static function redirect(
+        ?string $dest = null,
+        bool $preserve_request_method = true,
+    ): never {
         $dest ??= getRelativeURL($_SERVER["REQUEST_URI"]);
         // TODO check $_SERVER["REDIRECT_STATUS"]?
         header("Location: $dest");
-        http_response_code(302);
+        http_response_code($preserve_request_method ? 307 : 303);
         if (CONFIG["site"]["enable_redirect_message"]) {
             echo "If you're reading this message, then your browser has failed to redirect you " .
                 "to the proper destination. click <a href='$dest'>here</a> to continue.";
@@ -81,10 +88,11 @@ class UnityHTTPD
         self::errorLog($log_title, $log_message, data: $data, error: $error, errorid: $errorid);
         if (
             ($_SERVER["REQUEST_METHOD"] ?? "") == "POST" &&
-            !str_starts_with($_SERVER["REQUEST_URI"], "/lan/api/")
+            !str_starts_with($_SERVER["REQUEST_URI"], "/lan/api/") &&
+            !str_starts_with($_SERVER["REQUEST_URI"], "/panel/ajax/")
         ) {
             self::messageError($title, implode("\n", $body_paragraphs));
-            self::redirect();
+            self::redirectOverrideMethodGet();
         } else {
             if (!headers_sent()) {
                 http_response_code($http_response_code);
@@ -239,10 +247,21 @@ class UnityHTTPD
         return false;
     }
 
+    public static function assertRequestMethod(string $expected): void
+    {
+        if (($found = $_SERVER["REQUEST_METHOD"] ?? "") != $expected) {
+            UnityHTTPD::badRequest(
+                "expected request method '$expected', got '$found'",
+                "invalid request method",
+            );
+        }
+    }
+
     public static function getPostData(string $key): string
     {
+        self::assertRequestMethod("POST");
         if (!array_key_exists($key, $_POST)) {
-            self::badRequest("\$_POST has no array key '$key'");
+            self::badRequest("\$_POST has no array key '$key'", data: ['$_POST' => $_POST]);
         }
         return $_POST[$key];
     }
@@ -254,7 +273,7 @@ class UnityHTTPD
     {
         if (!array_key_exists($key, $_GET)) {
             if ($die_if_not_found) {
-                self::badRequest("\$_GET has no array key '$key'");
+                self::badRequest("\$_GET has no array key '$key'", data: ['$_GET' => $_GET]);
             } else {
                 return null;
             }
@@ -417,7 +436,7 @@ class UnityHTTPD
                 "Invalid Session Token",
                 "This can happen if you leave your browser open for too long. Error ID: $errorid",
             );
-            self::redirect();
+            self::redirectOverrideMethodGet();
         }
     }
 

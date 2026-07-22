@@ -12,7 +12,7 @@ $getPIGroupFromPost = function () {
     $pi_group = new UnityGroup($gid, $LDAP, $SQL, $MAILER);
     if (!$pi_group->exists()) {
         UnityHTTPD::messageError("This PI Doesn't Exist", $gid);
-        UnityHTTPD::redirect();
+        UnityHTTPD::redirectOverrideMethodGet();
     }
     return $pi_group;
 };
@@ -32,28 +32,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             "Invalid Group Membership Request",
                             "You've already requested this"
                         );
-                        UnityHTTPD::redirect();
+                        UnityHTTPD::redirectOverrideMethodGet();
                     }
                     if ($pi_account->memberUIDExists($USER->uid)) {
                         UnityHTTPD::messageError(
                             "Invalid Group Membership Request",
                             "You're already in this PI group"
                         );
-                        UnityHTTPD::redirect();
+                        UnityHTTPD::redirectOverrideMethodGet();
                     }
                 }
                 $pi_account->newUserRequest($USER);
-                UnityHTTPD::redirect();
+                UnityHTTPD::redirectOverrideMethodGet();
                 break; /** @phpstan-ignore deadCode.unreachable */
             case "removePIForm":
                 $pi_account = $getPIGroupFromPost();
                 $pi_account->removeUser($USER, UnityGroupUserRemovedReason::RemovedSelf);
-                UnityHTTPD::redirect();
+                UnityHTTPD::redirectOverrideMethodGet();
                 break; /** @phpstan-ignore deadCode.unreachable */
             case "cancelPIForm":
                 $pi_account = $getPIGroupFromPost();
                 $pi_account->cancelGroupJoinRequest($USER);
-                UnityHTTPD::redirect();
+                UnityHTTPD::redirectOverrideMethodGet();
                 break; /** @phpstan-ignore deadCode.unreachable */
         }
     }
