@@ -10,6 +10,7 @@ cp ../../composer.json web/composer.json
 cp ../../composer.lock web/composer.lock
 cp ../../package.json web/package.json
 cp ../../package-lock.json web/package-lock.json
+cp ../../tools/copy-node_modules-to-webroot.bash web/copy-node_modules-to-webroot.bash
 
 docker compose down
 docker compose build
