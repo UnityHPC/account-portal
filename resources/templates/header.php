@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         && ($_POST["form_type"] ?? null) == "clearView"
     ) {
         unset($_SESSION["viewUser"]);
-        UnityHTTPD::redirect(getRelativeURL("admin/user-mgmt.php"));
+        UnityHTTPD::redirectOverrideMethodGet(getRelativeURL("admin/user-mgmt.php"));
     }
     // Webroot files need to handle their own POSTs before loading the header
     // so that they can do UnityHTTPD::badRequest before anything else has been printed.
@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // header also needs to handle POST data. So this header does the PRG redirect
     // for all pages.
     unset($_POST); // unset ensures that header must not come before POST handling
-    UnityHTTPD::redirect();
+    UnityHTTPD::redirectOverrideMethodGet();
 }
 
 if (isset($SSO)) {

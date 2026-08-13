@@ -41,11 +41,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($_POST["action"] == "Approve") {
                 $group->approveUser($form_user);
                 UnityHTTPD::messageSuccess("User Approved", "");
-                UnityHTTPD::redirect();
+                UnityHTTPD::redirectOverrideMethodGet();
             } elseif ($_POST["action"] == "Deny") {
                 $group->denyUser($form_user);
                 UnityHTTPD::messageSuccess("User Denied", "");
-                UnityHTTPD::redirect();
+                UnityHTTPD::redirectOverrideMethodGet();
             } else {
                 UnityHTTPD::badRequest(sprintf("unrecognized action: '%s'", $_POST["action"]), "");
             }
@@ -57,9 +57,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             UnityHTTPD::messageSuccess("User Removed", "");
             // group manager removed themself
             if ($USER->uid === $form_user->uid) {
-                UnityHTTPD::redirect("/panel/groups.php");
+                UnityHTTPD::redirectOverrideMethodGet("/panel/groups.php");
             } else {
-                UnityHTTPD::redirect();
+                UnityHTTPD::redirectOverrideMethodGet();
             }
             break; /** @phpstan-ignore deadCode.unreachable */
         case "disable":
@@ -68,15 +68,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             if (count($group->getMemberUIDs()) > 1) {
                 UnityHTTPD::messageError("Cannot Disable PI Group", "Group still has members");
-                UnityHTTPD::redirect();
+                UnityHTTPD::redirectOverrideMethodGet();
             }
             if ($group->getIsDisabled()) {
                 UnityHTTPD::messageError("Cannot Disable PI Group", "Group is already disabled");
-                UnityHTTPD::redirect();
+                UnityHTTPD::redirectOverrideMethodGet();
             }
             $group->disable();
             UnityHTTPD::messageSuccess("Group Disabled", "");
-            UnityHTTPD::redirect(getRelativeURL("panel/account.php"));
+            UnityHTTPD::redirectOverrideMethodGet(getRelativeURL("panel/account.php"));
             break; /** @phpstan-ignore deadCode.unreachable */
     }
 }

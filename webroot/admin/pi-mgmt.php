@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $group = new UnityGroup(UnityHTTPD::getPostData("pi"), $LDAP, $SQL, $MAILER);
             if ($group->getIsDisabled()) {
                 UnityHTTPD::messageError("Cannot Disable PI Group", "Group is already disabled");
-                UnityHTTPD::redirect();
+                UnityHTTPD::redirectOverrideMethodGet();
             }
             $group->disable();
             UnityHTTPD::messageSuccess("Group Disabled", $group->gid);
