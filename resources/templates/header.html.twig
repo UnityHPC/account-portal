@@ -125,7 +125,7 @@
 
   {% if is_admin and (viewUser is not null) %}
     <div id="viewAsBar">
-      <span>You are accessing the web portal as the user <strong>{{ viewUser }}</strong></span>
+      <span>You are accessing the account portal as the user <strong>{{ viewUser }}</strong></span>
       <form method="POST" action="">
         {{ getCSRFTokenHiddenFormInput()|raw }}
         <input type="hidden" name="form_type" value="clearView">

@@ -31,6 +31,7 @@ jobs:
         run: |
           cp package{-lock,}.json tools/docker-dev/web/
           cp composer.{json,lock} tools/docker-dev/web/
+          cp tools/copy-node_modules-to-webroot.bash tools/docker-dev/web/copy-node_modules-to-webroot.bash
           cd tools/docker-dev
           python ./generate-github-ci-docker-compose.py > github-ci-docker-compose.yml
       - run: COMPOSE_BAKE=true docker compose -f ./tools/docker-dev/github-ci-docker-compose.yml up -d --build

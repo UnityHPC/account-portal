@@ -86,7 +86,7 @@ This was necessary because LDAP entries were not created for users until they be
 While a user was unqualified, if the Redis cache was cleared, the user info would be lost.
 Now, LDAP entries are created immediately for every user, so this is no longer necessary.
 
-- Shut down the web portal
+- Shut down the account portal
   ```shell
   systemctl stop apache2
   ```

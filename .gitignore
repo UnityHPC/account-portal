@@ -30,7 +30,7 @@ deployment/**/*
 .twig-cs-fixer.cache
 
 node_modules
-# copied from node_modules using the copy-files-from-to NPM package
+# copied from node_modules using copy-node_modules-to-webroot.bash
 webroot/js/jquery.min.js
 webroot/js/*dataTables*.js
 webroot/js/buttons.colVis.min.js

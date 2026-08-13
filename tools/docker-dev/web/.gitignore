@@ -2,3 +2,4 @@ composer.json
 composer.lock
 package.json
 package-lock.json
+copy-node_modules-to-webroot.bash

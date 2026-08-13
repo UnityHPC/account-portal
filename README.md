@@ -62,7 +62,7 @@ See the Docker Compose environment (`tools/docker-dev/`) for an (unsafe for prod
        - `COMPOSER_ALLOW_SUPERUSER=1 composer --no-dev --no-scripts --no-plugins install`
      - JS Libraries
        - `npm install`
-       - `npx copy-files-from-to`
+       - `./tools/copy-node_modules-to-webroot.bash`
    - `httpd` `DocumentRoot` set to `webroot/`
    - `httpd` Authentication:
      - Unity uses Shibboleth SP and the Apache Shibboleth module (`apt install shibboleth-sp-utils libapache2-mod-shib` on Ubuntu)
@@ -77,8 +77,8 @@ See the Docker Compose environment (`tools/docker-dev/`) for an (unsafe for prod
      - Restricted access to `webroot/admin/`
      - Global access (with valid authentication) to `webroot/`
      - IP-based access (no authentication) to `lan/`
-      - any IP address in your local area network should be authorized
-     - No access anywhere else
+         - any IP address in your local area network should be authorized
+         - No access anywhere else
 1. Authorization for your other services based on user flag groups
    - in order to access your services, a user should be in the `qualified` group and should not be in the `locked`, `idlelocked`, or `disabled` groups
    - (what services you offer) and (how you implement this authorization) are out of scope
@@ -124,7 +124,7 @@ git clone "$url" .
 git submodule update --init --checkout
 COMPOSER_ALLOW_SUPERUSER=1 composer --no-dev --no-scripts --no-plugins install
 npm install
-npx copy-files-from-to
+./tools/copy-node_modules-to-webroot.bash
 cp --preserve=all "$prod/deployment/config/config.ini" ./deployment/config/config.ini
 rsync -a "$prod/deployment/custom_user_mappings/" ./deployment/custom_user_mappings/
 rsync -a "$prod/deployment/overrides/" ./deployment/overrides/
