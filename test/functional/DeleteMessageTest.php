@@ -35,6 +35,19 @@ class DeleteMessageTest extends UnityWebPortalTestCase
                 [_json_encode($message_expected_removed)],
                 $difference,
             );
+            // idempotency: delete a message that no longer exists
+            $this->http_post(
+                __DIR__ . "/../../webroot/panel/ajax/delete_message.php",
+                [
+                    "level" => base64_encode("debug"),
+                    "title" => base64_encode("foo2"),
+                    "body" => base64_encode("bar2"),
+                ],
+                do_validate_messages: false,
+            );
+            $after2 = array_map("_json_encode", UnityHTTPD::getMessages());
+            // assert no new error messages have appeared
+            $this->assertEqualsCanonicalizing($after, $after2);
         } finally {
             UnityHTTPD::clearMessages();
         }
