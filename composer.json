@@ -1,7 +1,7 @@
 {
     "require": {
         "psr/log": ">=1",
-        "phpseclib/phpseclib": ">=3",
+        "phpseclib/phpseclib": "<4",
         "phpmailer/phpmailer": ">=6",
         "vanilla/garden-cli": "^4.0",
         "twig/twig": "^3.24"

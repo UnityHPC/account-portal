@@ -172,7 +172,7 @@ function getRelativeURL(string ...$relative_url_components): string
         throw new RuntimeException('CONFIG[site][url] does not have a scheme! (ex: "https://")');
     }
     $matches = [];
-    preg_match("#(^\w+://)(.*)#", CONFIG["site"]["url"], $matches);
+    _preg_match("#(^\w+://)(.*)#", CONFIG["site"]["url"], $matches);
     [$_, $site_url_scheme, $site_url_noscheme] = $matches;
     $path = join("/", [$site_url_noscheme, CONFIG["site"]["prefix"], ...$relative_url_components]);
     $path_normalized = pathNormalize($path);
