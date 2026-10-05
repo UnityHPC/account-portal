@@ -45,13 +45,16 @@ parameters:
         - test/functional/LeaveGroupTest.php
     - messages:
         - '#If condition is always false\.#'
-        - '#Right side of && is always false\.#'
       paths:
         - test/functional/PIBecomeRequestTest.php
         - test/functional/UserDisableTest.php
         - webroot/panel/pi.php
         - test/functional/ExpiryWorkerTest.php
         - test/functional/ExpiryGuiTest.php
+    - messages:
+        - '#Right side of && is always false\.#'
+      paths:
+        - test/functional/ExpiryWorkerTest.php
     # init.php sets these when the user is logged in
     - messages:
         - '#Variable \$(LDAP|SQL|MAILER|GITHUB|SSO|OPERATOR|USER|LOC_HEADER|LOC_FOOTER|TWIG) might not be defined.#'
