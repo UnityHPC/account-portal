@@ -45,6 +45,7 @@ parameters:
         - test/functional/LeaveGroupTest.php
     - messages:
         - '#If condition is always false\.#'
+        - '#Right side of && is always false\.#'
       paths:
         - test/functional/PIBecomeRequestTest.php
         - test/functional/UserDisableTest.php
