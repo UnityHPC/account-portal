@@ -15,7 +15,7 @@
 - `UnityHTTPD`'s user-facing error functionality (ex: `badRequest`) should only be called from `webroot/**/*.php`.
   `resources/**/*.php` should throw exceptions instead.
 - all pages under `webroot/admin/` must check for `$USER->getFlag(UserFlag::ADMIN)` and call `UnityHTTPD::forbidden()` if not admin.
-- All these conventions should be enforced with `pre-commit` / github CI if possible
+- All these conventions should be enforced with `prek` / github CI if possible
 
 ## Development Environment
 
@@ -28,8 +28,8 @@
 1. `docker login`
 1. In `tools/docker-dev` Run the build script: `./build.sh`
 1. Run the environment: `./run.sh`. Press `CTRL+C` to exit
-1. Install [pre-commit](https://pre-commit.com/)
-1. setup pre-commit hooks: `pre-commit install`
+1. Install [prek](https://prek.j178.dev/0.5.5/installation/)
+1. setup pre-commit hooks: `prek install`
 1. Install modern implementation of grep (not macOS builtin grep): `brew install grep`
 1. If using vscode, Copy the recommended config: `cp ./.vscode/settings-recommended.jsonc ./.vscode/settings.json`
 
