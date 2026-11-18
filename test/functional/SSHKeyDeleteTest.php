@@ -59,4 +59,17 @@ class SSHKeyDeleteTest extends UnityWebPortalTestCase
             callPrivateMethod($USER, "setSSHKeys", self::$initialKeys);
         }
     }
+
+    public function testDeleteInvalidKey()
+    {
+        global $USER;
+        try {
+            $key = "foo bar baz";
+            callPrivateMethod($USER, "setSSHKeys", [$key]);
+            $this->deleteKey($key);
+            $this->assertEquals([], $USER->getSSHKeys());
+        } finally {
+            callPrivateMethod($USER, "setSSHKeys", self::$initialKeys);
+        }
+    }
 }
