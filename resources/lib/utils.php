@@ -6,6 +6,7 @@ use phpseclib3\Crypt\PublicKeyLoader;
 use phpseclib3\Exception\NoKeyLoadedException;
 use UnityWebPortal\lib\exceptions\CurlException;
 use UnityWebPortal\lib\UnityDeployment;
+use UnityWebPortal\lib\UnityHTTPD;
 
 /**
  * key must take the form "KEY_TYPE KEY_DATA OPTIONAL_COMMENT"
@@ -62,6 +63,7 @@ function testValidSSHKey(string $key): array
     } catch (NoKeyLoadedException $e) {
         // phpseclib internally catches any throwable to make NoKeyLoadedException,
         // so I am not comfortable sharing the exception message with the user
+        UnityHTTPD::errorLog("invalid SSH key", $e->getMessage(), error: $e);
         return [false, "Invalid key"];
     }
 }
