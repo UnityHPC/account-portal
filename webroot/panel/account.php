@@ -277,7 +277,6 @@ if (count($sshPubKeys) == 0) {
     foreach ($sshPubKeys as $i => $key) {
         $key_escaped = htmlspecialchars($key);
         $key_escaped_sounded_out = htmlspecialchars(sound_it_out($key));
-        $key_b64 = base64_encode($key);
         try {
             [$type, $_, $comment] = tokenizeSSHKey($key);
             [$length, $sha256_fingerprint] = getSSHKeyInfo($key);
@@ -293,8 +292,10 @@ if (count($sshPubKeys) == 0) {
             $stub_fingprint = "";
             $type_escaped = "";
             $length = "";
-            $comment_escaped = "ERROR: Something went wrong while fetching your key. error ID: $errorid";
+            $comment_escaped =
+             "ERROR: Something went wrong while fetching your key. error ID: $errorid";
         }
+        $key_b64 = base64_encode($key);
         echo "
             <tr>
                 <td style='white-space: nowrap'><code>$stub_fingprint</code></td>
