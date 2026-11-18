@@ -105,7 +105,7 @@ function formatSSHKeyInfoInternal(string $key): string
             return "$length SHA256:$fingerprint ($type)";
         }
     } catch (NoKeyLoadedException $e) {
-        return $key;
+        return base64_encode($key);
     }
 }
 
