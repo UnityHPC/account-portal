@@ -289,19 +289,14 @@ if (count($sshPubKeys) == 0) {
         } catch (\Throwable $e) {
             $errorid = uniqid();
             UnityHTTPD::errorLog("error", "failed to analyze SSH key!", errorid: $errorid, error: $e, data: $key);
-            echo "
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>ERROR: Something went wrong while fetching your key. error ID: $errorid</td>
-                    <td></td>
-                </tr>
-            ";
-            continue;
+            $stub_fingprint = "";
+            $type_escaped = "";
+            $length = "";
+            $comment_escaped =
+             "ERROR: Something went wrong while fetching your key. error ID: $errorid";
         }
         $key_b64 = base64_encode($key);
-        echo"
+        echo "
             <tr>
                 <td style='white-space: nowrap'><code>$stub_fingprint</code></td>
                 <td style='white-space: nowrap'><code>$type_escaped</code></td>
