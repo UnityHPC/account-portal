@@ -277,6 +277,7 @@ if (count($sshPubKeys) == 0) {
     foreach ($sshPubKeys as $i => $key) {
         $key_escaped = htmlspecialchars($key);
         $key_escaped_sounded_out = htmlspecialchars(sound_it_out($key));
+        $key_b64 = base64_encode($key);
         try {
             [$type, $_, $comment] = tokenizeSSHKey($key);
             [$length, $sha256_fingerprint] = getSSHKeyInfo($key);
@@ -289,19 +290,12 @@ if (count($sshPubKeys) == 0) {
         } catch (\Throwable $e) {
             $errorid = uniqid();
             UnityHTTPD::errorLog("error", "failed to analyze SSH key!", errorid: $errorid, error: $e, data: $key);
-            echo "
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>ERROR: Something went wrong while fetching your key. error ID: $errorid</td>
-                    <td></td>
-                </tr>
-            ";
-            continue;
+            $stub_fingprint = "";
+            $type_escaped = "";
+            $length = "";
+            $comment_escaped = "ERROR: Something went wrong while fetching your key. error ID: $errorid";
         }
-        $key_b64 = base64_encode($key);
-        echo"
+        echo "
             <tr>
                 <td style='white-space: nowrap'><code>$stub_fingprint</code></td>
                 <td style='white-space: nowrap'><code>$type_escaped</code></td>
@@ -327,10 +321,10 @@ if (count($sshPubKeys) == 0) {
                     </div>
                 </td>
             </tr>
-        ";
-        // you shouldn't have a <dialog> in the middle of a table outside of any <tr>
-        // chrome and firefox seem to automatically move the <dialog> elements outside the table
-        // which works for me
+    ";
+    // you shouldn't have a <dialog> in the middle of a table outside of any <tr>
+    // chrome and firefox seem to automatically move the <dialog> elements outside the table
+    // which works for me
         echo "
             <dialog class='ssh-key-contents' id='key-$i-contents' autofocus closedby='any'>
                 <span style='font-size: 16pt'>Contents of SSH key </span><code>$stub_fingprint</code>
